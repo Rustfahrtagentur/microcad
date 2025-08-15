@@ -5,7 +5,7 @@
 
 use thiserror::Error;
 
-use crate::{parse::ParseError, syntax::*};
+use crate::{parse::ParseError, src_ref::*, syntax::*};
 
 /// Resolve error.
 #[derive(Debug, Error)]
@@ -45,6 +45,10 @@ pub enum ResolveError {
     /// Symbol not found (retry to load from external).
     #[error("Symbol {0} must be loaded from {1}")]
     SymbolMustBeLoaded(QualifiedName, std::path::PathBuf),
+
+    /// Expression is neither a valid name for a symbol nor local variable.
+    #[error("'{0}' is neither a valid name for a symbol nor local variable")]
+    NotAName(SrcRef),
 }
 
 /// Result type of any resolve.

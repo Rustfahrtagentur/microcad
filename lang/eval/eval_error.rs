@@ -3,9 +3,7 @@
 
 //! Evaluation error
 
-use crate::{
-    eval::*, model::OutputType, parse::*, resolve::*, src_ref::SrcRef, syntax::*, ty::*, value::*,
-};
+use crate::{eval::*, model::OutputType, parse::*, resolve::*, syntax::*, ty::*, value::*};
 use thiserror::Error;
 
 /// Evaluation error.
@@ -67,10 +65,6 @@ pub enum EvalError {
     /// Local Symbol not found.
     #[error("Local symbol not found: {0}")]
     LocalNotFound(Identifier),
-
-    /// Expression is neither a valid name for a symbol nor local variable.
-    #[error("'{0}' is neither a valid name for a symbol nor local variable")]
-    NotAName(SrcRef),
 
     /// A property of a value was not found.
     #[error("Property not found: {0}")]

@@ -29,7 +29,7 @@ pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
 
-use crate::syntax::*;
+use crate::{diag::*, syntax::*};
 
 /// Trait for items which can be fully qualified.
 pub trait FullyQualify {
@@ -37,9 +37,74 @@ pub trait FullyQualify {
     fn full_name(&self) -> QualifiedName;
 }
 
+#[derive(Default)]
+pub struct ResolveContext {
+    /// List of all global symbols.
+    pub symbols: SymbolMap,
+    /// Source file cache containing all source files loaded in the context and their syntax trees.
+    pub cache: SourceCache,
+    /// Source file diagnostics.
+    pub diag_handler: DiagHandler,
+}
+
 trait Resolve<T = Option<Symbol>> {
     /// Resolve into Symbol
     fn resolve(&self, parent: &Symbol) -> ResolveResult<T>;
+}
+
+impl ResolveContext {
+    /// Load a symbol from a qualified name.
+    ///
+    /// Might load any related external file if not already loaded.
+    ///
+    /// # Arguments
+    /// - `name`: Name of the symbol to load
+    pub fn load_symbol(&mut self, name: &QualifiedName) -> ResolveResult<Symbol> {
+        log::trace!("Trying to load symbol {name}");
+
+        // if symbol could not be found in symbol tree, try to load it from external file
+        match self.cache.get_by_name(name) {
+            Err(ResolveError::SymbolMustBeLoaded(_, path)) => {
+                log::trace!(
+                    "{load} symbol {name} from {path:?}",
+                    load = crate::mark!(LOAD)
+                );
+                let source_file =
+                    SourceFile::load_with_name(path.clone(), self.cache.name_by_path(&path)?)?;
+                let source_name = self.cache.insert(source_file.clone())?;
+                let node = source_file.resolve(None)?;
+                // search module where to place loaded source file into
+                let target = self.symbols.search(&source_name)?;
+                Symbol::move_children(&target, &node);
+                // mark target as "loaded" by changing the SymbolDefinition type
+                target.external_to_module();
+            }
+            Ok(_) => (),
+            Err(ResolveError::SymbolNotFound(_)) => {
+                return Err(ResolveError::SymbolNotFound(name.clone()))
+            }
+            Err(err) => return Err(err)?,
+        }
+
+        // get symbol from symbol map
+        self.symbols.search(name)
+    }
+
+    /// Lookup a symbol from global symbols.
+    pub fn lookup(&mut self, name: &QualifiedName) -> ResolveResult<Symbol> {
+        log::trace!("Looking for global symbol '{name}'");
+        let symbol = match self.symbols.search(name) {
+            Ok(symbol) => symbol.clone(),
+            Err(ResolveError::SymbolNotFound(_)) => self.load_symbol(name)?,
+            Err(err) => return Err(err)?,
+        };
+        log::trace!(
+            "{found} global symbol '{name}': = '{full_name}'",
+            found = crate::mark!(FOUND),
+            full_name = symbol.full_name()
+        );
+        Ok(symbol)
+    }
 }
 
 impl SourceFile {
