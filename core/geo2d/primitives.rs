@@ -3,7 +3,7 @@
 
 //! 2D primitives
 
-use geo::{AffineOps, Coord};
+use geo::AffineOps;
 
 use crate::{geo2d::*, *};
 
@@ -19,55 +19,6 @@ pub type MultiPolygon = geo::MultiPolygon<Scalar>;
 pub type Rect = geo::Rect<Scalar>;
 /// Point.
 pub type Point = geo::Point<Scalar>;
-
-/// Circle with offset.
-#[derive(Debug, Clone)]
-pub struct Circle {
-    /// Radius of the circle.
-    pub radius: Scalar,
-
-    /// Offset.
-    pub offset: Vec2,
-}
-
-impl FetchBounds2D for Circle {
-    fn fetch_bounds_2d(&self) -> Bounds2D {
-        if self.radius > 0.0 {
-            let r = Vec2::new(self.radius, self.radius);
-            let min: (Scalar, Scalar) = (self.offset - r).into();
-            let max: (Scalar, Scalar) = (self.offset + r).into();
-
-            Some(Rect::new(Coord::from(min), Coord::from(max)))
-        } else {
-            None
-        }
-        .into()
-    }
-}
-
-impl FetchPoints2D for Circle {
-    fn fetch_points_2d(&self) -> Vec<Vec2> {
-        vec![self.offset]
-    }
-}
-
-impl RenderToMultiPolygon for Circle {
-    fn render_to_polygon(self, resolution: &RenderResolution) -> Option<Polygon> {
-        use std::f64::consts::PI;
-
-        let n = (self.radius / resolution.linear * PI * 0.5).max(3.0) as u64;
-
-        let range = 0..n;
-        let points = range
-            .map(|i| {
-                let angle = 2.0 * PI * (i as f64) / (n as f64);
-                geo::coord!(x: self.offset.x + self.radius * angle.cos(), y: self.offset.y + self.radius * angle.sin())
-            })
-            .collect();
-
-        Some(Polygon::new(LineString::new(points), vec![]))
-    }
-}
 
 impl RenderToMultiPolygon for LineString {}
 
