@@ -4,6 +4,7 @@
 //! 2D Geometry
 
 mod bounds;
+mod circle;
 mod collection;
 mod geometry;
 mod line;
@@ -13,6 +14,7 @@ mod size;
 use crate::*;
 
 pub use bounds::*;
+pub use circle::*;
 pub use collection::*;
 use geo::AffineTransform;
 pub use geometry::*;
