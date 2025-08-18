@@ -8,34 +8,42 @@ use microcad_core::Mat4;
 use crate::{syntax::*, value::*};
 
 /// The origin is the [`Symbol`] and [`Tuple`] from which the model has been created.
+///
+/// Most likely, this will eventually replace the [`model::Element`] enum.
 #[derive(Clone, Default, Debug, serde::Serialize, serde::Deserialize)]
 pub enum Origin {
     #[default]
+    /// A group: `{ .. }`.
     Group,
+    /// A workbench from a definition: `sketch Circle(r: Length) { ... }`.
     Workbench {
-        symbol: QualifiedName, // Fully qualified name
-        kind: WorkbenchKind,
-        arguments: Tuple,
-    },
-    BuiltinWorkbench {
-        symbol: QualifiedName, // Fully qualified name
-        kind: WorkbenchKind,
-        arguments: Tuple,
-    },
-    BuiltinTransform {
+        /// Fully qualified name. (Note: to be replaced by hash?)
         symbol: QualifiedName,
+        /// Workbench kind.
+        kind: WorkbenchKind,
+        /// Arguments.
         arguments: Tuple,
-        matrix: Mat4,
     },
+    /// A builtin workbench from a Rust struct.
+    BuiltinWorkbench {
+        /// Fully qualified name. (Note: to be replaced by hash?)
+        symbol: QualifiedName,
+        /// Workbench kind.
+        kind: WorkbenchKind,
+        /// Arguments.
+        arguments: Tuple,
+    },
+    /// Source file origin.
     SourceFile,
 }
 
 impl Origin {
-    pub fn get_creator(&self) -> Option<QualifiedName> {
+    /// Get the qualified name of the creator symbol.
+    pub fn get_qualified_name(&self) -> Option<QualifiedName> {
         match &self {
-            Origin::Workbench { symbol, .. }
-            | Origin::BuiltinWorkbench { symbol, .. }
-            | Origin::BuiltinTransform { symbol, .. } => Some(symbol.clone()),
+            Origin::Workbench { symbol, .. } | Origin::BuiltinWorkbench { symbol, .. } => {
+                Some(symbol.clone())
+            }
             Origin::SourceFile | Origin::Group => None,
         }
     }

@@ -179,7 +179,7 @@ impl Model {
                 None => String::new(),
             },
             element_type = self_.element,
-            origin = match self_.origin.get_creator() {
+            origin = match self_.origin.get_qualified_name() {
                 Some(name) => format!(" = {name}"),
                 None => String::new(),
             },
