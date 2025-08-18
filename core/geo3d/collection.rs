@@ -8,7 +8,7 @@ use std::rc::Rc;
 use derive_more::{Deref, DerefMut};
 
 use crate::{
-    geo3d::{bounds::Bounds3D, FetchBounds3D},
+    geo3d::{FetchBounds3D, bounds::Bounds3D},
     *,
 };
 
@@ -61,6 +61,19 @@ impl Transformed3D for Geometries3D {
                 .map(|geometry| std::rc::Rc::new(geometry.transformed_3d(render_resolution, mat)))
                 .collect::<Vec<_>>(),
         )
+    }
+}
+
+impl RenderToMesh for Geometries3D {
+    fn render_to_manifold(self, resolution: &RenderResolution) -> std::rc::Rc<Manifold> {
+        std::rc::Rc::new(self.render_to_mesh(resolution).to_manifold())
+    }
+
+    fn render_to_mesh(self, resolution: &RenderResolution) -> TriangleMesh {
+        self.iter().fold(TriangleMesh::default(), |mut mesh, geo| {
+            mesh.append(&geo.as_ref().clone().render_to_mesh(resolution));
+            mesh
+        })
     }
 }
 

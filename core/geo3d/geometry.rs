@@ -22,6 +22,8 @@ pub enum Geometry3D {
     Sphere(Sphere),
     /// Cylinder.
     Cylinder(Cylinder),
+    /// Collection.
+    Collection(Geometries3D),
 }
 
 impl std::fmt::Debug for Geometry3D {
@@ -98,6 +100,7 @@ impl FetchBounds3D for Geometry3D {
             Geometry3D::Cube(cube) => cube.fetch_bounds_3d(),
             Geometry3D::Sphere(sphere) => sphere.fetch_bounds_3d(),
             Geometry3D::Cylinder(cylinder) => cylinder.fetch_bounds_3d(),
+            Geometry3D::Collection(collection) => collection.fetch_bounds_3d(),
         }
     }
 }
@@ -122,6 +125,7 @@ impl RenderToMesh for Geometry3D {
             Geometry3D::Cube(cube) => cube.render_to_manifold(resolution),
             Geometry3D::Sphere(sphere) => sphere.render_to_manifold(resolution),
             Geometry3D::Cylinder(cylinder) => cylinder.render_to_manifold(resolution),
+            Geometry3D::Collection(collection) => collection.render_to_manifold(resolution),
         }
     }
 }
