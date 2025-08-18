@@ -3,8 +3,6 @@
 
 //! Model origin. Original source code information about a model.
 
-use microcad_core::Mat4;
-
 use crate::{model::OutputType, syntax::*, value::*};
 
 /// The origin is the [`Symbol`] and [`Tuple`] from which the model has been created.

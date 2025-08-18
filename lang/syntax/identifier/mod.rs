@@ -19,7 +19,7 @@ static UNIQUE_ID_NEXT: std::sync::Mutex<usize> = std::sync::Mutex::new(0);
 
 /// A case for an identifier.
 #[derive(Debug, PartialEq, Eq)]
-enum Case {
+pub enum Case {
     /// PascalCase
     PascalCase,
     /// lower_snake_case

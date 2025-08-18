@@ -9,7 +9,7 @@ use derive_more::{Deref, DerefMut};
 use geo::{CoordsIter, LineString, Polygon};
 
 use crate::{
-    geo2d::{FetchBounds2D, bounds::Bounds2D, collection},
+    geo2d::{FetchBounds2D, bounds::Bounds2D},
     *,
 };
 

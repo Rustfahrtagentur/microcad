@@ -6,7 +6,7 @@
 use cgmath::SquareMatrix;
 use microcad_core::*;
 
-use crate::{eval::SymbolTable, model::*};
+use crate::model::*;
 
 pub mod cache;
 
@@ -181,20 +181,6 @@ impl Model {
             }
         }
     }
-
-    pub fn render_with_cache(&self, symbol_table: &mut SymbolTable, cache: &mut RenderCache) {
-        let origin = &self.borrow().origin.value;
-        let creator = origin.get_qualified_name();
-
-        match creator {
-            Some(name) => {
-                let symbol = symbol_table.root.search(&name).expect("Symbol");
-
-                //symbol.call(arguments);
-            }
-            None => {}
-        }
-    }
 }
 
 impl Operation for Model {
@@ -287,8 +273,4 @@ impl FetchBounds3D for Model {
                 bounds
             })
     }
-}
-
-pub trait Render {
-    fn render(&self, cache: &mut RenderCache) -> GeometryOutput;
 }
