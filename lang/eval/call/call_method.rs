@@ -62,11 +62,9 @@ impl CallMethod<Models> for Models {
         // Try nest models for an operation: models.op()
         fn try_nest(
             name: &QualifiedName,
-            args: &ArgumentValueList,
             context: &mut Context,
             models: &Models,
             op: Models,
-            symbol: &Symbol,
         ) -> EvalResult<Models> {
             if op.is_operation() {
                 if !models.contains_geometry() {
@@ -87,10 +85,10 @@ impl CallMethod<Models> for Models {
             Ok(match &symbol.borrow().def {
                 SymbolDefinition::Workbench(workbench_definition) => {
                     let op = workbench_definition.call(args, context)?;
-                    try_nest(name, args, context, self, op, &symbol)?
+                    try_nest(name, context, self, op)?
                 }
                 SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
-                    Value::Models(models) => try_nest(name, args, context, self, models, &symbol)?,
+                    Value::Models(models) => try_nest(name, context, self, models)?,
                     value => panic!("Builtin call returned {value} but no models."),
                 },
                 def => {

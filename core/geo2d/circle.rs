@@ -6,7 +6,7 @@
 use crate::*;
 
 /// Circle with offset.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Circle {
     /// Radius of the circle.
     pub radius: Scalar,
