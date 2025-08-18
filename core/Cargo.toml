@@ -28,9 +28,6 @@ thiserror = "2.0"
 toml = "0.9"
 serde = { version = "1", features = ["derive", "rc"] }
 
-[build-dependencies]
-rustfmt-wrapper = "0.2"
-
 [features]
 default = ["geo3d"]
 geo3d = ["dep:manifold-rs"]

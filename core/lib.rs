@@ -38,5 +38,3 @@ pub use core_error::*;
 pub use geo2d::*;
 pub use geo3d::*;
 pub use render_resolution::*;
-
-include!(concat!(env!("OUT_DIR"), "/microcad_core_sin_cos.rs"));

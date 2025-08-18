@@ -43,15 +43,12 @@ impl RenderToMultiPolygon for Circle {
         use std::f64::consts::PI;
 
         let n = (self.radius / resolution.linear * PI * 0.5).max(3.0);
-        let table_size = SIN_TABLE.len() as u32;
-        let n = 2_u32.pow(n.log2().ceil() as u32).min(table_size);
-
-        let step = table_size / n;
+        let n = 2_u32.pow(n.log2().ceil() as u32).min(1024);
 
         let points = (0..n)
             .map(|i| {
-                let idx = (i * step) as usize;
-                geo::coord!(x: self.offset.x + self.radius * COS_TABLE[idx], y: self.offset.y + self.radius * SIN_TABLE[idx])
+                let angle = 2.0 * PI * (i as f64) / (n as f64);
+                geo::coord!(x: self.offset.x + self.radius * angle.cos(), y: self.offset.y + self.radius * angle.sin())
             })
             .collect();
 
