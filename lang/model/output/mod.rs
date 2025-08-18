@@ -15,7 +15,7 @@ use microcad_core::{Geometries2D, Geometries3D, Mat3, Mat4, RenderResolution};
 /// The model output when a model has been processed.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ModelOutput {
-    /// The output geometry.
+    /// The output geometry. Note: To be replaced by render geometry hash.
     pub geometry: GeometryOutput,
     /// World transformation matrix.
     pub world_matrix: Mat4,
@@ -30,7 +30,9 @@ impl ModelOutput {
     pub fn new(ty: OutputType) -> Self {
         let geometry = match ty {
             OutputType::NotDetermined => GeometryOutput::None,
-            OutputType::Geometry2D => GeometryOutput::Geometries2D(Geometries2D::default()),
+            OutputType::Geometry2D => GeometryOutput::Geometry2D(
+                microcad_core::Geometry2D::Collection(Geometries2D::default()),
+            ),
             OutputType::Geometry3D => GeometryOutput::Geometries3D(Geometries3D::default()),
             OutputType::InvalidMixed => GeometryOutput::Invalid,
         };

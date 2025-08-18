@@ -76,9 +76,9 @@ impl Model {
     /// Fetch output 2d geometries.
     ///
     /// Panics if the model does not contain any 2d geometry.
-    pub fn fetch_output_geometries_2d(&self) -> Geometries2D {
+    pub fn fetch_output_geometry_2d(&self) -> Geometry2D {
         match &self.borrow().output.geometry {
-            GeometryOutput::Geometries2D(geometries) => geometries.clone(),
+            GeometryOutput::Geometry2D(geometries) => geometries.clone(),
             _ => panic!("The model does not contain a 2D geometry."),
         }
     }
@@ -94,20 +94,20 @@ impl Model {
     }
 
     /// Render geometries in 2D.
-    pub fn render_geometries_2d(&self) -> Geometries2D {
-        self.borrow()
-            .children
-            .iter()
-            .fold(Default::default(), |mut geometries, model| {
+    pub fn render_geometry_2d(&self) -> Geometry2D {
+        Geometry2D::Collection(Geometries2D::new(self.borrow().children.iter().fold(
+            Vec::new(),
+            |mut geometries, model| {
                 let model_ = model.borrow();
                 let mat = model_.output.local_matrix_2d();
-                geometries.append(
+                geometries.push(std::rc::Rc::new(
                     model
                         .process_2d(model)
                         .transformed_2d(&model_.output.resolution, &mat),
-                );
+                ));
                 geometries
-            })
+            },
+        )))
     }
 
     /// Render geometries in 3D.
@@ -135,11 +135,11 @@ impl Model {
     /// * `fetch_output_geometries_2d()` for 2D geometries.
     /// * `fetch_output_geometries_3d()` for 3D geometries.
     pub fn render(&self) {
-        fn render_geometries_2d(model: &Model) -> Geometries2D {
+        fn render_geometry_2d(model: &Model) -> Geometry2D {
             match &model.borrow().element {
-                Element::Primitive2D(geometry) => geometry.clone().into(),
+                Element::Primitive2D(geometry) => geometry.as_ref().clone(),
                 Element::Operation(operation) => operation.process_2d(model),
-                _ => Geometries2D::default(),
+                _ => Geometry2D::Collection(Geometries2D::default()),
             }
         }
 
@@ -157,14 +157,14 @@ impl Model {
 
         match self.final_output_type() {
             OutputType::Geometry2D => {
-                let geometries = render_geometries_2d(self);
+                let geometry = render_geometry_2d(self);
                 if !is_operation(self) {
                     self.borrow().children.iter().for_each(|model| {
                         model.render();
                     });
                 }
 
-                self.borrow_mut().output.geometry = GeometryOutput::Geometries2D(geometries);
+                self.borrow_mut().output.geometry = GeometryOutput::Geometry2D(geometry);
             }
             OutputType::Geometry3D => {
                 let geometries = render_geometries_3d(self);
@@ -198,7 +198,7 @@ impl Model {
 }
 
 impl Operation for Model {
-    fn process_2d(&self, model: &Model) -> Geometries2D {
+    fn process_2d(&self, model: &Model) -> Geometry2D {
         let mut geometries = Geometries2D::default();
 
         let model_ = &model.borrow();
@@ -206,19 +206,23 @@ impl Operation for Model {
             Element::Group | Element::Workpiece(_) | Element::Transform(_) => {
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_2d(n)));
+                    .for_each(|n| geometries.push(std::rc::Rc::new(n.process_2d(n))));
             }
             Element::Primitive2D(geo) => {
                 geometries.push(geo.clone());
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_2d(n)));
+                    .for_each(|n| geometries.push(std::rc::Rc::new(n.process_2d(n))));
             }
-            Element::Operation(operation) => geometries.append(operation.process_2d(model)),
+            Element::Operation(operation) => {
+                geometries.push(std::rc::Rc::new(operation.process_2d(model)))
+            }
             _ => {}
         }
 
-        geometries.transformed_2d(&model_.output.resolution, &model_.output.local_matrix_2d())
+        Geometry2D::Collection(
+            geometries.transformed_2d(&model_.output.resolution, &model_.output.local_matrix_2d()),
+        )
     }
 
     fn process_3d(&self, model: &Model) -> Geometries3D {
@@ -251,7 +255,7 @@ impl FetchBounds2D for Model {
 
         self.descendants().for_each(|model| {
             let output = &model.borrow().output;
-            if let GeometryOutput::Geometries2D(geometries) = &output.geometry {
+            if let GeometryOutput::Geometry2D(geometries) = &output.geometry {
                 let mat = output.world_matrix_2d();
                 let resolution = &output.resolution;
                 bounds = bounds.clone().extend(

@@ -5,7 +5,7 @@
 
 use microcad_core::Mat4;
 
-use crate::{syntax::*, value::*};
+use crate::{model::OutputType, syntax::*, value::*};
 
 /// The origin is the [`Symbol`] and [`Tuple`] from which the model has been created.
 ///
@@ -45,6 +45,16 @@ impl Origin {
                 Some(symbol.clone())
             }
             Origin::SourceFile | Origin::Group => None,
+        }
+    }
+
+    /// Return the expected output type of the origin.
+    pub fn expected_output_type(&self) -> OutputType {
+        match self {
+            Origin::Workbench { kind, .. } | Origin::BuiltinWorkbench { kind, .. } => {
+                (*kind).into()
+            }
+            _ => OutputType::NotDetermined,
         }
     }
 }

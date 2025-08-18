@@ -3,7 +3,7 @@
 
 //! Geometry model output.
 
-use microcad_core::{Geometries2D, Geometries3D};
+use microcad_core::Geometries3D;
 
 use crate::model::OutputType;
 
@@ -14,7 +14,7 @@ pub enum GeometryOutput {
     #[default]
     None,
     /// 2d geometry.
-    Geometries2D(Geometries2D),
+    Geometry2D(microcad_core::Geometry2D),
     /// 3d geometry.
     Geometries3D(Geometries3D),
     /// Invalid geometry.
@@ -26,7 +26,7 @@ impl GeometryOutput {
     pub(crate) fn model_output_type(&self) -> OutputType {
         match &self {
             Self::None => OutputType::NotDetermined,
-            Self::Geometries2D(_) => OutputType::Geometry2D,
+            Self::Geometry2D(_) => OutputType::Geometry2D,
             Self::Geometries3D(_) => OutputType::Geometry3D,
             Self::Invalid => OutputType::InvalidMixed,
         }

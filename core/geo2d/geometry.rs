@@ -23,6 +23,8 @@ pub enum Geometry2D {
     Circle(Circle),
     /// Line.
     Line(Line),
+    /// Collection
+    Collection(Geometries2D),
 }
 
 impl Geometry2D {
@@ -41,7 +43,7 @@ impl Geometry2D {
     }
 
     /// Apply hull operation.
-    pub fn hull(self) -> Self {
+    pub fn hull(self, resolution: &RenderResolution) -> Self {
         match self {
             Geometry2D::LineString(line_string) => Geometry2D::Polygon(line_string.convex_hull()),
             Geometry2D::MultiLineString(multi_line_string) => {
@@ -56,6 +58,7 @@ impl Geometry2D {
             Geometry2D::Line(line) => Geometry2D::Polygon(
                 LineString::new(vec![line.0.into(), line.1.into()]).convex_hull(),
             ),
+            Geometry2D::Collection(collection) => Geometry2D::Polygon(collection.hull(resolution)),
         }
     }
 
@@ -82,6 +85,7 @@ impl FetchBounds2D for Geometry2D {
             Geometry2D::Rect(rect) => Some(*rect).into(),
             Geometry2D::Circle(circle) => circle.fetch_bounds_2d(),
             Geometry2D::Line(line) => line.fetch_bounds_2d(),
+            Geometry2D::Collection(geometries) => geometries.fetch_bounds_2d(),
         }
     }
 }
@@ -103,6 +107,9 @@ impl Transformed2D for Geometry2D {
                     Self::MultiLineString(multi_line_string.transformed_2d(resolution, mat))
                 }
                 Geometry2D::Line(line) => Self::Line(line.transformed_2d(resolution, mat)),
+                Geometry2D::Collection(collection) => {
+                    Self::Collection(collection.transformed_2d(resolution, mat))
+                }
                 _ => unreachable!("Geometry type not supported"),
             }
         }

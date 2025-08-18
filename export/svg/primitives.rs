@@ -131,6 +131,9 @@ impl WriteSvg for Geometry2D {
             Geometry2D::Rect(rect) => rect.write_svg(writer, attr),
             Geometry2D::Circle(circle) => circle.write_svg(writer, attr),
             Geometry2D::Line(edge) => edge.write_svg(writer, attr),
+            Geometry2D::Collection(collection) => collection
+                .iter()
+                .try_for_each(|geo| geo.write_svg(writer, attr)),
         }
     }
 }
@@ -147,11 +150,8 @@ impl WriteSvg for Model {
             .insert(SvgTagAttribute::class("entity"));
 
         // Render all output geometries.
-        self.fetch_output_geometries_2d()
-            .iter()
-            .try_for_each(|geometry| {
-                geometry.write_svg_mapped(writer, &SvgTagAttributes::default())
-            })?;
+        self.fetch_output_geometry_2d()
+            .write_svg_mapped(writer, &SvgTagAttributes::default())?;
 
         let self_ = self.borrow();
         match &self_.element {
