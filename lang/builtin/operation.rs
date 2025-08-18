@@ -3,7 +3,7 @@
 
 //! Builtin operations.
 
-use microcad_core::{BooleanOp, Geometries3D, Geometry2D};
+use microcad_core::{BooleanOp, Geometry2D, Geometry3D};
 
 use crate::model::*;
 
@@ -22,11 +22,17 @@ impl Operation for BooleanOp {
         }
     }
 
-    fn process_3d(&self, model: &Model) -> Geometries3D {
-        match model.into_group() {
-            Some(model) => model.render_geometries_3d(),
-            None => model.render_geometries_3d(),
+    fn process_3d(&self, model: &Model) -> Geometry3D {
+        let geometry = match model.into_group() {
+            Some(model) => model.render_geometry_3d(),
+            None => model.render_geometry_3d(),
+        };
+
+        match geometry {
+            Geometry3D::Collection(collection) => Geometry3D::Collection(
+                collection.boolean_op(&model.borrow().output.resolution, self),
+            ),
+            geometry => geometry,
         }
-        .boolean_op(&model.borrow().output.resolution, self)
     }
 }

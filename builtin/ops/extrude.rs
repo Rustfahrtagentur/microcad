@@ -18,7 +18,7 @@ impl Operation for Extrude {
         OutputType::Geometry3D
     }
 
-    fn process_3d(&self, model: &Model) -> Geometries3D {
+    fn process_3d(&self, model: &Model) -> Geometry3D {
         use std::rc::Rc;
         let geometries = model.render_geometry_2d();
 
@@ -30,15 +30,14 @@ impl Operation for Extrude {
             .map(|ring| ring.as_slice())
             .collect();
 
-        Rc::new(Geometry3D::Manifold(Rc::new(Manifold::extrude(
+        Geometry3D::Manifold(Rc::new(Manifold::extrude(
             &multi_polygon_data,
             self.height,
             self.n_divisions as u32,
             self.twist_degrees,
             self.scale_top_x,
             self.scale_top_y,
-        ))))
-        .into()
+        )))
     }
 }
 

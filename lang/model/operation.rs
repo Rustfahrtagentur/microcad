@@ -28,7 +28,7 @@ pub trait Operation: std::fmt::Debug {
     }
 
     /// Process the model.
-    fn process_3d(&self, _model: &Model) -> Geometries3D {
+    fn process_3d(&self, _model: &Model) -> Geometry3D {
         unimplemented!()
     }
 }

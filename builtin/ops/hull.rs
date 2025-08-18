@@ -14,7 +14,7 @@ impl Operation for Hull {
             .hull(&model.borrow().output.resolution)
     }
 
-    fn process_3d(&self, _node: &Model) -> Geometries3D {
+    fn process_3d(&self, _node: &Model) -> Geometry3D {
         std::todo!("Hull operation for 3D")
     }
 }

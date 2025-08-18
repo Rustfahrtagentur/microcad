@@ -33,7 +33,9 @@ impl ModelOutput {
             OutputType::Geometry2D => GeometryOutput::Geometry2D(
                 microcad_core::Geometry2D::Collection(Geometries2D::default()),
             ),
-            OutputType::Geometry3D => GeometryOutput::Geometries3D(Geometries3D::default()),
+            OutputType::Geometry3D => GeometryOutput::Geometry3D(
+                microcad_core::Geometry3D::Collection(Geometries3D::default()),
+            ),
             OutputType::InvalidMixed => GeometryOutput::Invalid,
         };
 

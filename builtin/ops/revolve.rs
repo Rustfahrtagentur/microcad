@@ -15,7 +15,7 @@ impl Operation for Revolve {
         OutputType::Geometry3D
     }
 
-    fn process_3d(&self, model: &Model) -> Geometries3D {
+    fn process_3d(&self, model: &Model) -> Geometry3D {
         use std::rc::Rc;
         let geometries = model.render_geometry_2d();
 
@@ -27,12 +27,11 @@ impl Operation for Revolve {
             .map(|ring| ring.as_slice())
             .collect();
 
-        Rc::new(Geometry3D::Manifold(Rc::new(Manifold::revolve(
+        Geometry3D::Manifold(Rc::new(Manifold::revolve(
             &multi_polygon_data,
             self.circular_segments as u32,
             self.revolve_degrees,
-        ))))
-        .into()
+        )))
     }
 }
 

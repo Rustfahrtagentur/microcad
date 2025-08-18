@@ -86,9 +86,9 @@ impl Model {
     /// Fetch output 3d geometries.
     ///
     /// Panics if the model does not contain any 3d geometry.
-    pub fn fetch_output_geometries_3d(&self) -> Geometries3D {
+    pub fn fetch_output_geometry_3d(&self) -> Geometry3D {
         match &self.borrow().output.geometry {
-            GeometryOutput::Geometries3D(geometries) => geometries.clone(),
+            GeometryOutput::Geometry3D(geometries) => geometries.clone(),
             _ => panic!("The model does not contain a 3D geometry."),
         }
     }
@@ -111,20 +111,20 @@ impl Model {
     }
 
     /// Render geometries in 3D.
-    pub fn render_geometries_3d(&self) -> Geometries3D {
-        self.borrow()
-            .children
-            .iter()
-            .fold(Default::default(), |mut geometries, model| {
+    pub fn render_geometry_3d(&self) -> Geometry3D {
+        Geometry3D::Collection(Geometries3D::new(self.borrow().children.iter().fold(
+            Vec::new(),
+            |mut geometries, model| {
                 let model_ = model.borrow();
                 let mat = model_.output.local_matrix_3d();
-                geometries.append(
+                geometries.push(std::rc::Rc::new(
                     model
                         .process_3d(model)
                         .transformed_3d(&model_.output.resolution, &mat),
-                );
+                ));
                 geometries
-            })
+            },
+        )))
     }
 
     /// Render the model.
@@ -143,11 +143,11 @@ impl Model {
             }
         }
 
-        fn render_geometries_3d(model: &Model) -> Geometries3D {
+        fn render_geometry_3d(model: &Model) -> Geometry3D {
             match &model.borrow().element {
-                Element::Primitive3D(geometry) => geometry.clone().into(),
+                Element::Primitive3D(geometry) => geometry.as_ref().clone(),
                 Element::Operation(operation) => operation.process_3d(model),
-                _ => Geometries3D::default(),
+                _ => Geometry3D::Collection(Geometries3D::default()),
             }
         }
 
@@ -167,14 +167,14 @@ impl Model {
                 self.borrow_mut().output.geometry = GeometryOutput::Geometry2D(geometry);
             }
             OutputType::Geometry3D => {
-                let geometries = render_geometries_3d(self);
+                let geometry = render_geometry_3d(self);
                 if !is_operation(self) {
                     self.borrow().children.iter().for_each(|model| {
                         model.render();
                     });
                 }
 
-                self.borrow_mut().output.geometry = GeometryOutput::Geometries3D(geometries);
+                self.borrow_mut().output.geometry = GeometryOutput::Geometry3D(geometry);
             }
             output_type => {
                 panic!("Output type must have been determined at this point: {output_type}\n{self}")
@@ -211,7 +211,7 @@ impl Operation for Model {
         )
     }
 
-    fn process_3d(&self, model: &Model) -> Geometries3D {
+    fn process_3d(&self, model: &Model) -> Geometry3D {
         let mut geometries = Geometries3D::default();
 
         let model_ = &model.borrow();
@@ -219,19 +219,23 @@ impl Operation for Model {
             Element::Group | Element::Workpiece(_) | Element::Transform(_) => {
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_3d(n)));
+                    .for_each(|n| geometries.push(std::rc::Rc::new(n.process_3d(n))));
             }
             Element::Primitive3D(geo) => {
                 geometries.push(geo.clone());
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_3d(n)));
+                    .for_each(|n| geometries.push(std::rc::Rc::new(n.process_3d(n))));
             }
-            Element::Operation(operation) => geometries.append(operation.process_3d(model)),
+            Element::Operation(operation) => {
+                geometries.push(std::rc::Rc::new(operation.process_3d(model)))
+            }
             _ => {}
         }
 
-        geometries.transformed_3d(&model_.output.resolution, &model_.output.local_matrix_3d())
+        Geometry3D::Collection(
+            geometries.transformed_3d(&model_.output.resolution, &model_.output.local_matrix_3d()),
+        )
     }
 }
 
@@ -261,7 +265,7 @@ impl FetchBounds3D for Model {
         self.descendants()
             .fold(Bounds3D::default(), |mut bounds, model| {
                 let output = &model.borrow().output;
-                if let GeometryOutput::Geometries3D(geometries) = &output.geometry {
+                if let GeometryOutput::Geometry3D(geometries) = &output.geometry {
                     let mat = output.world_matrix_3d();
                     let resolution = &output.resolution;
                     bounds = bounds.clone().extend(
