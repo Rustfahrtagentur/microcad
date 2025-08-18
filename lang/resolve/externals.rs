@@ -33,42 +33,6 @@ impl Externals {
         new
     }
 
-    /// Creates symbol map from externals.
-    pub fn create_modules(&self) -> SymbolMap {
-        let mut map = SymbolMap::new();
-        self.iter().for_each(|(basename, _)| {
-            let (id, name) = basename.split_first();
-            let module = match map.get(&id) {
-                Some(symbol) => symbol.clone(),
-                _ => Symbol::new_external(id.clone()),
-            };
-            Self::recursive_create_modules(&module, &name);
-            map.insert(id.clone(), module);
-        });
-        map
-    }
-
-    fn recursive_create_modules(parent: &Symbol, name: &QualifiedName) -> Option<Symbol> {
-        if name.is_empty() {
-            return None;
-        }
-
-        let node_id = name.first().expect("Non-empty qualified name");
-        if let Some(child) = parent.get(node_id) {
-            return Some(child.clone());
-        }
-
-        let child = if name.is_id() {
-            Symbol::new_external(node_id.clone())
-        } else {
-            Symbol::new_module(node_id.clone())
-        };
-        Symbol::add_child(parent, child.clone());
-
-        Self::recursive_create_modules(&child, &name.remove_first());
-        Some(child)
-    }
-
     /// Search for an external file which may include a given qualified name.
     ///
     /// # Arguments
@@ -173,15 +137,4 @@ fn resolve_external_file() {
     assert!(externals
         .fetch_external(&"non_std::geo2d::Circle".into())
         .is_err());
-}
-
-#[test]
-fn create_modules() {
-    let externals = Externals::new(&["../lib".into()]);
-
-    assert!(!externals.is_empty());
-
-    let modules = externals.create_modules();
-
-    log::trace!("{modules:#?}");
 }

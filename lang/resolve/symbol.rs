@@ -273,8 +273,6 @@ impl std::fmt::Display for Symbol {
     }
 }
 
-impl WriteToFile for Symbol {}
-
 /// Print symbols via [std::fmt::Display]
 pub struct FormatSymbol<'a>(pub &'a Symbol);
 

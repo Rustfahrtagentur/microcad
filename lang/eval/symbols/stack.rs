@@ -69,15 +69,10 @@ impl Stack {
 
     /// Get name of current module.
     pub fn current_module_name(&self) -> QualifiedName {
-        if self.0.len() > 1 {
-            QualifiedName::no_ref(
-                self.0[1..]
-                    .iter()
-                    .filter_map(|locals| locals.id())
-                    .collect(),
-            )
-        } else {
+        if self.0.is_empty() {
             QualifiedName::default()
+        } else {
+            QualifiedName::no_ref(self.0.iter().filter_map(|locals| locals.id()).collect())
         }
     }
 
@@ -130,7 +125,11 @@ impl Stack {
 
 impl Locals for Stack {
     fn open(&mut self, frame: StackFrame) {
-        log::trace!("Opening {} stack frame", frame.kind_str());
+        if let Some(id) = frame.id() {
+            log::trace!("Opening {} stack frame '{id}'", frame.kind_str());
+        } else {
+            log::trace!("Opening {} stack frame", frame.kind_str());
+        }
         self.0.push(frame);
     }
 
@@ -240,7 +239,7 @@ fn local_stack() {
     };
 
     stack.open(StackFrame::Source("test".into(), SymbolMap::default()));
-    assert!(stack.current_module_name() == QualifiedName::default());
+    assert!(stack.current_module_name() == QualifiedName::from_id("test".into()));
 
     assert!(stack.put_local(None, make_int("a".into(), 1)).is_ok());
 
@@ -264,11 +263,9 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     // test alias
-    assert!(
-        stack
-            .put_local(Some("x".into()), make_int("x".into(), 3))
-            .is_ok()
-    );
+    assert!(stack
+        .put_local(Some("x".into()), make_int("x".into(), 3))
+        .is_ok());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);

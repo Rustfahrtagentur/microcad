@@ -41,25 +41,18 @@ impl Context {
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
     /// - `output`: Output channel to use.
     pub fn new(
-        root: Symbol,
-        builtin: Symbol,
-        search_paths: &[std::path::PathBuf],
+        root: Identifier,
+        symbols: SymbolMap,
+        sources: Sources,
         output: Box<dyn Output>,
     ) -> Self {
-        log::debug!(
-            "Creating Context (search paths: {})",
-            search_paths
-                .iter()
-                .map(|p| p.to_string_lossy())
-                .collect::<Vec<_>>()
-                .join(",")
-        );
+        log::debug!("Creating Context");
 
         // put all together
         Self {
-            symbol_table: SymbolTable::new(root, builtin, search_paths),
-            diag_handler: Default::default(),
+            symbol_table: SymbolTable::new(root, symbols, sources).expect("unknown root id"),
             output,
+            diag_handler: Default::default(),
             exporters: ExporterRegistry::default(),
             importers: ImporterRegistry::default(),
         }
@@ -72,16 +65,16 @@ impl Context {
     /// - `builtin`: The builtin library.
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
     pub fn from_source(
-        root: impl AsRef<std::path::Path>,
+        root: impl AsRef<std::path::Path> + std::fmt::Debug,
         builtin: Symbol,
         search_paths: &[std::path::PathBuf],
     ) -> EvalResult<Self> {
-        Ok(Self::new(
-            SourceFile::load(root)?.resolve(None)?,
-            builtin,
-            search_paths,
-            Box::new(Stdout),
-        ))
+        let root = SourceFile::load(root)?;
+        let root_id = root.id();
+        let sources = Sources::load(root, search_paths)?;
+        let mut symbols = sources.resolve()?;
+        symbols.insert(Identifier::no_ref("__builtin"), builtin);
+        Ok(Self::new(root_id, symbols, sources, Box::new(Stdout)))
     }
 
     /// Access captured output.

@@ -15,13 +15,13 @@ pub struct ContextBuilder {
 impl ContextBuilder {
     /// Create new context.
     pub fn new(
-        root: Symbol,
-        builtin: Symbol,
-        search_paths: &[std::path::PathBuf],
+        root: Identifier,
+        symbols: SymbolMap,
+        sources: Sources,
         output: Box<dyn Output>,
     ) -> Self {
         Self {
-            context: Context::new(root, builtin, search_paths, output),
+            context: Context::new(root, symbols, sources, output),
         }
     }
 
@@ -35,14 +35,15 @@ impl ContextBuilder {
         root: Rc<SourceFile>,
         search_paths: &[std::path::PathBuf],
     ) -> ResolveResult<Self> {
-        Ok(Self::new(
-            root.resolve(None)?,
-            crate::builtin_module(),
-            search_paths,
-            Box::new(Capture::new()),
+        let root_id = root.id();
+        let sources = Sources::load(root, search_paths)?;
+        let mut symbols = sources.resolve()?;
+        symbols.add_node(crate::builtin_module());
+        Ok(
+            Self::new(root_id, symbols, sources, Box::new(Capture::new()))
+                .importers(crate::builtin_importers())
+                .exporters(crate::builtin_exporters()),
         )
-        .importers(crate::builtin_importers())
-        .exporters(crate::builtin_exporters()))
     }
 
     /// Set importers to context.

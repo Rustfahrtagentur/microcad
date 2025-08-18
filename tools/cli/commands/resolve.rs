@@ -3,7 +3,7 @@
 
 //! µcad CLI resolve command.
 
-use microcad_lang::{diag::*, resolve::*};
+use microcad_lang::{diag::*, rc::*, resolve::*, syntax::*};
 
 use crate::*;
 
@@ -16,24 +16,24 @@ pub struct Resolve {
 }
 
 impl Resolve {
-    pub fn resolve(&self) -> ResolveResult<Symbol> {
-        let symbol_node = crate::commands::parse::Parse {
+    pub fn load(&self) -> ResolveResult<Rc<SourceFile>> {
+        let source = crate::commands::parse::Parse {
             input: self.input.clone(),
         }
-        .parse()?
-        .resolve(None)?;
+        .parse()?;
         log::info!("Resolved successfully!");
-        Ok(symbol_node)
+        Ok(source)
     }
 }
 
 impl RunCommand for Resolve {
-    fn run(&self, _: &Cli) -> anyhow::Result<()> {
-        let symbol = self.resolve()?;
-
+    fn run(&self, cli: &Cli) -> anyhow::Result<()> {
+        let root = self.load()?;
+        let sources = Sources::load(root, &cli.search_paths)?;
+        let symbols = sources.resolve()?;
         match &self.output {
-            Some(filename) => symbol.write_to_file(&filename)?,
-            None => println!("{symbol}"),
+            Some(filename) => symbols.write_to_file(&filename)?,
+            None => println!("{symbols}"),
         }
 
         Ok(())

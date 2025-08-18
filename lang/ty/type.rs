@@ -6,7 +6,7 @@
 use crate::{syntax::*, ty::*};
 
 /// µcad Basic Types
-#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum Type {
     /// Invalid type (used for error handling)
     Invalid,
@@ -98,6 +98,23 @@ impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::Invalid => write!(f, crate::invalid_no_ansi!(TYPE)),
+            Self::Integer => write!(f, "Integer"),
+            Self::Quantity(quantity) => write!(f, "{quantity}"),
+            Self::String => write!(f, "String"),
+            Self::Bool => write!(f, "Bool"),
+            Self::Array(t) => write!(f, "[{t}]"),
+            Self::Tuple(t) => write!(f, "{t}"),
+            Self::Matrix(t) => write!(f, "{t}"),
+            Self::Models => write!(f, "Models"),
+            Self::Custom(n) => write!(f, "Custom({n})"),
+        }
+    }
+}
+
+impl std::fmt::Debug for Type {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::Invalid => write!(f, crate::invalid!(TYPE)),
             Self::Integer => write!(f, "Integer"),
             Self::Quantity(quantity) => write!(f, "{quantity}"),
             Self::String => write!(f, "String"),

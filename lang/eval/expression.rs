@@ -272,12 +272,6 @@ impl Eval for Expression {
             expr => todo!("{expr:?}"),
         };
         match &result {
-            Ok(Value::None) => {
-                log::warn!(
-                    "Expression resulted in invalid value:\n{self}\n--- into ---\n{:?}",
-                    Value::None
-                )
-            }
             Ok(result) => log::trace!("Evaluated expression:\n{self}\n--- into ---\n{result}"),
             Err(_) => log::trace!("Evaluation of expression failed:\n{self}"),
         };

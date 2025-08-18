@@ -19,7 +19,7 @@ pub struct Cli {
 
     /// Paths to search for files.
     #[arg(short = 'P', long = "search-path", action = clap::ArgAction::Append, default_value = "./lib", global = true)]
-    search_paths: Vec<std::path::PathBuf>,
+    pub search_paths: Vec<std::path::PathBuf>,
 
     /// Load config from file.
     #[arg(short = 'C', long = "config")]
@@ -51,14 +51,14 @@ impl Cli {
 
     /// Make a new context from an input file.
     pub fn make_context(&self, input: impl AsRef<std::path::Path>) -> ResolveResult<Context> {
-        Ok(microcad_builtin::builtin_context(
+        microcad_builtin::builtin_context(
             crate::commands::Resolve {
                 input: input.as_ref().to_path_buf(),
                 output: None,
             }
-            .resolve()?,
+            .load()?,
             &self.search_paths,
-        ))
+        )
     }
 
     /// Fetch a config from file or default config.
