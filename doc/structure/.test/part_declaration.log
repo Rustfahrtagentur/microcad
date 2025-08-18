@@ -5,7 +5,7 @@
 -- Code --
 
  1: // sketch with a `radius` as building plan
- 2: sketch wheel(radius: Length) {
+ 2: sketch Wheel(radius: Length) {
  3: 
  4:     // init code
  5:     const FACTOR = 2;
@@ -29,18 +29,18 @@
 23:     i = 1;
 24:     
 25:     // create circle
-26:     std::geo2d::circle(radius);
+26:     std::geo2d::Circle(radius);
 27: }
 28: 
 29: use std::debug::assert;
 30: 
 31: // call sketch with diameter
-32: d = wheel(diameter = 2cm)
+32: d = Wheel(diameter = 2cm)
 33: // check radius
 34: assert_eq([d.radius, 1cm]);
 35: 
 36: // call sketch with radius
-37: r = wheel(radius = 1cm)
+37: r = Wheel(radius = 1cm)
 38: // check diameter
 39: assert([r.diameter, 2cm]);
 

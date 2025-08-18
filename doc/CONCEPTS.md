@@ -83,8 +83,8 @@ Any errors which occur here are related to geometrical processing.
 | ---------- | ----------------- | ----------------- | ---------- | --------------------- |
 | Assignment | *value*           | *value*           | `v = ..;`  | -                     |
 | Function   | *values*          | *value*           | `f(..);`   | `fn f(..) { .. }`     |
-| Sketch     | *values*          | *2D object*       | `s(..);`   | `sketch s(..) { .. }` |
-| Part       | *values*          | *3D object*       | `p(..);`   | `part p(..) { .. }`   |
+| Sketch     | *values*          | *2D object*       | `s(..);`   | `sketch S(..) { .. }` |
+| Part       | *values*          | *3D object*       | `p(..);`   | `part P(..) { .. }`   |
 | Operation  | *2D or 3D object* | *2D or 3D object* | `o(..) p;` | `op o(..) {..}`       |
 | Measure    | *2D or 3D object* | *value*           | `a.m();`   | *builtin only*        |
 
@@ -96,7 +96,7 @@ Any errors which occur here are related to geometrical processing.
 | --------- | -------------------- | --------------------- |
 | type      | `MyType`             | pascal case           |
 | const     | `const MY_CONST = 1` | upper case snake case |
-| namespace | `namespace my_lib`   | snake case            |
+| module    | `mod my_lib`         | snake case            |
 | function  | `fn my_func`         | snake case            |
 | sketch    | `sketch MyBench`     | pascal case           |
 | part      | `part MyBench`       | pascal case           |

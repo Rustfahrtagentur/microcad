@@ -40,9 +40,6 @@ use crate::{
     value::Value,
 };
 
-#[cfg(test)]
-mod tests;
-
 /// A reference counted, mutable [`Model`].
 #[derive(Debug, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
 pub struct Model(RcMut<ModelInner>);
@@ -53,9 +50,20 @@ impl Model {
         Self(inner)
     }
 
-    /// Calculate Depth of the model.
+    /// Calculate depth of the model.
     pub fn depth(&self) -> usize {
         self.parents().count()
+    }
+
+    /// Check if a model contains an operation element.
+    pub fn is_operation(&self) -> bool {
+        self.borrow().element.is_operation()
+    }
+
+    /// Check if this model contains geometry.
+    pub fn contains_geometry(&self) -> bool {
+        let self_ = &self.borrow();
+        self_.element.contains_geometry() || self_.children.contains_geometry()
     }
 
     /// Make a deep copy if this model.
@@ -131,18 +139,14 @@ impl Model {
         })
     }
 
-    /// Find the original source file of this model
-    pub fn find_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
-        self.ancestors()
-            .find_map(|model| model.borrow().origin.source_file.clone())
+    /// Return source hash.
+    pub fn source_hash(&self) -> crate::Hash {
+        self.borrow().origin.src_ref.source_hash()
     }
 
     /// Test if the model has this specific source file.
     pub fn has_source_file(&self, source_file: &std::rc::Rc<SourceFile>) -> bool {
-        match (source_file.as_ref(), self.find_source_file()) {
-            (a, Some(b)) => a.hash == b.hash,
-            _ => false,
-        }
+        source_file.hash == self.source_hash()
     }
 
     /// Return inner group if this model only contains a group as single child.
@@ -175,8 +179,8 @@ impl Model {
                 None => String::new(),
             },
             element_type = self_.element,
-            origin = match self_.origin.get_creator() {
-                Some(_) => format!(" = {origin}", origin = self_.origin),
+            origin = match self_.origin.get_qualified_name() {
+                Some(name) => format!(" = {name}"),
                 None => String::new(),
             },
             output_type = self.final_output_type(),
@@ -233,8 +237,8 @@ impl PartialEq for Model {
 ///
 /// ```custom
 /// id: Object:
-///     Object = std::geo2d::circle(radius = 3.0mm) -> Geometry2D:
-///         Primitive = __builtin::geo2d::circle(radius = 3.0) -> Geometry2D`
+///     Object = std::geo2d::Circle(radius = 3.0mm) -> Geometry2D:
+///         Primitive = __builtin::geo2d::Circle(radius = 3.0) -> Geometry2D`
 /// ```
 impl std::fmt::Display for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

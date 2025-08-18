@@ -41,7 +41,7 @@ impl Parse for ListExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         pair.inner()
             .filter_map(|pair| match pair.as_rule() {
-                Rule::expression | Rule::expression_no_semicolon => Some(Expression::parse(pair)),
+                Rule::expression => Some(Expression::parse(pair)),
                 _ => None,
             })
             .collect::<Result<Vec<_>, _>>()
@@ -117,7 +117,7 @@ impl Expression {
 
 impl Parse for Expression {
     fn parse(pair: Pair) -> ParseResult<Self> {
-        Parser::ensure_rules(&pair, &[Rule::expression_no_semicolon, Rule::expression]);
+        Parser::ensure_rule(&pair, Rule::expression);
 
         PRATT_PARSER
             .map_primary(|primary| {
@@ -236,36 +236,6 @@ impl Parse for Expression {
                     .into_inner()
                     .filter(|pair| pair.as_rule() != Rule::COMMENT), // Filter comments
             )
-    }
-}
-
-impl Parse for Nested {
-    fn parse(pair: Pair) -> ParseResult<Self> {
-        assert!(pair.as_rule() == Rule::expression_no_semicolon);
-
-        Ok(Self(Refer::new(
-            pair.inner()
-                .filter(|pair| {
-                    [Rule::qualified_name, Rule::call, Rule::body].contains(&pair.as_rule())
-                })
-                .map(NestedItem::parse)
-                .collect::<ParseResult<_>>()?,
-            pair.src_ref(),
-        )))
-    }
-}
-
-impl Parse for NestedItem {
-    fn parse(pair: Pair) -> ParseResult<Self> {
-        match pair.clone().as_rule() {
-            Rule::call => Ok(Self::Call(Call::parse(pair.clone())?)),
-            Rule::qualified_name => Ok(Self::QualifiedName(QualifiedName::parse(pair.clone())?)),
-            Rule::body => Ok(Self::Body(Body::parse(pair.clone())?)),
-            rule => unreachable!(
-                "NestedItem::parse expected call or qualified name, found {:?}",
-                rule
-            ),
-        }
     }
 }
 

@@ -8,7 +8,7 @@
  2: op nop() { @children }
  3: 
  4: // use operation nop on a circle
- 5: std::geo2d::circle(radius = 1cm).nop();
+ 5: std::geo2d::Circle(radius = 1cm).nop();
 
 -- Output --
 -- Errors --

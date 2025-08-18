@@ -1,6 +1,6 @@
 -- Test --
-  array_operations
-  ../doc/structure/arrays.md:42
+  array_mul_scale
+  ../doc/types/arrays.md:80
 
 -- Code --
 

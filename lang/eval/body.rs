@@ -17,6 +17,7 @@ impl Eval<Model> for Body {
     fn eval(&self, context: &mut Context) -> EvalResult<Model> {
         context.scope(StackFrame::Body(SymbolMap::default()), |context| {
             Ok(ModelBuilder::new_group()
+                .origin(Refer::new(Origin::Group, self.src_ref()))
                 .add_children(self.statements.eval(context)?)?
                 .attributes(self.statements.eval(context)?)
                 .build())

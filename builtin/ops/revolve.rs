@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{eval::*, model::*, parameter, syntax::WorkbenchKind, value::*};
 
 #[derive(Debug)]
 pub struct Revolve {
@@ -15,9 +15,9 @@ impl Operation for Revolve {
         OutputType::Geometry3D
     }
 
-    fn process_3d(&self, model: &Model) -> Geometries3D {
+    fn process_3d(&self, model: &Model) -> Geometry3D {
         use std::rc::Rc;
-        let geometries = model.render_geometries_2d();
+        let geometries = model.render_geometry_2d();
 
         let multi_polygon_data = geo2d::multi_polygon_to_vec(
             &geometries.render_to_multi_polygon(&model.borrow().output.resolution),
@@ -27,18 +27,21 @@ impl Operation for Revolve {
             .map(|ring| ring.as_slice())
             .collect();
 
-        Rc::new(Geometry3D::Manifold(Rc::new(Manifold::revolve(
+        Geometry3D::Manifold(Rc::new(Manifold::revolve(
             &multi_polygon_data,
             self.circular_segments as u32,
             self.revolve_degrees,
-        ))))
-        .into()
+        )))
     }
 }
 
 impl BuiltinWorkbenchDefinition for Revolve {
     fn id() -> &'static str {
         "revolve"
+    }
+
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Operation
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

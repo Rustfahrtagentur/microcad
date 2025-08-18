@@ -12,7 +12,7 @@ use crate::{
     syntax::{self, *},
 };
 
-use microcad_core::{Color, RenderResolution, Size2D, theme::Theme};
+use microcad_core::{Color, RenderResolution, Size2, theme::Theme};
 use thiserror::Error;
 
 /// Error type for attributes.
@@ -51,10 +51,8 @@ impl Eval<Option<ExportCommand>> for syntax::AttributeCommand {
                         (
                             Identifier::no_ref("size"),
                             eval::ParameterValue {
-                                specified_type: Some(Type::Tuple(
-                                    Box::new(TupleType::new_size2d()),
-                                )),
-                                default_value: Some(Value::Tuple(Box::new(Size2D::A4.into()))),
+                                specified_type: Some(Type::Tuple(Box::new(TupleType::new_size2()))),
+                                default_value: Some(Value::Tuple(Box::new(Size2::A4.into()))),
                                 src_ref: SrcRef(None),
                             },
                         ),
@@ -264,9 +262,9 @@ impl Eval<Option<std::rc::Rc<Theme>>> for syntax::AttributeCommand {
     }
 }
 
-impl Eval<Option<Size2D>> for syntax::AttributeCommand {
-    fn eval(&self, _: &mut Context) -> EvalResult<Option<Size2D>> {
-        todo!("Get Size2D, e.g. `size = (width = 10mm, height = 10mm) from AttributeCommand")
+impl Eval<Option<Size2>> for syntax::AttributeCommand {
+    fn eval(&self, _: &mut Context) -> EvalResult<Option<Size2>> {
+        todo!("Get Size2, e.g. `size = (width = 10mm, height = 10mm) from AttributeCommand")
     }
 }
 
@@ -290,7 +288,7 @@ macro_rules! eval_to_attribute {
 eval_to_attribute!(color: Color);
 eval_to_attribute!(resolution: ResolutionAttribute);
 eval_to_attribute!(theme: std::rc::Rc<Theme>);
-eval_to_attribute!(size: Size2D);
+eval_to_attribute!(size: Size2);
 
 impl Eval<Vec<crate::model::Attribute>> for syntax::Attribute {
     fn eval(&self, context: &mut Context) -> EvalResult<Vec<crate::model::Attribute>> {

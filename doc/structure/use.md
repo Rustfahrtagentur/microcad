@@ -4,6 +4,7 @@
 - [Use As Statement](#use-as-statement)
 - [Use All Statement](#use-all-statement)
 - [Public Use Statement](#public-use-statement)
+- [Tests](#tests)
 
 When including code from other *modules* or [other files](modules.md#file-modules)
 *fully qualified names* of *symbols* (e.g. `std:geo3d::cube`) often produce much
@@ -19,8 +20,8 @@ The following example which uses two *parts* of `geo3d` shows the problem:
 [![test](.test/none.svg)](.test/none.log)
 
 ```µcad,none
-std::geo3d::sphere(radius = 40mm);
-std::geo3d::cube(size = 40mm);
+std::geo3d::Sphere(radius = 40mm);
+std::geo3d::Cube(size = 40mm);
 ```
 
 ## Use Statement
@@ -31,11 +32,11 @@ shorten things a lot:
 [![test](.test/use.svg)](.test/use.log)
 
 ```µcad,use
-use std::geo2d::circle;
-use std::geo2d::rect;
+use std::geo2d::Circle;
+use std::geo2d::Rect;
 
-circle(r = 4mm);
-rect(size = 40mm);
+Circle(r = 4mm);
+Rect(size = 40mm);
 ```
 
 You may also use whole the *module* if the names you are using already exist as a symbol:
@@ -47,7 +48,7 @@ circle = 1;
 
 use std::geo2d;
 
-geo2d::circle(r = 40mm);
+geo2d::Circle(r = 40mm);
 ```
 
 ## Use As Statement
@@ -60,7 +61,7 @@ locally rename the *target symbol*:
 ```µcad,use_as
 circle = 1;
 
-use std::geo2d::circle as disk;
+use std::geo2d::Circle as disk;
 
 disk(r = 4mm);
 ```
@@ -74,7 +75,7 @@ geo2d = 1;
 
 use std::geo2d as geo;
 
-geo::circle(r = 4mm);
+geo::Circle(r = 4mm);
 ```
 
 ## Use All Statement
@@ -87,8 +88,8 @@ The following example aliases **all** symbols of `std::geo3d` into the current s
 ```µcad,use_all#todo
 use std::geo3d::*;
 
-sphere(r = 4mm);
-cube(size = 40mm);
+Sphere(r = 4mm);
+Cube(size = 40mm);
 ```
 
 ## Public Use Statement
@@ -96,7 +97,7 @@ cube(size = 40mm);
 This statement does not only make the *target symbol* visible on the current scope but in
 the symbol table where outside code might use it too.
 
-`sphere` and `cube` will be made available for using them outside of module `my` in the following example:
+`Sphere` and `Cube` will be made available for using them outside of module `my` in the following example:
 
 [![test](.test/use_statement_pub.svg)](.test/use_statement_pub.log)
 
@@ -105,8 +106,8 @@ mod my {
     pub use std::geo2d::*;
 }
 
-my::circle(r = 4mm);
-my::rect(size = 40mm);
+my::Circle(r = 4mm);
+my::Rect(size = 40mm);
 ```
 
 ## Tests
@@ -123,6 +124,6 @@ mod my {
     pub use name::space::*;
 }
 
-my::circle(r = 4mm);
-my::rect(size = 40mm);
+my::Circle(r = 4mm);
+my::Rect(size = 40mm);
 ```

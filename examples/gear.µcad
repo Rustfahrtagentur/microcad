@@ -1,0 +1,41 @@
+use std::ops::*;
+use std::geo2d::*;
+use std::math::*;
+
+op polar(angle: Angle, radius: Length, shift: Length = 0.0mm) {
+    @children.translate(x = radius, y = shift).rotate(z = angle);
+}
+
+/*sketch Gear(
+    d_a: Length,
+    d: Length,
+    d_b: Length,
+    d_f: Length,
+) {
+    teeth = {
+        Circle(d = (d_a - d_f) / 2)
+            .polar(length = d / 2, shift = d_b / 2, angle = 0°);
+        Circle(d = (d_a - d_f) / 2)
+            .polar(length = d / 2, shift = d_b / 2, angle = 360°/32);
+
+        Circle(d = d_a);
+    }
+    .intersection();
+
+    teeth | Circle(d = d_f);
+}
+
+
+Gear(d_a = 40mm, d = 30mm, d_b = 25mm, d_f = 20mm).extrude(4mm);
+*/
+
+sketch Gear(
+    d_0: Length,
+    m: Integer,
+    z: Integer
+) {
+    Circle(d = d_0) - Circle(d = 2 / z * d_0).polar(radius = d_0 / 2, angle = [0..z]/z*360°)
+}
+
+
+Gear(d_0 = 40mm, m = 1, z = 100).extrude(4mm);

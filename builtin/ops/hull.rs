@@ -8,13 +8,13 @@ use microcad_lang::{model::*, resolve::*, syntax::*};
 struct Hull;
 
 impl Operation for Hull {
-    fn process_2d(&self, model: &Model) -> Geometries2D {
+    fn process_2d(&self, model: &Model) -> Geometry2D {
         model
-            .render_geometries_2d()
+            .render_geometry_2d()
             .hull(&model.borrow().output.resolution)
     }
 
-    fn process_3d(&self, _node: &Model) -> Geometries3D {
+    fn process_3d(&self, _node: &Model) -> Geometry3D {
         std::todo!("Hull operation for 3D")
     }
 }

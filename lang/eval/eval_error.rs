@@ -35,9 +35,9 @@ pub enum EvalError {
         found: Type,
     },
 
-    /// Elements of list have different types.
-    #[error("Elements of list have different types: {0}")]
-    ListElementsDifferentTypes(TypeList),
+    /// Array elements have different types.
+    #[error("Array elements have different types: {0}")]
+    ArrayElementsDifferentTypes(TypeList),
 
     /// Symbol not found.
     #[error("Symbol {0} not found.")]
@@ -98,10 +98,6 @@ pub enum EvalError {
     /// Invalid argument type.
     #[error("Invalid argument type: {0}")]
     InvalidArgumentType(Type),
-
-    /// Cannot nest item.
-    #[error("Cannot nest item: {0}")]
-    CannotNestItem(NestedItem),
 
     /// Unexpected argument.
     #[error("Unexpected argument: {0}: {1}")]
@@ -235,6 +231,18 @@ pub enum EvalError {
     /// Unexpected source file in expression
     #[error("Unexpected source file {0} in expression")]
     InvalidSelfReference(Identifier),
+
+    /// Unexpected source file in expression
+    #[error("{0} is not operation.")]
+    NotAnOperation(QualifiedName),
+
+    /// Calling an operation on an empty geometry, e.g.: `{}.op()`.
+    #[error("Calling operation on empty geometry")]
+    OperationOnEmptyGeometry,
+
+    /// Cannot call operation without workpiece, e.g. `op()`.
+    #[error("Cannot call operation without workpiece.")]
+    CannotCallOperationWithoutWorkpiece,
 }
 
 /// Result type of any evaluation.

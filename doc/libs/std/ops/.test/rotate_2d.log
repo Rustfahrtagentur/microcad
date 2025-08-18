@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: std::geo2d::rect(30mm).std::ops::rotate(45°);
+ 1: std::geo2d::Rect(30mm).std::ops::rotate(45°);
 
 -- Output --
 -- Errors --

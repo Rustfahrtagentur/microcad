@@ -2,9 +2,9 @@
 /// Circle definition
 ///
 /// Examples:
-/// * with radius `r`: `circle(r = 10.0mm);`
-/// * with diameter `d`: `circle(d = 5.0mm);`
-sketch circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
+/// * with radius `r`: `Circle(r = 10.0mm);`
+/// * with diameter `d`: `Circle(d = 5.0mm);`
+sketch Circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
     init(r: Length, c = (x = 0.0mm, y = 0.0mm)) {
         radius = r;
         center = c;
@@ -19,14 +19,14 @@ sketch circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
         center = c;
     }
 
-    __builtin::geo2d::circle(radius = radius / 1mm, cx = center.x / 1mm, cy = center.y / 1mm);
+    __builtin::geo2d::Circle(radius = radius / 1mm, cx = center.x / 1mm, cy = center.y / 1mm);
 }
 
 /// Rectangle definition
 ///
 /// Examples:
 /// * centered rect with width `w` and height `h`: `rect(width = 10.0mm, height = 5.0mm);`
-sketch rect(width: Length, height: Length, x: Length, y: Length) {
+sketch Rect(width: Length, height: Length, x: Length, y: Length) {
     init(width: Length, height: Length) {
         x = -width / 2.0; // center x
         y = -height / 2.0; // center y
@@ -46,7 +46,7 @@ sketch rect(width: Length, height: Length, x: Length, y: Length) {
         y = -size / 2.0; // center y
     }
 
-    __builtin::geo2d::rect(
+    __builtin::geo2d::Rect(
             width = width / 1mm,
             height = height / 1mm,
             x = x / 1mm,
@@ -54,7 +54,7 @@ sketch rect(width: Length, height: Length, x: Length, y: Length) {
     );
 }
 
-sketch line(p0: Vec2, p1: Vec2) {
+sketch Line(p0: Vec2, p1: Vec2) {
     init(width: Length, y = 0.0mm) {
         p0 = (x = -width / 2mm, y = y / 1mm);
         p1 = (x =  width / 2mm , y = y / 1mm);
@@ -70,5 +70,5 @@ sketch line(p0: Vec2, p1: Vec2) {
         p1 = (x = (p.x + width) / 1mm , y = p.y / 1mm);
     }
 
-    __builtin::geo2d::line(x0 = p0.x, y0 = p0.y, x1 = p1.x, y1 = p1.y);
+    __builtin::geo2d::Line(x0 = p0.x, y0 = p0.y, x1 = p1.x, y1 = p1.y);
 }

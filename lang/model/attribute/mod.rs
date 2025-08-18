@@ -19,7 +19,7 @@ pub use resolution::ResolutionAttribute;
 
 use crate::{create_tuple_value, syntax::*, value::*};
 
-use microcad_core::{theme::Theme, Color, Size2D};
+use microcad_core::{Color, Size2, theme::Theme};
 
 /// A custom command attribute from an exporter, e.g.: `svg = (style = "fill:none")`
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -40,7 +40,7 @@ pub enum Attribute {
     /// Theme attribute: `theme = "default/dark"`.
     Theme(Rc<Theme>),
     /// Size attribute: `size = std::A4`.
-    Size(Size2D),
+    Size(Size2),
     /// Export command: `export = "test.svg"`.
     #[serde(skip)]
     Export(ExportCommand),
@@ -170,7 +170,7 @@ pub trait AttributesAccess {
     }
 
     /// Get size.
-    fn get_size(&self) -> Option<Size2D> {
+    fn get_size(&self) -> Option<Size2> {
         self.get_single_attribute(&Identifier::no_ref("size"))
             .map(|attr| match attr {
                 Attribute::Size(size) => size,

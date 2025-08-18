@@ -6,7 +6,7 @@
 
  1: width = 2mm;
  2: height = 2mm;
- 3: std::geo2d::rect(width, height);
+ 3: std::geo2d::Rect(width, height);
 
 -- Output --
 -- Errors --

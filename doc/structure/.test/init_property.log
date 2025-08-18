@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: sketch wheel(radius: Length, thickness: Length) {
+ 1: sketch Wheel(radius: Length, thickness: Length) {
  2:     // initializer with diameter
  3:     init( diameter: Length, thickness: Length ) {
  4:         // must set `radius` in code 
@@ -16,13 +16,13 @@
 10:     }
 11: 
 12:     // Now radius and thickness can be used
-13:     std::geo2d::circle(radius) - std::geo2d::circle(radius - thickness);
+13:     std::geo2d::Circle(radius) - std::geo2d::Circle(radius - thickness);
 14: }
 15: 
 16: // call with building plan
-17: wheel(radius=5cm, thickness=1cm);
+17: Wheel(radius=5cm, thickness=1cm);
 18: // call with initializer
-19: wheel(diameter=10cm, thickness=1cm);
+19: Wheel(diameter=10cm, thickness=1cm);
 
 -- Output --
 -- Errors --

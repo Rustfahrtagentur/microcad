@@ -25,13 +25,13 @@ impl SvgWriter {
     /// - `scale`: Scale of the output
     pub fn new_canvas(
         mut writer: Box<dyn std::io::Write>,
-        size: Option<Size2D>,
+        size: Option<Size2>,
         content_rect: Rect,
         scale: Option<Scalar>,
     ) -> std::io::Result<Self> {
         let size = match size {
             Some(size) => size,
-            None => Size2D {
+            None => Size2 {
                 width: content_rect.width(),
                 height: content_rect.height(),
             },

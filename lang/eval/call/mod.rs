@@ -68,9 +68,16 @@ impl Eval for Call {
                 src_ref: self.src_ref(),
             },
             |context| match &symbol.borrow().def {
-                SymbolDefinition::Builtin(f) => f.call(&args, context),
-                SymbolDefinition::Workbench(w) => Ok(Value::Models(w.call(&args, context)?)),
-                SymbolDefinition::Function(f) => f.call(&args, context),
+                SymbolDefinition::Builtin(f) => f.call(&symbol, &args, context),
+                SymbolDefinition::Workbench(w) => {
+                    if matches!(w.kind, WorkbenchKind::Operation) {
+                        context.error(self, EvalError::CannotCallOperationWithoutWorkpiece)?;
+                        Ok(Value::None)
+                    } else {
+                        Ok(Value::Models(w.call(&symbol, &args, context)?))
+                    }
+                }
+                SymbolDefinition::Function(f) => f.call(&symbol, &args, context),
                 def => {
                     context.error(
                         self,
@@ -82,7 +89,6 @@ impl Eval for Call {
         ) {
             Ok(Value::Models(models)) => {
                 // Store the information, saying that these models have been created by this symbol.
-                models.set_creator(symbol, self.src_ref());
                 Ok(Value::Models(models))
             }
             Ok(value) => Ok(value),

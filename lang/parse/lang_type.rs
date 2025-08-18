@@ -8,34 +8,44 @@ impl Parse for TupleType {
         use crate::ty::Ty;
         Parser::ensure_rule(&pair, Rule::tuple_type);
 
-        let mut named = std::collections::HashMap::new();
-        let mut unnamed = std::collections::HashSet::new();
+        match pair.as_str() {
+            "Color" => Ok(TupleType::new_color()),
+            "Vec2" => Ok(TupleType::new_vec2()),
+            "Vec3" => Ok(TupleType::new_vec3()),
+            "Size2" => Ok(TupleType::new_size2()),
+            _ => {
+                let mut named = std::collections::HashMap::new();
+                let mut unnamed = std::collections::HashSet::new();
 
-        pair.inner().try_for_each(|pair| {
-            let mut inner = pair.inner();
-            let next = inner.next().expect("Identifier or type expected");
-            if let Ok(id) = Identifier::parse(next.clone()) {
-                if named
-                    .insert(
-                        id.clone(),
-                        TypeAnnotation::parse(inner.next().expect("Identifier or type expected"))?
-                            .ty(),
-                    )
-                    .is_some()
-                {
-                    return Err(ParseError::DuplicateTupleIdentifier(id));
-                }
-            } else {
-                let ty = TypeAnnotation::parse(next)?.ty();
-                if !unnamed.insert(ty.clone()) {
-                    return Err(ParseError::DuplicateTupleType(ty));
-                }
+                pair.inner().try_for_each(|pair| {
+                    let mut inner = pair.inner();
+                    let next = inner.next().expect("Identifier or type expected");
+                    if let Ok(id) = Identifier::parse(next.clone()) {
+                        if named
+                            .insert(
+                                id.clone(),
+                                TypeAnnotation::parse(
+                                    inner.next().expect("Identifier or type expected"),
+                                )?
+                                .ty(),
+                            )
+                            .is_some()
+                        {
+                            return Err(ParseError::DuplicateTupleIdentifier(id));
+                        }
+                    } else {
+                        let ty = TypeAnnotation::parse(next)?.ty();
+                        if !unnamed.insert(ty.clone()) {
+                            return Err(ParseError::DuplicateTupleType(ty));
+                        }
+                    }
+
+                    Ok::<(), ParseError>(())
+                })?;
+
+                Ok(Self { named, unnamed })
             }
-
-            Ok::<(), ParseError>(())
-        })?;
-
-        Ok(Self { named, unnamed })
+        }
     }
 }
 

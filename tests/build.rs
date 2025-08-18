@@ -1,9 +1,8 @@
-// Copyright © 2024 The µcad authors <info@ucad.xyz>
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! µcad pest test
+//! µcad test generators.
 
-/// pest test main
 fn main() {
     microcad_pest_test::generate(
         "microcad_lang::parser::Parser",

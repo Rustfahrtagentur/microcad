@@ -3,13 +3,17 @@
 
 use geo::coord;
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, rc::*, value::*};
+use microcad_lang::{eval::*, model::*, parameter, rc::*, syntax::WorkbenchKind, value::*};
 
 pub struct Rect;
 
 impl BuiltinWorkbenchDefinition for Rect {
     fn id() -> &'static str {
-        "rect"
+        "Rect"
+    }
+
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Sketch
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

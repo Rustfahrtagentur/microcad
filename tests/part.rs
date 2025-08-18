@@ -30,13 +30,13 @@ fn workbench_call() {
     let mut context = crate::context_for_file("syntax/workbench/plan.µcad");
 
     let symbol = context
-        .lookup(&qualified_name("a"))
+        .lookup(&qualified_name("A"))
         .expect("Symbol expected");
 
     // Check symbol id
-    if let Ok(symbol) = context.lookup(&Identifier(Refer::none("a".into())).into()) {
+    if let Ok(symbol) = context.lookup(&Identifier(Refer::none("A".into())).into()) {
         let id = symbol.id();
-        assert_eq!(id.id(), "a");
+        assert_eq!(id.id(), "A");
     }
 
     // Get workbench definition for symbol `a`
@@ -48,6 +48,7 @@ fn workbench_call() {
     // Call `a` with `b = 3.0`
     let models = definition
         .call(
+            &symbol,
             &call_argument_value_list("b = 3.0", &mut context),
             &mut context,
         )
@@ -71,6 +72,7 @@ fn workbench_call() {
     // Call `a` with `b = [1.0, 2.0]` (multiplicity)
     let models = definition
         .call(
+            &symbol,
             &call_argument_value_list("b = [1.0, 2.0]", &mut context),
             &mut context,
         )
@@ -89,7 +91,7 @@ fn workbench_initializer_call() {
 
     let mut context = crate::context_for_file("syntax/workbench/initializer.µcad");
     let symbol = context
-        .lookup(&qualified_name("circle"))
+        .lookup(&qualified_name("Circle"))
         .expect("Symbol expected");
 
     // Get workbench definition for symbol `a`
@@ -109,10 +111,11 @@ fn workbench_initializer_call() {
         );
     }
 
-    // Call `circle(radius = 3.0)`
+    // Call `Circle(radius = 3.0)`
     {
         let models = definition
             .call(
+                &symbol,
                 &call_argument_value_list("radius = 3.0", &mut context),
                 &mut context,
             )
@@ -121,10 +124,11 @@ fn workbench_initializer_call() {
         check_property_radius(models.first().expect("Model expected"), 3.0);
     }
 
-    // Call `circle(r = 3.0)`
+    // Call `Circle(r = 3.0)`
     {
         let models = definition
             .call(
+                &symbol,
                 &call_argument_value_list("r = 3.0", &mut context),
                 &mut context,
             )
@@ -133,10 +137,11 @@ fn workbench_initializer_call() {
         check_property_radius(models.first().expect("Model expected"), 3.0);
     }
 
-    // Call circle(d = 6.0)`
+    // Call Circle(d = 6.0)`
     {
         let models = definition
             .call(
+                &symbol,
                 &call_argument_value_list("d = 6.0", &mut context),
                 &mut context,
             )
@@ -145,10 +150,11 @@ fn workbench_initializer_call() {
         check_property_radius(models.first().expect("Model expected"), 3.0);
     }
 
-    // Call `circle(d = [1.0, 2.0])` (multiplicity)
+    // Call `Circle(d = [1.0, 2.0])` (multiplicity)
     {
         let models = definition
             .call(
+                &symbol,
                 &call_argument_value_list("d = [1.0, 2.0]", &mut context),
                 &mut context,
             )
@@ -158,10 +164,10 @@ fn workbench_initializer_call() {
         check_property_radius(models.get(1).expect("Model expected"), 1.0);
     }
 
-    // Call `circle()` (missing arguments)
+    // Call `Circle()` (missing arguments)
     {
         let models = definition
-            .call(&ArgumentValueList::default(), &mut context)
+            .call(&symbol, &ArgumentValueList::default(), &mut context)
             .expect("Valid models");
         assert_eq!(models.len(), 0, "There should no models");
         log::trace!("{}", context.diagnosis());

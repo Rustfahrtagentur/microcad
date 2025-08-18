@@ -1,16 +1,16 @@
 -- Test --
   group_assignment
-  ../doc/tests/semicolon.md:74
+  ../doc/tests/semicolon.md:72
 
 -- Code --
 
- 1: use std::geo2d::circle;
+ 1: use std::geo2d::Circle;
  2: use std::ops::translate;
  3: 
  4: // assignment + group
  5: a = { 
- 6:     circle(radius = 1mm); 
- 7:     circle(radius = 2mm); 
+ 6:     Circle(radius = 1mm); 
+ 7:     Circle(radius = 2mm); 
  8: };
 
 -- Output --

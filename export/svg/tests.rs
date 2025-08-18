@@ -18,7 +18,7 @@ fn svg_writer() {
 
     let mut svg = SvgWriter::new_canvas(
         Box::new(file),
-        Size2D::A4.transposed().into(),
+        Size2::A4.transposed().into(),
         Rect::new(coord! {x: 0.0, y: 0.0}, coord! {x: 100.0, y: 100.0}),
         None,
     )
@@ -58,7 +58,7 @@ fn svg_canvas() -> std::io::Result<()> {
     let content_rect = Rect::new(coord! {x: 0.0, y: 0.0}, coord! {x: 100.0, y: 100.0});
     let mut svg = SvgWriter::new_canvas(
         Box::new(file),
-        Size2D::A4.transposed().into(),
+        Size2::A4.transposed().into(),
         content_rect,
         Some(2.0),
     )
@@ -132,7 +132,7 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     let content_rect = Rect::new(coord! {x: 0.0, y: 0.0}, coord! {x: 50.0, y: 50.0});
     let mut svg = SvgWriter::new_canvas(
         Box::new(file),
-        Size2D::A4.transposed().into(),
+        Size2::A4.transposed().into(),
         content_rect,
         Some(3.0),
     )

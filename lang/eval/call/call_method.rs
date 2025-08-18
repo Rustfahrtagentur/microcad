@@ -55,29 +55,45 @@ impl CallMethod for Array {
 impl CallMethod<Models> for Models {
     fn call_method(
         &self,
-        id: &QualifiedName,
+        name: &QualifiedName,
         args: &ArgumentValueList,
         context: &mut Context,
     ) -> EvalResult<Models> {
-        if let Some(symbol) = id.eval(context)? {
+        // Try nest models for an operation: models.op()
+        fn try_nest(
+            name: &QualifiedName,
+            context: &mut Context,
+            models: &Models,
+            op: Models,
+        ) -> EvalResult<Models> {
+            if op.is_operation() {
+                if !models.contains_geometry() {
+                    context.error(name, EvalError::OperationOnEmptyGeometry)?;
+                }
+
+                let models = op.nest(models);
+                return Ok(models);
+            } else {
+                context.error(name, EvalError::NotAnOperation(name.clone()))?;
+            }
+
+            Ok(models.clone())
+        }
+
+        if let Some(symbol) = name.eval(context)? {
             Ok(match &symbol.borrow().def {
                 SymbolDefinition::Workbench(workbench_definition) => {
-                    let models = workbench_definition.call(args, context)?.nest(self);
-                    models.set_creator(symbol.clone(), SrcRef::merge(id, args));
-                    models
+                    let op = workbench_definition.call(&symbol, args, context)?;
+                    try_nest(name, context, self, op)?
                 }
-                SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
-                    Value::Models(models) => {
-                        let models = models.nest(self);
-                        models.set_creator(symbol.clone(), SrcRef::merge(id, args));
-                        models
-                    }
+                SymbolDefinition::Builtin(builtin) => match builtin.call(&symbol, args, context)? {
+                    Value::Models(models) => try_nest(name, context, self, models)?,
                     value => panic!("Builtin call returned {value} but no models."),
                 },
                 def => {
                     context.error(
-                        id,
-                        EvalError::SymbolCannotBeCalled(id.clone(), Box::new(def.clone())),
+                        name,
+                        EvalError::SymbolCannotBeCalled(name.clone(), Box::new(def.clone())),
                     )?;
                     Models::default()
                 }

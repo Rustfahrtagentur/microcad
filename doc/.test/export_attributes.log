@@ -5,10 +5,10 @@
 -- Code --
 
  1: #[export = "rect.svg"] // Will be exported to `rect.svg`
- 2: std::geo2d::rect(42mm);
+ 2: std::geo2d::Rect(42mm);
  3: 
  4: #[export = "circle.svg"]  // Will be exported to `circle.svg`
- 5: std::geo2d::circle(r = 42mm);
+ 5: std::geo2d::Circle(r = 42mm);
 
 -- Output --
 -- Errors --

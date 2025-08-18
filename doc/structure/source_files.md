@@ -22,7 +22,7 @@ If you create objects within this code a workbench will implicitly be created wh
 
 ```µcad,initial_source_file_2D
 // simply draw a circle
-std::geo2d::circle(radius = 1cm);
+std::geo2d::Circle(radius = 1cm);
 ```
 
 ### Example 3D Source File
@@ -31,7 +31,7 @@ std::geo2d::circle(radius = 1cm);
 
 ```µcad,initial_source_file_3D
 // simply draw a sphere
-std::geo3d::sphere(radius = 1cm);
+std::geo3d::Sphere(radius = 1cm);
 ```
 
 Mixing both will lead to an error:
@@ -39,8 +39,8 @@ Mixing both will lead to an error:
 [![test](.test/initial_source_file_mixed.svg)](.test/initial_source_file_mixed.log)
 
 ```µcad,initial_source_file_mixed#fail
-std::geo2d::circle(radius = 1cm);
-std::geo3d::sphere(radius = 1cm);  // error: can't mix 2D and 3D
+std::geo2d::Circle(radius = 1cm);
+std::geo3d::Sphere(radius = 1cm);  // error: can't mix 2D and 3D
 ```
 
 ## Module Source Files

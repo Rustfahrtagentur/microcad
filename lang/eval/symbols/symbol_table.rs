@@ -62,18 +62,6 @@ impl SymbolTable {
         context
     }
 
-    /// Fetch global symbol from symbol map (for testing only).
-    #[cfg(test)]
-    pub fn fetch_global(&self, qualified_name: &QualifiedName) -> EvalResult<Symbol> {
-        self.globals.search(qualified_name)
-    }
-
-    /// Fetch local variable from local stack (for testing only).
-    #[cfg(test)]
-    pub fn fetch_local(&self, id: &Identifier) -> EvalResult<Symbol> {
-        self.stack.fetch(id)
-    }
-
     /// Lookup a symbol from local stack.
     fn lookup_local(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         log::trace!("Looking for local symbol '{name}'");
@@ -221,7 +209,7 @@ impl SymbolTable {
             }
             Ok(_) => (),
             Err(EvalError::SymbolNotFound(_)) => {
-                return Err(EvalError::SymbolNotFound(name.clone()))
+                return Err(EvalError::SymbolNotFound(name.clone()));
             }
             Err(err) => return Err(err),
         }

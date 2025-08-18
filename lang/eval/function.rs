@@ -16,7 +16,12 @@ impl Eval for FunctionDefinition {
 }
 
 impl CallTrait for FunctionDefinition {
-    fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<Value> {
+    fn call(
+        &self,
+        _symbol: &Symbol,
+        args: &ArgumentValueList,
+        context: &mut Context,
+    ) -> EvalResult<Value> {
         match ArgumentMatch::find_multi_match(args, &self.signature.parameters.eval(context)?) {
             Ok(matches) => {
                 let mut result: Vec<Value> = Vec::new();

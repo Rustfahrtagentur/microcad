@@ -5,7 +5,7 @@
 -- Code --
 
  1: // simply draw a circle
- 2: std::geo2d::circle(radius = 1cm);
+ 2: std::geo2d::Circle(radius = 1cm);
 
 -- Output --
 -- Errors --

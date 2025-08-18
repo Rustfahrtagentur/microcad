@@ -7,7 +7,7 @@ sketch drill_plate(size = 100mm, hole_size = 10mm) {
         l = size/2 - hole_size;
         rect(size);
         translate(x = [-l,l], y = [-l,l])
-            circle(diameter = hole_size) 
+            Circle(diameter = hole_size) 
     }
 }
 

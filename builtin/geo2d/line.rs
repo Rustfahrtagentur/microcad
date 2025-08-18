@@ -3,13 +3,17 @@
 
 use geo::coord;
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, rc::*, value::*};
+use microcad_lang::{eval::*, model::*, parameter, rc::*, syntax::WorkbenchKind, value::*};
 
 pub struct Line;
 
 impl BuiltinWorkbenchDefinition for Line {
     fn id() -> &'static str {
-        "line"
+        "Line"
+    }
+
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Sketch
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

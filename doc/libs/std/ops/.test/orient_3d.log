@@ -8,21 +8,9 @@
  2: use std::ops::*;
  3: use std::geo3d::*;
  4: 
- 5: cylinder(h = 50mm, d = 35mm).orient([X,Y,Z]);
+ 5: Cylinder(h = 50mm, d = 35mm).orient([X,Y,Z]);
 
 -- Output --
 -- Errors --
-error: Workbench orient cannot find initialization for those arguments
-  ---> <FROM STR>:5:37
-     |
-   5 | cylinder(h = 50mm, d = 35mm).orient([X,Y,Z]);
-     |                                     ^^^^^^^
-     |
-warning: This expression statement did not produce any model
-  ---> <FROM STR>:5:1
-     |
-   5 | cylinder(h = 50mm, d = 35mm).orient([X,Y,Z]);
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
-FAIL
+OK
