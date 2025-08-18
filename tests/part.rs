@@ -48,6 +48,7 @@ fn workbench_call() {
     // Call `a` with `b = 3.0`
     let models = definition
         .call(
+            &symbol,
             &call_argument_value_list("b = 3.0", &mut context),
             &mut context,
         )
@@ -71,6 +72,7 @@ fn workbench_call() {
     // Call `a` with `b = [1.0, 2.0]` (multiplicity)
     let models = definition
         .call(
+            &symbol,
             &call_argument_value_list("b = [1.0, 2.0]", &mut context),
             &mut context,
         )
@@ -113,6 +115,7 @@ fn workbench_initializer_call() {
     {
         let models = definition
             .call(
+                &symbol,
                 &call_argument_value_list("radius = 3.0", &mut context),
                 &mut context,
             )
@@ -125,6 +128,7 @@ fn workbench_initializer_call() {
     {
         let models = definition
             .call(
+                &symbol,
                 &call_argument_value_list("r = 3.0", &mut context),
                 &mut context,
             )
@@ -137,6 +141,7 @@ fn workbench_initializer_call() {
     {
         let models = definition
             .call(
+                &symbol,
                 &call_argument_value_list("d = 6.0", &mut context),
                 &mut context,
             )
@@ -149,6 +154,7 @@ fn workbench_initializer_call() {
     {
         let models = definition
             .call(
+                &symbol,
                 &call_argument_value_list("d = [1.0, 2.0]", &mut context),
                 &mut context,
             )
@@ -161,7 +167,7 @@ fn workbench_initializer_call() {
     // Call `Circle()` (missing arguments)
     {
         let models = definition
-            .call(&ArgumentValueList::default(), &mut context)
+            .call(&symbol, &ArgumentValueList::default(), &mut context)
             .expect("Valid models");
         assert_eq!(models.len(), 0, "There should no models");
         log::trace!("{}", context.diagnosis());

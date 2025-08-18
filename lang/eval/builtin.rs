@@ -40,7 +40,12 @@ impl CallTrait for Builtin {
     /// # Arguments
     /// - `args`: Function arguments
     /// - `context`: Execution context
-    fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<Value> {
+    fn call(
+        &self,
+        _symbol: &Symbol,
+        args: &ArgumentValueList,
+        context: &mut Context,
+    ) -> EvalResult<Value> {
         (self.f)(self.parameters.as_ref(), args, context)
     }
 }
@@ -49,6 +54,10 @@ impl CallTrait for Builtin {
 pub trait BuiltinWorkbenchDefinition {
     /// Get id of the builtin part
     fn id() -> &'static str;
+
+    /// Get the workbench kind.
+    fn kind() -> WorkbenchKind;
+
     /// Create model from argument map
     fn model(args: &Tuple) -> EvalResult<Model>;
     /// Part function
@@ -67,7 +76,14 @@ pub trait BuiltinWorkbenchDefinition {
                 .iter()
                 .map(|args| {
                     Self::model(args).inspect(|model| {
-                        model.borrow_mut().origin.arguments = args.clone();
+                        model.borrow_mut().origin = Refer::new(
+                            Origin::BuiltinWorkbench {
+                                symbol: Self::symbol().full_name(),
+                                kind: Self::kind(),
+                                arguments: args.clone(),
+                            },
+                            SrcRef(None),
+                        )
                     })
                 })
                 .collect::<Result<Models, _>>()?,

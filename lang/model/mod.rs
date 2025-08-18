@@ -139,18 +139,14 @@ impl Model {
         })
     }
 
-    /// Find the original source file of this model
-    pub fn find_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
-        self.ancestors()
-            .find_map(|model| model.borrow().origin.source_file.clone())
+    /// Return source hash.
+    pub fn source_hash(&self) -> crate::Hash {
+        self.borrow().origin.src_ref.source_hash()
     }
 
     /// Test if the model has this specific source file.
     pub fn has_source_file(&self, source_file: &std::rc::Rc<SourceFile>) -> bool {
-        match (source_file.as_ref(), self.find_source_file()) {
-            (a, Some(b)) => a.hash == b.hash,
-            _ => false,
-        }
+        source_file.hash == self.source_hash()
     }
 
     /// Return inner group if this model only contains a group as single child.
@@ -184,7 +180,7 @@ impl Model {
             },
             element_type = self_.element,
             origin = match self_.origin.get_creator() {
-                Some(_) => format!(" = {origin}", origin = self_.origin),
+                Some(name) => format!(" = {name}"),
                 None => String::new(),
             },
             output_type = self.final_output_type(),

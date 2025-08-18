@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{eval::*, model::*, parameter, syntax::WorkbenchKind, value::*};
 
 /// Builtin definition for a translation.
 #[derive(Debug)]
@@ -11,6 +11,10 @@ pub struct Translate;
 impl BuiltinWorkbenchDefinition for Translate {
     fn id() -> &'static str {
         "translate"
+    }
+
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Operation
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

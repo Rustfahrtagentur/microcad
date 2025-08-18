@@ -3,7 +3,7 @@
 
 //! Model
 
-use crate::{model::*, rc::*, resolve::*, src_ref::*, syntax::*};
+use crate::{model::*, rc::*, src_ref::*, syntax::*};
 use microcad_core::{Geometry2D, Geometry3D};
 
 /// The actual model contents
@@ -23,8 +23,8 @@ pub struct ModelInner {
     pub element: Element,
     /// Attributes used for export.
     pub attributes: Attributes,
-    /// The symbol (e.g. [`WorkbenchDefinition`]) that created this [`Model`].
-    pub origin: Origin,
+    /// The origin (e.g. [`WorkbenchDefinition`]) that created this [`Model`].
+    pub origin: Refer<Origin>,
     /// The output type of the this model.
     pub output: ModelOutput,
 }
@@ -59,15 +59,6 @@ impl ModelInner {
     /// Return if ,model has no children.
     pub fn is_empty(&self) -> bool {
         self.children.is_empty()
-    }
-
-    /// Set the information about the creator of this model.
-    ///
-    /// This function is called after the resulting models of a call of a part
-    /// have been retrieved.   
-    pub(crate) fn set_creator(&mut self, creator: Symbol, call_src_ref: SrcRef) {
-        self.origin.set_creator(creator);
-        self.origin.call_src_ref = call_src_ref;
     }
 }
 

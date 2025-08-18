@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{eval::*, model::*, parameter, syntax::WorkbenchKind, value::*};
 
 #[derive(Debug)]
 pub struct Revolve {
@@ -39,6 +39,10 @@ impl Operation for Revolve {
 impl BuiltinWorkbenchDefinition for Revolve {
     fn id() -> &'static str {
         "revolve"
+    }
+
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Operation
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

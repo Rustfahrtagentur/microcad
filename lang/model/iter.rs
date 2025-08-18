@@ -3,8 +3,6 @@
 
 //! Model tree iterators
 
-use crate::syntax::SourceFile;
-
 use super::*;
 
 /// Children iterator struct.
@@ -124,24 +122,24 @@ impl Iterator for Ancestors {
 /// Iterator over all descendants.
 pub struct SourceFileDescendants {
     stack: Models,
-    source_file: std::rc::Rc<SourceFile>,
+    source_file_hash: u64,
 }
 
 impl SourceFileDescendants {
     /// Create a new source file descendants.
     pub fn new(root: Model) -> Self {
-        let source_file = root.find_source_file().expect("A source file");
+        let source_file_hash = root.borrow().origin.src_ref.source_hash();
 
         Self {
             stack: root
                 .borrow()
                 .children
-                .filter_by_source_file(&source_file.clone())
+                .filter_by_source_hash(source_file_hash)
                 .iter()
                 .rev()
                 .cloned()
                 .collect(),
-            source_file,
+            source_file_hash,
         }
     }
 }
@@ -154,7 +152,7 @@ impl Iterator for SourceFileDescendants {
             let children = model
                 .borrow()
                 .children
-                .filter_by_source_file(&self.source_file);
+                .filter_by_source_hash(self.source_file_hash);
             for child in children.iter().rev() {
                 self.stack.push(child.clone());
             }

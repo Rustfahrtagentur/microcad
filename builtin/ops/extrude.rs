@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{eval::*, model::*, parameter, syntax::WorkbenchKind, value::*};
 
 #[derive(Debug)]
 pub struct Extrude {
@@ -45,6 +45,10 @@ impl Operation for Extrude {
 impl BuiltinWorkbenchDefinition for Extrude {
     fn id() -> &'static str {
         "extrude"
+    }
+
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Operation
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

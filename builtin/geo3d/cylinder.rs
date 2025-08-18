@@ -2,13 +2,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, rc::*, value::*};
+use microcad_lang::{eval::*, model::*, parameter, rc::*, syntax::WorkbenchKind, value::*};
 
 pub struct Cylinder;
 
 impl BuiltinWorkbenchDefinition for Cylinder {
     fn id() -> &'static str {
         "Cylinder"
+    }
+
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Part
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

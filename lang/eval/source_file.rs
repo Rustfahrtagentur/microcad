@@ -12,7 +12,7 @@ impl Eval<Model> for std::rc::Rc<SourceFile> {
                     .add_children(self.statements.eval(context)?)?
                     .attributes(self.statements.eval(context)?)
                     .build();
-                model.borrow_mut().origin.source_file = Some(self.clone());
+                model.borrow_mut().origin = Refer::new(Origin::SourceFile, self.src_ref());
                 Ok(model)
             },
         )

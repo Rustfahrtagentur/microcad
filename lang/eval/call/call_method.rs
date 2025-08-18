@@ -74,7 +74,6 @@ impl CallMethod<Models> for Models {
                 }
 
                 let models = op.nest(models);
-                models.set_creator(symbol.clone(), SrcRef::merge(name, args));
                 return Ok(models);
             } else {
                 context.error(name, EvalError::NotAnOperation(name.clone()))?;
@@ -86,10 +85,10 @@ impl CallMethod<Models> for Models {
         if let Some(symbol) = name.eval(context)? {
             Ok(match &symbol.borrow().def {
                 SymbolDefinition::Workbench(workbench_definition) => {
-                    let op = workbench_definition.call(args, context)?;
+                    let op = workbench_definition.call(&symbol, args, context)?;
                     try_nest(name, args, context, self, op, &symbol)?
                 }
-                SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
+                SymbolDefinition::Builtin(builtin) => match builtin.call(&symbol, args, context)? {
                     Value::Models(models) => try_nest(name, args, context, self, models, &symbol)?,
                     value => panic!("Builtin call returned {value} but no models."),
                 },

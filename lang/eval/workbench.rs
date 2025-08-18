@@ -13,6 +13,7 @@ impl WorkbenchDefinition {
     /// - `context`: Current evaluation context.
     fn eval_to_model<'a>(
         &'a self,
+        symbol: QualifiedName,
         arguments: Tuple,
         init: Option<&'a InitDefinition>,
         context: &mut Context,
@@ -25,7 +26,14 @@ impl WorkbenchDefinition {
 
         // Create model
         let model = ModelBuilder::new_workpiece(self.kind)
-            .origin(Origin::new(arguments.clone()))
+            .origin(Refer::new(
+                Origin::Workbench {
+                    symbol,
+                    kind: self.kind,
+                    arguments: arguments.clone(),
+                },
+                self.src_ref(),
+            ))
             .attributes(self.attribute_list.eval(context)?)
             .properties(
                 // copy all arguments which are part of the building plan to properties
@@ -102,7 +110,12 @@ impl CallTrait<Models> for WorkbenchDefinition {
     /// - `context`: Current evaluation context.
     ///
     /// Return evaluated nodes (multiple nodes might be created by parameter multiplicity).
-    fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<Models> {
+    fn call(
+        &self,
+        symbol: &Symbol,
+        args: &ArgumentValueList,
+        context: &mut Context,
+    ) -> EvalResult<Models> {
         log::debug!(
             "Workbench {call} {kind} {id:?}({args})",
             call = crate::mark!(CALL),
@@ -128,7 +141,7 @@ impl CallTrait<Models> for WorkbenchDefinition {
                 );
                 // evaluate models for all multiplicity matches
                 for args in matches {
-                    models.push(self.eval_to_model(args, None, context)?);
+                    models.push(self.eval_to_model(symbol.full_name(), args, None, context)?);
                 }
             }
             _ => {
@@ -152,7 +165,12 @@ impl CallTrait<Models> for WorkbenchDefinition {
                         );
                         // evaluate models for all multiplicity matches
                         for args in matches {
-                            models.push(self.eval_to_model(args, Some(init), context)?);
+                            models.push(self.eval_to_model(
+                                symbol.full_name(),
+                                args,
+                                Some(init),
+                                context,
+                            )?);
                         }
                         initialized = true;
                         break;

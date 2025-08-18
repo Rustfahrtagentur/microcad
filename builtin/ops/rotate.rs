@@ -4,7 +4,7 @@
 use microcad_lang::{
     eval::*,
     model::*,
-    syntax::Identifier,
+    syntax::{Identifier, WorkbenchKind},
     ty::{MatrixType, Type},
     value::*,
 };
@@ -16,6 +16,10 @@ pub struct Rotate;
 impl BuiltinWorkbenchDefinition for Rotate {
     fn id() -> &'static str {
         "rotate"
+    }
+
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Operation
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {

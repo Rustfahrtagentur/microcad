@@ -3,7 +3,7 @@
 
 //! Model tree module
 
-use crate::{model::*, resolve::*, src_ref::*, syntax::SourceFile};
+use crate::model::*;
 use derive_more::{Deref, DerefMut};
 use microcad_core::BooleanOp;
 
@@ -107,24 +107,10 @@ impl Models {
         lhs.iter().chain(rhs.iter()).cloned().collect()
     }
 
-    /// Set the information about the creator for all models.
-    ///
-    /// See [`ModelInner::set_creator`] for more info.
-    pub(crate) fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
-        self.iter().for_each(|model| {
-            model
-                .borrow_mut()
-                .set_creator(creator.clone(), call_src_ref.clone())
-        })
-    }
-
     /// Filter the models by source file.
-    pub fn filter_by_source_file(&self, source_file: &std::rc::Rc<SourceFile>) -> Models {
+    pub fn filter_by_source_hash(&self, source_hash: crate::Hash) -> Models {
         self.iter()
-            .filter(|model| match model.find_source_file() {
-                Some(other) => source_file.hash == other.hash,
-                None => false,
-            })
+            .filter(|model| model.source_hash() == source_hash)
             .cloned()
             .collect()
     }

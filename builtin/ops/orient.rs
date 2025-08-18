@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::Vec3;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{eval::*, model::*, parameter, syntax::WorkbenchKind, value::*};
 
 /// Builtin definition to orient an object towards an axis.
 #[derive(Debug)]
@@ -11,6 +11,10 @@ pub struct Orient;
 impl BuiltinWorkbenchDefinition for Orient {
     fn id() -> &'static str {
         "orient"
+    }
+
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Operation
     }
 
     fn model(args: &Tuple) -> EvalResult<Model> {
