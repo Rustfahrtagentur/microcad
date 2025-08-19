@@ -17,14 +17,14 @@
 
 mod externals;
 mod resolve_error;
-mod source_cache;
+mod sources;
 mod symbol;
 mod symbol_definition;
 mod symbol_map;
 
 pub use externals::*;
 pub use resolve_error::*;
-pub use source_cache::*;
+pub use sources::*;
 pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
