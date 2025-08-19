@@ -59,7 +59,7 @@ impl SymbolTable {
             Err(err) => return Err(err)?,
         };
         log::trace!(
-            "{found} global symbol '{name}': = '{full_name}'",
+            "{found} global symbol: '{name}' = '{full_name}'",
             found = crate::mark!(FOUND),
             full_name = symbol.full_name()
         );
@@ -99,18 +99,15 @@ impl SymbolTable {
         let name = &name.with_prefix(module);
         match self.lookup_global(name) {
             Ok(symbol) => {
-                if symbol.full_name() == *name {
-                    log::trace!(
-                        "{found} symbol in current module: '{name}' = '{full_name}'",
-                        found = crate::mark!(FOUND),
-                        full_name = symbol.full_name()
-                    );
-                    return self.follow_alias(&symbol);
-                }
+                log::trace!(
+                    "{found} symbol in current module: '{name}' = '{full_name}'",
+                    found = crate::mark!(FOUND),
+                    full_name = symbol.full_name()
+                );
+                self.follow_alias(&symbol)
             }
-            Err(err) => return Err(err)?,
-        };
-        Err(EvalError::SymbolNotFound(name.clone()))
+            Err(err) => Err(err)?,
+        }
     }
 
     fn lookup_workbench(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
