@@ -181,7 +181,7 @@ impl SymbolTable {
 
     /// Return search paths of this symbol table.
     pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
-        todo!() //self.resolved.cache.search_paths()
+        self.sources.search_paths()
     }
 }
 
