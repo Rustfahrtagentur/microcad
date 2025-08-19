@@ -5,6 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Run microcad Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/editors/vscode/"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/editors/vscode/dist/**/*.js"
+            ],
+            "preLaunchTask": "tsc: watch - editors/vscode/tsconfig.json"
+        },
+        {
             "type": "lldb",
             "request": "launch",
             "name": "Debug unit tests in library 'microcad_core'",
