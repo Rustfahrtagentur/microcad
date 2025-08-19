@@ -238,8 +238,10 @@ fn local_stack() {
         }
     };
 
+    let root_name = "test".into();
+    let root_id = QualifiedName::from_id(root_name);
     stack.open(StackFrame::Source("test".into(), SymbolMap::default()));
-    assert!(stack.current_module_name() == QualifiedName::from_id("test".into()));
+    assert!(stack.current_module_name() == root_id);
 
     assert!(stack.put_local(None, make_int("a".into(), 1)).is_ok());
 
@@ -250,7 +252,7 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     stack.open(StackFrame::Body(SymbolMap::default()));
-    assert!(stack.current_module_name() == QualifiedName::default());
+    assert!(stack.current_module_name() == root_id);
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
@@ -272,7 +274,7 @@ fn local_stack() {
     assert!(fetch_int(&stack, "x").unwrap() == 3);
 
     stack.close();
-    assert!(stack.current_module_name() == QualifiedName::default());
+    assert!(stack.current_module_name() == root_id);
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());
