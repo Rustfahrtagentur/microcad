@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{diag::*, resolve::*, syntax::*, value::*};
 use derive_more::{Deref, DerefMut};
 use std::collections::btree_map::BTreeMap;
 

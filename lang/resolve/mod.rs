@@ -29,7 +29,7 @@ pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
 
-use crate::{rc::*, syntax::*};
+use crate::syntax::*;
 
 /// Trait for items which can be fully qualified.
 pub trait FullyQualify {
@@ -50,7 +50,7 @@ fn resolve_test() {
     let symbols = sources.resolve().expect("resolve failed");
     log::trace!("Symbols:\n{symbols}");
 
-    crate::eval::SymbolTable::new(root_id, symbols, sources);
+    crate::eval::SymbolTable::new(root_id, symbols, sources).expect("new symbol table");
 }
 
 impl SourceFile {
@@ -197,7 +197,7 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
                     ),
                 )))
             }
-            UseDeclaration::UseAll(name) => Ok(None),
+            UseDeclaration::UseAll(_) => Ok(None),
             UseDeclaration::UseAlias(name, alias) => Ok(Some((
                 alias.clone(),
                 Symbol::new(
