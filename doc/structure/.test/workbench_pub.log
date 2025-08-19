@@ -12,6 +12,12 @@
 
 -- Output --
 -- Errors --
+error: Function statement not available here
+  ---> <FROM STR>:2:5
+     |
+   2 |     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 warning: The part workbench will produce no 3D output.
   ---> <FROM STR>:1:1
      |
@@ -19,4 +25,4 @@ warning: The part workbench will produce no 3D output.
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

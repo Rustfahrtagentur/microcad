@@ -325,11 +325,12 @@ impl Grant<ModuleDefinition> for Context {
 impl Grant<FunctionDefinition> for Context {
     fn grant(&mut self, statement: &FunctionDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
-            matches!(
-                stack_frame,
+            match stack_frame {
                 // TODO: check if expression generates models (see test `source_expression``)
-                StackFrame::Source(..) | StackFrame::Module(..) | StackFrame::Workbench(..)
-            )
+                StackFrame::Source(..) | StackFrame::Module(..) => true,
+                StackFrame::Workbench(..) => statement.visibility == Visibility::Private,
+                _ => false,
+            }
         } else {
             false
         };
