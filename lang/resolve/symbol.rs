@@ -210,7 +210,7 @@ impl Symbol {
     /// # Arguments
     /// - `name`: Name to search for.
     pub fn search(&self, name: &QualifiedName) -> Option<Symbol> {
-        log::trace!("Searching {name} in {}", self.id());
+        log::trace!("Searching {name} in {:?}", self.id());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first) {
                 let name = &name.remove_first();
