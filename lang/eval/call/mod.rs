@@ -22,23 +22,18 @@ use thiserror::Error;
 impl Eval<ArgumentValueList> for ArgumentList {
     /// Evaluate into a [`ArgumentValueList`].
     fn eval(&self, context: &mut Context) -> EvalResult<ArgumentValueList> {
-        let result = self
-            .iter()
+        self.iter()
             .map(|arg| {
                 (
                     arg.id.clone().unwrap_or(Identifier::none()),
                     arg.eval_value(context),
                 )
             })
-            .filter_map(|(id, arg)| {
-                if let Ok(arg) = arg {
-                    Some((id.clone(), arg))
-                } else {
-                    None
-                }
+            .map(|(id, arg)| match arg {
+                Ok(arg) => Ok((id.clone(), arg)),
+                Err(err) => Err(err),
             })
-            .collect();
-        Ok(result)
+            .collect()
     }
 }
 
@@ -54,7 +49,33 @@ impl Eval for Call {
         };
 
         // evaluate arguments
-        let args = self.argument_list.eval(context)?;
+        let args = match self.argument_list.eval(context) {
+            Ok(args) => args,
+            Err(err) => {
+                // For builtin calls ONLY: If arguments cannot be evaluated put
+                // the native argument code into a ArgumentValueList.
+                // E.g. this is needed to give assert_valid() a qualified name.
+                if matches!(symbol.borrow().def, SymbolDefinition::Builtin(..)) {
+                    self.argument_list
+                        .iter()
+                        .map(|arg| match context.source_code(&arg.value) {
+                            Ok(code) => Ok((
+                                arg.id.clone().unwrap_or(Identifier::none()),
+                                ArgumentValue::new(
+                                    code.into(),
+                                    arg.id.clone(),
+                                    arg.src_ref.clone(),
+                                ),
+                            )),
+                            Err(err) => Err(err),
+                        })
+                        .collect::<EvalResult<ArgumentValueList>>()?
+                } else {
+                    Err(err)?
+                }
+            }
+        };
+
         log::debug!(
             "{call} {name}({args})",
             name = self.name,
