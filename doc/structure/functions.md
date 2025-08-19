@@ -100,7 +100,7 @@ sketch PunchedDisk(radius: Length) {
     use std::geo2d::Circle;
 
     // calculate inner from radius in a method
-    fn inner() { radius/2 }
+    fn inner() { return radius/2; }
 
     // generate donut (and call inner)
     Circle(radius) - Circle(inner());
@@ -119,7 +119,7 @@ Trying to make them public with the keyword `pub` will result into an error:
 
 ```µcad,workbench_pub#fail
 part PunchedDisk(radius: Length) {
-    pub fn inner() { radius/2 }   // error: cant use pub inside workbench
+    pub fn inner() { return radius/2; }   // error: cant use pub fn inside workbench
 }
 
 PunchedDisk(4.0mm);
@@ -133,6 +133,7 @@ You cannot create *workbench properties* within the code body.
 part PunchedDisk(radius: Length) {
     fn inner() { 
         prop hole = radius/2;  // eval error: prop not allowed in function
+        return hole;
     }
 }
 
