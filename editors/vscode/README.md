@@ -1,8 +1,13 @@
-# microcad language syntax
+# microcad VSCode plugin
 
-Provides the syntax of microcad language.
+Provides the syntax highlighting and LSP integration for microcad language plugin.
 
 ## Manual installation
+
+```sh
+sudo npm install -g vsce # Install Visual Studio Code Extension via `npm`
+sudo npm install -g typescript --save-dev # Install type script
+```
 
 Assuming the current directory is the `microcad` repository root, install this plugin manually with:
 
