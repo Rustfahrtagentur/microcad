@@ -8,7 +8,7 @@ use microcad_core::Scalar;
 use crate::{ty::QuantityType, value::*};
 
 /// Render resolution when rendering things e.g. to polygons or meshes.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub enum ResolutionAttribute {
     /// Linear resolution in millimeters (Default = 0.1mm)
     Linear(Scalar),

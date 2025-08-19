@@ -13,7 +13,7 @@ use crate::{model::*, syntax::Identifier};
 /// * outer attributes: `#[export = "test.svg"]`
 /// * inner attributes: `#![export = "test.svg"]`
 ///
-#[derive(Clone, Debug, Default, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default, Deref, DerefMut)]
 pub struct Attributes(pub Vec<Attribute>);
 
 impl AttributesAccess for Attributes {

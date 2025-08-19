@@ -5,17 +5,7 @@ use crate::src_ref::*;
 use derive_more::{Deref, DerefMut};
 
 /// Packs any value together with a source reference
-#[derive(
-    Clone,
-    Default,
-    Ord,
-    PartialEq,
-    PartialOrd,
-    Deref,
-    DerefMut,
-    serde::Serialize,
-    serde::Deserialize,
-)]
+#[derive(Clone, Default, Ord, PartialEq, PartialOrd, Deref, DerefMut)]
 pub struct Refer<T> {
     /// Value
     #[deref]

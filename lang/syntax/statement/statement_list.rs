@@ -7,7 +7,7 @@ use crate::syntax::*;
 use derive_more::Deref;
 
 /// A list of statements.
-#[derive(Clone, Default, Debug, Deref, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default, Debug, Deref)]
 pub struct StatementList(pub Vec<Statement>);
 
 impl std::fmt::Display for StatementList {

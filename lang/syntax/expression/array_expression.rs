@@ -10,7 +10,7 @@ use crate::{
 use derive_more::{Deref, DerefMut};
 
 /// Inner of an [`ArrayExpression`].
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug)]
 pub enum ArrayExpressionInner {
     /// List: `a,b,c`.
     List(ListExpression),
@@ -75,7 +75,7 @@ impl TreeDisplay for ArrayExpressionInner {
 }
 
 /// Array of expressions with common result unit, e.g. `[1+2,4,9]`.
-#[derive(Default, Clone, Debug, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
+#[derive(Default, Clone, Debug, Deref, DerefMut)]
 pub struct ArrayExpression {
     /// Expression list.
     #[deref]

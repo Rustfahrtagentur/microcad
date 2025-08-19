@@ -7,7 +7,7 @@ use crate::{src_ref::*, syntax::*};
 use custom_debug::Debug;
 
 /// Kind of a [`WorkbenchDefinition`].
-#[derive(Clone, Debug, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Copy, PartialEq)]
 pub enum WorkbenchKind {
     /// 3D part
     Part,
@@ -35,7 +35,7 @@ impl std::fmt::Display for WorkbenchKind {
 }
 
 /// Workbench definition, e.g `sketch`, `part` or `op`.
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug)]
 pub struct WorkbenchDefinition {
     /// Documentation.
     pub doc: DocBlock,

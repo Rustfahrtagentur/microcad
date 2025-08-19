@@ -26,7 +26,6 @@ rctree = "0.6"
 strum = { version = "0.27", features = ["derive"] }
 thiserror = "2.0"
 toml = "0.9"
-serde = { version = "1", features = ["derive", "rc"] }
 
 [features]
 default = ["geo3d"]

@@ -8,7 +8,7 @@ use derive_more::Deref;
 use crate::{src_ref::*, syntax::*};
 
 /// [StatementList] from inside `{}` brackets.
-#[derive(Clone, Debug, Default, Deref, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default, Deref)]
 pub struct Body {
     /// Body statements.
     #[deref]

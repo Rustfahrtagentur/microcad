@@ -13,7 +13,7 @@ use crate::{
 };
 
 /// 3D geometry collection.
-#[derive(Debug, Clone, Default, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Default, Deref, DerefMut)]
 pub struct Geometries3D(Vec<Rc<Geometry3D>>);
 
 impl Geometries3D {

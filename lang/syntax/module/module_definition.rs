@@ -6,7 +6,7 @@
 use crate::{rc::*, src_ref::*, syntax::*};
 
 /// Module definition.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub struct ModuleDefinition {
     /// Name of the module.
     pub id: Identifier,

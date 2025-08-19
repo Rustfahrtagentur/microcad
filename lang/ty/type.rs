@@ -6,7 +6,7 @@
 use crate::{syntax::*, ty::*};
 
 /// µcad Basic Types
-#[derive(Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Type {
     /// Invalid type (used for error handling)
     Invalid,

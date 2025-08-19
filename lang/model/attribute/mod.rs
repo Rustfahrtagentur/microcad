@@ -19,10 +19,10 @@ pub use resolution::ResolutionAttribute;
 
 use crate::{create_tuple_value, syntax::*, value::*};
 
-use microcad_core::{Color, Size2, theme::Theme};
+use microcad_core::{theme::Theme, Color, Size2};
 
 /// A custom command attribute from an exporter, e.g.: `svg = (style = "fill:none")`
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug)]
 pub struct CustomCommand {
     /// Attribute id.
     pub id: Identifier,
@@ -31,7 +31,7 @@ pub struct CustomCommand {
 }
 
 /// An attribute for a model.
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug)]
 pub enum Attribute {
     /// Color attribute: `color = "red"`
     Color(Color),
@@ -42,7 +42,6 @@ pub enum Attribute {
     /// Size attribute: `size = std::A4`.
     Size(Size2),
     /// Export command: `export = "test.svg"`.
-    #[serde(skip)]
     Export(ExportCommand),
     /// Measure command: `measure = width`
     Measure(MeasureCommand),

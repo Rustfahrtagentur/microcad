@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Function definition
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub struct FunctionDefinition {
     /// Visibility
     pub visibility: Visibility,

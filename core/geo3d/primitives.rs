@@ -10,7 +10,7 @@ use manifold_rs::Manifold;
 use crate::{geo3d::RenderToMesh, *};
 
 /// The builtin cube primitive, defined by its size in the x, y, and z dimensions.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Cube {
     /// Size of the cube in millimeters.
     pub size: Vec3,
@@ -29,7 +29,7 @@ impl FetchBounds3D for Cube {
 }
 
 /// The builtin sphere primitive, defined by its radius.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Sphere {
     /// Radius of the sphere in millimeters.
     pub radius: Scalar,
@@ -53,7 +53,7 @@ impl RenderToMesh for Sphere {
 
 /// The built-in cylinder primitive, defined by an bottom radius, top radius and height.
 /// The cylinder is oriented along the z-axis.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Cylinder {
     /// Bottom radius of the cylinder in millimeters.
     pub radius_bottom: Scalar,

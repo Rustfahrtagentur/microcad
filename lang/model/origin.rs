@@ -3,13 +3,13 @@
 
 //! Model origin. Original source code information about a model.
 
-use crate::{eval::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{resolve::*, src_ref::*, syntax::*, value::*};
 
 /// The origin is the [`Symbol`] and [`Tuple`] from which the model has been created.
-#[derive(Clone, Default, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default, Debug)]
 pub struct Origin {
     /// The original symbol that has been called.
-    creator: Option<Link<Symbol, QualifiedName>>,
+    creator: Option<Symbol>,
 
     /// The original arguments.
     pub arguments: Tuple,
@@ -35,20 +35,12 @@ impl Origin {
     ///
     /// If a creator is available returns a `Link` to it which might need to be
     /// loaded before accessing it (see [`Self::load_creator()`]).
-    pub fn get_creator(&self) -> &Option<Link<Symbol, QualifiedName>> {
+    pub fn get_creator(&self) -> &Option<Symbol> {
         &self.creator
     }
     /// Set a new creator.
     pub fn set_creator(&mut self, creator: Symbol) {
-        self.creator = Some(creator.into())
-    }
-    /// Get the original symbol which might be loaded at first access from given `symbol_table`.
-    pub fn load_creator(&mut self, symbol_table: &mut impl Lookup) -> EvalResult<Option<&Symbol>> {
-        if let Some(creator) = &mut self.creator {
-            Ok(Some(creator.load(|name| symbol_table.lookup(name))?))
-        } else {
-            Ok(None)
-        }
+        self.creator = Some(creator)
     }
 }
 

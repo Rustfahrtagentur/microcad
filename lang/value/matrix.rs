@@ -6,7 +6,7 @@
 use crate::ty::*;
 
 /// Matrix type
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Matrix {
     /// 2x2 matrix.
     Matrix2(microcad_core::Mat2),

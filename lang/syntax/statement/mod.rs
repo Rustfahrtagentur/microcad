@@ -18,7 +18,7 @@ pub use return_statement::*;
 pub use statement_list::*;
 
 /// Any statement.
-#[derive(Clone, Debug, strum::IntoStaticStr, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, strum::IntoStaticStr)]
 pub enum Statement {
     /// Part definition
     Workbench(Rc<WorkbenchDefinition>),

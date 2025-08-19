@@ -11,7 +11,7 @@ use crate::{src_ref::*, syntax::*};
 /// ```ucad
 /// use std::*;
 /// ```
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug)]
 pub struct UseStatement {
     /// export of use
     pub visibility: Visibility,

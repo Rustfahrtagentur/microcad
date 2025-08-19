@@ -27,7 +27,7 @@ use derive_more::Deref;
 /// Reference into a source file.
 ///
 /// *Hint*: Source file is not part of `SrcRef` and must be provided from outside
-#[derive(Clone, Default, Deref, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default, Deref)]
 pub struct SrcRef(pub Option<Box<SrcRefInner>>);
 
 impl SrcRef {
@@ -49,7 +49,7 @@ impl SrcRef {
     }
 }
 /// A reference into the source code
-#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default)]
 pub struct SrcRefInner {
     /// Range in bytes
     pub range: std::ops::Range<usize>,

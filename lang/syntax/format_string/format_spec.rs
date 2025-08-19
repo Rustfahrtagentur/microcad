@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Format specification.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default)]
 pub struct FormatSpec {
     /// Precision for number formatting.
     pub precision: Option<u32>,
