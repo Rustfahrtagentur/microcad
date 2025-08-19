@@ -135,6 +135,7 @@ part PunchedDisk(radius: Length) {
         prop hole = radius/2;  // eval error: prop not allowed in function
         return hole;
     }
+    inner();
 }
 
 PunchedDisk(1cm);
