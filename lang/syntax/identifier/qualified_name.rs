@@ -132,6 +132,13 @@ impl QualifiedName {
         full_name.append(&mut self.clone());
         full_name
     }
+
+    /// Add a given identifier as suffix.
+    pub fn with_suffix(&self, suffix: Identifier) -> Self {
+        let mut name = self.clone();
+        name.push(suffix.clone());
+        name
+    }
 }
 
 impl std::fmt::Display for QualifiedName {

@@ -205,6 +205,10 @@ pub enum EvalError {
     /// Resolve Error
     #[error("Resolve error {0}")]
     ResolveError(#[from] ResolveError),
+
+    /// Function missing return statement
+    #[error("Missing return statement in {0}")]
+    MissingReturn(QualifiedName),
 }
 
 /// Result type of any evaluation.

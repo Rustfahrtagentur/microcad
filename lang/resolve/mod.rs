@@ -68,12 +68,12 @@ impl SourceFile {
 impl Resolve<Symbol> for ModuleDefinition {
     /// Resolve into Symbol
     fn resolve(&self, parent: &Symbol) -> ResolveResult<Symbol> {
-        let node = Symbol::new(
+        let symbol = Symbol::new(
             SymbolDefinition::Module(self.clone().into()),
             Some(parent.clone()),
         );
-        node.borrow_mut().children = self.body.resolve(&node)?;
-        Ok(node)
+        symbol.borrow_mut().children = self.body.resolve(&symbol)?;
+        Ok(symbol)
     }
 }
 
@@ -112,23 +112,24 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
 
 impl Resolve<Symbol> for WorkbenchDefinition {
     fn resolve(&self, parent: &Symbol) -> ResolveResult<Symbol> {
-        let node = Symbol::new(
+        let symbol = Symbol::new(
             SymbolDefinition::Workbench(self.clone().into()),
             Some(parent.clone()),
         );
-        node.borrow_mut().children = self.body.resolve(&node)?;
-        Ok(node)
+        symbol.borrow_mut().children = self.body.resolve(&symbol)?;
+        Ok(symbol)
     }
 }
 
 impl Resolve<Symbol> for FunctionDefinition {
     fn resolve(&self, parent: &Symbol) -> ResolveResult<Symbol> {
-        let node = Symbol::new(
+        let symbol = Symbol::new(
             SymbolDefinition::Function((*self).clone().into()),
             Some(parent.clone()),
         );
-        node.borrow_mut().children = self.body.resolve(&node)?;
-        Ok(node)
+        symbol.borrow_mut().children = self.body.resolve(&symbol)?;
+
+        Ok(symbol)
     }
 }
 
@@ -226,14 +227,14 @@ fn resolve_source_file() {
     assert!(symbol.search(&"A::B".into()).is_some());
     assert!(symbol.search(&"A::B::C".into()).is_none());
 
-    // use std::print; // Add symbol "print" to current symbol node
+    // use std::print; // Add symbol "print" to current symbol symbol
     // part M() {
-    //      print("test"); // Use symbol node from parent
+    //      print("test"); // Use symbol symbol from parent
     // }
 
-    log::trace!("Symbol node:\n{symbol}");
+    log::trace!("Symbol symbol:\n{symbol}");
 
-    let b = symbol.search(&"A::B".into()).expect("cant find node");
+    let b = symbol.search(&"A::B".into()).expect("cant find symbol");
     assert!(b.search(&"A".into()).is_none());
 
     //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());

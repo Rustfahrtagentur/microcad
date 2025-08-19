@@ -9,6 +9,18 @@ impl Eval for FunctionDefinition {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         context.grant(self)?;
         context.scope(StackFrame::Function(Default::default()), |context| {
+            // check if there is any return statement
+            if !self
+                .body
+                .statements
+                .iter()
+                .any(|s| matches!(&s, Statement::Return(..)))
+            {
+                context.error(
+                    &self.body,
+                    EvalError::MissingReturn(context.current_name().with_suffix(self.id.clone())),
+                )?
+            }
             // avoid body frame
             self.body.statements.eval(context)
         })
