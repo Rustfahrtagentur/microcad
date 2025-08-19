@@ -15,15 +15,17 @@ pub struct SymbolInner {
     pub parent: Option<Symbol>,
     /// Symbol's children
     pub children: SymbolMap,
+    /// Flag if this symbol was in use
+    pub used: bool,
 }
 
 /// Symbol
 ///
-/// Every `symbol` has a [`SymbolDefinition`], a *parent* and *children* stored within a `Rc<RefCell<`[`SymbolInner`]`>`.
-/// So `symbol` is meant as a tree which is used by [`SymbolTable`] to store
+/// Every `Symbol` has a [`SymbolDefinition`], a *parent* and *children* stored within a `Rc<RefCell<`[`SymbolInner`]`>`.
+/// So `Symbol` is meant as a tree which is used by [`SymbolTable`] to store
 /// the resolved symbols by it's original structure in the source code and by it's *id*.
 ///
-/// `SymbolNode` can be shared as mutable.
+/// `Symbol` can be shared as mutable.
 #[derive(Debug, Clone, Deref, DerefMut)]
 pub struct Symbol(RcMut<SymbolInner>);
 
@@ -37,6 +39,7 @@ impl Default for Symbol {
             def: SymbolDefinition::SourceFile(SourceFile::default().into()),
             parent: Default::default(),
             children: Default::default(),
+            used: false,
         }))
     }
 }
@@ -77,6 +80,7 @@ impl Symbol {
             def,
             parent,
             children: Default::default(),
+            used: false,
         }))
     }
     /// Create a symbol of a source file ([`SymbolDefinition::SourceFile`]).
@@ -142,13 +146,23 @@ impl Symbol {
     ) -> std::fmt::Result {
         let self_id = &self.id();
         let id = id.unwrap_or(self_id);
-        writeln!(
-            f,
-            "{:depth$}{id:?} {} [{}]",
-            "",
-            self.0.borrow().def,
-            self.full_name()
-        )?;
+        if cfg!(feature = "ansi-color") && !self.borrow().used {
+            color_print::cwriteln!(
+                f,
+                "{:depth$}<#606060>{id:?} {} [{}]</>",
+                "",
+                self.0.borrow().def,
+                self.full_name(),
+            )?;
+        } else {
+            writeln!(
+                f,
+                "{:depth$}{id:?} {} [{}]",
+                "",
+                self.0.borrow().def,
+                self.full_name(),
+            )?;
+        }
         let indent = 4; //format!("{id}").len();
 
         self.borrow()

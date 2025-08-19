@@ -42,6 +42,7 @@ impl SymbolMap {
     pub fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         if name.is_empty() {
             if let Some(symbol) = self.get(&Identifier::none()) {
+                symbol.borrow_mut().used = true;
                 return Ok(symbol.clone());
             }
         } else {
@@ -49,8 +50,10 @@ impl SymbolMap {
             if let Some(symbol) = self.get(&id) {
                 if leftover.is_empty() {
                     log::trace!("Fetched {name} from globals (symbol map)");
+                    symbol.borrow_mut().used = true;
                     return Ok(symbol.clone());
                 } else if let Some(symbol) = symbol.search(&leftover) {
+                    symbol.borrow_mut().used = true;
                     return Ok(symbol);
                 }
             }
