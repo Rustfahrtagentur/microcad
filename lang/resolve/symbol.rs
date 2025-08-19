@@ -227,7 +227,7 @@ impl Symbol {
                     child.search(name)
                 }
             } else {
-                log::trace!("No child in {} while searching for {name}", self.id());
+                log::trace!("No child in {:?} while searching for {name}", self.id());
                 None
             }
         } else {
