@@ -1,6 +1,6 @@
 -- Test --
   workbench_init
-  ../doc/tests/statement_usage.md:452
+  ../doc/tests/statement_usage.md:440
 
 -- Code --
 

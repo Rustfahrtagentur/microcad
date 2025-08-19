@@ -1,20 +1,26 @@
 -- Test --
   pre_init_pub_use
-  ../doc/tests/statement_usage.md:250
+  ../doc/tests/statement_usage.md:244
 
 -- Code --
 
- 1: sketch k() { 
+ 1: sketch K() { 
  2:   pub use std; // error
- 3: init(l:Length) {} } k();
- 4: >>>>>>> f14fa203 (fix statement usage tests)
+ 3: init(l:Length) {} } K();
 
--- Parse Error --
-Parser error:  --> 4:1
-  |
-4 | >>>>>>> f14fa203 (fix statement usage tests)
-  | ^---
-  |
-  = expected EOI, single_line_comment, final_expression_statement, or statement
+-- Output --
+-- Errors --
+error: Use statement not available here
+  ---> <FROM STR>:2:3
+     |
+   2 |   pub use std; // error
+     |   ^^^^^^^^^^^^
+     |
+warning: The sketch workbench will produce no 2D output.
+  ---> <FROM STR>:1:1
+     |
+   1 | sketch K() { 
+     | ^^^^^^^^^^^^^
+     |
 -- Test Result --
-FAILED AS EXPECTED (PARSE: Cannot check error line)
+FAILED AS EXPECTED

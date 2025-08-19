@@ -5,7 +5,7 @@
 -- Code --
 
  1: part PunchedDisk(radius: Length) {
- 2:     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
+ 2:     pub fn inner() { return radius/2; }   // error: cant use pub fn inside workbench
  3: }
  4: 
  5: PunchedDisk(4.0mm);
@@ -15,8 +15,8 @@
 error: Function statement not available here
   ---> <FROM STR>:2:5
      |
-   2 |     pub fn inner() { radius/2 }   // error: cant use pub inside workbench
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   2 |     pub fn inner() { return radius/2; }   // error: cant use pub fn inside workbench
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 warning: The part workbench will produce no 3D output.
   ---> <FROM STR>:1:1

@@ -8,7 +8,7 @@
  2:     use std::geo2d::Circle;
  3: 
  4:     // calculate inner from radius in a method
- 5:     fn inner() { radius/2 }
+ 5:     fn inner() { return radius/2; }
  6: 
  7:     // generate donut (and call inner)
  8:     Circle(radius) - Circle(inner());
@@ -18,11 +18,5 @@
 
 -- Output --
 -- Errors --
-error: Workbench Circle cannot find initialization for those arguments
-  ---> <FROM STR>:8:29
-     |
-   8 |     Circle(radius) - Circle(inner());
-     |                             ^^^^^^^
-     |
 -- Test Result --
-FAIL
+OK

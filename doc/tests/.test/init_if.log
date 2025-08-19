@@ -1,6 +1,6 @@
 -- Test --
   init_if
-  ../doc/tests/statement_usage.md:378
+  ../doc/tests/statement_usage.md:366
 
 -- Code --
 
