@@ -87,7 +87,7 @@ impl Sources {
             let (id, name) = basename.split_first();
             let module = match map.get(&id) {
                 Some(symbol) => symbol.clone(),
-                _ => Symbol::new_external(id.clone()),
+                _ => Symbol::new_module(id.clone()),
             };
             Self::recursive_create_modules(&module, &name);
             map.insert(id.clone(), module);
@@ -105,11 +105,7 @@ impl Sources {
             return Some(child.clone());
         }
 
-        let child = if name.is_id() {
-            Symbol::new_external(node_id.clone())
-        } else {
-            Symbol::new_module(node_id.clone())
-        };
+        let child = Symbol::new_module(node_id.clone());
         Symbol::add_child(parent, child.clone());
 
         Self::recursive_create_modules(&child, &name.remove_first());

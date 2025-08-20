@@ -113,13 +113,6 @@ impl Symbol {
         Symbol::new(SymbolDefinition::Module(ModuleDefinition::new(id)), None)
     }
 
-    /// Create a symbol for an external  ([`SymbolDefinition::External`])..
-    /// # Arguments
-    /// - `id`: Name of the symbol
-    pub fn new_external(id: Identifier) -> Symbol {
-        Symbol::new(SymbolDefinition::External(ModuleDefinition::new(id)), None)
-    }
-
     /// Create a new constant ([`SymbolDefinition::Constant`]).
     /// # Arguments
     /// - `id`: Name of the symbol
@@ -235,24 +228,6 @@ impl Symbol {
             None
         }
     }
-
-    /// Converts the *symbol definition* from [`SymbolDefinition::External`] into [`SymbolDefinition::Module`]
-    /// without changing the inner [`ModuleDefinition`].
-    ///
-    /// Symbols which have not already been loaded from [`Externals`] into [`SourceCache`] will remain
-    /// of type [`SymbolDefinition::External`] until they get loaded.
-    pub fn external_to_module(&self) {
-        let def = match &self.borrow().def {
-            SymbolDefinition::External(e) => SymbolDefinition::Module(e.clone()),
-            def => def.clone(),
-        };
-        self.borrow_mut().def = def
-    }
-
-    /// Returns if symbol is an external module which must be loaded before using.
-    pub fn is_external(&self) -> bool {
-        matches!(&self.borrow().def, SymbolDefinition::External(_))
-    }
 }
 
 impl FullyQualify for Symbol {
@@ -293,9 +268,7 @@ impl SrcReferrer for SymbolInner {
     fn src_ref(&self) -> SrcRef {
         match &self.def {
             SymbolDefinition::SourceFile(source_file) => source_file.src_ref(),
-            SymbolDefinition::Module(module) | SymbolDefinition::External(module) => {
-                module.src_ref()
-            }
+            SymbolDefinition::Module(module) => module.src_ref(),
             SymbolDefinition::Workbench(workbench) => workbench.src_ref(),
             SymbolDefinition::Function(function) => function.src_ref(),
             SymbolDefinition::Builtin(_) => {

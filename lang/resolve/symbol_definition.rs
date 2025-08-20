@@ -10,8 +10,6 @@ pub enum SymbolDefinition {
     SourceFile(Rc<SourceFile>),
     /// Module symbol.
     Module(Rc<ModuleDefinition>),
-    /// External module symbol (not already loaded).
-    External(Rc<ModuleDefinition>),
     /// Part symbol.
     Workbench(Rc<WorkbenchDefinition>),
     /// Function symbol.
@@ -33,7 +31,7 @@ impl SymbolDefinition {
     pub fn id(&self) -> Identifier {
         match &self {
             Self::Workbench(w) => w.id.clone(),
-            Self::Module(m) | Self::External(m) => m.id.clone(),
+            Self::Module(m) => m.id.clone(),
             Self::Function(f) => f.id.clone(),
             Self::SourceFile(s) => s.id(),
             Self::Builtin(m) => m.id(),
@@ -48,7 +46,6 @@ impl std::fmt::Display for SymbolDefinition {
         match self {
             Self::Workbench(w) => write!(f, "({})", w.kind),
             Self::Module(_) => write!(f, "(module)"),
-            Self::External(_) => write!(f, "(external)"),
             Self::Function(_) => write!(f, "(function)"),
             Self::SourceFile(_) => write!(f, "(file)"),
             Self::Builtin(_) => write!(f, "(builtin)"),
