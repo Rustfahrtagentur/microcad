@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**219** tests from markdown.
+**221** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -55,6 +55,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/.test/export_attributes.svg)](../doc/.test/export_attributes.log) | [export_attributes](../doc/export.md) |
 | [![test](../doc/libs/std/ops/.test/extrude.svg)](../doc/libs/std/ops/.test/extrude.log) | [extrude](../doc/libs/std/ops/extrude.md) |
 | [![test](../.test/first_example.svg)](../.test/first_example.log) | [first_example](../README.md) |
+| [![test](../doc/structure/.test/fn_no_return.svg)](../doc/structure/.test/fn_no_return.log) | [fn_no_return](../doc/structure/functions.md) |
 | [![test](../doc/tests/.test/function_assignment_const.svg)](../doc/tests/.test/function_assignment_const.log) | [function_assignment_const](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/function_assignment_prop.svg)](../doc/tests/.test/function_assignment_prop.log) | [function_assignment_prop](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/function_assignment_var.svg)](../doc/tests/.test/function_assignment_var.log) | [function_assignment_var](../doc/tests/statement_usage.md) |
@@ -215,6 +216,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/workbench_example.svg)](../doc/structure/.test/workbench_example.log) | [workbench_example](../doc/structure/functions.md) |
 | [![test](../doc/tests/.test/workbench_expression.svg)](../doc/tests/.test/workbench_expression.log) | [workbench_expression](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/workbench_expression_model.svg)](../doc/tests/.test/workbench_expression_model.log) | [workbench_expression_model](../doc/tests/statement_usage.md) |
+| [![test](../doc/structure/.test/workbench_fn_no_return.svg)](../doc/structure/.test/workbench_fn_no_return.log) | [workbench_fn_no_return](../doc/structure/functions.md) |
 | [![test](../doc/structure/.test/workbench_fn_prop.svg)](../doc/structure/.test/workbench_fn_prop.log) | [workbench_fn_prop](../doc/structure/functions.md) |
 | [![test](../doc/tests/.test/workbench_function.svg)](../doc/tests/.test/workbench_function.log) | [workbench_function](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/workbench_if.svg)](../doc/tests/.test/workbench_if.log) | [workbench_if](../doc/tests/statement_usage.md) |
