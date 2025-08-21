@@ -61,7 +61,9 @@ impl CallMethod<Models> for Models {
     ) -> EvalResult<Models> {
         // Try nest models for an operation: models.op()
         fn try_nest(
+            symbol: &Symbol,
             name: &QualifiedName,
+            args: &ArgumentValueList,
             context: &mut Context,
             models: &Models,
             op: Models,
@@ -85,10 +87,10 @@ impl CallMethod<Models> for Models {
             Ok(match &symbol.borrow().def {
                 SymbolDefinition::Workbench(workbench_definition) => {
                     let op = workbench_definition.call(args, context)?;
-                    try_nest(name, context, self, op)?
+                    try_nest(&symbol, name, args, context, self, op)?
                 }
                 SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
-                    Value::Models(models) => try_nest(name, context, self, models)?,
+                    Value::Models(models) => try_nest(&symbol, name, args, context, self, models)?,
                     value => panic!("Builtin call returned {value} but no models."),
                 },
                 def => {
