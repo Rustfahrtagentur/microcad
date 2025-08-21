@@ -34,12 +34,12 @@ pub trait RenderToMesh: Sized {
     /// Render to manifold.
     ///
     /// Implement this method preferably.
-    fn render_to_manifold(self, resolution: &RenderResolution) -> std::rc::Rc<Manifold>;
+    fn render_to_manifold(&self, resolution: &RenderResolution) -> std::rc::Rc<Manifold>;
 
     /// Render to mesh.
     ///
     /// Implement only if [`RenderToMesh::render_to_manifold`] is not possible.
-    fn render_to_mesh(self, resolution: &RenderResolution) -> TriangleMesh {
+    fn render_to_mesh(&self, resolution: &RenderResolution) -> TriangleMesh {
         self.render_to_manifold(resolution).to_mesh().into()
     }
 }
@@ -47,8 +47,12 @@ pub trait RenderToMesh: Sized {
 #[test]
 fn test_boolean_op_multi() {
     use std::rc::Rc;
-    let a = Rc::new(Geometry3D::Manifold(Rc::new(Manifold::sphere(2.0, 32))));
-    let b = Rc::new(Geometry3D::Manifold(Rc::new(Manifold::sphere(1.0, 32))));
+    let a = Rc::new(Geometry3D::Manifold(std::rc::Rc::new(Manifold::sphere(
+        2.0, 32,
+    ))));
+    let b = Rc::new(Geometry3D::Manifold(std::rc::Rc::new(Manifold::sphere(
+        1.0, 32,
+    ))));
 
     let result = Geometry3D::boolean_op_multi(
         vec![a, b],

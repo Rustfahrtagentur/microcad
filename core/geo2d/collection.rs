@@ -46,7 +46,7 @@ impl Geometries2D {
             return geo2d::MultiPolygon::empty();
         }
 
-        multi_polygon_list
+        multi_polygon_list[1..]
             .iter()
             .fold(multi_polygon_list[0].clone(), |acc, geo| {
                 use geo::BooleanOps;

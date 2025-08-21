@@ -117,10 +117,10 @@ impl Transformed3D for Geometry3D {
 }
 
 impl RenderToMesh for Geometry3D {
-    fn render_to_manifold(self, resolution: &RenderResolution) -> Rc<Manifold> {
+    fn render_to_manifold(&self, resolution: &RenderResolution) -> std::rc::Rc<Manifold> {
         match self {
-            Geometry3D::Mesh(triangle_mesh) => Rc::new(triangle_mesh.to_manifold()),
-            Geometry3D::Manifold(manifold) => manifold,
+            Geometry3D::Mesh(triangle_mesh) => std::rc::Rc::new(triangle_mesh.to_manifold()),
+            Geometry3D::Manifold(manifold) => manifold.clone(),
             Geometry3D::Cube(cube) => cube.render_to_manifold(resolution),
             Geometry3D::Sphere(sphere) => sphere.render_to_manifold(resolution),
             Geometry3D::Cylinder(cylinder) => cylinder.render_to_manifold(resolution),

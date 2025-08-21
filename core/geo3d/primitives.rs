@@ -17,7 +17,7 @@ pub struct Cube {
 }
 
 impl RenderToMesh for Cube {
-    fn render_to_manifold(self, _: &RenderResolution) -> Rc<Manifold> {
+    fn render_to_manifold(&self, _: &RenderResolution) -> Rc<Manifold> {
         Rc::new(geo3d::Manifold::cube(self.size.x, self.size.y, self.size.z))
     }
 }
@@ -44,7 +44,7 @@ impl FetchBounds3D for Sphere {
 }
 
 impl RenderToMesh for Sphere {
-    fn render_to_manifold(self, resolution: &RenderResolution) -> Rc<Manifold> {
+    fn render_to_manifold(&self, resolution: &RenderResolution) -> Rc<Manifold> {
         use std::f64::consts::PI;
         let segments = (self.radius / resolution.linear * PI * 0.5).max(3.0) as u32;
         Rc::new(geo3d::Manifold::sphere(self.radius, segments))
@@ -71,7 +71,7 @@ impl FetchBounds3D for Cylinder {
 }
 
 impl RenderToMesh for Cylinder {
-    fn render_to_manifold(self, resolution: &RenderResolution) -> Rc<Manifold> {
+    fn render_to_manifold(&self, resolution: &RenderResolution) -> Rc<Manifold> {
         use std::f64::consts::PI;
         let n = (self.radius_bottom / resolution.linear * PI * 0.5).max(3.0) as u32;
         Rc::new(geo3d::Manifold::cylinder(
