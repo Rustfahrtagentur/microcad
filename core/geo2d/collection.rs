@@ -45,7 +45,7 @@ impl Geometries2D {
     }
 
     /// Apply contex hull operation to geometries.
-    pub fn hull(&self, resolution: &RenderResolution) -> Self {
+    pub fn hull(&self, resolution: &RenderResolution) -> geo2d::Polygon {
         let mut coords = self.iter().fold(Vec::new(), |mut coords, geo| {
             match geo {
                 Geometry2D::LineString(line_string) => {
@@ -76,15 +76,17 @@ impl Geometries2D {
                     coords.push(line.0.into());
                     coords.push(line.1.into());
                 }
+                Geometry2D::Collection(collection) => {
+                    coords.append(&mut collection.hull(resolution).exterior_coords_iter().collect())
+                }
             }
             coords
         });
 
-        Geometry2D::Polygon(geo2d::Polygon::new(
+        geo2d::Polygon::new(
             geo::algorithm::convex_hull::qhull::quick_hull(&mut coords),
             vec![],
-        ))
-        .into()
+        )
     }
 }
 
