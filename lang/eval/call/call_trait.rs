@@ -6,7 +6,7 @@
 use crate::eval::*;
 
 /// Trait for calls with argument list.
-pub trait CallTrait<T = Value> {
+pub trait CallTrait<ReturnType = Value> {
     /// Evaluate call into value (if possible).
-    fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<T>;
+    fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<ReturnType>;
 }
