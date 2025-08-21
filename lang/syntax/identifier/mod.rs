@@ -19,13 +19,13 @@ static UNIQUE_ID_NEXT: std::sync::Mutex<usize> = std::sync::Mutex::new(0);
 
 /// A case for an identifier.
 #[derive(Debug, PartialEq, Eq)]
-enum Case {
+pub enum Case {
     /// PascalCase
-    PascalCase,
+    Pascal,
     /// lower_snake_case
-    LowerSnakeCase,
+    LowerSnake,
     /// UPPER_SNAKE_CASE
-    UpperSnakeCase,
+    UpperSnake,
     /// A
     UpperSingleChar,
     /// Invalid.
@@ -106,9 +106,9 @@ impl Identifier {
 
         if has_underscore {
             if s.chars().all(|c| c.is_ascii_uppercase() || c == '_') {
-                return Case::UpperSnakeCase;
+                return Case::UpperSnake;
             } else if s.chars().all(|c| c.is_ascii_lowercase() || c == '_') {
-                return Case::LowerSnakeCase;
+                return Case::LowerSnake;
             } else {
                 return Case::Invalid;
             }
@@ -117,7 +117,7 @@ impl Identifier {
             let mut chars = s.chars();
             if let Some(first) = chars.next() {
                 if first.is_ascii_uppercase() && chars.all(|c| c.is_ascii_alphanumeric()) {
-                    return Case::PascalCase;
+                    return Case::Pascal;
                 }
             }
         }
@@ -246,16 +246,16 @@ fn identifier_hash() {
 fn identifier_case() {
     let detect_case = |s| -> Case { Identifier::no_ref(s).detect_case() };
 
-    assert_eq!(detect_case("PascalCase"), Case::PascalCase);
-    assert_eq!(detect_case("lower_snake_case"), Case::LowerSnakeCase);
-    assert_eq!(detect_case("UPPER_SNAKE_CASE"), Case::UpperSnakeCase);
+    assert_eq!(detect_case("PascalCase"), Case::Pascal);
+    assert_eq!(detect_case("lower_snake_case"), Case::LowerSnake);
+    assert_eq!(detect_case("UPPER_SNAKE_CASE"), Case::UpperSnake);
     assert_eq!(detect_case("notValid123_"), Case::Invalid);
     assert_eq!(detect_case(""), Case::Invalid);
     assert_eq!(detect_case("A"), Case::UpperSingleChar); // New case
     assert_eq!(detect_case("z"), Case::Invalid); // lowercase single letter
     assert_eq!(detect_case("_"), Case::Invalid); // only underscore
-    assert_eq!(detect_case("a_b"), Case::LowerSnakeCase);
-    assert_eq!(detect_case("A_B"), Case::UpperSnakeCase);
+    assert_eq!(detect_case("a_b"), Case::LowerSnake);
+    assert_eq!(detect_case("A_B"), Case::UpperSnake);
 
     println!("All tests passed.");
 }
