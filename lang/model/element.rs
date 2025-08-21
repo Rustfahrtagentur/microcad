@@ -31,7 +31,7 @@ pub enum Element {
     Primitive2D(Geometry2D),
 
     /// A 3D geometry. Note: This will become a hash to render cache eventually.
-    Primitive3D(std::rc::Rc<Geometry3D>),
+    Primitive3D(Geometry3D),
 
     /// An operation that generates geometries from its children.
     Operation(std::rc::Rc<dyn Operation>),

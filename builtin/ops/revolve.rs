@@ -27,11 +27,11 @@ impl Operation for Revolve {
             .map(|ring| ring.as_slice())
             .collect();
 
-        Rc::new(Geometry3D::Manifold(Rc::new(Manifold::revolve(
+        Geometry3D::Manifold(Rc::new(Manifold::revolve(
             &multi_polygon_data,
             self.circular_segments as u32,
             self.revolve_degrees,
-        ))))
+        )))
         .into()
     }
 }
