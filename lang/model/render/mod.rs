@@ -3,6 +3,10 @@
 
 //! Model methods and trait implementations for rendering.
 
+mod cache;
+
+pub use cache::*;
+
 use cgmath::SquareMatrix;
 use microcad_core::*;
 
@@ -89,7 +93,7 @@ impl Model {
     }
 
     /// Render geometries in 2D.
-    pub fn render_geometry_2d(&self) -> Geometries2D {
+    pub fn render_geometry_2d(&self, cache: &mut RenderCache) -> Geometries2D {
         self.borrow()
             .children
             .iter()
@@ -98,7 +102,7 @@ impl Model {
                 let mat = model_.output.local_matrix_2d();
                 geometries.append(
                     model
-                        .process_2d(model)
+                        .process_2d(cache, model)
                         .transformed_2d(&model_.output.resolution, &mat),
                 );
                 geometries
@@ -106,7 +110,7 @@ impl Model {
     }
 
     /// Render geometries in 3D.
-    pub fn render_geometry_3d(&self) -> Geometries3D {
+    pub fn render_geometry_3d(&self, cache: &mut RenderCache) -> Geometries3D {
         self.borrow()
             .children
             .iter()
@@ -115,7 +119,7 @@ impl Model {
                 let mat = model_.output.local_matrix_3d();
                 geometries.append(
                     model
-                        .process_3d(model)
+                        .process_3d(cache, model)
                         .transformed_3d(&model_.output.resolution, &mat),
                 );
                 geometries
@@ -129,19 +133,19 @@ impl Model {
     /// This means after rendering, the rendered geometry can be retrieved via:
     /// * `fetch_output_geometry_2d()` for 2D geometry.
     /// * `fetch_output_geometry_3d()` for 3D geometry.
-    pub fn render(&self) {
-        fn render_geometry_2d(model: &Model) -> Geometries2D {
+    pub fn render(&self, cache: &mut RenderCache) {
+        fn render_geometry_2d(cache: &mut RenderCache, model: &Model) -> Geometries2D {
             match &model.borrow().element {
                 Element::Primitive2D(geometry) => geometry.clone().into(),
-                Element::Operation(operation) => operation.process_2d(model),
+                Element::Operation(operation) => operation.process_2d(cache, model),
                 _ => Geometries2D::default(),
             }
         }
 
-        fn render_geometry_3d(model: &Model) -> Geometries3D {
+        fn render_geometry_3d(cache: &mut RenderCache, model: &Model) -> Geometries3D {
             match &model.borrow().element {
                 Element::Primitive3D(geometry) => geometry.clone().into(),
-                Element::Operation(operation) => operation.process_3d(model),
+                Element::Operation(operation) => operation.process_3d(cache, model),
                 _ => Geometries3D::default(),
             }
         }
@@ -152,20 +156,20 @@ impl Model {
 
         match self.final_output_type() {
             OutputType::Geometry2D => {
-                let geometries = render_geometry_2d(self);
+                let geometries = render_geometry_2d(cache, self);
                 if !is_operation(self) {
                     self.borrow().children.iter().for_each(|model| {
-                        model.render();
+                        model.render(cache);
                     });
                 }
 
                 self.borrow_mut().output.geometry = GeometryOutput::Geometries2D(geometries);
             }
             OutputType::Geometry3D => {
-                let geometries = render_geometry_3d(self);
+                let geometries = render_geometry_3d(cache, self);
                 if !is_operation(self) {
                     self.borrow().children.iter().for_each(|model| {
-                        model.render();
+                        model.render(cache);
                     });
                 }
 
@@ -179,7 +183,7 @@ impl Model {
 }
 
 impl Operation for Model {
-    fn process_2d(&self, model: &Model) -> Geometries2D {
+    fn process_2d(&self, cache: &mut RenderCache, model: &Model) -> Geometries2D {
         let mut geometries = Geometries2D::default();
 
         let model_ = &model.borrow();
@@ -187,22 +191,22 @@ impl Operation for Model {
             Element::Group | Element::Workpiece(_) | Element::Transform(_) => {
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_2d(n)));
+                    .for_each(|n| geometries.append(n.process_2d(cache, n)));
             }
             Element::Primitive2D(geo) => {
                 geometries.push(geo.clone());
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_2d(n)));
+                    .for_each(|n| geometries.append(n.process_2d(cache, n)));
             }
-            Element::Operation(operation) => geometries.append(operation.process_2d(model)),
+            Element::Operation(operation) => geometries.append(operation.process_2d(cache, model)),
             _ => {}
         }
 
         geometries.transformed_2d(&model_.output.resolution, &model_.output.local_matrix_2d())
     }
 
-    fn process_3d(&self, model: &Model) -> Geometries3D {
+    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> Geometries3D {
         let mut geometries = Geometries3D::default();
 
         let model_ = &model.borrow();
@@ -210,15 +214,15 @@ impl Operation for Model {
             Element::Group | Element::Workpiece(_) | Element::Transform(_) => {
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_3d(n)));
+                    .for_each(|n| geometries.append(n.process_3d(cache, n)));
             }
             Element::Primitive3D(geo) => {
                 geometries.push(geo.clone());
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_3d(n)));
+                    .for_each(|n| geometries.append(n.process_3d(cache, n)));
             }
-            Element::Operation(operation) => geometries.append(operation.process_3d(model)),
+            Element::Operation(operation) => geometries.append(operation.process_3d(cache, model)),
             _ => {}
         }
 
