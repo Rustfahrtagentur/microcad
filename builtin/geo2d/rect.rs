@@ -3,7 +3,7 @@
 
 use geo::coord;
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, rc::*, value::*};
+use microcad_lang::{eval::*, model::*, parameter, value::*};
 
 pub struct Rect;
 
@@ -19,10 +19,10 @@ impl BuiltinWorkbenchDefinition for Rect {
         let y = args.get("y")?;
 
         Ok(
-            ModelBuilder::new_2d_primitive(Rc::new(Geometry2D::Rect(geo2d::Rect::new(
+            ModelBuilder::new_2d_primitive(Geometry2D::Rect(geo2d::Rect::new(
                 coord! {x: x, y: y},
                 coord! {x: x + width, y: y + height},
-            ))))
+            )))
             .build(),
         )
     }

@@ -80,8 +80,8 @@ impl PropertiesAccess for ModelInner {
     }
 }
 
-impl From<Rc<Geometry2D>> for ModelInner {
-    fn from(geometry: Rc<Geometry2D>) -> Self {
+impl From<Geometry2D> for ModelInner {
+    fn from(geometry: Geometry2D) -> Self {
         Self::new(Element::Primitive2D(geometry))
     }
 }
