@@ -4,7 +4,7 @@
 //! 2D Geometry collection
 
 use derive_more::{Deref, DerefMut};
-use geo::{CoordsIter, LineString, Polygon};
+use geo::{CoordsIter, HasDimensions, LineString, Polygon};
 
 use crate::{
     geo2d::{FetchBounds2D, bounds::Bounds2D},
@@ -26,22 +26,32 @@ impl Geometries2D {
         self.0.append(&mut geometries.0)
     }
 
-    /// Apply boolean operation to multiple geometries.
-    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> Self {
-        if self.0.is_empty() {
-            return Geometries2D::default();
-        }
-
-        self.0[1..]
+    /// Apply boolean operation to render into MultiPolygon.
+    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> geo2d::MultiPolygon {
+        let multi_polygon_list: Vec<_> = self
+            .0
             .iter()
-            .fold(self.0[0].clone(), |acc, geo| {
-                if let Some(r) = acc.boolean_op(resolution, geo, op) {
-                    r
+            // Render each geometry into a multipolygon and filter out empty ones
+            .filter_map(|geo| {
+                let multi_polygon = geo.render_to_multi_polygon(resolution);
+                if multi_polygon.is_empty() {
+                    None
                 } else {
-                    acc
+                    Some(multi_polygon)
                 }
             })
-            .into()
+            .collect();
+
+        if multi_polygon_list.is_empty() {
+            return geo2d::MultiPolygon::empty();
+        }
+
+        multi_polygon_list
+            .iter()
+            .fold(multi_polygon_list[0].clone(), |acc, geo| {
+                use geo::BooleanOps;
+                acc.boolean_op(geo, op.into())
+            })
     }
 
     /// Apply contex hull operation to geometries.

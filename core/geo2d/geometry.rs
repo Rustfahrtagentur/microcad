@@ -34,12 +34,10 @@ impl Geometry2D {
         resolution: &RenderResolution,
         other: &Self,
         op: &BooleanOp,
-    ) -> Option<Self> {
-        let a = self.clone().render_to_multi_polygon(resolution);
-        let b = other.clone().render_to_multi_polygon(resolution);
+    ) -> geo2d::MultiPolygon {
         use geo::BooleanOps;
-        let result = a.boolean_op(&b, op.into());
-        Some(Geometry2D::MultiPolygon(result))
+        self.render_to_multi_polygon(resolution)
+            .boolean_op(&other.render_to_multi_polygon(resolution), op.into())
     }
 
     /// Apply hull operation.
@@ -71,6 +69,13 @@ impl Geometry2D {
     }
 }
 
+impl FetchBounds2D for MultiPolygon {
+    fn fetch_bounds_2d(&self) -> Bounds2D {
+        use geo::BoundingRect;
+        self.bounding_rect().into()
+    }
+}
+
 impl FetchBounds2D for Geometry2D {
     fn fetch_bounds_2d(&self) -> Bounds2D {
         use geo::BoundingRect;
@@ -81,7 +86,7 @@ impl FetchBounds2D for Geometry2D {
                 multi_line_string.bounding_rect().into()
             }
             Geometry2D::Polygon(polygon) => polygon.bounding_rect().into(),
-            Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.bounding_rect().into(),
+            Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.fetch_bounds_2d(),
             Geometry2D::Rect(rect) => Some(*rect).into(),
             Geometry2D::Circle(circle) => circle.fetch_bounds_2d(),
             Geometry2D::Line(line) => line.fetch_bounds_2d(),
