@@ -3,22 +3,20 @@
 
 //! 3D Geometry collection
 
-use std::rc::Rc;
-
 use derive_more::{Deref, DerefMut};
 
 use crate::{
-    geo3d::{bounds::Bounds3D, FetchBounds3D},
+    geo3d::{FetchBounds3D, bounds::Bounds3D},
     *,
 };
 
 /// 3D geometry collection.
 #[derive(Debug, Clone, Default, Deref, DerefMut)]
-pub struct Geometries3D(Vec<Rc<Geometry3D>>);
+pub struct Geometries3D(Vec<Geometry3D>);
 
 impl Geometries3D {
     /// New geometry collection.
-    pub fn new(geometries: Vec<Rc<Geometry3D>>) -> Self {
+    pub fn new(geometries: Vec<Geometry3D>) -> Self {
         Self(geometries)
     }
 
@@ -35,9 +33,9 @@ impl Geometries3D {
 
         self.0[1..]
             .iter()
-            .fold(self.0[0].clone(), |acc, geo| {
-                if let Some(r) = acc.boolean_op(resolution, geo.as_ref(), op) {
-                    Rc::new(r)
+            .fold(self.0[0].clone(), |acc, other| {
+                if let Some(r) = acc.boolean_op(resolution, other, op) {
+                    r
                 } else {
                     acc
                 }
@@ -58,14 +56,14 @@ impl Transformed3D for Geometries3D {
     fn transformed_3d(&self, render_resolution: &RenderResolution, mat: &Mat4) -> Self {
         Self(
             self.iter()
-                .map(|geometry| std::rc::Rc::new(geometry.transformed_3d(render_resolution, mat)))
+                .map(|geometry| geometry.transformed_3d(render_resolution, mat))
                 .collect::<Vec<_>>(),
         )
     }
 }
 
-impl From<std::rc::Rc<Geometry3D>> for Geometries3D {
-    fn from(geometry: std::rc::Rc<Geometry3D>) -> Self {
+impl From<Geometry3D> for Geometries3D {
+    fn from(geometry: Geometry3D) -> Self {
         Self::new(vec![geometry])
     }
 }

@@ -30,14 +30,14 @@ impl Operation for Extrude {
             .map(|ring| ring.as_slice())
             .collect();
 
-        Rc::new(Geometry3D::Manifold(Rc::new(Manifold::extrude(
+        Geometry3D::Manifold(Rc::new(Manifold::extrude(
             &multi_polygon_data,
             self.height,
             self.n_divisions as u32,
             self.twist_degrees,
             self.scale_top_x,
             self.scale_top_y,
-        ))))
+        )))
         .into()
     }
 }

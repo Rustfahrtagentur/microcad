@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, rc::*, value::*};
+use microcad_lang::{eval::*, model::*, parameter, value::*};
 
 pub struct Sphere;
 
@@ -13,9 +13,9 @@ impl BuiltinWorkbenchDefinition for Sphere {
 
     fn model(args: &Tuple) -> EvalResult<Model> {
         Ok(
-            ModelBuilder::new_3d_primitive(Rc::new(geo3d::Geometry3D::Sphere(geo3d::Sphere {
+            ModelBuilder::new_3d_primitive(geo3d::Geometry3D::Sphere(geo3d::Sphere {
                 radius: args.get("radius")?,
-            })))
+            }))
             .build(),
         )
     }
