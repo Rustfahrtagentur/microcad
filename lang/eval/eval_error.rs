@@ -217,6 +217,10 @@ pub enum EvalError {
     /// Cannot call operation without workpiece, e.g. `op()`.
     #[error("Cannot call operation without workpiece.")]
     CannotCallOperationWithoutWorkpiece,
+
+    /// Function missing return statement
+    #[error("Missing return statement in {0}")]
+    MissingReturn(QualifiedName),
 }
 
 /// Result type of any evaluation.
