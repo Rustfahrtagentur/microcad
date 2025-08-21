@@ -119,6 +119,14 @@ impl WriteSvg for MultiPolygon {
 
 impl WriteSvgMapped for MultiPolygon {}
 
+impl WriteSvg for Geometries2D {
+    fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
+        self.iter().try_for_each(|geo| geo.write_svg(writer, attr))
+    }
+}
+
+impl WriteSvgMapped for Geometries2D {}
+
 impl WriteSvg for Geometry2D {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
         match self {
@@ -131,6 +139,7 @@ impl WriteSvg for Geometry2D {
             Geometry2D::Rect(rect) => rect.write_svg(writer, attr),
             Geometry2D::Circle(circle) => circle.write_svg(writer, attr),
             Geometry2D::Line(edge) => edge.write_svg(writer, attr),
+            Geometry2D::Collection(collection) => collection.write_svg(writer, attr),
         }
     }
 }

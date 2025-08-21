@@ -9,9 +9,11 @@ struct Hull;
 
 impl Operation for Hull {
     fn process_2d(&self, model: &Model) -> Geometries2D {
-        model
-            .render_geometry_2d()
-            .hull(&model.borrow().output.resolution)
+        Geometries2D::new(vec![Geometry2D::Polygon(
+            model
+                .render_geometry_2d()
+                .hull(&model.borrow().output.resolution),
+        )])
     }
 
     fn process_3d(&self, _node: &Model) -> Geometries3D {
