@@ -25,22 +25,35 @@ impl Geometries3D {
         self.0.append(&mut geometries.0)
     }
 
-    /// Apply boolean operation to geometry collection.
-    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> Geometries3D {
-        if self.0.is_empty() {
-            return Geometries3D::default();
-        }
-
-        self.0[1..]
+    /// Apply boolean operation on collection and render to manifold.
+    pub fn boolean_op(
+        &self,
+        resolution: &RenderResolution,
+        op: &BooleanOp,
+    ) -> std::rc::Rc<Manifold> {
+        let manifold_list: Vec<_> = self
+            .0
             .iter()
-            .fold(self.0[0].clone(), |acc, other| {
-                if let Some(r) = acc.boolean_op(resolution, other, op) {
-                    r
+            // Render each geometry into a multipolygon and filter out empty ones
+            .filter_map(|geo| {
+                let manifold = geo.render_to_manifold(resolution);
+                if manifold.is_empty() {
+                    None
                 } else {
-                    acc
+                    Some(manifold)
                 }
             })
-            .into()
+            .collect();
+
+        if manifold_list.is_empty() {
+            return std::rc::Rc::new(Manifold::empty());
+        }
+
+        manifold_list[1..]
+            .iter()
+            .fold(manifold_list[0].clone(), |acc, other| {
+                std::rc::Rc::new(acc.boolean_op(other, op.into()))
+            })
     }
 }
 
@@ -63,7 +76,7 @@ impl Transformed3D for Geometries3D {
 }
 
 impl RenderToMesh for Geometries3D {
-    fn render_to_manifold(self, _resolution: &RenderResolution) -> std::rc::Rc<Manifold> {
+    fn render_to_manifold(&self, _resolution: &RenderResolution) -> std::rc::Rc<Manifold> {
         todo!()
     }
 }
