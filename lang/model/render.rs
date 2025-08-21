@@ -71,7 +71,7 @@ impl Model {
     /// Fetch output 2d geometries.
     ///
     /// Panics if the model does not contain any 2d geometry.
-    pub fn fetch_output_geometries_2d(&self) -> Geometries2D {
+    pub fn fetch_output_geometry_2d(&self) -> Geometries2D {
         match &self.borrow().output.geometry {
             GeometryOutput::Geometries2D(geometries) => geometries.clone(),
             _ => panic!("The model does not contain a 2D geometry."),
@@ -81,7 +81,7 @@ impl Model {
     /// Fetch output 3d geometries.
     ///
     /// Panics if the model does not contain any 3d geometry.
-    pub fn fetch_output_geometries_3d(&self) -> Geometries3D {
+    pub fn fetch_output_geometry_3d(&self) -> Geometries3D {
         match &self.borrow().output.geometry {
             GeometryOutput::Geometries3D(geometries) => geometries.clone(),
             _ => panic!("The model does not contain a 3D geometry."),
@@ -89,7 +89,7 @@ impl Model {
     }
 
     /// Render geometries in 2D.
-    pub fn render_geometries_2d(&self) -> Geometries2D {
+    pub fn render_geometry_2d(&self) -> Geometries2D {
         self.borrow()
             .children
             .iter()
@@ -106,7 +106,7 @@ impl Model {
     }
 
     /// Render geometries in 3D.
-    pub fn render_geometries_3d(&self) -> Geometries3D {
+    pub fn render_geometry_3d(&self) -> Geometries3D {
         self.borrow()
             .children
             .iter()
@@ -127,10 +127,10 @@ impl Model {
     /// Rendering the model means that all geometry is calculated and stored
     /// in the respective model output.
     /// This means after rendering, the rendered geometry can be retrieved via:
-    /// * `fetch_output_geometries_2d()` for 2D geometries.
-    /// * `fetch_output_geometries_3d()` for 3D geometries.
+    /// * `fetch_output_geometry_2d()` for 2D geometry.
+    /// * `fetch_output_geometry_3d()` for 3D geometry.
     pub fn render(&self) {
-        fn render_geometries_2d(model: &Model) -> Geometries2D {
+        fn render_geometry_2d(model: &Model) -> Geometries2D {
             match &model.borrow().element {
                 Element::Primitive2D(geometry) => geometry.clone().into(),
                 Element::Operation(operation) => operation.process_2d(model),
@@ -138,7 +138,7 @@ impl Model {
             }
         }
 
-        fn render_geometries_3d(model: &Model) -> Geometries3D {
+        fn render_geometry_3d(model: &Model) -> Geometries3D {
             match &model.borrow().element {
                 Element::Primitive3D(geometry) => geometry.clone().into(),
                 Element::Operation(operation) => operation.process_3d(model),
@@ -152,7 +152,7 @@ impl Model {
 
         match self.final_output_type() {
             OutputType::Geometry2D => {
-                let geometries = render_geometries_2d(self);
+                let geometries = render_geometry_2d(self);
                 if !is_operation(self) {
                     self.borrow().children.iter().for_each(|model| {
                         model.render();
@@ -162,7 +162,7 @@ impl Model {
                 self.borrow_mut().output.geometry = GeometryOutput::Geometries2D(geometries);
             }
             OutputType::Geometry3D => {
-                let geometries = render_geometries_3d(self);
+                let geometries = render_geometry_3d(self);
                 if !is_operation(self) {
                     self.borrow().children.iter().for_each(|model| {
                         model.render();

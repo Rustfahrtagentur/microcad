@@ -20,7 +20,7 @@ impl Operation for Extrude {
 
     fn process_3d(&self, model: &Model) -> Geometries3D {
         use std::rc::Rc;
-        let geometries = model.render_geometries_2d();
+        let geometries = model.render_geometry_2d();
 
         let multi_polygon_data = geo2d::multi_polygon_to_vec(
             &geometries.render_to_multi_polygon(&model.borrow().output.resolution),
