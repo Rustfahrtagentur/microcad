@@ -27,10 +27,10 @@ pub enum Element {
     /// An affine transform.
     Transform(AffineTransform),
 
-    /// A 2D geometry.
-    Primitive2D(std::rc::Rc<Geometry2D>),
+    /// A 2D geometry. Note: This will become a hash to render cache eventually.
+    Primitive2D(Geometry2D),
 
-    /// A 3D geometry.
+    /// A 3D geometry. Note: This will become a hash to render cache eventually.
     Primitive3D(std::rc::Rc<Geometry3D>),
 
     /// An operation that generates geometries from its children.

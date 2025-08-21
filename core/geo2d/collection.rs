@@ -3,8 +3,6 @@
 
 //! 2D Geometry collection
 
-use std::rc::Rc;
-
 use derive_more::{Deref, DerefMut};
 use geo::{CoordsIter, LineString, Polygon};
 
@@ -15,11 +13,11 @@ use crate::{
 
 /// 2D geometry collection.
 #[derive(Debug, Clone, Default, Deref, DerefMut)]
-pub struct Geometries2D(Vec<Rc<Geometry2D>>);
+pub struct Geometries2D(Vec<Geometry2D>);
 
 impl Geometries2D {
     /// New geometry collection.
-    pub fn new(geometries: Vec<Rc<Geometry2D>>) -> Self {
+    pub fn new(geometries: Vec<Geometry2D>) -> Self {
         Self(geometries)
     }
 
@@ -37,8 +35,8 @@ impl Geometries2D {
         self.0[1..]
             .iter()
             .fold(self.0[0].clone(), |acc, geo| {
-                if let Some(r) = acc.boolean_op(resolution, geo.as_ref(), op) {
-                    Rc::new(r)
+                if let Some(r) = acc.boolean_op(resolution, geo, op) {
+                    r
                 } else {
                     acc
                 }
@@ -49,7 +47,7 @@ impl Geometries2D {
     /// Apply contex hull operation to geometries.
     pub fn hull(&self, resolution: &RenderResolution) -> Self {
         let mut coords = self.iter().fold(Vec::new(), |mut coords, geo| {
-            match geo.as_ref() {
+            match geo {
                 Geometry2D::LineString(line_string) => {
                     coords.append(&mut line_string.coords_iter().collect())
                 }
@@ -82,10 +80,10 @@ impl Geometries2D {
             coords
         });
 
-        Rc::new(Geometry2D::Polygon(geo2d::Polygon::new(
+        Geometry2D::Polygon(geo2d::Polygon::new(
             geo::algorithm::convex_hull::qhull::quick_hull(&mut coords),
             vec![],
-        )))
+        ))
         .into()
     }
 }
@@ -102,14 +100,14 @@ impl Transformed2D for Geometries2D {
     fn transformed_2d(&self, render_resolution: &RenderResolution, mat: &Mat3) -> Self {
         Self(
             self.iter()
-                .map(|geometry| std::rc::Rc::new(geometry.transformed_2d(render_resolution, mat)))
+                .map(|geometry| geometry.transformed_2d(render_resolution, mat))
                 .collect::<Vec<_>>(),
         )
     }
 }
 
-impl From<std::rc::Rc<Geometry2D>> for Geometries2D {
-    fn from(geometry: std::rc::Rc<Geometry2D>) -> Self {
+impl From<Geometry2D> for Geometries2D {
+    fn from(geometry: Geometry2D) -> Self {
         Self::new(vec![geometry])
     }
 }
@@ -121,10 +119,7 @@ impl RenderToMultiPolygon for Geometries2D {
         polygons: &mut geo2d::MultiPolygon,
     ) {
         self.iter().for_each(|geometry| {
-            geometry
-                .as_ref()
-                .clone()
-                .render_to_existing_multi_polygon(resolution, polygons);
+            geometry.render_to_existing_multi_polygon(resolution, polygons);
         });
     }
 }
