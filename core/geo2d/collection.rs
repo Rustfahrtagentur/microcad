@@ -9,7 +9,7 @@ use derive_more::{Deref, DerefMut};
 use geo::{CoordsIter, LineString, Polygon};
 
 use crate::{
-    geo2d::{bounds::Bounds2D, FetchBounds2D},
+    geo2d::{FetchBounds2D, bounds::Bounds2D},
     *,
 };
 
@@ -116,7 +116,7 @@ impl From<std::rc::Rc<Geometry2D>> for Geometries2D {
 
 impl RenderToMultiPolygon for Geometries2D {
     fn render_to_existing_multi_polygon(
-        self,
+        &self,
         resolution: &RenderResolution,
         polygons: &mut geo2d::MultiPolygon,
     ) {

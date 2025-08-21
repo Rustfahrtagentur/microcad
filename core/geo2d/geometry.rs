@@ -90,8 +90,7 @@ impl Transformed2D for Geometry2D {
     fn transformed_2d(&self, resolution: &RenderResolution, mat: &Mat3) -> Self {
         if self.is_areal() {
             Self::MultiPolygon(
-                self.clone()
-                    .render_to_multi_polygon(resolution)
+                self.render_to_multi_polygon(resolution)
                     .transformed_2d(resolution, mat),
             )
         } else {
@@ -111,13 +110,15 @@ impl Transformed2D for Geometry2D {
 
 impl RenderToMultiPolygon for Geometry2D {
     fn render_to_existing_multi_polygon(
-        self,
+        &self,
         resolution: &RenderResolution,
         polygons: &mut MultiPolygon,
     ) {
         match self {
-            Geometry2D::Polygon(polygon) => polygons.0.push(polygon),
-            Geometry2D::MultiPolygon(mut multi_polygon) => polygons.0.append(&mut multi_polygon.0),
+            Geometry2D::Polygon(polygon) => polygons.0.push(polygon.clone()),
+            Geometry2D::MultiPolygon(multi_polygon) => {
+                polygons.0.append(&mut multi_polygon.0.clone())
+            }
             Geometry2D::Rect(rect) => polygons
                 .0
                 .push(rect.render_to_polygon(resolution).expect("Polygon")),

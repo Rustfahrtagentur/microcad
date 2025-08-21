@@ -39,7 +39,7 @@ impl FetchPoints2D for Circle {
 }
 
 impl RenderToMultiPolygon for Circle {
-    fn render_to_polygon(self, resolution: &RenderResolution) -> Option<Polygon> {
+    fn render_to_polygon(&self, resolution: &RenderResolution) -> Option<Polygon> {
         use std::f64::consts::PI;
 
         let n = (self.radius / resolution.linear * PI * 0.5).max(3.0);
