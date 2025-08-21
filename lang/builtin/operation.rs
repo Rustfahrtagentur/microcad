@@ -3,17 +3,19 @@
 
 //! Builtin operations.
 
-use microcad_core::{BooleanOp, Geometries2D, Geometries3D};
+use microcad_core::{BooleanOp, Geometries2D, Geometries3D, Geometry2D};
 
 use crate::model::*;
 
 impl Operation for BooleanOp {
     fn process_2d(&self, model: &Model) -> Geometries2D {
-        match model.into_group() {
-            Some(model) => model.render_geometry_2d(),
-            None => model.render_geometry_2d(),
-        }
-        .boolean_op(&model.borrow().output.resolution, self)
+        Geometries2D::new(vec![Geometry2D::MultiPolygon(
+            match model.into_group() {
+                Some(model) => model.render_geometry_2d(),
+                None => model.render_geometry_2d(),
+            }
+            .boolean_op(&model.borrow().output.resolution, self),
+        )])
     }
 
     fn process_3d(&self, model: &Model) -> Geometries3D {
