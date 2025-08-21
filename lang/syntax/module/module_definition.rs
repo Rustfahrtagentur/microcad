@@ -3,10 +3,10 @@
 
 //! Module definition syntax element.
 
-use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
+use crate::{rc::*, src_ref::*, syntax::*};
 
 /// Module definition.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub struct ModuleDefinition {
     /// Name of the module.
     pub id: Identifier,
@@ -24,13 +24,6 @@ impl ModuleDefinition {
             body: Body::default(),
             src_ref: SrcRef(None),
         })
-    }
-
-    /// Resolve into SymbolNode.
-    pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
-        let node = Symbol::new(SymbolDefinition::Module(self.clone()), parent);
-        node.borrow_mut().children = self.body.resolve(Some(node.clone()));
-        node
     }
 }
 

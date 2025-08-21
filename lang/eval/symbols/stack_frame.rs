@@ -139,9 +139,6 @@ impl StackFrame {
                 SymbolDefinition::Module(def) => {
                     writeln!(f, "{:depth$}Module: {:?}{full_name}", "", def.id)?
                 }
-                SymbolDefinition::External(def) => {
-                    writeln!(f, "{:depth$}External: {:?}{full_name}", "", def.id)?
-                }
                 SymbolDefinition::Workbench(def) => {
                     writeln!(f, "{:depth$}Workbench: {:?}{full_name}", "", def.id)?
                 }

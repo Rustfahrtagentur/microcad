@@ -6,7 +6,7 @@
 use crate::{ord_map::*, src_ref::*, syntax::*};
 
 /// Argument in a [`Call`].
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug)]
 pub struct Argument {
     /// Name of the argument
     pub id: Option<Identifier>,

@@ -5,23 +5,16 @@
 
 use derive_more::Deref;
 
-use crate::{resolve::*, src_ref::*, syntax::*};
+use crate::{src_ref::*, syntax::*};
 
 /// [StatementList] from inside `{}` brackets.
-#[derive(Clone, Debug, Default, Deref, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default, Deref)]
 pub struct Body {
     /// Body statements.
     #[deref]
     pub statements: StatementList,
     /// Source code reference.
     pub src_ref: SrcRef,
-}
-
-impl Body {
-    /// fetches all symbols from the statements in the body.
-    pub fn resolve(&self, parent: Option<Symbol>) -> SymbolMap {
-        self.statements.fetch_symbol_map(parent)
-    }
 }
 
 impl SrcReferrer for Body {

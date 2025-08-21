@@ -6,19 +6,7 @@ use derive_more::{Deref, DerefMut};
 
 /// A *qualified name* consists of a list of *identifiers*, separated by `::`,
 /// e.g. `a::b::c`
-#[derive(
-    Default,
-    Clone,
-    PartialEq,
-    Hash,
-    Eq,
-    Ord,
-    PartialOrd,
-    DerefMut,
-    Deref,
-    serde::Serialize,
-    serde::Deserialize,
-)]
+#[derive(Default, Clone, PartialEq, Hash, Eq, Ord, PartialOrd, DerefMut, Deref)]
 pub struct QualifiedName(Refer<Vec<Identifier>>);
 
 /// List of *qualified names* which can be displayed.
@@ -143,6 +131,13 @@ impl QualifiedName {
         let mut full_name = prefix.clone();
         full_name.append(&mut self.clone());
         full_name
+    }
+
+    /// Add a given identifier as suffix.
+    pub fn with_suffix(&self, suffix: Identifier) -> Self {
+        let mut name = self.clone();
+        name.push(suffix.clone());
+        name
     }
 }
 

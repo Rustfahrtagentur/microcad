@@ -30,7 +30,7 @@ fn workbench_call() {
     let mut context = crate::context_for_file("syntax/workbench/plan.µcad");
 
     let symbol = context
-        .lookup(&qualified_name("A"))
+        .lookup(&qualified_name("plan::A"))
         .expect("Symbol expected");
 
     // Check symbol id
@@ -89,7 +89,7 @@ fn workbench_initializer_call() {
 
     let mut context = crate::context_for_file("syntax/workbench/initializer.µcad");
     let symbol = context
-        .lookup(&qualified_name("Circle"))
+        .lookup(&qualified_name("initializer::Circle"))
         .expect("Symbol expected");
 
     // Get workbench definition for symbol `a`

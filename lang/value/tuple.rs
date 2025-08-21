@@ -10,7 +10,7 @@ use crate::{src_ref::*, ty::*, value::*};
 /// Tuple with named values
 ///
 /// Names are optional, which means Identifiers can be empty.
-#[derive(Clone, Default, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct Tuple {
     pub(crate) named: std::collections::HashMap<Identifier, Value>,
     pub(crate) unnamed: std::collections::HashMap<Type, Value>,

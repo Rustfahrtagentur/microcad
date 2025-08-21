@@ -8,7 +8,7 @@ use compact_str::CompactStringExt;
 use derive_more::Deref;
 
 /// List of parameter values
-#[derive(Clone, Debug, Default, Deref, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default, Deref)]
 pub struct ParameterValueList(std::collections::HashMap<Identifier, ParameterValue>);
 
 impl ParameterValueList {

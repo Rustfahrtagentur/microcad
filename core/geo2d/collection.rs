@@ -14,7 +14,7 @@ use crate::{
 };
 
 /// 2D geometry collection.
-#[derive(Debug, Clone, Default, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Default, Deref, DerefMut)]
 pub struct Geometries2D(Vec<Rc<Geometry2D>>);
 
 impl Geometries2D {

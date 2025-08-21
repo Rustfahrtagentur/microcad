@@ -3,11 +3,11 @@
 
 //! Workbench definition syntax element
 
-use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
+use crate::{src_ref::*, syntax::*};
 use custom_debug::Debug;
 
 /// Kind of a [`WorkbenchDefinition`].
-#[derive(Clone, Debug, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Copy, PartialEq)]
 pub enum WorkbenchKind {
     /// 3D part
     Part,
@@ -35,7 +35,7 @@ impl std::fmt::Display for WorkbenchKind {
 }
 
 /// Workbench definition, e.g `sketch`, `part` or `op`.
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug)]
 pub struct WorkbenchDefinition {
     /// Documentation.
     pub doc: DocBlock,
@@ -53,15 +53,6 @@ pub struct WorkbenchDefinition {
     pub body: Body,
     /// Workbench code reference
     pub src_ref: SrcRef,
-}
-
-impl WorkbenchDefinition {
-    /// Resolve into SymbolNode.
-    pub fn resolve(self: &Rc<Self>, parent: Option<Symbol>) -> Symbol {
-        let node = Symbol::new(SymbolDefinition::Workbench(self.clone()), parent);
-        node.borrow_mut().children = self.body.resolve(Some(node.clone()));
-        node
-    }
 }
 
 impl<'a> Initialized<'a> for WorkbenchDefinition {

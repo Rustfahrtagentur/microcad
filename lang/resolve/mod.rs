@@ -15,10 +15,16 @@
 //!
 //! To "run" the source file (and get the expected output) it must now be evaluated (see [`crate::eval`])  .
 
+mod externals;
+mod resolve_error;
+mod sources;
 mod symbol;
 mod symbol_definition;
 mod symbol_map;
 
+pub use externals::*;
+pub use resolve_error::*;
+pub use sources::*;
 pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
@@ -31,34 +37,207 @@ pub trait FullyQualify {
     fn full_name(&self) -> QualifiedName;
 }
 
+trait Resolve<T = Option<Symbol>> {
+    /// Resolve into Symbol
+    fn resolve(&self, parent: &Symbol) -> ResolveResult<T>;
+}
+
+#[test]
+fn resolve_test() {
+    let root = SourceFile::load("../examples/lego_brick.µcad").expect("loading failed");
+    let sources = Sources::load(root.clone(), &["../lib".into()]).expect("loading failed");
+    let root_id = sources.root().id();
+    let symbols = sources.resolve().expect("resolve failed");
+    log::trace!("Symbols:\n{symbols}");
+
+    crate::eval::SymbolTable::new(root_id, symbols, sources).expect("new symbol table");
+}
+
+impl SourceFile {
+    /// Resolve into Symbol
+    pub fn resolve(&self) -> ResolveResult<Symbol> {
+        let name = self.filename_as_str();
+        log::debug!("Creating symbol from source file {name}");
+        let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone().into()), None);
+        symbol.borrow_mut().children = self.statements.resolve(&symbol)?;
+        log::trace!("Created symbol from source file {name}:\n{symbol}");
+        Ok(symbol)
+    }
+}
+
+impl Resolve<Symbol> for ModuleDefinition {
+    /// Resolve into Symbol
+    fn resolve(&self, parent: &Symbol) -> ResolveResult<Symbol> {
+        let symbol = Symbol::new(
+            SymbolDefinition::Module(self.clone().into()),
+            Some(parent.clone()),
+        );
+        symbol.borrow_mut().children = self.body.resolve(&symbol)?;
+        Ok(symbol)
+    }
+}
+
+impl Resolve<SymbolMap> for StatementList {
+    fn resolve(&self, parent: &Symbol) -> ResolveResult<SymbolMap> {
+        let mut symbols = SymbolMap::default();
+
+        // Iterate over all statement fetch definitions
+        for statement in &self.0 {
+            if let Some((id, symbol)) = statement.resolve(parent)? {
+                symbols.insert(id, symbol);
+            }
+        }
+
+        Ok(symbols)
+    }
+}
+
+impl Resolve<Option<(Identifier, Symbol)>> for Statement {
+    fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
+        match self {
+            Statement::Workbench(wd) => Ok(Some((wd.id.clone(), wd.resolve(parent)?))),
+            Statement::Module(md) => Ok(Some((md.id.clone(), md.resolve(parent)?))),
+            Statement::Function(fd) => Ok(Some((fd.id.clone(), fd.resolve(parent)?))),
+            Statement::Use(us) => us.resolve(parent),
+            // Not producing any symbols
+            Statement::Init(_)
+            | Statement::Return(_)
+            | Statement::If(_)
+            | Statement::InnerAttribute(_)
+            | Statement::Assignment(_)
+            | Statement::Expression(_) => Ok(None),
+        }
+    }
+}
+
+impl Resolve<Symbol> for WorkbenchDefinition {
+    fn resolve(&self, parent: &Symbol) -> ResolveResult<Symbol> {
+        let symbol = Symbol::new(
+            SymbolDefinition::Workbench(self.clone().into()),
+            Some(parent.clone()),
+        );
+        symbol.borrow_mut().children = self.body.resolve(&symbol)?;
+        Ok(symbol)
+    }
+}
+
+impl Resolve<Symbol> for FunctionDefinition {
+    fn resolve(&self, parent: &Symbol) -> ResolveResult<Symbol> {
+        let symbol = Symbol::new(
+            SymbolDefinition::Function((*self).clone().into()),
+            Some(parent.clone()),
+        );
+        symbol.borrow_mut().children = self.body.resolve(&symbol)?;
+
+        Ok(symbol)
+    }
+}
+
+impl Resolve for InitDefinition {
+    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+        Ok(None)
+    }
+}
+
+impl Resolve<Option<(Identifier, Symbol)>> for UseStatement {
+    fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
+        match self.visibility {
+            Visibility::Private => Ok(None),
+            // Public symbols are put into resolving symbol map
+            Visibility::Public => self.decl.resolve(parent),
+        }
+    }
+}
+
+impl Resolve for ReturnStatement {
+    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+        Ok(None)
+    }
+}
+
+impl Resolve for IfStatement {
+    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+        Ok(None)
+    }
+}
+
+impl Resolve for Attribute {
+    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+        Ok(None)
+    }
+}
+
+impl Resolve for AssignmentStatement {
+    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+        Ok(None)
+    }
+}
+
+impl Resolve for ExpressionStatement {
+    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+        Ok(None)
+    }
+}
+
+impl Resolve<SymbolMap> for Body {
+    fn resolve(&self, parent: &Symbol) -> ResolveResult<SymbolMap> {
+        self.statements.resolve(parent)
+    }
+}
+
+impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
+    fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
+        match self {
+            UseDeclaration::Use(name) => {
+                let identifier = name.last().expect("Identifier");
+                Ok(Some((
+                    identifier.clone(),
+                    Symbol::new(
+                        SymbolDefinition::Alias(identifier.clone(), name.clone()),
+                        Some(parent.clone()),
+                    ),
+                )))
+            }
+            UseDeclaration::UseAll(_) => Ok(None),
+            UseDeclaration::UseAlias(name, alias) => Ok(Some((
+                alias.clone(),
+                Symbol::new(
+                    SymbolDefinition::Alias(alias.clone(), name.clone()),
+                    Some(parent.clone()),
+                ),
+            ))),
+        }
+    }
+}
+
 #[test]
 fn resolve_source_file() {
     let source_file =
         SourceFile::load_from_str(r#"part A() { part B() {} } "#).expect("Valid source");
 
-    let symbol_node = source_file.resolve(None);
+    let symbol = source_file.resolve().expect("expecting resolve success");
 
     // file <no file>
     //  part a
     //   part b
-    assert!(symbol_node.get(&"A".into()).is_some());
-    assert!(symbol_node.get(&"c".into()).is_none());
+    assert!(symbol.get(&"A".into()).is_some());
+    assert!(symbol.get(&"c".into()).is_none());
 
-    assert!(symbol_node.search(&"A".into()).is_some());
-    assert!(symbol_node.search(&"A::B".into()).is_some());
-    assert!(symbol_node.search(&"A::B::C".into()).is_none());
+    assert!(symbol.search(&"A".into()).is_some());
+    assert!(symbol.search(&"A::B".into()).is_some());
+    assert!(symbol.search(&"A::B::C".into()).is_none());
 
-    // use std::print; // Add symbol "print" to current symbol node
+    // use std::print; // Add symbol "print" to current symbol symbol
     // part M() {
-    //      print("test"); // Use symbol node from parent
+    //      print("test"); // Use symbol symbol from parent
     // }
 
-    log::trace!("Symbol node:\n{symbol_node}");
+    log::trace!("Symbol symbol:\n{symbol}");
 
-    let b = symbol_node.search(&"A::B".into()).expect("cant find node");
+    let b = symbol.search(&"A::B".into()).expect("cant find symbol");
     assert!(b.search(&"A".into()).is_none());
 
     //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());
 
-    log::trace!("{symbol_node}");
+    log::trace!("{symbol}");
 }

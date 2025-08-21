@@ -19,7 +19,7 @@ use crate::{src_ref::*, syntax::*, value::*};
 pub type ListExpression = Vec<Expression>;
 
 /// Any expression.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default)]
 pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]

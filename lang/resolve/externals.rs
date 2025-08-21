@@ -3,7 +3,7 @@
 
 //! External files register
 
-use crate::{MICROCAD_EXTENSIONS, eval::*, syntax::*};
+use crate::{resolve::*, syntax::*, MICROCAD_EXTENSIONS};
 use derive_more::Deref;
 
 /// External files register.
@@ -33,42 +33,6 @@ impl Externals {
         new
     }
 
-    /// Creates symbol map from externals.
-    pub fn create_modules(&self) -> SymbolMap {
-        let mut map = SymbolMap::new();
-        self.iter().for_each(|(basename, _)| {
-            let (id, name) = basename.split_first();
-            let module = match map.get(&id) {
-                Some(symbol) => symbol.clone(),
-                _ => Symbol::new_external(id.clone()),
-            };
-            Self::recursive_create_modules(&module, &name);
-            map.insert(id.clone(), module);
-        });
-        map
-    }
-
-    fn recursive_create_modules(parent: &Symbol, name: &QualifiedName) -> Option<Symbol> {
-        if name.is_empty() {
-            return None;
-        }
-
-        let node_id = name.first().expect("Non-empty qualified name");
-        if let Some(child) = parent.get(node_id) {
-            return Some(child.clone());
-        }
-
-        let child = if name.is_id() {
-            Symbol::new_external(node_id.clone())
-        } else {
-            Symbol::new_module(node_id.clone())
-        };
-        Symbol::add_child(parent, child.clone());
-
-        Self::recursive_create_modules(&child, &name.remove_first());
-        Some(child)
-    }
-
     /// Search for an external file which may include a given qualified name.
     ///
     /// # Arguments
@@ -76,7 +40,7 @@ impl Externals {
     pub fn fetch_external(
         &self,
         name: &QualifiedName,
-    ) -> EvalResult<(QualifiedName, std::path::PathBuf)> {
+    ) -> ResolveResult<(QualifiedName, std::path::PathBuf)> {
         log::trace!("fetching {name} from externals");
 
         if let Some(found) = self
@@ -92,17 +56,17 @@ impl Externals {
             return Ok(found);
         }
 
-        Err(EvalError::ExternalSymbolNotFound(name.clone()))
+        Err(ResolveError::ExternalSymbolNotFound(name.clone()))
     }
 
     /// Get qualified name by path
-    pub fn get_name(&self, path: &std::path::Path) -> EvalResult<&QualifiedName> {
+    pub fn get_name(&self, path: &std::path::Path) -> ResolveResult<&QualifiedName> {
         match self.0.iter().find(|(_, p)| p.as_path() == path) {
             Some((name, _)) => {
                 log::trace!("got name of {path:?} => {name}");
                 Ok(name)
             }
-            None => Err(EvalError::ExternalPathNotFound(path.to_path_buf())),
+            None => Err(ResolveError::ExternalPathNotFound(path.to_path_buf())),
         }
     }
 
@@ -166,26 +130,11 @@ fn resolve_external_file() {
 
     log::trace!("{externals}");
 
-    assert!(
-        externals
-            .fetch_external(&"std::geo2d::Circle".into())
-            .is_ok()
-    );
+    assert!(externals
+        .fetch_external(&"std::geo2d::Circle".into())
+        .is_ok());
 
-    assert!(
-        externals
-            .fetch_external(&"non_std::geo2d::Circle".into())
-            .is_err()
-    );
-}
-
-#[test]
-fn create_modules() {
-    let externals = Externals::new(&["../lib".into()]);
-
-    assert!(!externals.is_empty());
-
-    let modules = externals.create_modules();
-
-    log::trace!("{modules:#?}");
+    assert!(externals
+        .fetch_external(&"non_std::geo2d::Circle".into())
+        .is_err());
 }

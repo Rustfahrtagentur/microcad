@@ -7,7 +7,7 @@ use crate::{model::*, rc::*, resolve::*, src_ref::*, syntax::*};
 use microcad_core::{Geometry2D, Geometry3D};
 
 /// The actual model contents
-#[derive(custom_debug::Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(custom_debug::Debug, Default)]
 pub struct ModelInner {
     /// Optional id.
     ///
@@ -15,7 +15,6 @@ pub struct ModelInner {
     pub id: Option<Identifier>,
     /// Parent object.
     #[debug(skip)]
-    #[serde(skip)]
     pub parent: Option<Model>,
     /// Children of the model.
     pub children: Models,

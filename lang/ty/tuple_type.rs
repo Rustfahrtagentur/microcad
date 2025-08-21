@@ -6,7 +6,7 @@
 use crate::{syntax::*, ty::*};
 
 /// (Partially named) tuple (e.g. `(n: Scalar, m: String, Integer)`)
-#[derive(Debug, Clone, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct TupleType {
     pub(crate) named: std::collections::HashMap<Identifier, Type>,
     pub(crate) unnamed: std::collections::HashSet<Type>,

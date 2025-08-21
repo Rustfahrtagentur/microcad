@@ -6,15 +6,24 @@ use std::io::Read;
 
 impl SourceFile {
     /// Load µcad source file from given `path`
-    pub fn load(path: impl AsRef<std::path::Path>) -> ParseResult<Rc<Self>> {
-        Self::load_with_name(path, QualifiedName::default())
+    pub fn load(path: impl AsRef<std::path::Path> + std::fmt::Debug) -> ParseResult<Rc<Self>> {
+        let name = QualifiedName::from_id(Identifier::no_ref(
+            &path
+                .as_ref()
+                .file_stem()
+                .expect("illegal file name")
+                .to_string_lossy(),
+        ));
+        Self::load_with_name(path, name)
     }
 
     /// Load µcad source file from given `path`
     pub fn load_with_name(
-        path: impl AsRef<std::path::Path>,
+        path: impl AsRef<std::path::Path> + std::fmt::Debug,
         name: QualifiedName,
     ) -> ParseResult<Rc<Self>> {
+        log::trace!("{load} file {path:?} [{name}]", load = crate::mark!(LOAD),);
+
         let mut file = match std::fs::File::open(&path) {
             Ok(file) => file,
             _ => return Err(ParseError::LoadSource(path.as_ref().into())),
@@ -28,8 +37,9 @@ impl SourceFile {
         source_file.filename = Some(path.as_ref().to_path_buf());
         source_file.name = name;
         log::debug!(
-            "Successfully loaded file {}",
+            "Successfully loaded file {} to {}",
             path.as_ref().to_string_lossy(),
+            source_file.name
         );
         log::trace!("Syntax tree:\n{}", FormatTree(&source_file));
 

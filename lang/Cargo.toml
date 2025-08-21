@@ -32,7 +32,6 @@ pathdiff = "0.2"
 ctor = "0.5"
 color-print = { version = "0.3", optional = true }
 sqids = "0.4"
-serde = { version = "1", features = ["derive", "rc"] }
 
 microcad-core = { workspace = true }
 custom_debug = "0.6.2"

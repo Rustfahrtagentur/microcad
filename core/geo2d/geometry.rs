@@ -7,7 +7,7 @@ use geo::ConvexHull;
 use strum::IntoStaticStr;
 
 /// Geometry
-#[derive(IntoStaticStr, Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(IntoStaticStr, Clone, Debug)]
 pub enum Geometry2D {
     /// Line string.
     LineString(LineString),

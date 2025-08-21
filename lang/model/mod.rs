@@ -41,7 +41,7 @@ use crate::{
 };
 
 /// A reference counted, mutable [`Model`].
-#[derive(Debug, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Deref, DerefMut)]
 pub struct Model(RcMut<ModelInner>);
 
 impl Model {

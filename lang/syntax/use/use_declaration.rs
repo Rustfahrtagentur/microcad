@@ -3,7 +3,7 @@
 
 //! Use statement syntax element.
 
-use crate::{resolve::*, src_ref::*, syntax::*};
+use crate::{src_ref::*, syntax::*};
 use strum::IntoStaticStr;
 
 /// Use declaration.
@@ -17,7 +17,7 @@ use strum::IntoStaticStr;
 /// use std::print as p;
 /// ```
 ///
-#[derive(Clone, Debug, IntoStaticStr, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, IntoStaticStr)]
 pub enum UseDeclaration {
     /// Import symbols given as qualified names: `use a, b`
     Use(QualifiedName),
@@ -25,29 +25,6 @@ pub enum UseDeclaration {
     UseAll(QualifiedName),
     /// Import as alias: `use a as b`
     UseAlias(QualifiedName, Identifier),
-}
-
-impl UseDeclaration {
-    /// resolve public use declaration (shall not be called with private use statements)
-    pub fn resolve(&self, parent: Option<Symbol>) -> Option<(Identifier, Symbol)> {
-        match self {
-            UseDeclaration::Use(name) => {
-                let identifier = name.last().expect("Identifier");
-                Some((
-                    identifier.clone(),
-                    Symbol::new(
-                        SymbolDefinition::Alias(identifier.clone(), name.clone()),
-                        parent,
-                    ),
-                ))
-            }
-            UseDeclaration::UseAll(_) => None,
-            UseDeclaration::UseAlias(name, alias) => Some((
-                alias.clone(),
-                Symbol::new(SymbolDefinition::Alias(alias.clone(), name.clone()), parent),
-            )),
-        }
-    }
 }
 
 impl SrcReferrer for UseDeclaration {

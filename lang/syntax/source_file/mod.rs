@@ -3,10 +3,10 @@
 
 //! µcad source file representation
 
-use crate::{rc::*, resolve::*, src_ref::*, syntax::*};
+use crate::{src_ref::*, syntax::*};
 
 /// µcad source file
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default)]
 pub struct SourceFile {
     /// Qualified name of the file if loaded from externals
     pub name: QualifiedName,
@@ -66,21 +66,6 @@ impl SourceFile {
     /// return number of source code lines
     pub fn num_lines(&self) -> usize {
         self.source.lines().count()
-    }
-
-    /// Resolve into SymbolNode
-    pub fn resolve(&self, parent: Option<Symbol>) -> Symbol {
-        Rc::new(self.clone()).resolve_rc(parent)
-    }
-
-    /// Like resolve but with `Rc<SourceFile>`
-    pub fn resolve_rc(self: Rc<Self>, parent: Option<Symbol>) -> Symbol {
-        let name = self.filename_as_str();
-        log::debug!("Resolving source file {name}");
-        let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone()), parent);
-        symbol.borrow_mut().children = self.statements.fetch_symbol_map(Some(symbol.clone()));
-        log::trace!("Resolved source file {name}:\n{symbol}");
-        symbol
     }
 }
 impl std::fmt::Display for SourceFile {

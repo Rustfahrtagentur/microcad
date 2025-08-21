@@ -9,12 +9,11 @@ use strum::IntoStaticStr;
 use crate::geo3d::*;
 
 /// 3D Geometry
-#[derive(IntoStaticStr, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(IntoStaticStr, Clone)]
 pub enum Geometry3D {
     /// Triangle mesh.
     Mesh(TriangleMesh),
     /// Manifold.
-    #[serde(skip)]
     Manifold(Rc<Manifold>),
     /// Cube.
     Cube(Cube),

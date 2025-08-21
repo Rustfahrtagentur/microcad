@@ -93,6 +93,7 @@ pub fn run_test(
                     source.clone(),
                     &["../lib".into(), "../doc/assets".into()],
                 )
+                .expect("resolve error")
                 .build();
                 let eval = context.eval();
 
@@ -195,6 +196,7 @@ pub fn run_test(
                     source.clone(),
                     &["../lib".into(), "../doc/assets".into()],
                 )
+                .expect("resolve error")
                 .build();
                 let eval = context.eval();
 

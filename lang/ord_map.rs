@@ -17,7 +17,7 @@ where
 }
 
 /// Map whose values can be accessed via index in original insert order.
-#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Clone)]
 pub struct OrdMap<K, V>
 where
     V: OrdMapValue<K>,

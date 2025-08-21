@@ -11,7 +11,7 @@ use crate::{
 };
 
 /// A workpiece is an element produced by a workbench.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Workpiece {
     /// Workpiece kind: `op`, `sketch`, `part`.
     pub kind: WorkbenchKind,

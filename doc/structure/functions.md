@@ -2,8 +2,9 @@
 
 - [Declaration](#declaration)
 - [Module Functions](#module-functions)
+  - [Functions Restrictions](#functions-restrictions)
 - [Workbench Functions](#workbench-functions)
-  - [Restrictions](#restrictions)
+  - [Workbench Functions Restrictions](#workbench-functions-restrictions)
 
 *Functions* provide a way to encapsulate frequently used code into sub-routines.
 These sub-routines can then be [called](calls.md) to execute their code with a
@@ -63,28 +64,41 @@ use outside the module.
 
 [![test](.test/mod.svg)](.test/mod.log)
 
-```µcad,mod#todo_fail
+```µcad,mod#fail
 // module math
 mod math {
     // pow cannot be called from outside math
     fn pow( x: Scalar, n: Integer ) {
         if n == 1 {
-            x   // return x
+            return x;   // return x
         } else {
-            x * pow(x, n-1) // return recursive product
+            return x * pow(x, n-1); // return recursive product
         }
     }
 
     // square is callable from outside math
     pub fn square(x: Scalar) {
         // call internal pow
-        pow(x, 2.0)
+        return pow(x, 2.0);
     }
 }
 
 // call square in math
 math::square(2.0);
 math::pow(2.0, 5);  // error: pow is private
+```
+
+### Functions Restrictions
+
+There are some restrictions for *functions*:
+
+Functions must have a return statement.
+
+[![test](.test/fn_no_return.svg)](.test/fn_no_return.log)
+
+```µcad,fn_no_return#fail
+fn inner() {} // error: function needs return statement
+inner();
 ```
 
 ## Workbench Functions
@@ -100,7 +114,7 @@ sketch PunchedDisk(radius: Length) {
     use std::geo2d::Circle;
 
     // calculate inner from radius in a method
-    fn inner() { radius/2 }
+    fn inner() { return radius/2; }
 
     // generate donut (and call inner)
     Circle(radius) - Circle(inner());
@@ -109,7 +123,7 @@ sketch PunchedDisk(radius: Length) {
 PunchedDisk(radius = 1cm);
 ```
 
-### Restrictions
+### Workbench Functions Restrictions
 
 There are some restrictions for *workbench functions*:
 
@@ -119,7 +133,7 @@ Trying to make them public with the keyword `pub` will result into an error:
 
 ```µcad,workbench_pub#fail
 part PunchedDisk(radius: Length) {
-    pub fn inner() { radius/2 }   // error: cant use pub inside workbench
+    pub fn inner() { return radius/2; }   // error: cant use pub fn inside workbench
 }
 
 PunchedDisk(4.0mm);
@@ -133,8 +147,19 @@ You cannot create *workbench properties* within the code body.
 part PunchedDisk(radius: Length) {
     fn inner() { 
         prop hole = radius/2;  // eval error: prop not allowed in function
+        return hole;
     }
+    inner();
 }
 
 PunchedDisk(1cm);
+```
+
+Workbench functions must have a return statement.
+
+[![test](.test/workbench_fn_no_return.svg)](.test/workbench_fn_no_return.log)
+
+```µcad,workbench_fn_no_return#fail
+fn inner() {} // error: function needs return statement
+inner();
 ```

@@ -10,7 +10,7 @@ use crate::{diag::*, eval::*, ord_map::*, src_ref::*, syntax::*, ty::*, value::*
 pub use parameter_list::*;
 
 /// A parameter of a parameter list.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default)]
 pub struct Parameter {
     /// Name of the parameter
     pub id: Identifier,

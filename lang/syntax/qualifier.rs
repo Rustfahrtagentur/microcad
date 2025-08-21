@@ -7,7 +7,7 @@
 ///
 /// This is used to determine if an entity is public or private.
 /// By default, entities are private.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default)]
 pub enum Qualifier {
     /// local variable
     #[default]

@@ -16,5 +16,11 @@ error: Function statement not available here
    2 |   fn f() {} // error
      |   ^^^^^^^^^
      |
+error: Missing return statement in [30m[105m[1m NO ID [39m[49m[22m::f
+  ---> <FROM STR>:2:10
+     |
+   2 |   fn f() {} // error
+     |          ^^
+     |
 -- Test Result --
 FAILED AS EXPECTED

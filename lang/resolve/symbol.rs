@@ -1,38 +1,33 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{eval::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
 use derive_more::{Deref, DerefMut};
 
 /// Symbol content
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub struct SymbolInner {
     /// Symbol definition
     pub def: SymbolDefinition,
     /// Symbol's parent
     #[debug(skip)]
-    #[serde(skip)]
     pub parent: Option<Symbol>,
     /// Symbol's children
     pub children: SymbolMap,
+    /// Flag if this symbol was in use
+    pub used: bool,
 }
 
 /// Symbol
 ///
-/// Every `symbol` has a [`SymbolDefinition`], a *parent* and *children* stored within a `Rc<RefCell<`[`SymbolInner`]`>`.
-/// So `symbol` is meant as a tree which is used by [`SymbolTable`] to store
+/// Every `Symbol` has a [`SymbolDefinition`], a *parent* and *children* stored within a `Rc<RefCell<`[`SymbolInner`]`>`.
+/// So `Symbol` is meant as a tree which is used by [`SymbolTable`] to store
 /// the resolved symbols by it's original structure in the source code and by it's *id*.
 ///
-/// `SymbolNode` can be shared as mutable.
-#[derive(Debug, Clone, Deref, DerefMut, serde::Serialize, serde::Deserialize)]
+/// `Symbol` can be shared as mutable.
+#[derive(Debug, Clone, Deref, DerefMut)]
 pub struct Symbol(RcMut<SymbolInner>);
-
-impl Linkable<QualifiedName> for Symbol {
-    fn link(&self) -> QualifiedName {
-        self.full_name()
-    }
-}
 
 /// List of qualified names which can pe displayed
 #[derive(Debug, Deref)]
@@ -44,6 +39,7 @@ impl Default for Symbol {
             def: SymbolDefinition::SourceFile(SourceFile::default().into()),
             parent: Default::default(),
             children: Default::default(),
+            used: false,
         }))
     }
 }
@@ -84,6 +80,7 @@ impl Symbol {
             def,
             parent,
             children: Default::default(),
+            used: false,
         }))
     }
     /// Create a symbol of a source file ([`SymbolDefinition::SourceFile`]).
@@ -116,13 +113,6 @@ impl Symbol {
         Symbol::new(SymbolDefinition::Module(ModuleDefinition::new(id)), None)
     }
 
-    /// Create a symbol for an external  ([`SymbolDefinition::External`])..
-    /// # Arguments
-    /// - `id`: Name of the symbol
-    pub fn new_external(id: Identifier) -> Symbol {
-        Symbol::new(SymbolDefinition::External(ModuleDefinition::new(id)), None)
-    }
-
     /// Create a new constant ([`SymbolDefinition::Constant`]).
     /// # Arguments
     /// - `id`: Name of the symbol
@@ -149,13 +139,23 @@ impl Symbol {
     ) -> std::fmt::Result {
         let self_id = &self.id();
         let id = id.unwrap_or(self_id);
-        writeln!(
-            f,
-            "{:depth$}{id:?} {} [{}]",
-            "",
-            self.0.borrow().def,
-            self.full_name()
-        )?;
+        if cfg!(feature = "ansi-color") && !self.borrow().used {
+            color_print::cwriteln!(
+                f,
+                "{:depth$}<#606060>{id:?} {} [{}]</>",
+                "",
+                self.0.borrow().def,
+                self.full_name(),
+            )?;
+        } else {
+            writeln!(
+                f,
+                "{:depth$}{id:?} {} [{}]",
+                "",
+                self.0.borrow().def,
+                self.full_name(),
+            )?;
+        }
         let indent = 4; //format!("{id}").len();
 
         self.borrow()
@@ -210,7 +210,7 @@ impl Symbol {
     /// # Arguments
     /// - `name`: Name to search for.
     pub fn search(&self, name: &QualifiedName) -> Option<Symbol> {
-        log::trace!("Searching {name} in {}", self.id());
+        log::trace!("Searching {name} in {:?}", self.id());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first) {
                 let name = &name.remove_first();
@@ -220,31 +220,13 @@ impl Symbol {
                     child.search(name)
                 }
             } else {
-                log::trace!("No child in {} while searching for {name}", self.id());
+                log::trace!("No child in {:?} while searching for {name}", self.id());
                 None
             }
         } else {
             log::warn!("Cannot search for an anonymous name");
             None
         }
-    }
-
-    /// Converts the *symbol definition* from [`SymbolDefinition::External`] into [`SymbolDefinition::Module`]
-    /// without changing the inner [`ModuleDefinition`].
-    ///
-    /// Symbols which have not already been loaded from [`Externals`] into [`SourceCache`] will remain
-    /// of type [`SymbolDefinition::External`] until they get loaded.
-    pub fn external_to_module(&self) {
-        let def = match &self.borrow().def {
-            SymbolDefinition::External(e) => SymbolDefinition::Module(e.clone()),
-            def => def.clone(),
-        };
-        self.borrow_mut().def = def
-    }
-
-    /// Returns if symbol is an external module which must be loaded before using.
-    pub fn is_external(&self) -> bool {
-        matches!(&self.borrow().def, SymbolDefinition::External(_))
     }
 }
 
@@ -273,8 +255,6 @@ impl std::fmt::Display for Symbol {
     }
 }
 
-impl WriteToFile for Symbol {}
-
 /// Print symbols via [std::fmt::Display]
 pub struct FormatSymbol<'a>(pub &'a Symbol);
 
@@ -288,9 +268,7 @@ impl SrcReferrer for SymbolInner {
     fn src_ref(&self) -> SrcRef {
         match &self.def {
             SymbolDefinition::SourceFile(source_file) => source_file.src_ref(),
-            SymbolDefinition::Module(module) | SymbolDefinition::External(module) => {
-                module.src_ref()
-            }
+            SymbolDefinition::Module(module) => module.src_ref(),
             SymbolDefinition::Workbench(workbench) => workbench.src_ref(),
             SymbolDefinition::Function(function) => function.src_ref(),
             SymbolDefinition::Builtin(_) => {

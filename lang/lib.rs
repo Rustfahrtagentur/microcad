@@ -127,6 +127,15 @@ macro_rules! mark {
     (LOAD) => {
         color_print::cformat!("<Y,k,s> LOADING </>")
     };
+    (RESOLVE) => {
+        color_print::cformat!("<M,k,s> RESOLVE </>")
+    };
+    (AMBIGUOUS) => {
+        color_print::cformat!("<R,k,s> AMBIGUOUS </>")
+    };
+    (NOT_FOUND) => {
+        color_print::cformat!("<R,k,s> NOT FOUND </>")
+    };
 }
 
 #[cfg(not(feature = "ansi-color"))]
@@ -147,7 +156,17 @@ macro_rules! found {
     (LOAD) => {
         "Loading"
     };
+    (RESOLVE) => {
+        "Resolve"
+    };
+    (AMBIGUOUS) => {
+        "Ambiguous"
+    };
+    (NOT_FOUND) => {
+        "Not found"
+    };
 }
+
 /// Generate string literal ` INVALID `*XXX*` ` with ANSI color.
 #[cfg(feature = "ansi-color")]
 #[macro_export]

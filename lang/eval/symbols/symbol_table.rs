@@ -15,14 +15,15 @@ use crate::{eval::*, model::*, rc::*, resolve::*, syntax::*};
 /// All these internal structures can be accessed by several implemented traits.
 #[derive(Default)]
 pub struct SymbolTable {
+    sources: Sources,
     /// Symbol of the initial source file.
     pub root: Symbol,
-    /// List of all global symbols.
-    globals: SymbolMap,
     /// Stack of currently opened scopes with symbols while evaluation.
     pub stack: Stack,
-    /// Source file cache containing all source files loaded in the context and their syntax trees.
-    cache: SourceCache,
+    /// Global symbols (including root).
+    pub symbols: SymbolMap,
+    /// Source file diagnostics.
+    pub diag_handler: DiagHandler,
 }
 
 impl SymbolTable {
@@ -30,48 +31,39 @@ impl SymbolTable {
     /// List of all global symbols.
     /// Stack of currently opened scopes with local symbols while evaluation.
     /// Source file cache containing all source files loaded in the context and their syntax trees.
-    pub fn new(root: Symbol, builtin: Symbol, search_paths: &[std::path::PathBuf]) -> Self {
-        // if node owns a source file store this in the file cache
-        let (source_cache, root) = match &root.borrow().def {
-            SymbolDefinition::SourceFile(source_file) => (
-                SourceCache::new(source_file.clone(), search_paths),
-                root.clone(),
-            ),
-            _ => unreachable!("missing root source file"),
-        };
-
+    pub fn new(root: Identifier, symbols: SymbolMap, sources: Sources) -> ResolveResult<Self> {
         // prepare symbol map
-        let mut globals = root.borrow().children.clone().detach_from_parent();
-        globals.add_node(builtin);
 
-        // create modules for all files in search paths into symbol map
-        source_cache
-            .create_modules()
-            .iter()
-            .for_each(|(id, module)| {
-                globals.insert_node(id.clone(), module.clone());
-            });
-
-        let context = Self {
-            root,
-            globals,
+        let symbol_table = Self {
+            sources,
+            root: symbols.search(&QualifiedName::from_id(root))?,
             stack: Default::default(),
-            cache: source_cache,
+            symbols,
+            diag_handler: Default::default(),
         };
-        log::trace!("Initial context:\n{context}");
-        context
-    }
-
-    /// Fetch global symbol from symbol map (for testing only).
-    #[cfg(test)]
-    pub fn fetch_global(&self, qualified_name: &QualifiedName) -> EvalResult<Symbol> {
-        self.globals.search(qualified_name)
+        log::trace!("Initial symbol table:\n{symbol_table}");
+        Ok(symbol_table)
     }
 
     /// Fetch local variable from local stack (for testing only).
     #[cfg(test)]
     pub fn fetch_local(&self, id: &Identifier) -> EvalResult<Symbol> {
         self.stack.fetch(id)
+    }
+
+    /// Lookup a symbol from global symbols.
+    pub fn lookup_global(&mut self, name: &QualifiedName) -> ResolveResult<Symbol> {
+        log::trace!("Looking for global symbol '{name}'");
+        let symbol = match self.symbols.search(name) {
+            Ok(symbol) => symbol.clone(),
+            Err(err) => return Err(err)?,
+        };
+        log::trace!(
+            "{found} global symbol: '{name}' = '{full_name}'",
+            found = crate::mark!(FOUND),
+            full_name = symbol.full_name()
+        );
+        Ok(symbol)
     }
 
     /// Lookup a symbol from local stack.
@@ -101,40 +93,21 @@ impl SymbolTable {
         }
     }
 
-    /// Lookup a symbol from global symbols.
-    fn lookup_global(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("Looking for global symbol '{name}'");
-        let symbol = match self.globals.search(name) {
-            Ok(symbol) => symbol.clone(),
-            Err(EvalError::SymbolNotFound(_)) => self.load_symbol(name)?,
-            err => return err,
-        };
-        log::trace!(
-            "{found} global symbol '{name}': = '{full_name}'",
-            found = crate::mark!(FOUND),
-            full_name = symbol.full_name()
-        );
-        Ok(symbol)
-    }
-
     fn lookup_current(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         let module = &self.stack.current_module_name();
         log::trace!("Looking for symbol '{name}' in current module '{module}'");
         let name = &name.with_prefix(module);
         match self.lookup_global(name) {
             Ok(symbol) => {
-                if symbol.full_name() == *name {
-                    log::trace!(
-                        "{found} symbol in current module: '{name}' = '{full_name}'",
-                        found = crate::mark!(FOUND),
-                        full_name = symbol.full_name()
-                    );
-                    return self.follow_alias(&symbol);
-                }
+                log::trace!(
+                    "{found} symbol in current module: '{name}' = '{full_name}'",
+                    found = crate::mark!(FOUND),
+                    full_name = symbol.full_name()
+                );
+                self.follow_alias(&symbol)
             }
-            err => return err,
-        };
-        Err(EvalError::SymbolNotFound(name.clone()))
+            Err(err) => Err(err)?,
+        }
     }
 
     fn lookup_workbench(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
@@ -152,7 +125,7 @@ impl SymbolTable {
                         return self.follow_alias(&symbol);
                     }
                 }
-                err => return err,
+                Err(err) => return Err(err)?,
             };
         }
         Err(EvalError::SymbolNotFound(name.clone()))
@@ -165,8 +138,10 @@ impl SymbolTable {
     /// Returns found symbol or error if `name` does not have a *source code reference* or symbol could not be found.
     fn lookup_relatively(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         if name.src_ref().is_some() {
-            let name =
-                &name.with_prefix(self.cache.get_name_by_hash(name.src_ref().source_hash())?);
+            let name = &name.with_prefix(
+                self.sources
+                    .get_name_by_hash(name.src_ref().source_hash())?,
+            );
             log::trace!("Looking relatively for symbol '{name}'");
             let symbol = self.lookup_global(name)?;
             log::trace!(
@@ -193,43 +168,6 @@ impl SymbolTable {
         name.clone()
     }
 
-    /// Load a symbol from a qualified name.
-    ///
-    /// Might load any related external file if not already loaded.
-    ///
-    /// # Arguments
-    /// - `name`: Name of the symbol to load
-    fn load_symbol(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("Trying to load symbol {name}");
-
-        // if symbol could not be found in symbol tree, try to load it from external file
-        match self.cache.get_by_name(name) {
-            Err(EvalError::SymbolMustBeLoaded(_, path)) => {
-                log::trace!(
-                    "{load} symbol {name} from {path:?}",
-                    load = crate::mark!(LOAD)
-                );
-                let source_file =
-                    SourceFile::load_with_name(path.clone(), self.cache.name_by_path(&path)?)?;
-                let source_name = self.cache.insert(source_file.clone())?;
-                let node = source_file.resolve(None);
-                // search module where to place loaded source file into
-                let target = self.globals.search(&source_name)?;
-                Symbol::move_children(&target, &node);
-                // mark target as "loaded" by changing the SymbolDefinition type
-                target.external_to_module();
-            }
-            Ok(_) => (),
-            Err(EvalError::SymbolNotFound(_)) => {
-                return Err(EvalError::SymbolNotFound(name.clone()))
-            }
-            Err(err) => return Err(err),
-        }
-
-        // get symbol from symbol map
-        self.globals.search(name)
-    }
-
     fn follow_alias(&mut self, symbol: &Symbol) -> EvalResult<Symbol> {
         // execute alias from any use statement
         let def = &symbol.borrow().def;
@@ -243,7 +181,7 @@ impl SymbolTable {
 
     /// Return search paths of this symbol table.
     pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
-        self.cache.search_paths()
+        self.sources.search_paths()
     }
 }
 
@@ -258,7 +196,7 @@ impl Lookup for SymbolTable {
             ("local", self.lookup_local(name)),
             ("current", self.lookup_current(name)),
             ("workbench", self.lookup_workbench(name)),
-            ("global", self.lookup_global(name)),
+            ("global", self.lookup_global(name).map_err(|e| e.into())),
             ("relative", self.lookup_relatively(name)),
         ]
         .into_iter();
@@ -276,9 +214,10 @@ impl Lookup for SymbolTable {
                     }
                     Err(
                         EvalError::SymbolNotFound(_)
+                        | EvalError::ResolveError(ResolveError::SymbolNotFound(_))
                         | EvalError::LocalNotFound(_)
-                        | EvalError::ExternalPathNotFound(_)
-                        | EvalError::NulHash,
+                        | EvalError::ResolveError(ResolveError::ExternalPathNotFound(_))
+                        | EvalError::ResolveError(ResolveError::NulHash),
                     ) => (),
                     Err(err) => errors.push((origin, err)),
                 }
@@ -299,12 +238,13 @@ impl Lookup for SymbolTable {
         // early emit any ambiguity error
         if !ambiguous.is_empty() {
             log::debug!(
-                "Ambiguous Symbol '{name}':\n{}",
+                "{ambiguous} Symbol '{name}':\n{}",
                 ambiguous
                     .iter()
                     .map(|(origin, err)| format!("{origin}: {err}"))
                     .collect::<Vec<_>>()
-                    .join("\n")
+                    .join("\n"),
+                ambiguous = crate::mark!(AMBIGUOUS)
             );
             return Err(ambiguous.remove(0).1);
         }
@@ -335,7 +275,14 @@ impl Lookup for SymbolTable {
                     Ok(first.clone())
                 }
             }
-            None => Err(EvalError::SymbolNotFound(name.clone())),
+            None => {
+                log::debug!(
+                    "{not_found} Symbol '{name}'",
+                    not_found = crate::mark!(NOT_FOUND)
+                );
+
+                Err(EvalError::SymbolNotFound(name.clone()))
+            }
         }
     }
 }
@@ -388,27 +335,16 @@ impl UseSymbol for SymbolTable {
     ) -> EvalResult<Symbol> {
         log::debug!("Using all symbols in {name}");
 
-        let symbol = match self.lookup(name) {
-            Ok(symbol) => {
-                //  load external file if symbol was not loaded before
-                let ext = symbol.is_external();
-                match ext {
-                    true => self.load_symbol(name)?,
-                    false => symbol.clone(),
-                }
-            }
-            _ => self.load_symbol(name)?,
-        };
-
+        let symbol = self.lookup(name)?;
         if symbol.is_empty() {
             Err(EvalError::NoSymbolsToUse(symbol.full_name()))
         } else {
             for (id, symbol) in symbol.borrow().children.iter() {
                 self.stack.put_local(Some(id.clone()), symbol.clone())?;
                 if within.is_empty() {
-                    self.globals.insert(id.clone(), symbol.clone());
+                    self.symbols.insert(id.clone(), symbol.clone());
                 } else {
-                    self.globals
+                    self.symbols
                         .search(within)?
                         .borrow_mut()
                         .children
@@ -423,18 +359,18 @@ impl UseSymbol for SymbolTable {
 
 impl std::fmt::Display for SymbolTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "\nLoaded files:\n{}", self.cache)?;
+        write!(f, "\nLoaded files:\n{}", self.sources)?;
         writeln!(f, "\nCurrent: {}", self.stack.current_name())?;
         writeln!(f, "\nModule: {}", self.stack.current_module_name())?;
         write!(f, "\nLocals Stack:\n{}", self.stack)?;
         writeln!(f, "\nCall Stack:")?;
-        self.stack.pretty_print_call_trace(f, &self.cache)?;
-        writeln!(f, "\nSymbols:\n{}", self.globals)
+        self.stack.pretty_print_call_trace(f, &self.sources)?;
+        writeln!(f, "\nSymbols:\n{}", self.symbols)
     }
 }
 
 impl GetSourceByHash for SymbolTable {
-    fn get_by_hash(&self, hash: u64) -> EvalResult<std::rc::Rc<SourceFile>> {
-        self.cache.get_by_hash(hash)
+    fn get_by_hash(&self, hash: u64) -> ResolveResult<std::rc::Rc<SourceFile>> {
+        self.sources.get_by_hash(hash)
     }
 }
