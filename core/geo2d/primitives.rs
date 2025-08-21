@@ -37,8 +37,8 @@ impl Transformed2D for MultiLineString {
 }
 
 impl RenderToMultiPolygon for Polygon {
-    fn render_to_polygon(self, _: &RenderResolution) -> Option<Polygon> {
-        Some(self)
+    fn render_to_polygon(&self, _: &RenderResolution) -> Option<Polygon> {
+        Some(self.clone())
     }
 }
 
@@ -50,11 +50,11 @@ impl Transformed2D for Polygon {
 
 impl RenderToMultiPolygon for MultiPolygon {
     fn render_to_existing_multi_polygon(
-        mut self,
+        &self,
         _resolution: &RenderResolution,
         polygons: &mut MultiPolygon,
     ) {
-        polygons.0.append(&mut self.0);
+        polygons.0.append(&mut self.0.clone());
     }
 }
 
@@ -78,7 +78,7 @@ impl FetchPoints2D for Rect {
 }
 
 impl RenderToMultiPolygon for Rect {
-    fn render_to_polygon(self, _: &RenderResolution) -> Option<Polygon> {
+    fn render_to_polygon(&self, _: &RenderResolution) -> Option<Polygon> {
         Some(self.to_polygon())
     }
 }
