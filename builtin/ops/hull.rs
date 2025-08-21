@@ -2,21 +2,25 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{model::*, resolve::*, syntax::*};
+use microcad_lang::{
+    model::{render::RenderCache, *},
+    resolve::*,
+    syntax::*,
+};
 
 #[derive(Debug)]
 struct Hull;
 
 impl Operation for Hull {
-    fn process_2d(&self, model: &Model) -> Geometries2D {
+    fn process_2d(&self, cache: &mut RenderCache, model: &Model) -> Geometries2D {
         Geometries2D::new(vec![Geometry2D::Polygon(
             model
-                .render_geometry_2d()
+                .render_geometry_2d(cache)
                 .hull(&model.borrow().output.resolution),
         )])
     }
 
-    fn process_3d(&self, _node: &Model) -> Geometries3D {
+    fn process_3d(&self, _cache: &mut RenderCache, _node: &Model) -> Geometries3D {
         std::todo!("Hull operation for 3D")
     }
 }

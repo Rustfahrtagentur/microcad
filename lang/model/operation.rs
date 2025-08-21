@@ -3,7 +3,7 @@
 
 //! Algorithm
 
-use crate::model::*;
+use crate::model::{render::RenderCache, *};
 use microcad_core::*;
 
 /// Operation trait.
@@ -23,12 +23,12 @@ pub trait Operation: std::fmt::Debug {
     }
 
     /// Process the model.
-    fn process_2d(&self, _model: &Model) -> Geometries2D {
+    fn process_2d(&self, _cache: &mut RenderCache, _model: &Model) -> Geometries2D {
         unimplemented!()
     }
 
     /// Process the model.
-    fn process_3d(&self, _model: &Model) -> Geometries3D {
+    fn process_3d(&self, _cache: &mut RenderCache, _model: &Model) -> Geometries3D {
         unimplemented!()
     }
 }
