@@ -1,3 +1,6 @@
+# Use statement tests
+
+```µcad,use_test
 // use debug from `std/module.µcad`
 use std::debug::assert;
 assert(true);
@@ -34,3 +37,4 @@ part MyPart() {
 }
 
 assert_valid(MyPart);
+```

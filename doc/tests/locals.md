@@ -1,3 +1,6 @@
+# Locals tests
+
+```µcad,locals
 // This tests the local stack
 
 use __builtin::debug::*;
@@ -40,3 +43,4 @@ p = __builtin::math::PI;
 q = p > 3.;
 
 assert(q);
+```

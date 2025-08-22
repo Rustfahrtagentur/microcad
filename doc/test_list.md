@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**219** tests from markdown.
+**221** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -96,6 +96,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/inline_identifiers.svg)](../doc/structure/.test/inline_identifiers.log) | [inline_identifiers](../doc/structure/arguments.md) |
 | [![test](../doc/libs/std/ops/.test/intersection_alt_operator.svg)](../doc/libs/std/ops/.test/intersection_alt_operator.log) | [intersection_alt_operator](../doc/libs/std/ops/intersection.md) |
 | [![test](../doc/libs/std/ops/.test/intersection_operator.svg)](../doc/libs/std/ops/.test/intersection_operator.log) | [intersection_operator](../doc/libs/std/ops/intersection.md) |
+| [![test](../doc/tests/.test/locals.svg)](../doc/tests/.test/locals.log) | [locals](../doc/tests/locals.md) |
 | [![test](../doc/libs/std/math/.test/math_abs.svg)](../doc/libs/std/math/.test/math_abs.log) | [math_abs](../doc/libs/std/math/README.md) |
 | [![test](../doc/libs/std/math/.test/math_trigonometric.svg)](../doc/libs/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/libs/std/math/README.md) |
 | [![test](../doc/nodes/.test/measure.svg)](../doc/nodes/.test/measure.log) | [measure](../doc/nodes/measures.md) |
@@ -205,6 +206,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/use_module.svg)](../doc/structure/.test/use_module.log) | [use_module](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_statement_pub.svg)](../doc/structure/.test/use_statement_pub.log) | [use_statement_pub](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_statement_pub_in_module.svg)](../doc/structure/.test/use_statement_pub_in_module.log) | [use_statement_pub_in_module](../doc/structure/use.md) |
+| [![test](../doc/tests/.test/use_test.svg)](../doc/tests/.test/use_test.log) | [use_test](../doc/tests/use.md) |
 | [![test](../doc/debug/.test/verify_assert.svg)](../doc/debug/.test/verify_assert.log) | [verify_assert](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_assert_fail.svg)](../doc/debug/.test/verify_assert_fail.log) | [verify_assert_fail](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_error.svg)](../doc/debug/.test/verify_error.log) | [verify_error](../doc/debug/README.md) |
