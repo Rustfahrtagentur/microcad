@@ -218,7 +218,7 @@ impl std::fmt::Display for Stack {
             writeln!(f, crate::invalid!(STACK))
         } else {
             for (n, locals) in self.0.iter().enumerate() {
-                locals.print_locals(f, n * 4 + 4)?;
+                locals.print_locals(f, n, 4)?;
             }
             Ok(())
         }
