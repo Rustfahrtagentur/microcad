@@ -53,6 +53,10 @@ pub enum EvalError {
     #[error("Symbol `{0}` cannot be called {1}.")]
     SymbolCannotBeCalled(QualifiedName, Box<SymbolDefinition>),
 
+    /// The symbol cannot used, because it's private
+    #[error("Symbol `{0}` is private.")]
+    SymbolIsPrivate(QualifiedName),
+
     /// Found ambiguous symbols.
     #[error("Ambiguous symbol {ambiguous} might be one of the following:\n{others}")]
     AmbiguousSymbol {

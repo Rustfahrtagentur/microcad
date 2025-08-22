@@ -82,6 +82,8 @@ impl Eval for Call {
             call = crate::mark!(CALL),
         );
 
+        let caller = context.current_name();
+
         match context.scope(
             StackFrame::Call {
                 symbol: symbol.clone(),
@@ -98,7 +100,14 @@ impl Eval for Call {
                         Ok(Value::Models(w.call(&args, context)?))
                     }
                 }
-                SymbolDefinition::Function(f) => f.call(&args, context),
+                SymbolDefinition::Function(f) => {
+                    if f.visibility == Visibility::Public || caller == symbol.full_base() {
+                        f.call(&args, context)
+                    } else {
+                        context.error(self, EvalError::SymbolIsPrivate(symbol.full_name()))?;
+                        Ok(Value::None)
+                    }
+                }
                 def => {
                     context.error(
                         self,
