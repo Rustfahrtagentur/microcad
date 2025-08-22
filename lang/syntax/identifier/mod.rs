@@ -204,6 +204,15 @@ impl TreeDisplay for Identifier {
 pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
     identifiers
         .iter()
+        .map(|ident| format!("{ident}"))
+        .collect::<Vec<_>>()
+        .join(separator)
+}
+
+/// join several identifiers with `::` and return as string
+pub fn join_identifiers_debug(identifiers: &[Identifier], separator: &str) -> String {
+    identifiers
+        .iter()
         .map(|ident| format!("{ident:?}"))
         .collect::<Vec<_>>()
         .join(separator)

@@ -252,7 +252,7 @@ macro_rules! invalid_no_ansi {
         "<INVALID NAME>"
     };
     (EXPRESSION) => {
-        color_print::cstr!("<INVALID EXPRESSION>")
+        "<INVALID EXPRESSION>"
     };
 }
 
