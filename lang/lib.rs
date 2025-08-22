@@ -246,7 +246,7 @@ macro_rules! invalid_no_ansi {
         "<INVALID UNKNOWN>"
     };
     (ID) => {
-        "<INVALID ID>"
+        "<NO ID>"
     };
     (NAME) => {
         "<INVALID NAME>"
