@@ -57,32 +57,59 @@ impl Stack {
         Err(EvalError::LocalStackEmpty(id))
     }
 
-    fn current_workbench_id(&self) -> Option<&Identifier> {
-        self.0.iter().rev().find_map(|frame| {
-            if let StackFrame::Workbench(_, id, _) = frame {
-                Some(id)
-            } else {
-                None
-            }
-        })
-    }
-
     /// Get name of current module.
     pub fn current_module_name(&self) -> QualifiedName {
-        if self.0.is_empty() {
-            QualifiedName::default()
-        } else {
-            QualifiedName::no_ref(self.0.iter().filter_map(|locals| locals.id()).collect())
+        let mut ids: Vec<Identifier> = Vec::new();
+        for frame in self.0.iter().rev() {
+            match frame {
+                StackFrame::Source(id, _)
+                | StackFrame::Module(id, _)
+                | StackFrame::Workbench(_, id, _) => ids.push(id.clone()),
+                StackFrame::Init(_) | StackFrame::Body(_) | StackFrame::Function(_) => (),
+                StackFrame::Call { symbol, .. } => {
+                    // RULE: builtins run in the callers context - so skip builtin call frames
+                    if !symbol.is_builtin() {
+                        ids.extend(symbol.full_base().iter().cloned().rev());
+                        break;
+                    }
+                }
+            }
         }
+        QualifiedName::no_ref(ids.into_iter().rev().collect())
     }
 
     /// Get name of current workbench.
     pub fn current_workbench_name(&self) -> Option<QualifiedName> {
-        if let Some(id) = self.current_workbench_id() {
-            let name = QualifiedName::new(vec![id.clone()], id.src_ref());
-            Some(name.with_prefix(&self.current_module_name()))
-        } else {
+        let mut ids: Vec<Identifier> = Vec::new();
+        for frame in self.0.iter().rev() {
+            match frame {
+                StackFrame::Source(id, _) | StackFrame::Module(id, _) => {
+                    if ids.is_empty() {
+                        // return none if we haven't found a workbench yet
+                        return None;
+                    } else {
+                        // add id to full name of the workbench
+                        ids.push(id.clone())
+                    }
+                }
+                StackFrame::Workbench(_, id, _) => {
+                    assert!(ids.is_empty());
+                    ids.push(id.clone())
+                }
+                // ignore frames without ids
+                StackFrame::Init(_) | StackFrame::Body(_) | StackFrame::Function(_) => (),
+                StackFrame::Call { symbol, .. } => {
+                    //  finish name
+                    ids.extend(symbol.full_base().iter().cloned().rev());
+                    // stop here
+                    break;
+                }
+            }
+        }
+        if ids.is_empty() {
             None
+        } else {
+            Some(QualifiedName::no_ref(ids.into_iter().rev().collect()))
         }
     }
 
@@ -199,9 +226,8 @@ impl Locals for Stack {
 
     /// Get name of current workbench or module (might be empty).
     fn current_name(&self) -> QualifiedName {
-        if let Some(id) = self.current_workbench_id() {
-            let name = QualifiedName::new(vec![id.clone()], id.src_ref());
-            name.with_prefix(&self.current_module_name())
+        if let Some(name) = self.current_workbench_name() {
+            name
         } else {
             self.current_module_name()
         }

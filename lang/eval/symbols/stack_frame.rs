@@ -20,10 +20,10 @@ pub enum StackFrame {
     Source(Identifier, SymbolMap),
     /// Module scope with locals.
     Module(Identifier, SymbolMap),
-    /// initializer scope with locals.
-    Init(SymbolMap),
     /// Part scope with locals.
     Workbench(Model, Identifier, SymbolMap),
+    /// initializer scope with locals.
+    Init(SymbolMap),
     /// Body (scope)  with locals.
     Body(SymbolMap),
     /// Function body

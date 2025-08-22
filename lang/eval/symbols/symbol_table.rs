@@ -93,7 +93,7 @@ impl SymbolTable {
         }
     }
 
-    fn lookup_current(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+    fn lookup_module(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         let module = &self.stack.current_module_name();
         log::trace!("Looking for symbol '{name}' in current module '{module}'");
         let name = &name.with_prefix(module);
@@ -127,29 +127,6 @@ impl SymbolTable {
                 }
                 Err(err) => return Err(err)?,
             };
-        }
-        Err(EvalError::SymbolNotFound(name.clone()))
-    }
-
-    /// Lookup a symbol from global symbols but relatively to the file the given `name` came from.
-    ///
-    /// - `name`: *Qualified`name* to search for (must have a proper *source code reference*.
-    ///
-    /// Returns found symbol or error if `name` does not have a *source code reference* or symbol could not be found.
-    fn lookup_relatively(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        if name.src_ref().is_some() {
-            let name = &name.with_prefix(
-                self.sources
-                    .get_name_by_hash(name.src_ref().source_hash())?,
-            );
-            log::trace!("Looking relatively for symbol '{name}'");
-            let symbol = self.lookup_global(name)?;
-            log::trace!(
-                "{found} symbol relatively: '{name}' = '{full_name}'",
-                found = crate::mark!(FOUND),
-                full_name = symbol.full_name()
-            );
-            return self.follow_alias(&symbol);
         }
         Err(EvalError::SymbolNotFound(name.clone()))
     }
@@ -194,10 +171,9 @@ impl Lookup for SymbolTable {
         // collect all symbols that can be found and remember origin
         let result = [
             ("local", self.lookup_local(name)),
-            ("current", self.lookup_current(name)),
+            ("module", self.lookup_module(name)),
             ("workbench", self.lookup_workbench(name)),
             ("global", self.lookup_global(name).map_err(|e| e.into())),
-            ("relative", self.lookup_relatively(name)),
         ]
         .into_iter();
 

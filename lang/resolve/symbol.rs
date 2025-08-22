@@ -228,6 +228,11 @@ impl Symbol {
             None
         }
     }
+
+    /// Return `true` if this symbol is builtin.
+    pub fn is_builtin(&self) -> bool {
+        matches!(self.borrow().def, SymbolDefinition::Builtin(..))
+    }
 }
 
 impl FullyQualify for Symbol {
