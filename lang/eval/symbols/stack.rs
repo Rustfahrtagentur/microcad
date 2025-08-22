@@ -92,10 +92,7 @@ impl Stack {
                         ids.push(id.clone())
                     }
                 }
-                StackFrame::Workbench(_, id, _) => {
-                    assert!(ids.is_empty());
-                    ids.push(id.clone())
-                }
+                StackFrame::Workbench(_, id, _) => ids.push(id.clone()),
                 // ignore frames without ids
                 StackFrame::Init(_) | StackFrame::Body(_) | StackFrame::Function(_) => (),
                 StackFrame::Call { symbol, .. } => {
