@@ -63,7 +63,7 @@ use outside the module.
 
 [![test](.test/mod.svg)](.test/mod.log)
 
-```µcad,mod#todo_fail
+```µcad,mod#fail
 // module math
 mod math {
     // pow cannot be called from outside math
@@ -78,7 +78,7 @@ mod math {
     // square is callable from outside math
     pub fn square(x: Scalar) {
         // call internal pow
-        pow(x, 2.0)
+        pow(x, 2)
     }
 }
 
