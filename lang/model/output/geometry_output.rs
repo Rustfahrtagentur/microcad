@@ -14,9 +14,9 @@ pub enum GeometryOutput {
     #[default]
     None,
     /// 2d geometry.
-    Geometries2D(Geometries2D),
+    Geometry2D(Geometries2D),
     /// 3d geometry.
-    Geometries3D(Geometries3D),
+    Geometry3D(Geometries3D),
     /// Invalid geometry.
     Invalid,
 }
@@ -26,8 +26,8 @@ impl GeometryOutput {
     pub(crate) fn model_output_type(&self) -> OutputType {
         match &self {
             Self::None => OutputType::NotDetermined,
-            Self::Geometries2D(_) => OutputType::Geometry2D,
-            Self::Geometries3D(_) => OutputType::Geometry3D,
+            Self::Geometry2D(_) => OutputType::Geometry2D,
+            Self::Geometry3D(_) => OutputType::Geometry3D,
             Self::Invalid => OutputType::InvalidMixed,
         }
     }

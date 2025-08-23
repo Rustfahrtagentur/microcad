@@ -77,7 +77,7 @@ impl Model {
     /// Panics if the model does not contain any 2d geometry.
     pub fn fetch_output_geometry_2d(&self) -> Geometries2D {
         match &self.borrow().output.geometry {
-            GeometryOutput::Geometries2D(geometries) => geometries.clone(),
+            GeometryOutput::Geometry2D(geometries) => geometries.clone(),
             _ => panic!("The model does not contain a 2D geometry."),
         }
     }
@@ -87,7 +87,7 @@ impl Model {
     /// Panics if the model does not contain any 3d geometry.
     pub fn fetch_output_geometry_3d(&self) -> Geometries3D {
         match &self.borrow().output.geometry {
-            GeometryOutput::Geometries3D(geometries) => geometries.clone(),
+            GeometryOutput::Geometry3D(geometries) => geometries.clone(),
             _ => panic!("The model does not contain a 3D geometry."),
         }
     }
@@ -163,7 +163,7 @@ impl Model {
                     });
                 }
 
-                self.borrow_mut().output.geometry = GeometryOutput::Geometries2D(geometries);
+                self.borrow_mut().output.geometry = GeometryOutput::Geometry2D(geometries);
             }
             OutputType::Geometry3D => {
                 let geometries = render_geometry_3d(cache, self);
@@ -173,7 +173,7 @@ impl Model {
                     });
                 }
 
-                self.borrow_mut().output.geometry = GeometryOutput::Geometries3D(geometries);
+                self.borrow_mut().output.geometry = GeometryOutput::Geometry3D(geometries);
             }
             output_type => {
                 panic!("Output type must have been determined at this point: {output_type}\n{self}")
@@ -236,7 +236,7 @@ impl FetchBounds2D for Model {
 
         self.descendants().for_each(|model| {
             let output = &model.borrow().output;
-            if let GeometryOutput::Geometries2D(geometries) = &output.geometry {
+            if let GeometryOutput::Geometry2D(geometries) = &output.geometry {
                 let mat = output.world_matrix_2d();
                 let resolution = &output.resolution;
                 bounds = bounds.clone().extend(
@@ -256,7 +256,7 @@ impl FetchBounds3D for Model {
         self.descendants()
             .fold(Bounds3D::default(), |mut bounds, model| {
                 let output = &model.borrow().output;
-                if let GeometryOutput::Geometries3D(geometries) = &output.geometry {
+                if let GeometryOutput::Geometry3D(geometries) = &output.geometry {
                     let mat = output.world_matrix_3d();
                     let resolution = &output.resolution;
                     bounds = bounds.clone().extend(

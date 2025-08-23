@@ -30,8 +30,8 @@ impl ModelOutput {
     pub fn new(ty: OutputType) -> Self {
         let geometry = match ty {
             OutputType::NotDetermined => GeometryOutput::None,
-            OutputType::Geometry2D => GeometryOutput::Geometries2D(Geometries2D::default()),
-            OutputType::Geometry3D => GeometryOutput::Geometries3D(Geometries3D::default()),
+            OutputType::Geometry2D => GeometryOutput::Geometry2D(Geometries2D::default()),
+            OutputType::Geometry3D => GeometryOutput::Geometry3D(Geometries3D::default()),
             OutputType::InvalidMixed => GeometryOutput::Invalid,
         };
 
