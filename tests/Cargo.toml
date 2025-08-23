@@ -11,17 +11,12 @@ version.workspace = true
 [lib]
 path = "lib.rs"
 
-[[bin]]
-name = "source_file_test_summary"
-path = "source_file_test_summary/main.rs"
-
-
 [dependencies]
 pest = "2.8"
 pest_derive = "2.8"
 anyhow = "1"
 log = "0.4"
-ctor = "0.4"
+ctor = "0.5"
 env_logger = "0.11"
 
 microcad-core = { workspace = true }
@@ -32,7 +27,6 @@ microcad-export = { workspace = true }
 [build-dependencies]
 microcad_markdown_test = { path = "microcad_markdown_test", version = "0.1.0" }
 microcad_pest_test = { path = "microcad_pest_test", version = "0.1.0" }
-microcad_source_file_test = { path = "source_file_test", version = "0.1.0" }
 rustfmt-wrapper = "0.2"
 
 [lints.rust]

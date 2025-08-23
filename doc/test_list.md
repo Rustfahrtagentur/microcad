@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**221** tests from markdown.
+**240** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -14,6 +14,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/types/.test/array_div.svg)](../doc/types/.test/array_div.log) | [array_div](../doc/types/arrays.md) |
 | [![test](../doc/types/.test/array_expressions.svg)](../doc/types/.test/array_expressions.log) | [array_expressions](../doc/types/arrays.md) |
 | [![test](../doc/types/.test/array_mul_scale.svg)](../doc/types/.test/array_mul_scale.log) | [array_mul_scale](../doc/types/arrays.md) |
+| [![test](../doc/types/.test/array_neg.svg)](../doc/types/.test/array_neg.log) | [array_neg](../doc/types/arrays.md) |
 | [![test](../doc/types/.test/array_sub.svg)](../doc/types/.test/array_sub.log) | [array_sub](../doc/types/arrays.md) |
 | [![test](../doc/types/.test/array_unit_bundling.svg)](../doc/types/.test/array_unit_bundling.log) | [array_unit_bundling](../doc/types/arrays.md) |
 | [![test](../doc/types/.test/arrays_and_comments.svg)](../doc/types/.test/arrays_and_comments.log) | [arrays_and_comments](../doc/types/arrays.md) |
@@ -42,6 +43,16 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/body_workbench.svg)](../doc/tests/.test/body_workbench.log) | [body_workbench](../doc/tests/statement_usage.md) |
 | [![test](../doc/types/.test/boolean.svg)](../doc/types/.test/boolean.log) | [boolean](../doc/types/primitive_types.md) |
 | [![test](../doc/structure/.test/building_plan.svg)](../doc/structure/.test/building_plan.log) | [building_plan](../doc/structure/workbench.md) |
+| [![test](../doc/libs/builtin/.test/builtin_debug_assert_false.svg)](../doc/libs/builtin/.test/builtin_debug_assert_false.log) | [builtin_debug_assert_false](../doc/libs/builtin/debug.md) |
+| [![test](../doc/libs/builtin/.test/builtin_debug_assert_true.svg)](../doc/libs/builtin/.test/builtin_debug_assert_true.log) | [builtin_debug_assert_true](../doc/libs/builtin/debug.md) |
+| [![test](../doc/libs/builtin/.test/builtin_difference_2d.svg)](../doc/libs/builtin/.test/builtin_difference_2d.log) | [builtin_difference_2d](../doc/libs/builtin/ops.md) |
+| [![test](../doc/libs/builtin/.test/builtin_difference_3d.svg)](../doc/libs/builtin/.test/builtin_difference_3d.log) | [builtin_difference_3d](../doc/libs/builtin/ops.md) |
+| [![test](../doc/libs/builtin/.test/builtin_extrude.svg)](../doc/libs/builtin/.test/builtin_extrude.log) | [builtin_extrude](../doc/libs/builtin/ops.md) |
+| [![test](../doc/tests/.test/builtin_modules.svg)](../doc/tests/.test/builtin_modules.log) | [builtin_modules](../doc/tests/modules.md) |
+| [![test](../doc/libs/builtin/.test/builtin_print.svg)](../doc/libs/builtin/.test/builtin_print.log) | [builtin_print](../doc/libs/builtin/debug.md) |
+| [![test](../doc/libs/builtin/.test/builtin_revolve.svg)](../doc/libs/builtin/.test/builtin_revolve.log) | [builtin_revolve](../doc/libs/builtin/ops.md) |
+| [![test](../doc/libs/builtin/.test/builtin_translate.svg)](../doc/libs/builtin/.test/builtin_translate.log) | [builtin_translate](../doc/libs/builtin/ops.md) |
+| [![test](../doc/libs/builtin/.test/builtin_translate_twice.svg)](../doc/libs/builtin/.test/builtin_translate_twice.log) | [builtin_translate_twice](../doc/libs/builtin/ops.md) |
 | [![test](../doc/structure/.test/call_function.svg)](../doc/structure/.test/call_function.log) | [call_function](../doc/structure/calls.md) |
 | [![test](../doc/structure/.test/call_workbench.svg)](../doc/structure/.test/call_workbench.log) | [call_workbench](../doc/structure/calls.md) |
 | [![test](../doc/structure/.test/children.svg)](../doc/structure/.test/children.log) | [children](../doc/structure/op.md) |
@@ -152,6 +163,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/ops/.test/revolve.svg)](../doc/libs/std/ops/.test/revolve.log) | [revolve](../doc/libs/std/ops/revolve.md) |
 | [![test](../doc/libs/std/ops/.test/rotate_2d.svg)](../doc/libs/std/ops/.test/rotate_2d.log) | [rotate_2d](../doc/libs/std/ops/rotate.md) |
 | [![test](../doc/libs/std/ops/.test/rotate_3d.svg)](../doc/libs/std/ops/.test/rotate_3d.log) | [rotate_3d](../doc/libs/std/ops/rotate.md) |
+| [![test](../doc/tests/.test/scopes.svg)](../doc/tests/.test/scopes.log) | [scopes](../doc/tests/locals.md) |
 | [![test](../doc/structure/.test/sketch_basic.svg)](../doc/structure/.test/sketch_basic.log) | [sketch_basic](../doc/structure/sketch.md) |
 | [![test](../doc/tests/.test/sketch_missing_semicolon.svg)](../doc/tests/.test/sketch_missing_semicolon.log) | [sketch_missing_semicolon](../doc/tests/semicolon.md) |
 | [![test](../doc/tests/.test/sketch_with_body.svg)](../doc/tests/.test/sketch_with_body.log) | [sketch_with_body](../doc/tests/semicolon.md) |
@@ -170,13 +182,19 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/source_use.svg)](../doc/tests/.test/source_use.log) | [source_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_workbench.svg)](../doc/tests/.test/source_workbench.log) | [source_workbench](../doc/tests/statement_usage.md) |
 | [![test](../doc/.test/toml_import.svg)](../doc/.test/toml_import.log) | [toml_import](../doc/import.md) |
+| [![test](../doc/types/.test/tuple_add_different.svg)](../doc/types/.test/tuple_add_different.log) | [tuple_add_different](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/tuple_add_same.svg)](../doc/types/.test/tuple_add_same.log) | [tuple_add_same](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_assignment.svg)](../doc/types/.test/tuple_assignment.log) | [tuple_assignment](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_assignment_bundle.svg)](../doc/types/.test/tuple_assignment_bundle.log) | [tuple_assignment_bundle](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_assignment_convert.svg)](../doc/types/.test/tuple_assignment_convert.log) | [tuple_assignment_convert](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/tuple_div.svg)](../doc/types/.test/tuple_div.log) | [tuple_div](../doc/types/tuples.md) |
 | [![test](../doc/structure/.test/tuple_match.svg)](../doc/structure/.test/tuple_match.log) | [tuple_match](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/tuple_match_errors.svg)](../doc/structure/.test/tuple_match_errors.log) | [tuple_match_errors](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/tuple_match_variants.svg)](../doc/structure/.test/tuple_match_variants.log) | [tuple_match_variants](../doc/structure/arguments.md) |
 | [![test](../doc/structure/.test/tuple_match_warnings.svg)](../doc/structure/.test/tuple_match_warnings.log) | [tuple_match_warnings](../doc/structure/arguments.md) |
+| [![test](../doc/types/.test/tuple_mul_scale.svg)](../doc/types/.test/tuple_mul_scale.log) | [tuple_mul_scale](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/tuple_neg.svg)](../doc/types/.test/tuple_neg.log) | [tuple_neg](../doc/types/tuples.md) |
+| [![test](../doc/types/.test/tuple_sub.svg)](../doc/types/.test/tuple_sub.log) | [tuple_sub](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/types_bundles_functions.svg)](../doc/types/.test/types_bundles_functions.log) | [types_bundles_functions](../doc/types/README.md) |
 | [![test](../doc/types/.test/types_def_vs_decl.svg)](../doc/types/.test/types_def_vs_decl.log) | [types_def_vs_decl](../doc/types/README.md) |
 | [![test](../doc/types/.test/types_named_tuple.svg)](../doc/types/.test/types_named_tuple.log) | [types_named_tuple](../doc/types/named_tuple.md) |
@@ -190,6 +208,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/types/.test/types_quantity_angle.svg)](../doc/types/.test/types_quantity_angle.log) | [types_quantity_angle](../doc/types/quantity.md) |
 | [![test](../doc/types/.test/types_quantity_area.svg)](../doc/types/.test/types_quantity_area.log) | [types_quantity_area](../doc/types/quantity.md) |
 | [![test](../doc/types/.test/types_quantity_area_units.svg)](../doc/types/.test/types_quantity_area_units.log) | [types_quantity_area_units](../doc/types/quantity.md) |
+| [![test](../doc/types/.test/types_quantity_arithmetic.svg)](../doc/types/.test/types_quantity_arithmetic.log) | [types_quantity_arithmetic](../doc/types/quantity.md) |
 | [![test](../doc/types/.test/types_quantity_length.svg)](../doc/types/.test/types_quantity_length.log) | [types_quantity_length](../doc/types/quantity.md) |
 | [![test](../doc/types/.test/types_quantity_scalar.svg)](../doc/types/.test/types_quantity_scalar.log) | [types_quantity_scalar](../doc/types/quantity.md) |
 | [![test](../doc/types/.test/types_quantity_volume.svg)](../doc/types/.test/types_quantity_volume.log) | [types_quantity_volume](../doc/types/quantity.md) |

@@ -24,12 +24,12 @@ Circle( radius = 5mm )
 
 [![test](.test/sketch_missing_semicolon.svg)](.test/sketch_missing_semicolon.log)
 
-```µcad,sketch_missing_semicolon#fail
+```µcad,sketch_missing_semicolon
 use std::geo2d::Circle;
 use std::ops::translate;
 
 {
-    Circle(radius = 5mm) // error: missing semicolon
+    Circle(radius = 5mm) // missing semicolon is ok.
 }.translate(y=[-34mm/2 , 34mm/2]);
 ```
 

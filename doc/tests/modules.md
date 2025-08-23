@@ -1,4 +1,8 @@
+# Modules
 
+[![test](.test/builtin_modules.svg)](.test/builtin_modules.log)
+
+```µcad,builtin_modules
 mod a {
     mod b {
         mod c {
@@ -11,3 +15,4 @@ mod a {
 
 a::b::c::M1();
 a::M2();
+```

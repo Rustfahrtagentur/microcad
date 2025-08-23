@@ -1,5 +1,7 @@
 # Use statement tests
 
+[![test](.test/use_test.svg)](.test/use_test.log)
+
 ```µcad,use_test
 // use debug from `std/module.µcad`
 use std::debug::assert;
