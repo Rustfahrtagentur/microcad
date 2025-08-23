@@ -1,0 +1,12 @@
+-- Test --
+  builtin_debug_assert_true
+  ../doc/libs/builtin/debug.md:17
+
+-- Code --
+
+ 1: __builtin::debug::assert(true);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK
