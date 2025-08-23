@@ -55,6 +55,11 @@ impl Geometries3D {
                 std::rc::Rc::new(acc.boolean_op(other, op.into()))
             })
     }
+
+    /// Convex hull.
+    pub fn hull(&self, resolution: &RenderResolution) -> Manifold {
+        self.render_to_manifold(resolution).hull()
+    }
 }
 
 impl FetchBounds3D for Geometries3D {

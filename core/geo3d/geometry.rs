@@ -33,7 +33,7 @@ impl std::fmt::Debug for Geometry3D {
 }
 
 impl Geometry3D {
-    /// Execute boolean operation
+    /// Execute boolean operation.
     pub fn boolean_op(
         &self,
         resolution: &RenderResolution,
@@ -47,27 +47,9 @@ impl Geometry3D {
         Some(Geometry3D::Manifold(Rc::new(a.boolean_op(&b, op))))
     }
 
-    /// Execute multiple boolean operations
-    pub fn boolean_op_multi(
-        geometries: Vec<Rc<Self>>,
-        resolution: &RenderResolution,
-        op: &BooleanOp,
-    ) -> Option<Rc<Self>> {
-        if geometries.is_empty() {
-            return None;
-        }
-
-        Some(
-            geometries[1..]
-                .iter()
-                .fold(geometries[0].clone(), |acc, geo| {
-                    if let Some(r) = acc.boolean_op(resolution, geo.as_ref(), op) {
-                        Rc::new(r)
-                    } else {
-                        acc
-                    }
-                }),
-        )
+    /// Convex hull for geometry.
+    pub fn hull(&self, resolution: &RenderResolution) -> Manifold {
+        self.render_to_manifold(resolution).hull()
     }
 
     /// Transform mesh geometry

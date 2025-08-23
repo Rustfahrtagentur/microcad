@@ -45,41 +45,6 @@ pub trait RenderToMesh: Sized {
 }
 
 #[test]
-fn test_boolean_op_multi() {
-    use std::rc::Rc;
-    let a = Rc::new(Geometry3D::Manifold(std::rc::Rc::new(Manifold::sphere(
-        2.0, 32,
-    ))));
-    let b = Rc::new(Geometry3D::Manifold(std::rc::Rc::new(Manifold::sphere(
-        1.0, 32,
-    ))));
-
-    let result = Geometry3D::boolean_op_multi(
-        vec![a, b],
-        &RenderResolution::default(),
-        &BooleanOp::Difference,
-    );
-    assert!(result.is_some());
-
-    let result = result.expect("test error");
-
-    if let Geometry3D::Manifold(manifold) = &*result {
-        assert!(manifold.to_mesh().vertices().len() > 1);
-    } else {
-        panic!("Expected manifold");
-    }
-
-    let transform = crate::Mat4::from_translation(crate::Vec3::new(5.0, 10.0, 0.0));
-    let result = result.transform(&transform);
-
-    if let Geometry3D::Manifold(manifold) = result {
-        assert!(manifold.to_mesh().vertices().len() > 1);
-    } else {
-        panic!("Expected manifold");
-    }
-}
-
-#[test]
 fn test_mesh_volume() {
     let manifold = Manifold::sphere(1.0, 512);
     let mesh = TriangleMesh::from(manifold.to_mesh());

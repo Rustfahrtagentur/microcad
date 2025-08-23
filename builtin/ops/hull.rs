@@ -22,8 +22,12 @@ impl Operation for Hull {
         ))
     }
 
-    fn process_3d(&self, _cache: &mut RenderCache, _node: &Model) -> Rc<Geometry3D> {
-        std::todo!("Hull operation for 3D")
+    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> Rc<Geometry3D> {
+        Rc::new(Geometry3D::Manifold(Rc::new(
+            model
+                .render_geometry_3d(cache)
+                .hull(&model.borrow().output.resolution),
+        )))
     }
 }
 
