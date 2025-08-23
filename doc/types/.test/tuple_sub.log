@@ -1,0 +1,14 @@
+-- Test --
+  tuple_sub
+  ../doc/types/tuples.md:114
+
+-- Code --
+
+ 1: a = (x = 2.0mm, y = 3.0mm);
+ 2: b = (x = 1.0mm, y = 4.0mm);
+ 3: std::debug::assert_eq([a - b, (x = 1.0mm, y = -1.0mm)]);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

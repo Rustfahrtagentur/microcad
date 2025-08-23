@@ -1,0 +1,18 @@
+-- Test --
+  builtin_debug_assert_false
+  ../doc/libs/builtin/debug.md:23
+
+-- Code --
+
+ 1: __builtin::debug::assert(false); // error: Assertion failed: false
+
+-- Output --
+-- Errors --
+error: Assertion failed: false
+  ---> <FROM STR>:1:26
+     |
+   1 | __builtin::debug::assert(false); // error: Assertion failed: false
+     |                          ^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

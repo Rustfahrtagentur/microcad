@@ -1,6 +1,6 @@
 -- Test --
   use_test
-  ../doc/tests/use.md:3
+  ../doc/tests/use.md:5
 
 -- Code --
 

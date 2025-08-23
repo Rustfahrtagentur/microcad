@@ -1,0 +1,16 @@
+-- Test --
+  builtin_revolve
+  ../doc/libs/builtin/ops.md:54
+
+-- Code --
+
+ 1: use __builtin::*;
+ 2: 
+ 3: std::geo2d::Circle(10mm)
+ 4:     .ops::translate(x = 20.0, y = 0.0, z = 0.0)
+ 5:     .ops::revolve(circular_segments = 64, revolve_degrees = 360.0);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

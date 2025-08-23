@@ -1,0 +1,35 @@
+-- Test --
+  builtin_modules
+  ../doc/tests/modules.md:5
+
+-- Code --
+
+ 1: mod a {
+ 2:     mod b {
+ 3:         mod c {
+ 4:             part M1() {}
+ 5:         }
+ 6:     }
+ 7: 
+ 8:     part M2() {}
+ 9: }
+10: 
+11: a::b::c::M1();
+12: a::M2();
+
+-- Output --
+-- Errors --
+warning: The part workbench will produce no 3D output.
+  ---> <FROM STR>:4:13
+     |
+   4 |             part M1() {}
+     |             ^^^^^^^^^^^^
+     |
+warning: The part workbench will produce no 3D output.
+  ---> <FROM STR>:8:5
+     |
+   8 |     part M2() {}
+     |     ^^^^^^^^^^^^
+     |
+-- Test Result --
+OK
