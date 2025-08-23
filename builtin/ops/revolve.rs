@@ -1,6 +1,8 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use std::rc::Rc;
+
 use microcad_core::*;
 use microcad_lang::{
     eval::*,
@@ -20,7 +22,7 @@ impl Operation for Revolve {
         OutputType::Geometry3D
     }
 
-    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> Geometries3D {
+    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> Rc<Geometry3D> {
         use std::rc::Rc;
         let geometries = model.render_geometry_2d(cache);
 
@@ -32,12 +34,11 @@ impl Operation for Revolve {
             .map(|ring| ring.as_slice())
             .collect();
 
-        Geometry3D::Manifold(Rc::new(Manifold::revolve(
+        Rc::new(Geometry3D::Manifold(Rc::new(Manifold::revolve(
             &multi_polygon_data,
             self.circular_segments as u32,
             self.revolve_degrees,
-        )))
-        .into()
+        ))))
     }
 }
 

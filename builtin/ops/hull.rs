@@ -22,7 +22,7 @@ impl Operation for Hull {
         ))
     }
 
-    fn process_3d(&self, _cache: &mut RenderCache, _node: &Model) -> Geometries3D {
+    fn process_3d(&self, _cache: &mut RenderCache, _node: &Model) -> Rc<Geometry3D> {
         std::todo!("Hull operation for 3D")
     }
 }

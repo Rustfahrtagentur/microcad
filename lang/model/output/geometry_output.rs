@@ -5,7 +5,7 @@
 
 use std::rc::Rc;
 
-use microcad_core::{Geometries3D, Geometry2D};
+use microcad_core::{Geometry2D, Geometry3D};
 
 use crate::model::OutputType;
 
@@ -18,7 +18,7 @@ pub enum GeometryOutput {
     /// 2d geometry.
     Geometry2D(Option<Rc<Geometry2D>>),
     /// 3d geometry.
-    Geometry3D(Geometries3D),
+    Geometry3D(Option<Rc<Geometry3D>>),
     /// Invalid geometry.
     Invalid,
 }

@@ -87,7 +87,7 @@ impl Model {
     /// Fetch output 3d geometries.
     ///
     /// Panics if the model does not contain any 3d geometry.
-    pub fn fetch_output_geometry_3d(&self) -> Geometries3D {
+    pub fn fetch_output_geometry_3d(&self) -> Option<Rc<Geometry3D>> {
         match &self.borrow().output.geometry {
             GeometryOutput::Geometry3D(geometries) => geometries.clone(),
             _ => panic!("The model does not contain a 3D geometry."),
@@ -119,7 +119,7 @@ impl Model {
             .fold(Default::default(), |mut geometries, model| {
                 let model_ = model.borrow();
                 let mat = model_.output.local_matrix_3d();
-                geometries.append(
+                geometries.push(
                     model
                         .process_3d(cache, model)
                         .transformed_3d(&model_.output.resolution, &mat),
@@ -144,11 +144,11 @@ impl Model {
             }
         }
 
-        fn render_geometry_3d(cache: &mut RenderCache, model: &Model) -> Geometries3D {
+        fn render_geometry_3d(cache: &mut RenderCache, model: &Model) -> Option<Rc<Geometry3D>> {
             match &model.borrow().element {
-                Element::Primitive3D(geometry) => geometry.clone().into(),
-                Element::Operation(operation) => operation.process_3d(cache, model),
-                _ => Geometries3D::default(),
+                Element::Primitive3D(geometry) => Some(geometry.clone().into()),
+                Element::Operation(operation) => Some(operation.process_3d(cache, model)),
+                _ => None,
             }
         }
 
@@ -213,7 +213,7 @@ impl Operation for Model {
         )))
     }
 
-    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> Geometries3D {
+    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> Rc<Geometry3D> {
         let mut geometries = Geometries3D::default();
 
         let model_ = &model.borrow();
@@ -221,19 +221,24 @@ impl Operation for Model {
             Element::Group | Element::Workpiece(_) | Element::Transform(_) => {
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_3d(cache, n)));
+                    .for_each(|n| geometries.push(n.process_3d(cache, n).as_ref().clone()));
             }
             Element::Primitive3D(geo) => {
                 geometries.push(geo.clone());
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_3d(cache, n)));
+                    .for_each(|n| geometries.push(n.process_3d(cache, n).as_ref().clone()));
             }
-            Element::Operation(operation) => geometries.append(operation.process_3d(cache, model)),
+            Element::Operation(operation) => {
+                geometries.push(operation.process_3d(cache, model).as_ref().clone())
+            }
             _ => {}
         }
 
-        geometries.transformed_3d(&model_.output.resolution, &model_.output.local_matrix_3d())
+        Rc::new(Geometry3D::Collection(geometries.transformed_3d(
+            &model_.output.resolution,
+            &model_.output.local_matrix_3d(),
+        )))
     }
 }
 
@@ -261,7 +266,7 @@ impl FetchBounds3D for Model {
         self.descendants()
             .fold(Bounds3D::default(), |mut bounds, model| {
                 let output = &model.borrow().output;
-                if let GeometryOutput::Geometry3D(geometries) = &output.geometry {
+                if let GeometryOutput::Geometry3D(Some(geometries)) = &output.geometry {
                     let mat = output.world_matrix_3d();
                     let resolution = &output.resolution;
                     bounds = bounds.clone().extend(

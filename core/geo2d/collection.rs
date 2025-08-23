@@ -118,12 +118,6 @@ impl Transformed2D for Geometries2D {
     }
 }
 
-impl From<Geometry2D> for Geometries2D {
-    fn from(geometry: Geometry2D) -> Self {
-        Self::new(vec![geometry])
-    }
-}
-
 impl RenderToMultiPolygon for Geometries2D {
     fn render_to_existing_multi_polygon(
         &self,

@@ -5,7 +5,7 @@
 
 use std::rc::Rc;
 
-use microcad_core::{BooleanOp, Geometries3D, Geometry2D, Geometry3D};
+use microcad_core::{BooleanOp, Geometry2D, Geometry3D};
 
 use crate::model::{render::RenderCache, *};
 
@@ -20,13 +20,13 @@ impl Operation for BooleanOp {
         ))
     }
 
-    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> Geometries3D {
-        Geometries3D::new(vec![Geometry3D::Manifold(
+    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> Rc<Geometry3D> {
+        Rc::new(Geometry3D::Manifold(
             match model.into_group() {
                 Some(model) => model.render_geometry_3d(cache),
                 None => model.render_geometry_3d(cache),
             }
             .boolean_op(&model.borrow().output.resolution, self),
-        )])
+        ))
     }
 }

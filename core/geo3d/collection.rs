@@ -76,13 +76,7 @@ impl Transformed3D for Geometries3D {
 }
 
 impl RenderToMesh for Geometries3D {
-    fn render_to_manifold(&self, _resolution: &RenderResolution) -> std::rc::Rc<Manifold> {
-        todo!()
-    }
-}
-
-impl From<Geometry3D> for Geometries3D {
-    fn from(geometry: Geometry3D) -> Self {
-        Self::new(vec![geometry])
+    fn render_to_manifold(&self, resolution: &RenderResolution) -> std::rc::Rc<Manifold> {
+        self.boolean_op(resolution, &BooleanOp::Union)
     }
 }
