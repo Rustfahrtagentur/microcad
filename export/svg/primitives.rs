@@ -156,11 +156,9 @@ impl WriteSvg for Model {
             .insert(SvgTagAttribute::class("entity"));
 
         // Render all output geometries.
-        self.fetch_output_geometry_2d()
-            .iter()
-            .try_for_each(|geometry| {
-                geometry.write_svg_mapped(writer, &SvgTagAttributes::default())
-            })?;
+        if let Some(geometry) = self.fetch_output_geometry_2d() {
+            geometry.write_svg_mapped(writer, &SvgTagAttributes::default())?;
+        }
 
         let self_ = self.borrow();
         match &self_.element {

@@ -10,7 +10,7 @@ pub use geometry_output::*;
 pub use output_type::*;
 
 use cgmath::SquareMatrix;
-use microcad_core::{Geometries2D, Geometries3D, Mat3, Mat4, RenderResolution};
+use microcad_core::{Geometries3D, Mat3, Mat4, RenderResolution};
 
 /// The model output when a model has been processed.
 #[derive(Debug, Clone)]
@@ -30,7 +30,7 @@ impl ModelOutput {
     pub fn new(ty: OutputType) -> Self {
         let geometry = match ty {
             OutputType::NotDetermined => GeometryOutput::None,
-            OutputType::Geometry2D => GeometryOutput::Geometry2D(Geometries2D::default()),
+            OutputType::Geometry2D => GeometryOutput::Geometry2D(None),
             OutputType::Geometry3D => GeometryOutput::Geometry3D(Geometries3D::default()),
             OutputType::InvalidMixed => GeometryOutput::Invalid,
         };

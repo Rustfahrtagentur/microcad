@@ -5,6 +5,8 @@
 
 mod cache;
 
+use std::rc::Rc;
+
 pub use cache::*;
 
 use cgmath::SquareMatrix;
@@ -75,9 +77,9 @@ impl Model {
     /// Fetch output 2d geometries.
     ///
     /// Panics if the model does not contain any 2d geometry.
-    pub fn fetch_output_geometry_2d(&self) -> Geometries2D {
+    pub fn fetch_output_geometry_2d(&self) -> Option<Rc<Geometry2D>> {
         match &self.borrow().output.geometry {
-            GeometryOutput::Geometry2D(geometries) => geometries.clone(),
+            GeometryOutput::Geometry2D(geometry) => geometry.clone(),
             _ => panic!("The model does not contain a 2D geometry."),
         }
     }
@@ -100,7 +102,7 @@ impl Model {
             .fold(Default::default(), |mut geometries, model| {
                 let model_ = model.borrow();
                 let mat = model_.output.local_matrix_2d();
-                geometries.append(
+                geometries.push(
                     model
                         .process_2d(cache, model)
                         .transformed_2d(&model_.output.resolution, &mat),
@@ -134,11 +136,11 @@ impl Model {
     /// * `fetch_output_geometry_2d()` for 2D geometry.
     /// * `fetch_output_geometry_3d()` for 3D geometry.
     pub fn render(&self, cache: &mut RenderCache) {
-        fn render_geometry_2d(cache: &mut RenderCache, model: &Model) -> Geometries2D {
+        fn render_geometry_2d(cache: &mut RenderCache, model: &Model) -> Option<Rc<Geometry2D>> {
             match &model.borrow().element {
-                Element::Primitive2D(geometry) => geometry.clone().into(),
-                Element::Operation(operation) => operation.process_2d(cache, model),
-                _ => Geometries2D::default(),
+                Element::Primitive2D(geometry) => Some(geometry.clone().into()),
+                Element::Operation(operation) => Some(operation.process_2d(cache, model)),
+                _ => None,
             }
         }
 
@@ -183,7 +185,7 @@ impl Model {
 }
 
 impl Operation for Model {
-    fn process_2d(&self, cache: &mut RenderCache, model: &Model) -> Geometries2D {
+    fn process_2d(&self, cache: &mut RenderCache, model: &Model) -> Rc<Geometry2D> {
         let mut geometries = Geometries2D::default();
 
         let model_ = &model.borrow();
@@ -191,19 +193,24 @@ impl Operation for Model {
             Element::Group | Element::Workpiece(_) | Element::Transform(_) => {
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_2d(cache, n)));
+                    .for_each(|n| geometries.push(n.process_2d(cache, n).as_ref().clone()));
             }
             Element::Primitive2D(geo) => {
                 geometries.push(geo.clone());
                 model_
                     .children()
-                    .for_each(|n| geometries.append(n.process_2d(cache, n)));
+                    .for_each(|n| geometries.push(n.process_2d(cache, n).as_ref().clone()));
             }
-            Element::Operation(operation) => geometries.append(operation.process_2d(cache, model)),
+            Element::Operation(operation) => {
+                geometries.push(operation.process_2d(cache, model).as_ref().clone())
+            }
             _ => {}
         }
 
-        geometries.transformed_2d(&model_.output.resolution, &model_.output.local_matrix_2d())
+        Rc::new(Geometry2D::Collection(geometries.transformed_2d(
+            &model_.output.resolution,
+            &model_.output.local_matrix_2d(),
+        )))
     }
 
     fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> Geometries3D {
@@ -236,14 +243,12 @@ impl FetchBounds2D for Model {
 
         self.descendants().for_each(|model| {
             let output = &model.borrow().output;
-            if let GeometryOutput::Geometry2D(geometries) = &output.geometry {
+            if let GeometryOutput::Geometry2D(Some(geometry)) = &output.geometry {
                 let mat = output.world_matrix_2d();
                 let resolution = &output.resolution;
-                bounds = bounds.clone().extend(
-                    geometries
-                        .fetch_bounds_2d()
-                        .transformed_2d(resolution, &mat),
-                );
+                bounds = bounds
+                    .clone()
+                    .extend(geometry.fetch_bounds_2d().transformed_2d(resolution, &mat));
             }
         });
 
