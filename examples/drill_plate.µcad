@@ -2,13 +2,14 @@ use std::geo2d::*;
 use std::ops::*;
 
 #[color = "red"]
-sketch drill_plate(size = 100mm, hole_size = 10mm) {
-    difference() {
+sketch DrillPlate(size = 100mm, hole_size = 10mm) {
+    {
         l = size/2 - hole_size;
-        rect(size);
-        translate(x = [-l,l], y = [-l,l])
-            Circle(diameter = hole_size) 
-    }
+        std::geo2d::Rect(size);
+        Circle(diameter = hole_size).
+            translate(x = [-l,l], y = [-l,l])
+    }.difference()
 }
 
-drill_plate();
+
+DrillPlate();
