@@ -15,13 +15,11 @@ struct Hull;
 
 impl Operation for Hull {
     fn process_2d(&self, cache: &mut RenderCache, model: &Model) -> Rc<Geometry2D> {
-        Rc::new(Geometry2D::Collection(Geometries2D::new(vec![
-            Geometry2D::Polygon(
-                model
-                    .render_geometry_2d(cache)
-                    .hull(&model.borrow().output.resolution),
-            ),
-        ])))
+        Rc::new(Geometry2D::Polygon(
+            model
+                .render_geometry_2d(cache)
+                .hull(&model.borrow().output.resolution),
+        ))
     }
 
     fn process_3d(&self, _cache: &mut RenderCache, _node: &Model) -> Geometries3D {
