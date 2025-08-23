@@ -16,4 +16,6 @@ error: Missing arguments: x,y
      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
-FAILED BUT WITH WRONG ERRORS
+FAIL(TODO)
+-- Test Result --
+FAILED AS EXPECTED BUT IS TODO
