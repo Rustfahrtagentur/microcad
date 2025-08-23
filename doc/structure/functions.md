@@ -132,7 +132,7 @@ You cannot create *workbench properties* within the code body.
 ```µcad,workbench_fn_prop#fail
 part PunchedDisk(radius: Length) {
     fn inner() { 
-        prop hole = radius/2;  // eval error: prop not allowed in function
+        prop hole = radius/2;  // error: prop not allowed in function
         return hole;
     }
     inner();
