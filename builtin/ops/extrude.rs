@@ -6,8 +6,12 @@ use std::rc::Rc;
 use microcad_core::*;
 use microcad_lang::{
     eval::*,
-    model::{render::RenderCache, *},
+    model::{
+        render::{RenderCache, RenderResult},
+        *,
+    },
     parameter,
+    syntax::WorkbenchKind,
     value::*,
 };
 
@@ -25,9 +29,9 @@ impl Operation for Extrude {
         OutputType::Geometry3D
     }
 
-    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> Rc<Geometry3D> {
+    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry3D>> {
         use std::rc::Rc;
-        let geometries = model.render_geometry_2d(cache);
+        let geometries = model.render_geometry_2d(cache)?;
 
         let multi_polygon_data = geo2d::multi_polygon_to_vec(
             &geometries.render_to_multi_polygon(&model.borrow().output.resolution),
@@ -37,31 +41,36 @@ impl Operation for Extrude {
             .map(|ring| ring.as_slice())
             .collect();
 
-        Rc::new(Geometry3D::Manifold(Rc::new(Manifold::extrude(
+        Ok(Rc::new(Geometry3D::Manifold(Rc::new(Manifold::extrude(
             &multi_polygon_data,
             self.height,
             self.n_divisions as u32,
             self.twist_degrees,
             self.scale_top_x,
             self.scale_top_y,
-        ))))
+        )))))
     }
 }
 
 impl BuiltinWorkbenchDefinition for Extrude {
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Operation
+    }
+
     fn id() -> &'static str {
         "extrude"
     }
 
-    fn model(args: &Tuple) -> EvalResult<Model> {
-        Ok(ModelBuilder::new_operation(Extrude {
-            height: args.get("height")?,
-            n_divisions: args.get("n_divisions")?,
-            twist_degrees: args.get("twist_degrees")?,
-            scale_top_x: args.get("scale_top_x")?,
-            scale_top_y: args.get("scale_top_y")?,
-        })
-        .build())
+    fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        &|args| {
+            Ok(BuiltinWorkpieceOutput::Operation(Box::new(Extrude {
+                height: args.get("height")?,
+                n_divisions: args.get("n_divisions")?,
+                twist_degrees: args.get("twist_degrees")?,
+                scale_top_x: args.get("scale_top_x")?,
+                scale_top_y: args.get("scale_top_y")?,
+            })))
+        }
     }
 
     fn parameters() -> microcad_lang::eval::ParameterValueList {

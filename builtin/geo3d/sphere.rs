@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{eval::*, parameter, syntax::WorkbenchKind, value::*};
 
 pub struct Sphere;
 
@@ -11,13 +11,18 @@ impl BuiltinWorkbenchDefinition for Sphere {
         "Sphere"
     }
 
-    fn model(args: &Tuple) -> EvalResult<Model> {
-        Ok(
-            ModelBuilder::new_3d_primitive(geo3d::Geometry3D::Sphere(geo3d::Sphere {
-                radius: args.get("radius")?,
-            }))
-            .build(),
-        )
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Part
+    }
+
+    fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        &|args| {
+            Ok(BuiltinWorkpieceOutput::Geometry3D(
+                geo3d::Geometry3D::Sphere(geo3d::Sphere {
+                    radius: args.get("radius")?,
+                }),
+            ))
+        }
     }
 
     fn parameters() -> ParameterValueList {

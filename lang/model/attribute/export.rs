@@ -26,9 +26,8 @@ impl ExportCommand {
     /// Export the model. By the settings in the attribute.
     pub fn export(&self, model: &Model) -> Result<Value, ExportError> {
         let mut render_cache = RenderCache::new();
-        model.set_matrix(Mat4::identity());
-        model.set_resolution(self.resolution.clone());
-        model.render(&mut render_cache);
+
+        model.render(RenderResolution::default(), &mut render_cache);
 
         self.exporter.export(model, &self.filename)
     }

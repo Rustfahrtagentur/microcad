@@ -162,7 +162,7 @@ impl WriteSvg for Model {
 
         let self_ = self.borrow();
         match &self_.element {
-            Element::Group | Element::Workpiece(_) | Element::Primitive2D(_) => {
+            Element::Group | Element::Workpiece(_) => {
                 if !self_.is_empty() {
                     writer.begin_group(&node_attr)?;
                     self_.children().try_for_each(|child| {
@@ -171,7 +171,9 @@ impl WriteSvg for Model {
                     writer.end_group()?;
                 }
             }
-            Element::Transform(affine_transform) => {
+            /*Element::Transform(affine_transform) => {
+
+
                 if !self_.is_empty() {
                     let mut mat = affine_transform.mat2d();
                     mat.z.y = -mat.z.y;
@@ -186,7 +188,8 @@ impl WriteSvg for Model {
                     })?;
                     writer.end_group()?;
                 }
-            }
+            }*/
+            Element::BuiltinWorkpiece(_) => todo!(),
             _ => {}
         }
 

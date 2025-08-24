@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{eval::*, parameter, syntax::WorkbenchKind, value::*};
 
 pub struct Cylinder;
 
@@ -11,15 +11,20 @@ impl BuiltinWorkbenchDefinition for Cylinder {
         "Cylinder"
     }
 
-    fn model(args: &Tuple) -> EvalResult<Model> {
-        Ok(
-            ModelBuilder::new_3d_primitive(Geometry3D::Cylinder(geo3d::Cylinder {
-                radius_bottom: args.get("radius_bottom")?,
-                radius_top: args.get("radius_top")?,
-                height: args.get("height")?,
-            }))
-            .build(),
-        )
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Part
+    }
+
+    fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        &|args| {
+            Ok(BuiltinWorkpieceOutput::Geometry3D(Geometry3D::Cylinder(
+                geo3d::Cylinder {
+                    radius_bottom: args.get("radius_bottom")?,
+                    radius_top: args.get("radius_top")?,
+                    height: args.get("height")?,
+                },
+            )))
+        }
     }
 
     fn parameters() -> ParameterValueList {

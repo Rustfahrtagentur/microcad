@@ -47,34 +47,9 @@ impl ModelBuilder {
         }
     }
 
-    /// New 2D primitive.
-    pub fn new_2d_primitive(geometry: Geometry2D) -> Self {
+    pub fn new_builtin_workpiece(builtin_workpiece: BuiltinWorkpiece) -> Self {
         Self {
-            root: geometry.into(),
-            ..Default::default()
-        }
-    }
-
-    /// New 3D primitive.
-    pub fn new_3d_primitive(geometry: Geometry3D) -> Self {
-        Self {
-            root: geometry.into(),
-            ..Default::default()
-        }
-    }
-
-    /// New transform.
-    pub fn new_transform(transform: AffineTransform) -> Self {
-        Self {
-            root: transform.into(),
-            ..Default::default()
-        }
-    }
-
-    /// New operation.
-    pub fn new_operation<T: Operation + 'static>(operation: T) -> Self {
-        Self {
-            root: ModelInner::new(Element::Operation(Rc::new(operation))),
+            root: ModelInner::new(Element::BuiltinWorkpiece(builtin_workpiece)),
             ..Default::default()
         }
     }

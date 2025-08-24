@@ -4,7 +4,6 @@
 //! Model
 
 use crate::{model::*, resolve::*, src_ref::*, syntax::*};
-use microcad_core::{Geometry2D, Geometry3D};
 
 /// The actual model contents
 #[derive(custom_debug::Debug, Default)]
@@ -77,23 +76,5 @@ impl PropertiesAccess for ModelInner {
 
     fn add_properties(&mut self, props: Properties) {
         self.element.add_properties(props);
-    }
-}
-
-impl From<Geometry2D> for ModelInner {
-    fn from(geometry: Geometry2D) -> Self {
-        Self::new(Element::Primitive2D(geometry))
-    }
-}
-
-impl From<Geometry3D> for ModelInner {
-    fn from(geometry: Geometry3D) -> Self {
-        Self::new(Element::Primitive3D(geometry))
-    }
-}
-
-impl From<AffineTransform> for ModelInner {
-    fn from(transform: AffineTransform) -> Self {
-        ModelInner::new(Element::Transform(transform))
     }
 }

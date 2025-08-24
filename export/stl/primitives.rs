@@ -49,12 +49,14 @@ impl WriteStl for Model {
                     .write_stl(writer)
             })?;
 
+        todo!()
+        /*
         if !matches!(self_.element, Element::Operation(_)) {
             self_
                 .children()
                 .try_for_each(|child| child.write_stl(writer))?;
         }
 
-        Ok(())
+        Ok(())*/
     }
 }

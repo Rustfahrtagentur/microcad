@@ -4,7 +4,7 @@
 use microcad_lang::{
     eval::*,
     model::*,
-    syntax::Identifier,
+    syntax::{Identifier, WorkbenchKind},
     ty::{MatrixType, Type},
     value::*,
 };
@@ -18,8 +18,16 @@ impl BuiltinWorkbenchDefinition for Rotate {
         "rotate"
     }
 
-    fn model(args: &Tuple) -> EvalResult<Model> {
-        Ok(ModelBuilder::new_transform(AffineTransform::Rotation(args.get("matrix")?)).build())
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Operation
+    }
+
+    fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        &|args| {
+            Ok(BuiltinWorkpieceOutput::Transform(
+                AffineTransform::Rotation(args.get("matrix")?),
+            ))
+        }
     }
 
     fn parameters() -> ParameterValueList {

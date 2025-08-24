@@ -70,10 +70,11 @@ impl WorkbenchDefinition {
 
                 // We have to deduce the output type of this model, otherwise the model is incomplete.
                 {
-                    let output_type = model.deduce_output_type();
                     let model_ = model.borrow();
                     match &model_.element {
                         Element::Workpiece(workpiece) => {
+                            let output_type = model.deduce_output_type();
+
                             let result = workpiece.check_output_type(output_type);
                             match result {
                                 Ok(()) => {}

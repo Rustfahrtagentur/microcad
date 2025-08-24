@@ -3,7 +3,12 @@
 
 //! Model tree module
 
-use crate::{model::*, resolve::*, src_ref::*, syntax::SourceFile};
+use crate::{
+    model::*,
+    resolve::*,
+    src_ref::*,
+    syntax::{SourceFile, WorkbenchDefinition},
+};
 use derive_more::{Deref, DerefMut};
 use microcad_core::BooleanOp;
 
@@ -85,7 +90,7 @@ impl Models {
     pub fn boolean_op(&self, op: BooleanOp) -> Model {
         match self.single_model() {
             Some(model) => model,
-            None => ModelBuilder::new_operation(op)
+            None => ModelBuilder::new_builtin_workpiece(op.into())
                 .add_children(
                     [ModelBuilder::new_group()
                         .add_children(self.clone())

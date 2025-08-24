@@ -3,7 +3,19 @@
 
 //! Builtin function evaluation entity
 
-use crate::{eval::*, model::*, syntax::*};
+use std::rc::Rc;
+
+use custom_debug::Debug;
+use microcad_core::{Geometry2D, Geometry3D};
+
+use crate::{
+    eval::*,
+    model::{
+        render::{RenderCache, RenderResult},
+        *,
+    },
+    syntax::*,
+};
 
 /// Builtin function type
 pub type BuiltinFn =
@@ -45,13 +57,72 @@ impl CallTrait for Builtin {
     }
 }
 
+pub enum BuiltinWorkpieceOutput {
+    Geometry2D(Geometry2D),
+    Geometry3D(Geometry3D),
+    Transform(AffineTransform),
+    Operation(Box<dyn Operation>),
+}
+
+/// Builtin sketch function type
+pub type BuiltinWorkpieceFn = dyn Fn(&Tuple) -> RenderResult<BuiltinWorkpieceOutput>;
+
+#[derive(Clone, Debug)]
+pub struct BuiltinWorkpiece {
+    pub kind: WorkbenchKind,
+    pub symbol: Symbol,
+    pub args: Tuple,
+    #[debug(skip)]
+    pub f: &'static BuiltinWorkpieceFn,
+}
+
+impl BuiltinWorkpiece {
+    pub fn call_2d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry2D>> {
+        Ok(match (self.f)(&self.args)? {
+            BuiltinWorkpieceOutput::Geometry2D(geo2d) => Rc::new(geo2d),
+            BuiltinWorkpieceOutput::Geometry3D(_) => todo!(),
+            BuiltinWorkpieceOutput::Transform(_) => todo!(),
+            BuiltinWorkpieceOutput::Operation(operation) => operation.process_2d(cache, model)?,
+        })
+    }
+}
+
+impl std::fmt::Display for BuiltinWorkpiece {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(
+            f,
+            "{kind} {symbol}{args}",
+            kind = self.kind,
+            symbol = self.symbol,
+            args = self.args
+        )
+    }
+}
+
 /// Builtin part definition
 pub trait BuiltinWorkbenchDefinition {
     /// Get id of the builtin part
     fn id() -> &'static str;
+
+    fn kind() -> WorkbenchKind;
+
+    fn workpiece_function() -> &'static BuiltinWorkpieceFn;
+
+    fn workpiece(args: &Tuple) -> BuiltinWorkpiece {
+        BuiltinWorkpiece {
+            kind: Self::kind(),
+            symbol: Self::symbol(),
+            args: args.clone(),
+            f: Self::workpiece_function(),
+        }
+    }
+
     /// Create model from argument map
-    fn model(args: &Tuple) -> EvalResult<Model>;
-    /// Part function
+    fn model(args: &Tuple) -> Model {
+        ModelBuilder::new_builtin_workpiece(Self::workpiece(args)).build()
+    }
+
+    /// Workbench function
     fn function() -> &'static BuiltinFn {
         &|params, args, _| {
             log::trace!(
@@ -65,18 +136,16 @@ pub trait BuiltinWorkbenchDefinition {
                     params.expect("A built-in part must have a parameter list"),
                 )?
                 .iter()
-                .map(|args| {
-                    Self::model(args).inspect(|model| {
-                        model.borrow_mut().origin.arguments = args.clone();
-                    })
-                })
-                .collect::<Result<Models, _>>()?,
+                .map(Self::model)
+                .collect(),
             ))
         }
     }
 
     /// Part initialization parameters
-    fn parameters() -> ParameterValueList;
+    fn parameters() -> ParameterValueList {
+        ParameterValueList::default()
+    }
 
     /// Create builtin symbol
     fn symbol() -> Symbol {

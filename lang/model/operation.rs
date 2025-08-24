@@ -5,7 +5,10 @@
 
 use std::rc::Rc;
 
-use crate::model::{render::RenderCache, *};
+use crate::model::{
+    render::{RenderCache, RenderResult},
+    *,
+};
 use microcad_core::*;
 
 /// Operation trait.
@@ -18,12 +21,12 @@ pub trait Operation: std::fmt::Debug {
     }
 
     /// Process the model.
-    fn process_2d(&self, _cache: &mut RenderCache, _model: &Model) -> Rc<Geometry2D> {
+    fn process_2d(&self, _cache: &mut RenderCache, _model: &Model) -> RenderResult<Rc<Geometry2D>> {
         unimplemented!()
     }
 
     /// Process the model.
-    fn process_3d(&self, _cache: &mut RenderCache, _model: &Model) -> Rc<Geometry3D> {
+    fn process_3d(&self, _cache: &mut RenderCache, _model: &Model) -> RenderResult<Rc<Geometry3D>> {
         unimplemented!()
     }
 }

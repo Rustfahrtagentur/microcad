@@ -3,7 +3,7 @@
 
 use geo::coord;
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{eval::*, parameter, syntax::WorkbenchKind, value::*};
 
 pub struct Rect;
 
@@ -12,19 +12,21 @@ impl BuiltinWorkbenchDefinition for Rect {
         "Rect"
     }
 
-    fn model(args: &Tuple) -> EvalResult<Model> {
-        let width: Scalar = args.get("width")?;
-        let height: Scalar = args.get("height")?;
-        let x = args.get("x")?;
-        let y = args.get("y")?;
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Sketch
+    }
 
-        Ok(
-            ModelBuilder::new_2d_primitive(Geometry2D::Rect(geo2d::Rect::new(
-                coord! {x: x, y: y},
-                coord! {x: x + width, y: y + height},
+    fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        &|args| {
+            let width: Scalar = args.get("width")?;
+            let height: Scalar = args.get("height")?;
+            let x = args.get("x")?;
+            let y = args.get("y")?;
+
+            Ok(BuiltinWorkpieceOutput::Geometry2D(Geometry2D::Rect(
+                geo2d::Rect::new(coord! {x: x, y: y}, coord! {x: x + width, y: y + height}),
             )))
-            .build(),
-        )
+        }
     }
 
     fn parameters() -> ParameterValueList {

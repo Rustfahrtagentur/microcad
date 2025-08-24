@@ -3,7 +3,7 @@
 
 use geo::coord;
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{eval::*, parameter, syntax::WorkbenchKind, value::*};
 
 pub struct Line;
 
@@ -12,19 +12,23 @@ impl BuiltinWorkbenchDefinition for Line {
         "Line"
     }
 
-    fn model(args: &Tuple) -> EvalResult<Model> {
-        let (x0, y0, x1, y1) = (
-            args.get("x0")?,
-            args.get("y0")?,
-            args.get("x1")?,
-            args.get("y1")?,
-        );
+    fn kind() -> WorkbenchKind {
+        WorkbenchKind::Sketch
+    }
 
-        Ok(ModelBuilder::new_2d_primitive(Geometry2D::Line(geo2d::Line(
-            coord! {x: x0, y: y0}.into(),
-            coord! {x: x1, y: y1}.into(),
-        )))
-        .build())
+    fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        &|args| {
+            let (x0, y0, x1, y1) = (
+                args.get("x0")?,
+                args.get("y0")?,
+                args.get("x1")?,
+                args.get("y1")?,
+            );
+
+            Ok(BuiltinWorkpieceOutput::Geometry2D(Geometry2D::Line(
+                geo2d::Line(coord! {x: x0, y: y0}.into(), coord! {x: x1, y: y1}.into()),
+            )))
+        }
     }
 
     fn parameters() -> ParameterValueList {

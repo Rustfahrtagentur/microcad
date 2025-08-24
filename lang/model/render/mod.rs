@@ -9,10 +9,19 @@ use std::rc::Rc;
 
 pub use cache::*;
 
-use cgmath::SquareMatrix;
 use microcad_core::*;
+use thiserror::Error;
 
-use crate::model::*;
+use crate::{model::*, value::ValueError};
+
+#[derive(Debug, Error)]
+pub enum RenderError {
+    /// Value error
+    #[error("Value Error: {0}")]
+    ValueError(#[from] ValueError),
+}
+
+pub type RenderResult<T> = Result<T, RenderError>;
 
 impl Model {
     /// Return output type.
@@ -22,223 +31,107 @@ impl Model {
 
     /// Deduce output type from children and set it and return it.
     pub fn deduce_output_type(&self) -> OutputType {
-        let mut self_ = self.borrow_mut();
-        let mut output_type = match &self_.element {
-            Element::Group
-            | Element::Workpiece(_)
-            | Element::ChildrenMarker
-            | Element::Transform(_) => OutputType::NotDetermined,
-            Element::Primitive2D(_) => OutputType::Geometry2D,
-            Element::Primitive3D(_) => OutputType::Geometry3D,
-            Element::Operation(operation) => operation.output_type(),
-        };
+        let self_ = self.borrow();
+        let mut output_type = todo!("Get output type from element");
         if output_type == OutputType::NotDetermined {
             let children = &self_.children;
             output_type = children.deduce_output_type();
         }
 
-        self_.output = ModelOutput::new(output_type);
-
         output_type
-    }
-
-    /// Set the transformation matrices for this model and its children.
-    pub fn set_matrix(&self, mat: Mat4) {
-        let world_matrix = {
-            let mut self_ = self.borrow_mut();
-            let local_matrix = match &self_.element {
-                Element::Transform(affine_transform) => affine_transform.mat3d(),
-                _ => Mat4::identity(),
-            };
-            self_.output.world_matrix = mat * local_matrix;
-            self_.output.local_matrix = local_matrix;
-            self_.output.world_matrix
-        };
-
-        self.borrow().children.iter().for_each(|model| {
-            model.set_matrix(world_matrix);
-        });
-    }
-
-    /// Set the resolution for this model.
-    pub fn set_resolution(&self, resolution: RenderResolution) {
-        let new_resolution = {
-            let mut self_ = self.borrow_mut();
-            let new_resolution = resolution * self_.output.world_matrix;
-            self_.output.resolution = new_resolution.clone();
-            new_resolution
-        };
-
-        self.borrow().children.iter().for_each(|model| {
-            model.set_resolution(new_resolution.clone());
-        });
     }
 
     /// Fetch output 2d geometries.
     ///
     /// Panics if the model does not contain any 2d geometry.
     pub fn fetch_output_geometry_2d(&self) -> Option<Rc<Geometry2D>> {
-        match &self.borrow().output.geometry {
-            GeometryOutput::Geometry2D(geometry) => geometry.clone(),
-            _ => panic!("The model does not contain a 2D geometry."),
-        }
+        todo!()
     }
 
     /// Fetch output 3d geometries.
     ///
     /// Panics if the model does not contain any 3d geometry.
     pub fn fetch_output_geometry_3d(&self) -> Option<Rc<Geometry3D>> {
-        match &self.borrow().output.geometry {
-            GeometryOutput::Geometry3D(geometries) => geometries.clone(),
-            _ => panic!("The model does not contain a 3D geometry."),
-        }
+        todo!()
     }
 
     /// Render geometries in 2D.
-    pub fn render_geometry_2d(&self, cache: &mut RenderCache) -> Geometries2D {
-        self.borrow()
-            .children
-            .iter()
-            .fold(Default::default(), |mut geometries, model| {
+    pub fn render_geometry_2d(&self, cache: &mut RenderCache) -> RenderResult<Geometries2D> {
+        self.borrow().children.iter().try_fold(
+            Default::default(),
+            |mut geometries: Geometries2D, model| {
                 let model_ = model.borrow();
                 let mat = model_.output.local_matrix_2d();
                 geometries.push(
                     model
-                        .process_2d(cache, model)
+                        .process_2d(cache, model)?
                         .transformed_2d(&model_.output.resolution, &mat),
                 );
-                geometries
-            })
+                Ok(geometries)
+            },
+        )
     }
 
     /// Render geometries in 3D.
-    pub fn render_geometry_3d(&self, cache: &mut RenderCache) -> Geometries3D {
-        self.borrow()
-            .children
-            .iter()
-            .fold(Default::default(), |mut geometries, model| {
-                let model_ = model.borrow();
-                let mat = model_.output.local_matrix_3d();
-                geometries.push(
-                    model
-                        .process_3d(cache, model)
-                        .transformed_3d(&model_.output.resolution, &mat),
-                );
-                geometries
-            })
+    pub fn render_geometry_3d(&self, cache: &mut RenderCache) -> RenderResult<Geometries3D> {
+        todo!()
     }
 
     /// Render the model.
     ///
     /// Rendering the model means that all geometry is calculated and stored
-    /// in the respective model output.
-    /// This means after rendering, the rendered geometry can be retrieved via:
-    /// * `fetch_output_geometry_2d()` for 2D geometry.
-    /// * `fetch_output_geometry_3d()` for 3D geometry.
-    pub fn render(&self, cache: &mut RenderCache) {
-        fn render_geometry_2d(cache: &mut RenderCache, model: &Model) -> Option<Rc<Geometry2D>> {
-            match &model.borrow().element {
-                Element::Primitive2D(geometry) => Some(geometry.clone().into()),
-                Element::Operation(operation) => Some(operation.process_2d(cache, model)),
-                _ => None,
-            }
+    /// in the in the render cache.
+    pub fn render(&self, resolution: RenderResolution, cache: &mut RenderCache) {
+        /// Set the resolution for this model.
+        pub fn set_resolution(model: &Model, resolution: RenderResolution) {
+            let new_resolution = {
+                let mut model_ = model.borrow_mut();
+                let new_resolution = resolution * model_.output.world_matrix;
+                model_.output.resolution = new_resolution.clone();
+                new_resolution
+            };
+
+            model.borrow().children.iter().for_each(|model| {
+                set_resolution(model, new_resolution.clone());
+            });
         }
 
-        fn render_geometry_3d(cache: &mut RenderCache, model: &Model) -> Option<Rc<Geometry3D>> {
-            match &model.borrow().element {
-                Element::Primitive3D(geometry) => Some(geometry.clone().into()),
-                Element::Operation(operation) => Some(operation.process_3d(cache, model)),
-                _ => None,
-            }
-        }
+        //set_matrix(self, Mat4::identity());
+        set_resolution(self, resolution);
 
-        fn is_operation(model: &Model) -> bool {
-            matches!(&model.borrow().element, Element::Operation(_))
-        }
-
-        match self.final_output_type() {
-            OutputType::Geometry2D => {
-                let geometries = render_geometry_2d(cache, self);
-                if !is_operation(self) {
-                    self.borrow().children.iter().for_each(|model| {
-                        model.render(cache);
-                    });
-                }
-
-                self.borrow_mut().output.geometry = GeometryOutput::Geometry2D(geometries);
-            }
-            OutputType::Geometry3D => {
-                let geometries = render_geometry_3d(cache, self);
-                if !is_operation(self) {
-                    self.borrow().children.iter().for_each(|model| {
-                        model.render(cache);
-                    });
-                }
-
-                self.borrow_mut().output.geometry = GeometryOutput::Geometry3D(geometries);
-            }
-            output_type => {
-                panic!("Output type must have been determined at this point: {output_type}\n{self}")
-            }
-        }
+        todo!("Implement render algorithm")
     }
 }
 
 impl Operation for Model {
-    fn process_2d(&self, cache: &mut RenderCache, model: &Model) -> Rc<Geometry2D> {
+    fn process_2d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry2D>> {
         let mut geometries = Geometries2D::default();
 
         let model_ = &model.borrow();
         match &model_.element {
-            Element::Group | Element::Workpiece(_) | Element::Transform(_) => {
-                model_
-                    .children()
-                    .for_each(|n| geometries.push(n.process_2d(cache, n).as_ref().clone()));
+            Element::Group | Element::Workpiece(_) => {
+                model_.children().try_for_each(|n| -> RenderResult<_> {
+                    Ok(geometries.push(n.process_2d(cache, n)?.as_ref().clone()))
+                });
             }
-            Element::Primitive2D(geo) => {
-                geometries.push(geo.clone());
-                model_
-                    .children()
-                    .for_each(|n| geometries.push(n.process_2d(cache, n).as_ref().clone()));
-            }
-            Element::Operation(operation) => {
-                geometries.push(operation.process_2d(cache, model).as_ref().clone())
+            Element::BuiltinWorkpiece(builtin_workpiece) => {
+                geometries.push(builtin_workpiece.call_2d(cache, model)?.as_ref().clone());
+                // TODO: Pass children geometry, too?
+                //model_
+                //    .children()
+                //    .for_each(|n| geometries.push(n.process_2d(cache, n).as_ref().clone()));
             }
             _ => {}
         }
 
-        Rc::new(Geometry2D::Collection(geometries.transformed_2d(
+        Ok(Rc::new(Geometry2D::Collection(geometries.transformed_2d(
             &model_.output.resolution,
             &model_.output.local_matrix_2d(),
-        )))
+        ))))
     }
 
-    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> Rc<Geometry3D> {
-        let mut geometries = Geometries3D::default();
-
-        let model_ = &model.borrow();
-        match &model_.element {
-            Element::Group | Element::Workpiece(_) | Element::Transform(_) => {
-                model_
-                    .children()
-                    .for_each(|n| geometries.push(n.process_3d(cache, n).as_ref().clone()));
-            }
-            Element::Primitive3D(geo) => {
-                geometries.push(geo.clone());
-                model_
-                    .children()
-                    .for_each(|n| geometries.push(n.process_3d(cache, n).as_ref().clone()));
-            }
-            Element::Operation(operation) => {
-                geometries.push(operation.process_3d(cache, model).as_ref().clone())
-            }
-            _ => {}
-        }
-
-        Rc::new(Geometry3D::Collection(geometries.transformed_3d(
-            &model_.output.resolution,
-            &model_.output.local_matrix_3d(),
-        )))
+    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry3D>> {
+        todo!();
     }
 }
 
