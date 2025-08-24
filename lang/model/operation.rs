@@ -17,13 +17,6 @@ pub trait Operation: std::fmt::Debug {
         OutputType::NotDetermined
     }
 
-    /// The input type of this operation.
-    ///
-    /// By default, the input type is undetermined.
-    fn input_type(&self) -> OutputType {
-        OutputType::NotDetermined
-    }
-
     /// Process the model.
     fn process_2d(&self, _cache: &mut RenderCache, _model: &Model) -> Rc<Geometry2D> {
         unimplemented!()
