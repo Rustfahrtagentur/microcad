@@ -19,17 +19,5 @@
 
 -- Output --
 -- Errors --
-warning: The part workbench will produce no 3D output.
-  ---> <FROM STR>:4:13
-     |
-   4 |             part M1() {}
-     |             ^^^^^^^^^^^^
-     |
-warning: The part workbench will produce no 3D output.
-  ---> <FROM STR>:8:5
-     |
-   8 |     part M2() {}
-     |     ^^^^^^^^^^^^
-     |
 -- Test Result --
 OK

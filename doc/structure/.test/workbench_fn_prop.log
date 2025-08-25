@@ -28,11 +28,5 @@ warning: This expression statement did not produce any model
    6 |     inner();
      |     ^^^^^^^^
      |
-warning: The part workbench will produce no 3D output.
-  ---> <FROM STR>:1:1
-     |
-   1 | part PunchedDisk(radius: Length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
 FAILED BUT WITH WRONG ERRORS

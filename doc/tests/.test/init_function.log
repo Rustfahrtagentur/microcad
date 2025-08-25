@@ -22,11 +22,5 @@ error: Missing return statement in [30m[105m[1m NO ID [39m[49m[22m::K::f
    2 |   fn f() {} // error
      |          ^^
      |
-warning: The sketch workbench will produce no 2D output.
-  ---> <FROM STR>:1:1
-     |
-   1 | sketch K() { init(l:Length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED
