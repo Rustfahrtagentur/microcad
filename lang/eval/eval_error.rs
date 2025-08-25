@@ -225,6 +225,14 @@ pub enum EvalError {
     /// Function missing return statement
     #[error("Missing return statement in {0}")]
     MissingReturn(QualifiedName),
+
+    /// There is no model in this workbench
+    #[error("Missing model in workbench")]
+    NoModelInWorkbench,
+
+    /// Found a symbol and a property with that name
+    #[error("Found a symbol and a property with names {0} and {1}")]
+    AmbiguousProperty(QualifiedName, Identifier),
 }
 
 /// Result type of any evaluation.

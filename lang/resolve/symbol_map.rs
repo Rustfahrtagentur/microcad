@@ -19,6 +19,16 @@ impl From<Tuple> for SymbolMap {
     }
 }
 
+impl FromIterator<(Identifier, Value)> for SymbolMap {
+    fn from_iter<T: IntoIterator<Item = (Identifier, Value)>>(iter: T) -> Self {
+        let mut symbol_map = SymbolMap::default();
+        for (id, value) in iter {
+            symbol_map.add_node(Symbol::new_call_argument(id.clone(), value.clone()))
+        }
+        symbol_map
+    }
+}
+
 impl WriteToFile for SymbolMap {}
 
 impl SymbolMap {
@@ -97,7 +107,7 @@ impl SymbolMap {
 impl std::fmt::Display for SymbolMap {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (id, symbol) in self.0.iter() {
-            symbol.print_symbol(f, Some(id), 4)?;
+            symbol.print_symbol(f, Some(id), 0)?;
         }
 
         Ok(())

@@ -29,7 +29,7 @@ pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
 
-use crate::syntax::*;
+use crate::{syntax::*, value::Value};
 
 /// Trait for items which can be fully qualified.
 pub trait FullyQualify {
@@ -103,12 +103,14 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
             Statement::Module(md) => Ok(Some((md.id.clone(), md.resolve(parent)?))),
             Statement::Function(fd) => Ok(Some((fd.id.clone(), fd.resolve(parent)?))),
             Statement::Use(us) => us.resolve(parent),
+            Statement::Assignment(a) => Ok(a
+                .resolve(parent)?
+                .map(|symbol| (a.assignment.id.clone(), symbol))),
             // Not producing any symbols
             Statement::Init(_)
             | Statement::Return(_)
             | Statement::If(_)
             | Statement::InnerAttribute(_)
-            | Statement::Assignment(_)
             | Statement::Expression(_) => Ok(None),
         }
     }
@@ -173,7 +175,16 @@ impl Resolve for Attribute {
 
 impl Resolve for AssignmentStatement {
     fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
-        Ok(None)
+        match self.assignment.qualifier {
+            Qualifier::Prop | Qualifier::Var => Ok(None),
+            Qualifier::Const => {
+                log::trace!("Declare constant {}", self.assignment.id);
+                Ok(Some(Symbol::new_constant(
+                    self.assignment.id.clone(),
+                    Value::None,
+                )))
+            }
+        }
     }
 }
 

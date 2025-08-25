@@ -3,7 +3,7 @@
 
 //! Object properties.
 
-use crate::{syntax::*, value::*};
+use crate::{syntax::*, tree_display::*, value::*};
 use derive_more::{Deref, DerefMut};
 use std::collections::BTreeMap;
 
@@ -28,12 +28,19 @@ impl Properties {
 
 impl std::fmt::Display for Properties {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "ObjectProperties:")?;
+        writeln!(f, "Properties:")?;
         for (id, value) in self.0.iter() {
-            writeln!(f, "\t{id:?} = {value:?}")?;
+            writeln!(f, "\t{id:?} : {value:?}")?;
         }
 
         Ok(())
+    }
+}
+
+impl TreeDisplay for Properties {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
+        self.iter()
+            .try_for_each(|(id, value)| writeln!(f, "{:depth$}{id:?} : {value:?}", ""))
     }
 }
 
@@ -41,6 +48,8 @@ impl std::fmt::Display for Properties {
 pub trait PropertiesAccess {
     /// Get a value of property, or [`Value::None`] if the property does not exist.
     fn get_property(&self, id: &Identifier) -> Option<&Value>;
+    /// Get all properties
+    fn get_properties(&self) -> &Properties;
     /// Set or create properties with the given ids and values.
     fn add_properties(&mut self, props: Properties);
 }

@@ -93,6 +93,13 @@ impl PropertiesAccess for Element {
         }
     }
 
+    fn get_properties(&self) -> &Properties {
+        match self {
+            Self::Workpiece(workpiece) => workpiece.get_properties(),
+            _ => unreachable!("not a workpiece element"),
+        }
+    }
+
     fn add_properties(&mut self, props: Properties) {
         match self {
             Self::Workpiece(workpiece) => {

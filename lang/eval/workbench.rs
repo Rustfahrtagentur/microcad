@@ -23,27 +23,29 @@ impl WorkbenchDefinition {
             kind = self.kind
         );
 
+        let (properties,non_properties) :(Vec<_>,Vec<_>) =                 // copy all arguments which are part of the building plan into properties
+                arguments
+                    .named_iter().map(|(id, value)|(id.clone(),value.clone()))
+                    .partition(|(id, _)| {
+                        self.plan.contains_key(id)
+                    });
+
+        log::trace!("Properties:\n{:?}", properties);
+        log::trace!("Non-Properties:\n{:?}", non_properties);
+
         // Create model
         let model = ModelBuilder::new_workpiece(self.kind)
             .origin(Origin::new(arguments.clone()))
             .attributes(self.attribute_list.eval(context)?)
-            .properties(
-                // copy all arguments which are part of the building plan to properties
-                arguments
-                    .named_iter()
-                    .filter_map(|(id, arg)| {
-                        if self.plan.contains_key(id) {
-                            Some((id.clone(), arg.clone()))
-                        } else {
-                            None
-                        }
-                    })
-                    .collect(),
-            )
+            .properties(properties.into_iter().collect())
             .build();
 
         context.scope(
-            StackFrame::Workbench(model, self.id.clone(), arguments.clone().into()),
+            StackFrame::Workbench(
+                model,
+                self.id.clone(),
+                non_properties.clone().into_iter().collect(),
+            ),
             |context| {
                 let model = context.get_model()?;
 
@@ -54,12 +56,9 @@ impl WorkbenchDefinition {
                         id = self.id,
                         kind = self.kind
                     );
-                    if let Err(err) = match init.eval(&self.plan, arguments.clone(), context) {
-                        Ok(props) => props.iter().try_for_each(|(id, value)| {
-                            context.set_local_value(id.clone(), value.clone())
-                        }),
-                        Err(err) => context.error(init, err),
-                    } {
+                    if let Err(err) =
+                        init.eval(&self.plan, non_properties.into_iter().collect(), context)
+                    {
                         context.error(self, err)?;
                     }
                 }
