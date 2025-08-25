@@ -22,7 +22,7 @@ impl SourceFile {
         path: impl AsRef<std::path::Path> + std::fmt::Debug,
         name: QualifiedName,
     ) -> ParseResult<Rc<Self>> {
-        log::trace!("{load} file {path:?} [{name}]", load = crate::mark!(LOAD),);
+        log::trace!("{load} file {path:?} [{name}]", load = crate::mark!(LOAD));
 
         let mut file = match std::fs::File::open(&path) {
             Ok(file) => file,
@@ -49,9 +49,10 @@ impl SourceFile {
     /// Create `SourceFile` from string
     /// The hash of the result will be of `crate::from_str!()`.
     pub fn load_from_str(s: &str) -> ParseResult<Rc<Self>> {
+        log::trace!("{load} source from string", load = crate::mark!(LOAD));
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, 0)?;
+        log::debug!("Successfully loaded source from string");
         source_file.filename = None;
-        log::debug!("loaded string successfully",);
         log::trace!("Syntax tree:\n{}", FormatTree(&source_file));
         Ok(Rc::new(source_file))
     }
