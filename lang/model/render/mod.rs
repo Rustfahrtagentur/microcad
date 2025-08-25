@@ -33,17 +33,14 @@ impl Model {
 
     /// Deduce output type from children and set it and return it.
     pub fn deduce_output_type(&self) -> OutputType {
-        todo!("Get output type from element");
-        /*
-        let mut _output_type =
         let self_ = self.borrow();
-
+        let mut output_type = self_.element.output_type();
         if output_type == OutputType::NotDetermined {
             let children = &self_.children;
             output_type = children.deduce_output_type();
         }
 
-        output_type*/
+        output_type
     }
 
     /// Fetch output 2d geometries.

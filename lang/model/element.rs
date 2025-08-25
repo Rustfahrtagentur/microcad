@@ -35,6 +35,25 @@ pub enum Element {
 }
 
 impl Element {
+    /// Get output type of element.
+    pub fn output_type(&self) -> OutputType {
+        match self {
+            Element::Workpiece(workpiece) => match workpiece.kind {
+                WorkbenchKind::Sketch => OutputType::Geometry2D,
+                WorkbenchKind::Part => OutputType::Geometry3D,
+                WorkbenchKind::Operation => OutputType::NotDetermined,
+            },
+            Element::BuiltinWorkpiece(builtin_workpiece) => match builtin_workpiece.kind {
+                BuiltinWorkbenchKind::Primitive2D => OutputType::Geometry2D,
+                BuiltinWorkbenchKind::Primitive3D => OutputType::Geometry3D,
+                BuiltinWorkbenchKind::Transform | BuiltinWorkbenchKind::Operation => {
+                    OutputType::NotDetermined
+                }
+            },
+            Element::Group | Element::ChildrenMarker => OutputType::NotDetermined,
+        }
+    }
+
     /// Check if an element is an operation.
     pub fn is_operation(&self) -> bool {
         match self {
