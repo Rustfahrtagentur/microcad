@@ -18,7 +18,7 @@
 12:     // square is callable from outside math
 13:     pub fn square(x: Scalar) {
 14:         // call internal pow
-15:         pow(x, 2.0)
+15:         pow(x, 2)
 16:     }
 17: }
 18: 
@@ -28,19 +28,11 @@
 
 -- Output --
 -- Errors --
-error: Symbol pow not found.
-  ---> <FROM STR>:15:9
+error: Symbol `<NO ID>::math::pow` is private.
+  ---> <FROM STR>:21:1
      |
-  15 |         pow(x, 2.0)
-     |         ^^^^^^^^^^^
-     |
-error: Symbol pow not found.
-  ---> <FROM STR>:8:17
-     |
-   8 |             x * pow(x, n-1) // return recursive product
-     |                 ^^^^^^^^^^^
+  21 | math::pow(2.0, 5);  // error: pow is private
+     | ^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
-FAIL(TODO)
--- Test Result --
-FAILED AS EXPECTED BUT IS TODO
+FAILED AS EXPECTED

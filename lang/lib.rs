@@ -246,13 +246,13 @@ macro_rules! invalid_no_ansi {
         "<INVALID UNKNOWN>"
     };
     (ID) => {
-        "<INVALID ID>"
+        "<NO ID>"
     };
     (NAME) => {
         "<INVALID NAME>"
     };
     (EXPRESSION) => {
-        color_print::cstr!("<INVALID EXPRESSION>")
+        "<INVALID EXPRESSION>"
     };
 }
 

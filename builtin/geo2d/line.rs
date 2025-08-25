@@ -3,7 +3,7 @@
 
 use geo::coord;
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, rc::*, value::*};
+use microcad_lang::{eval::*, model::*, parameter, value::*};
 
 pub struct Line;
 
@@ -20,13 +20,11 @@ impl BuiltinWorkbenchDefinition for Line {
             args.get("y1")?,
         );
 
-        Ok(
-            ModelBuilder::new_2d_primitive(Rc::new(Geometry2D::Line(geo2d::Line(
-                coord! {x: x0, y: y0}.into(),
-                coord! {x: x1, y: y1}.into(),
-            ))))
-            .build(),
-        )
+        Ok(ModelBuilder::new_2d_primitive(Geometry2D::Line(geo2d::Line(
+            coord! {x: x0, y: y0}.into(),
+            coord! {x: x1, y: y1}.into(),
+        )))
+        .build())
     }
 
     fn parameters() -> ParameterValueList {

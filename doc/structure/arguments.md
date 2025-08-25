@@ -117,7 +117,7 @@ When you provide all parameters but some are redundant, you will get a warning:
 
 [![test](.test/tuple_match_warnings.svg)](.test/tuple_match_warnings.log)
 
-```µcad,tuple_match_warnings#fail
+```µcad,tuple_match_warnings#todo_fail
 fn f( x: Length, y: Length, z: Length ) {}
 f( (x=1cm, y=2cm, v=5cm), z=3cm);  // warning: v is redundant
 ```

@@ -21,7 +21,7 @@ cgmath = { version = "0.18", features = ["serde"] }
 derive_more = { version = "2", features = ["deref", "deref_mut"] }
 geo = { version = "0.30", features = ["use-serde"] }
 log = "0.4"
-manifold-rs = { version = "0.6", optional = true }
+manifold-rs = { version = "0.6.2", optional = true }
 rctree = "0.6"
 strum = { version = "0.27", features = ["derive"] }
 thiserror = "2.0"

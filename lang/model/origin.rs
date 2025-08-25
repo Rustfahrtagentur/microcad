@@ -34,7 +34,6 @@ impl Origin {
     /// Get creator, if available.
     ///
     /// If a creator is available returns a `Link` to it which might need to be
-    /// loaded before accessing it (see [`Self::load_creator()`]).
     pub fn get_creator(&self) -> &Option<Symbol> {
         &self.creator
     }

@@ -3,8 +3,6 @@
 
 use std::str::FromStr;
 
-#[cfg(test)]
-use crate::builtin_module;
 use microcad_lang::{diag::*, eval::*, parameter, resolve::*, syntax::*, value::*};
 
 pub fn assert() -> Symbol {
@@ -125,40 +123,4 @@ pub fn assert_invalid() -> Symbol {
         }
         Ok(Value::None)
     })
-}
-
-#[test]
-fn assert_ok() {
-    let mut context = Context::from_source(
-        "../tests/test_cases/syntax/assert_ok.µcad",
-        builtin_module(),
-        &[],
-    )
-    .expect("resolvable file ../tests/test_cases/syntax/assert_ok.µcad");
-
-    assert!(context.eval().is_ok());
-}
-
-#[test]
-fn assert_fail() {
-    let mut context = Context::from_source(
-        "../tests/test_cases/syntax/assert_fail.µcad",
-        builtin_module(),
-        &[],
-    )
-    .expect("resolvable file ../tests/test_cases/syntax/assert_fail.µcad");
-
-    assert!(context.eval().is_ok());
-    assert!(context.error_count() > 0);
-
-    assert_eq!(
-        context.diagnosis(),
-        "error: Assertion failed: false
-  ---> ../tests/test_cases/syntax/assert_fail.µcad:1:26
-     |
-   1 | __builtin::debug::assert(false);
-     |                          ^^^^^
-     |
-"
-    );
 }

@@ -117,3 +117,7 @@ Any errors which occur here are related to geometrical processing.
 | Call        |     -     |   -    |    -     |   -   |   -   |    -    |   -    |   -   |   -    |        -         |     -      |
 
 [See tests](tests/statement_usage.md)
+
+## Stack Frames
+
+![Stack Frames](images/stack_frames.svg)

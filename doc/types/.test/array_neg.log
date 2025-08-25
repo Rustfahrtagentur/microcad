@@ -1,0 +1,13 @@
+-- Test --
+  array_neg
+  ../doc/types/arrays.md:104
+
+-- Code --
+
+ 1: d = 1.0mm;
+ 2: std::debug::assert_eq([[-d,d], -[d, -d]]);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

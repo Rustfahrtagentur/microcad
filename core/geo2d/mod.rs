@@ -4,6 +4,7 @@
 //! 2D Geometry
 
 mod bounds;
+mod circle;
 mod collection;
 mod geometry;
 mod line;
@@ -13,6 +14,7 @@ mod size;
 use crate::*;
 
 pub use bounds::*;
+pub use circle::*;
 pub use collection::*;
 use geo::AffineTransform;
 pub use geometry::*;
@@ -26,14 +28,14 @@ pub trait RenderToMultiPolygon: Sized {
     ///
     /// Implement this method if the geometry only returns a single polygon.
     /// Line geometry returns [`None`].
-    fn render_to_polygon(self, _: &RenderResolution) -> Option<Polygon> {
+    fn render_to_polygon(&self, _: &RenderResolution) -> Option<Polygon> {
         None
     }
 
     /// Render a geometry into a new multi polygon.
     ///
     /// This method uses [`RenderToMultiPolygon::render_to_existing_multi_polygon`] and does not need to be reimplemented.  
-    fn render_to_multi_polygon(self, resolution: &RenderResolution) -> MultiPolygon {
+    fn render_to_multi_polygon(&self, resolution: &RenderResolution) -> MultiPolygon {
         let mut polygons = geo::MultiPolygon(vec![]);
         self.render_to_existing_multi_polygon(resolution, &mut polygons);
         polygons
@@ -43,7 +45,7 @@ pub trait RenderToMultiPolygon: Sized {
     ///
     /// Reimplement this function preferably if the geometry returns more than one polygon.
     fn render_to_existing_multi_polygon(
-        self,
+        &self,
         resolution: &RenderResolution,
         polygons: &mut MultiPolygon,
     ) {

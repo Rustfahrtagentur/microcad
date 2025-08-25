@@ -41,7 +41,7 @@ impl WriteStl for Model {
         let render_resolution = self_.output.resolution.clone();
 
         // Render all output geometries.
-        self.fetch_output_geometries_3d()
+        self.fetch_output_geometry_3d()
             .iter()
             .try_for_each(|geometry| {
                 geometry

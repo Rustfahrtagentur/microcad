@@ -1,0 +1,13 @@
+-- Test --
+  tuple_mul_scale
+  ../doc/types/tuples.md:126
+
+-- Code --
+
+ 1: v = (x = 1.0mm, y = 2.0mm);
+ 2: std::debug::assert_eq([v*2, (x = 2.0mm, y = 4.0mm)]);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

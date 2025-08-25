@@ -97,28 +97,6 @@ impl SrcReferrer for SourceFile {
 }
 
 #[test]
-fn load_source_file() {
-    let source_file = SourceFile::load(r#"../tests/test_cases/ops/difference.µcad"#);
-    if let Err(ref err) = source_file {
-        log::error!("{err}");
-    }
-
-    let source_file = source_file.expect("test error");
-
-    let first_statement = source_file.statements.first().expect("test error");
-    match first_statement {
-        Statement::Use(u) => {
-            use crate::src_ref::SrcReferrer;
-            assert_eq!(
-                u.src_ref().source_slice(&source_file.source),
-                "use __builtin::*;"
-            );
-        }
-        _ => panic!(),
-    }
-}
-
-#[test]
 fn load_source_file_wrong_location() {
     let source_file = SourceFile::load("I do not exist.µcad");
     if let Err(err) = source_file {

@@ -1,0 +1,14 @@
+-- Test --
+  tuple_add_same
+  ../doc/types/tuples.md:93
+
+-- Code --
+
+ 1: a = (x = 1.0mm, y = 2.0mm);
+ 2: b = (x = 3.0mm, y = 4.0mm);
+ 3: std::debug::assert_eq([a + b, (x = 4.0mm, y = 6.0mm)]);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

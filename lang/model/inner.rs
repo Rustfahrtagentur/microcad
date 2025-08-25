@@ -3,7 +3,7 @@
 
 //! Model
 
-use crate::{model::*, rc::*, resolve::*, src_ref::*, syntax::*};
+use crate::{model::*, resolve::*, src_ref::*, syntax::*};
 use microcad_core::{Geometry2D, Geometry3D};
 
 /// The actual model contents
@@ -80,14 +80,14 @@ impl PropertiesAccess for ModelInner {
     }
 }
 
-impl From<Rc<Geometry2D>> for ModelInner {
-    fn from(geometry: Rc<Geometry2D>) -> Self {
+impl From<Geometry2D> for ModelInner {
+    fn from(geometry: Geometry2D) -> Self {
         Self::new(Element::Primitive2D(geometry))
     }
 }
 
-impl From<Rc<Geometry3D>> for ModelInner {
-    fn from(geometry: Rc<Geometry3D>) -> Self {
+impl From<Geometry3D> for ModelInner {
+    fn from(geometry: Geometry3D) -> Self {
         Self::new(Element::Primitive3D(geometry))
     }
 }

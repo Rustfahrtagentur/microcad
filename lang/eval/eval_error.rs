@@ -53,6 +53,10 @@ pub enum EvalError {
     #[error("Symbol `{0}` cannot be called {1}.")]
     SymbolCannotBeCalled(QualifiedName, Box<SymbolDefinition>),
 
+    /// The symbol cannot used, because it's private
+    #[error("Symbol `{0}` is private.")]
+    SymbolIsPrivate(QualifiedName),
+
     /// Found ambiguous symbols.
     #[error("Ambiguous symbol {ambiguous} might be one of the following:\n{others}")]
     AmbiguousSymbol {
@@ -205,6 +209,18 @@ pub enum EvalError {
     /// Resolve Error
     #[error("Resolve error {0}")]
     ResolveError(#[from] ResolveError),
+
+    /// Unexpected source file in expression
+    #[error("{0} is not operation.")]
+    NotAnOperation(QualifiedName),
+
+    /// Calling an operation on an empty geometry, e.g.: `{}.op()`.
+    #[error("Calling operation on empty geometry")]
+    OperationOnEmptyGeometry,
+
+    /// Cannot call operation without workpiece, e.g. `op()`.
+    #[error("Cannot call operation without workpiece.")]
+    CannotCallOperationWithoutWorkpiece,
 
     /// Function missing return statement
     #[error("Missing return statement in {0}")]

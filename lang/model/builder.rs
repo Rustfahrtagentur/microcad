@@ -48,7 +48,7 @@ impl ModelBuilder {
     }
 
     /// New 2D primitive.
-    pub fn new_2d_primitive(geometry: std::rc::Rc<Geometry2D>) -> Self {
+    pub fn new_2d_primitive(geometry: Geometry2D) -> Self {
         Self {
             root: geometry.into(),
             ..Default::default()
@@ -56,7 +56,7 @@ impl ModelBuilder {
     }
 
     /// New 3D primitive.
-    pub fn new_3d_primitive(geometry: std::rc::Rc<Geometry3D>) -> Self {
+    pub fn new_3d_primitive(geometry: Geometry3D) -> Self {
         Self {
             root: geometry.into(),
             ..Default::default()

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, rc::*, value::*};
+use microcad_lang::{eval::*, model::*, parameter, value::*};
 
 pub struct Cylinder;
 
@@ -13,11 +13,11 @@ impl BuiltinWorkbenchDefinition for Cylinder {
 
     fn model(args: &Tuple) -> EvalResult<Model> {
         Ok(
-            ModelBuilder::new_3d_primitive(Rc::new(Geometry3D::Cylinder(geo3d::Cylinder {
+            ModelBuilder::new_3d_primitive(Geometry3D::Cylinder(geo3d::Cylinder {
                 radius_bottom: args.get("radius_bottom")?,
                 radius_top: args.get("radius_top")?,
                 height: args.get("height")?,
-            })))
+            }))
             .build(),
         )
     }

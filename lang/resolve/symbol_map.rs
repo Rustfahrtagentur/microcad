@@ -48,12 +48,11 @@ impl SymbolMap {
         } else {
             let (id, leftover) = name.split_first();
             if let Some(symbol) = self.get(&id) {
+                symbol.borrow_mut().used = true;
                 if leftover.is_empty() {
                     log::trace!("Fetched {name} from globals (symbol map)");
-                    symbol.borrow_mut().used = true;
                     return Ok(symbol.clone());
                 } else if let Some(symbol) = symbol.search(&leftover) {
-                    symbol.borrow_mut().used = true;
                     return Ok(symbol);
                 }
             }

@@ -4,11 +4,15 @@
 
 -- Code --
 
- 1: use std::geo2d::Circle;
- 2: 
- 3: {}.Circle(radius = 5mm) // error: sketch with body
+ 1: {}.std::ops::translate(x = 5mm) // error: Calling operation on empty geometry
 
 -- Output --
 -- Errors --
+error: Calling operation on empty geometry
+  ---> <FROM STR>:1:4
+     |
+   1 | {}.std::ops::translate(x = 5mm) // error: Calling operation on empty geometry
+     |    ^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

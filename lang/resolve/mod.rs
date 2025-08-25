@@ -10,7 +10,7 @@
 //!
 //! let source_file = SourceFile::load("my.µcad").expect("parsing success");
 //!
-//! let source_symbol = source_file.resolve(None);
+//! let source_symbol = source_file.resolve();
 //! ```
 //!
 //! To "run" the source file (and get the expected output) it must now be evaluated (see [`crate::eval`])  .
@@ -35,6 +35,10 @@ use crate::syntax::*;
 pub trait FullyQualify {
     /// Get a fully (up to root of symbol map) qualified name.
     fn full_name(&self) -> QualifiedName;
+    /// Get a fully (up to root of symbol map) qualified base name.
+    fn full_base(&self) -> QualifiedName {
+        self.full_name().remove_last()
+    }
 }
 
 trait Resolve<T = Option<Symbol>> {
