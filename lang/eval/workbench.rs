@@ -30,14 +30,15 @@ impl WorkbenchDefinition {
                         self.plan.contains_key(id)
                     });
 
+        log::trace!("Properties:\n{:?}", properties);
+        log::trace!("Non-Properties:\n{:?}", non_properties);
+
         // Create model
         let model = ModelBuilder::new_workpiece(self.kind)
             .origin(Origin::new(arguments.clone()))
             .attributes(self.attribute_list.eval(context)?)
             .properties(properties.into_iter().collect())
             .build();
-
-        log::trace!("{:?}", non_properties);
 
         context.scope(
             StackFrame::Workbench(

@@ -14,8 +14,14 @@ impl InitDefinition {
 
             let (found, not_found): (Vec<_>, Vec<_>) = plan
                 .iter()
-                .map(|param| (&param.id, context.get_local_value(&param.id)))
-                .partition(|(_, v)| v.is_ok());
+                .map(|param| (&param.id, context.get_property(&param.id)))
+                .partition(|(_, v)| {
+                    if let Ok(v) = v {
+                        !v.is_invalid()
+                    } else {
+                        false
+                    }
+                });
 
             if not_found.is_empty() {
                 let props: Properties = found

@@ -1,7 +1,9 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{builtin::*, diag::*, eval::*, model::Model, rc::*, resolve::*, syntax::*};
+use crate::{
+    builtin::*, diag::*, eval::*, model::*, rc::*, resolve::*, syntax::*, tree_display::*,
+};
 
 /// Grant statements depending on context
 pub trait Grant<T> {
@@ -147,17 +149,16 @@ impl Context {
         self.symbol_table.search_paths()
     }
 
-    pub fn get_property(&self, name: &QualifiedName) -> EvalResult<Symbol> {
-        if let Some(id) = name.single_identifier() {
-            match self.get_model() {
-                Ok(model) => Ok(Symbol::new(
-                    SymbolDefinition::Constant(id.clone(), model.get_property(id)),
-                    None,
-                )),
-                Err(err) => Err(err),
+    pub fn get_property(&self, id: &Identifier) -> EvalResult<Value> {
+        match self.get_model() {
+            Ok(model) => {
+                if let Some(value) = model.get_property(id) {
+                    Ok(value)
+                } else {
+                    Err(EvalError::PropertyNotFound(id.clone()))
+                }
             }
-        } else {
-            Err(EvalError::SymbolNotFound(name.clone()))
+            Err(err) => Err(err),
         }
     }
 }
@@ -208,7 +209,12 @@ impl Lookup for Context {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         log::debug!("Lookup symbol or property '{name}'");
         let symbol = self.symbol_table.lookup(name);
-        let property = self.get_property(name);
+        let property = match name.single_identifier() {
+            Some(id) => self
+                .get_property(id)
+                .map(|value| Symbol::new(SymbolDefinition::Constant(id.clone(), value), None)),
+            None => Err(EvalError::SymbolNotFound(name.clone())),
+        };
 
         match (&symbol, &property) {
             (Ok(_), Err(_)) => symbol,
@@ -271,12 +277,17 @@ impl GetSourceByHash for Context {
 
 impl std::fmt::Display for Context {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Ok(model) = self.get_model() {
+            write!(f, "\nModel:\n")?;
+            model.tree_print(f, 4.into())?;
+        }
         if self.has_errors() {
             writeln!(f, "{}\nErrors:", self.symbol_table)?;
-            self.diag_handler.pretty_print(f, &self.symbol_table)
+            self.diag_handler.pretty_print(f, &self.symbol_table)?;
         } else {
-            write!(f, "{}", self.symbol_table)
+            write!(f, "{}", self.symbol_table)?;
         }
+        Ok(())
     }
 }
 

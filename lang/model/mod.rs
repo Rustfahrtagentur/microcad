@@ -221,11 +221,8 @@ impl Model {
         Ancestors::new(self.clone())
     }
 
-    pub fn get_property(&self, id: &Identifier) -> Value {
-        match self.borrow().element.get_property(id) {
-            Some(value) => value.clone(),
-            None => Value::None,
-        }
+    pub fn get_property(&self, id: &Identifier) -> Option<Value> {
+        self.borrow().element.get_property(id).cloned()
     }
 
     pub fn add_properties(&mut self, props: Properties) {
@@ -279,6 +276,7 @@ impl TreeDisplay for Model {
         )?;
         tree_state.indent();
         let self_ = self.borrow();
+        self_.get_properties().tree_print(f, tree_state)?;
         self_.attributes.tree_print(f, tree_state)?;
         self_.children.tree_print(f, tree_state)
     }
