@@ -8,7 +8,7 @@ use crate::{eval::*, model::*, rc::*, resolve::*, syntax::*};
 /// The symbol table consists of the following members:
 ///
 /// - One *root [`Symbol`]* resolved from the *initial source file*.
-/// - A [`SourceCache`] of all *loaded source files* (accessible by *qualified name*, *file path* and *source hash*).
+/// - A [`Sources`] of all *loaded source files* (accessible by *qualified name*, *file path* and *source hash*).
 /// - A [`Stack`] of [`StackFrame`]s.
 /// - A [`SymbolMap`] of all *global symbols*.
 ///
