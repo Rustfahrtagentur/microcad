@@ -21,24 +21,6 @@ impl Assignment {
     }
 }
 
-impl Eval<()> for Assignment {
-    fn eval(&self, context: &mut Context) -> EvalResult<()> {
-        let value: Value = self.expression.eval(context)?;
-
-        if let Err(err) = self.type_check(value.ty()) {
-            context.error(self, err)?;
-            return Ok(());
-        }
-
-        if let Err(err) = context.set_local_value(self.id.clone(), value) {
-            context.error(self, err)?;
-            return Ok(());
-        }
-
-        Ok(())
-    }
-}
-
 impl Eval<()> for AssignmentStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<()> {
         log::debug!("Evaluating assignment statement:\n{self}");
@@ -71,9 +53,23 @@ impl Eval<()> for AssignmentStatement {
             }
         };
 
-        if let Err(err) = context.set_local_value(assignment.id.clone(), value) {
-            context.error(self, err)?;
-        }
+        match assignment.qualifier {
+            Qualifier::Var => {
+                if context.is_init() {
+                    context
+                        .get_model()?
+                        .add_property(assignment.id.clone(), value)
+                } else if let Err(err) = context.set_local_value(assignment.id.clone(), value) {
+                    context.error(self, err)?;
+                }
+            }
+            Qualifier::Const => {
+                if let Err(err) = context.set_local_value(assignment.id.clone(), value) {
+                    context.error(self, err)?;
+                }
+            }
+            Qualifier::Prop => (),
+        };
 
         Ok(())
     }

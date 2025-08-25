@@ -112,7 +112,10 @@ macro_rules! mark {
     (FOUND) => {
         color_print::cformat!("<W!,k,s> FOUND </>")
     };
-    (FINAL) => {
+    (FOUND_INTERIM) => {
+        color_print::cformat!("<Y!,k,s> FOUND </>")
+    };
+    (FOUND_FINAL) => {
         color_print::cformat!("<G!,k,s> FOUND </>")
     };
     (MATCH) => {
@@ -133,6 +136,9 @@ macro_rules! mark {
     (NOT_FOUND) => {
         color_print::cformat!("<R,k,s> NOT FOUND </>")
     };
+    (NOT_FOUND_INTERIM) => {
+        color_print::cformat!("<Y,k,s> NOT FOUND </>")
+    };
 }
 
 #[cfg(not(feature = "ansi-color"))]
@@ -142,6 +148,9 @@ macro_rules! found {
         "Found"
     };
     (FINAL) => {
+        "Found"
+    };
+    (INTERMEDIATE) => {
         "Found"
     };
     (MATCH) => {
@@ -160,6 +169,9 @@ macro_rules! found {
         "Ambiguous"
     };
     (NOT_FOUND) => {
+        "Not found"
+    };
+    (NOT_FOUND_INTERIMEDIATE) => {
         "Not found"
     };
 }

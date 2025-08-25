@@ -112,7 +112,7 @@ impl StackFrame {
             } => {
                 return writeln!(
                     f,
-                    "{:depth$}[{idx}] Call: {name}({args})",
+                    "{:depth$}[{idx}] Call: {name:?}({args})",
                     "",
                     args = args,
                     name = symbol.full_name()

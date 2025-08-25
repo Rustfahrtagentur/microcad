@@ -209,6 +209,16 @@ impl Model {
     pub fn ancestors(&self) -> Ancestors {
         Ancestors::new(self.clone())
     }
+
+    pub fn get_property(&self, id: &Identifier) -> Option<Value> {
+        self.borrow().element.get_property(id).cloned()
+    }
+
+    pub fn add_property(&mut self, id: Identifier, value: Value) {
+        self.borrow_mut()
+            .element
+            .add_properties([(id, value)].into_iter().collect())
+    }
 }
 
 impl AttributesAccess for Model {
@@ -263,6 +273,7 @@ impl TreeDisplay for Model {
         )?;
         tree_state.indent();
         let self_ = self.borrow();
+        self_.get_properties().tree_print(f, tree_state)?;
         self_.attributes.tree_print(f, tree_state)?;
         if let Some(output) = &self_.output {
             output.tree_print(f, tree_state)?;

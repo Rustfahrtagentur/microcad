@@ -167,7 +167,7 @@ impl Locals for Stack {
             .find(|frame| matches!(frame, StackFrame::Workbench(_, _, _)))
         {
             Some(StackFrame::Workbench(model, _, _)) => Ok(model.clone()),
-            _ => unreachable!("missing model in workbench"),
+            _ => Err(EvalError::NoModelInWorkbench),
         }
     }
 
@@ -218,7 +218,7 @@ impl std::fmt::Display for Stack {
             writeln!(f, crate::invalid!(STACK))
         } else {
             for (n, locals) in self.0.iter().enumerate() {
-                locals.print_locals(f, n, 4)?;
+                locals.print_locals(f, n, 0)?;
             }
             Ok(())
         }

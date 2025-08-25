@@ -64,6 +64,10 @@ impl PropertiesAccess for Workpiece {
         self.properties.get(id)
     }
 
+    fn get_properties(&self) -> &Properties {
+        &self.properties
+    }
+
     fn add_properties(&mut self, props: Properties) {
         self.properties
             .extend(props.iter().map(|(id, prop)| (id.clone(), prop.clone())));
