@@ -3,7 +3,7 @@
 
 use geo::coord;
 use microcad_core::*;
-use microcad_lang::{eval::*, parameter, syntax::WorkbenchKind, value::*};
+use microcad_lang::{eval::*, parameter, value::*};
 
 pub struct Line;
 
@@ -12,8 +12,8 @@ impl BuiltinWorkbenchDefinition for Line {
         "Line"
     }
 
-    fn kind() -> WorkbenchKind {
-        WorkbenchKind::Sketch
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Primitive2D
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {

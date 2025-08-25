@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, parameter, syntax::WorkbenchKind, value::*};
+use microcad_lang::{eval::*, parameter, value::*};
 
 pub struct Circle;
 
@@ -11,8 +11,8 @@ impl BuiltinWorkbenchDefinition for Circle {
         "Circle"
     }
 
-    fn kind() -> WorkbenchKind {
-        WorkbenchKind::Sketch
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Primitive2D
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {

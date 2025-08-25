@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, parameter, syntax::WorkbenchKind, value::*};
+use microcad_lang::{eval::*, parameter, value::*};
 
 pub struct Cube;
 
@@ -11,8 +11,8 @@ impl BuiltinWorkbenchDefinition for Cube {
         "Cube"
     }
 
-    fn kind() -> WorkbenchKind {
-        WorkbenchKind::Part
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Primitive3D
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {

@@ -11,7 +11,6 @@ use microcad_lang::{
         *,
     },
     parameter,
-    syntax::WorkbenchKind,
     value::*,
 };
 
@@ -51,8 +50,8 @@ impl BuiltinWorkbenchDefinition for Revolve {
         "revolve"
     }
 
-    fn kind() -> WorkbenchKind {
-        WorkbenchKind::Operation
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Operation
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {

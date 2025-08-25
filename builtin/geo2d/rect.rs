@@ -3,7 +3,7 @@
 
 use geo::coord;
 use microcad_core::*;
-use microcad_lang::{eval::*, parameter, syntax::WorkbenchKind, value::*};
+use microcad_lang::{eval::*, parameter, value::*};
 
 pub struct Rect;
 
@@ -12,8 +12,8 @@ impl BuiltinWorkbenchDefinition for Rect {
         "Rect"
     }
 
-    fn kind() -> WorkbenchKind {
-        WorkbenchKind::Sketch
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Primitive2D
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {

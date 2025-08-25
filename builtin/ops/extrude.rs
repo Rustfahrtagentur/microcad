@@ -11,7 +11,6 @@ use microcad_lang::{
         *,
     },
     parameter,
-    syntax::WorkbenchKind,
     value::*,
 };
 
@@ -53,12 +52,12 @@ impl Operation for Extrude {
 }
 
 impl BuiltinWorkbenchDefinition for Extrude {
-    fn kind() -> WorkbenchKind {
-        WorkbenchKind::Operation
-    }
-
     fn id() -> &'static str {
         "extrude"
+    }
+
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Operation
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {

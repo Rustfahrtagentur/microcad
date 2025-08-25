@@ -13,7 +13,6 @@ use crate::{
         render::{RenderCache, RenderResult},
         *,
     },
-    syntax::WorkbenchKind,
     value::Tuple,
 };
 
@@ -46,8 +45,8 @@ impl BuiltinWorkbenchDefinition for Union {
         "union"
     }
 
-    fn kind() -> WorkbenchKind {
-        WorkbenchKind::Operation
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Operation
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
@@ -66,8 +65,8 @@ impl BuiltinWorkbenchDefinition for Difference {
         "difference"
     }
 
-    fn kind() -> WorkbenchKind {
-        WorkbenchKind::Operation
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Operation
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
@@ -86,8 +85,8 @@ impl BuiltinWorkbenchDefinition for Intersection {
         "intersection"
     }
 
-    fn kind() -> WorkbenchKind {
-        WorkbenchKind::Operation
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Operation
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {

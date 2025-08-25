@@ -7,6 +7,7 @@ use std::rc::Rc;
 
 use custom_debug::Debug;
 use microcad_core::{Geometry2D, Geometry3D};
+use strum::Display;
 
 use crate::{
     eval::*,
@@ -57,6 +58,20 @@ impl CallTrait for Builtin {
     }
 }
 
+/// The kind of the built-in workbench determines its output.
+#[derive(Debug, Clone, Display)]
+pub enum BuiltinWorkbenchKind {
+    /// A parametric 2D primitive.
+    Primitive2D,
+    /// A parametric 3D primitive.
+    Primitive3D,
+    /// An affine transformation.
+    Transform,
+    /// An operation on a model.
+    Operation,
+}
+
+/// The output of a
 pub enum BuiltinWorkpieceOutput {
     Geometry2D(Geometry2D),
     Geometry3D(Geometry3D),
@@ -69,7 +84,7 @@ pub type BuiltinWorkpieceFn = dyn Fn(&Tuple) -> RenderResult<BuiltinWorkpieceOut
 
 #[derive(Clone, Debug)]
 pub struct BuiltinWorkpiece {
-    pub kind: WorkbenchKind,
+    pub kind: BuiltinWorkbenchKind,
     pub creator: Symbol,
     pub args: Tuple,
     #[debug(skip)]
@@ -104,8 +119,10 @@ pub trait BuiltinWorkbenchDefinition {
     /// Get id of the builtin part
     fn id() -> &'static str;
 
-    fn kind() -> WorkbenchKind;
+    /// The kind of the built-in workbench.
+    fn kind() -> BuiltinWorkbenchKind;
 
+    /// The function that generates an output from the workpiece.
     fn workpiece_function() -> &'static BuiltinWorkpieceFn;
 
     fn workpiece(args: &Tuple) -> BuiltinWorkpiece {

@@ -5,12 +5,11 @@ use std::rc::Rc;
 
 use microcad_core::*;
 use microcad_lang::{
-    eval::{BuiltinWorkbenchDefinition, BuiltinWorkpieceFn, BuiltinWorkpieceOutput},
+    eval::*,
     model::{
         render::{RenderCache, RenderResult},
         *,
     },
-    syntax::*,
 };
 
 #[derive(Debug)]
@@ -39,8 +38,8 @@ impl BuiltinWorkbenchDefinition for Hull {
         "hull"
     }
 
-    fn kind() -> WorkbenchKind {
-        WorkbenchKind::Operation
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Operation
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {

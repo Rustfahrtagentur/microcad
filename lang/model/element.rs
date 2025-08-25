@@ -3,7 +3,12 @@
 
 //! Element of a [`Model`].
 
-use crate::{eval::BuiltinWorkpiece, model::*, syntax::*, value::*};
+use crate::{
+    eval::{BuiltinWorkbenchKind, BuiltinWorkpiece},
+    model::*,
+    syntax::*,
+    value::*,
+};
 use strum::IntoStaticStr;
 
 /// An element defines the entity of a [`Model`].
@@ -34,8 +39,8 @@ impl Element {
     pub fn is_operation(&self) -> bool {
         match self {
             Element::BuiltinWorkpiece(builtin_workpiece) => match builtin_workpiece.kind {
-                WorkbenchKind::Part | WorkbenchKind::Sketch => false,
-                WorkbenchKind::Operation => true,
+                BuiltinWorkbenchKind::Primitive2D | BuiltinWorkbenchKind::Primitive3D => false,
+                BuiltinWorkbenchKind::Operation | BuiltinWorkbenchKind::Transform => true,
             },
             Element::ChildrenMarker | Element::Group => false,
             Element::Workpiece(workpiece) => match workpiece.kind {
@@ -49,8 +54,8 @@ impl Element {
     pub fn contains_geometry(&self) -> bool {
         match self {
             Element::BuiltinWorkpiece(builtin_workpiece) => match builtin_workpiece.kind {
-                WorkbenchKind::Part | WorkbenchKind::Sketch => true,
-                WorkbenchKind::Operation => false,
+                BuiltinWorkbenchKind::Primitive2D | BuiltinWorkbenchKind::Primitive3D => true,
+                BuiltinWorkbenchKind::Operation | BuiltinWorkbenchKind::Transform => false,
             },
             Element::ChildrenMarker => true,
             Element::Workpiece(workpiece) => match workpiece.kind {
