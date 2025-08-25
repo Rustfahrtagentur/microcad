@@ -95,7 +95,12 @@ impl Eval for Call {
                         context.error(self, EvalError::CannotCallOperationWithoutWorkpiece)?;
                         Ok(Value::None)
                     } else {
-                        Ok(Value::Models(w.call(&args, context)?))
+                        Ok(Value::Models(w.call(
+                            self.src_ref(),
+                            symbol.clone(),
+                            &args,
+                            context,
+                        )?))
                     }
                 }
                 SymbolDefinition::Function(f) => f.call(&args, context),
@@ -108,11 +113,6 @@ impl Eval for Call {
                 }
             },
         ) {
-            Ok(Value::Models(models)) => {
-                // Store the information, saying that these models have been created by this symbol.
-                models.set_creator(symbol, self.src_ref());
-                Ok(Value::Models(models))
-            }
             Ok(value) => Ok(value),
             Err(err) => {
                 context.error(self, err)?;

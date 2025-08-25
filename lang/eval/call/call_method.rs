@@ -61,9 +61,7 @@ impl CallMethod<Models> for Models {
     ) -> EvalResult<Models> {
         // Try nest models for an operation: models.op()
         fn try_nest(
-            symbol: &Symbol,
             name: &QualifiedName,
-            args: &ArgumentValueList,
             context: &mut Context,
             models: &Models,
             op: Models,
@@ -73,9 +71,7 @@ impl CallMethod<Models> for Models {
                     context.error(name, EvalError::OperationOnEmptyGeometry)?;
                 }
 
-                let models = op.nest(models);
-                models.set_creator(symbol.clone(), SrcRef::merge(name, args));
-                return Ok(models);
+                return Ok(op.nest(models));
             } else {
                 context.error(name, EvalError::NotAnOperation(name.clone()))?;
             }
@@ -86,11 +82,16 @@ impl CallMethod<Models> for Models {
         if let Some(symbol) = name.eval(context)? {
             Ok(match &symbol.borrow().def {
                 SymbolDefinition::Workbench(workbench_definition) => {
-                    let op = workbench_definition.call(args, context)?;
-                    try_nest(&symbol, name, args, context, self, op)?
+                    let op = workbench_definition.call(
+                        SrcRef::merge(name, args),
+                        symbol.clone(),
+                        args,
+                        context,
+                    )?;
+                    try_nest(name, context, self, op)?
                 }
                 SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
-                    Value::Models(models) => try_nest(&symbol, name, args, context, self, models)?,
+                    Value::Models(models) => try_nest(&name, context, self, models)?,
                     value => panic!("Builtin call returned {value} but no models."),
                 },
                 def => {

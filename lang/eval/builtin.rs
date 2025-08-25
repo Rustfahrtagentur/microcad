@@ -70,7 +70,7 @@ pub type BuiltinWorkpieceFn = dyn Fn(&Tuple) -> RenderResult<BuiltinWorkpieceOut
 #[derive(Clone, Debug)]
 pub struct BuiltinWorkpiece {
     pub kind: WorkbenchKind,
-    pub symbol: Symbol,
+    pub creator: Symbol,
     pub args: Tuple,
     #[debug(skip)]
     pub f: &'static BuiltinWorkpieceFn,
@@ -93,7 +93,7 @@ impl std::fmt::Display for BuiltinWorkpiece {
             f,
             "{kind} {symbol}{args}",
             kind = self.kind,
-            symbol = self.symbol,
+            symbol = self.creator,
             args = self.args
         )
     }
@@ -111,7 +111,7 @@ pub trait BuiltinWorkbenchDefinition {
     fn workpiece(args: &Tuple) -> BuiltinWorkpiece {
         BuiltinWorkpiece {
             kind: Self::kind(),
-            symbol: Self::symbol(),
+            creator: Self::symbol(),
             args: args.clone(),
             f: Self::workpiece_function(),
         }
@@ -119,7 +119,11 @@ pub trait BuiltinWorkbenchDefinition {
 
     /// Create model from argument map
     fn model(args: &Tuple) -> Model {
-        ModelBuilder::new_builtin_workpiece(Self::workpiece(args)).build()
+        ModelBuilder::new(
+            Element::BuiltinWorkpiece(Self::workpiece(args)),
+            SrcRef(None),
+        )
+        .build()
     }
 
     /// Workbench function

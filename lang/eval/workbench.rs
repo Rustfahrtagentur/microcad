@@ -13,6 +13,8 @@ impl WorkbenchDefinition {
     /// - `context`: Current evaluation context.
     fn eval_to_model<'a>(
         &'a self,
+        call_src_ref: SrcRef,
+        creator: Symbol,
         arguments: Tuple,
         init: Option<&'a InitDefinition>,
         context: &mut Context,
@@ -24,12 +26,12 @@ impl WorkbenchDefinition {
         );
 
         // Create model
-        let model = ModelBuilder::new_workpiece(self.kind)
-            .origin(Origin::new(arguments.clone()))
-            .attributes(self.attribute_list.eval(context)?)
-            .properties(
+        let model = ModelBuilder::new(
+            Element::Workpiece(Workpiece {
+                kind: self.kind,
+
                 // copy all arguments which are part of the building plan to properties
-                arguments
+                properties: arguments
                     .named_iter()
                     .filter_map(|(id, arg)| {
                         if self.plan.contains_key(id) {
@@ -39,8 +41,13 @@ impl WorkbenchDefinition {
                         }
                     })
                     .collect(),
-            )
-            .build();
+                args: arguments.clone(),
+                creator,
+            }),
+            call_src_ref,
+        )
+        .attributes(self.attribute_list.eval(context)?)
+        .build();
 
         context.scope(
             StackFrame::Workbench(model, self.id.clone(), arguments.clone().into()),
@@ -71,7 +78,7 @@ impl WorkbenchDefinition {
                 // We have to deduce the output type of this model, otherwise the model is incomplete.
                 {
                     let model_ = model.borrow();
-                    match &model_.element {
+                    match &*model_.element {
                         Element::Workpiece(workpiece) => {
                             let output_type = model.deduce_output_type();
 
@@ -96,14 +103,20 @@ impl WorkbenchDefinition {
     }
 }
 
-impl CallTrait<Models> for WorkbenchDefinition {
+impl WorkbenchDefinition {
     /// Evaluate the call of a workbench with given arguments.
     ///
     /// - `args`: Arguments which will be matched with the building plan and the initializers using parameter multiplicity.
     /// - `context`: Current evaluation context.
     ///
     /// Return evaluated nodes (multiple nodes might be created by parameter multiplicity).
-    fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<Models> {
+    pub fn call(
+        &self,
+        call_src_ref: SrcRef,
+        symbol: Symbol,
+        args: &ArgumentValueList,
+        context: &mut Context,
+    ) -> EvalResult<Models> {
         log::debug!(
             "Workbench {call} {kind} {id:?}({args})",
             call = crate::mark!(CALL),
@@ -129,7 +142,13 @@ impl CallTrait<Models> for WorkbenchDefinition {
                 );
                 // evaluate models for all multiplicity matches
                 for args in matches {
-                    models.push(self.eval_to_model(args, None, context)?);
+                    models.push(self.eval_to_model(
+                        call_src_ref.clone(),
+                        symbol.clone(),
+                        args,
+                        None,
+                        context,
+                    )?);
                 }
             }
             _ => {
@@ -153,7 +172,13 @@ impl CallTrait<Models> for WorkbenchDefinition {
                         );
                         // evaluate models for all multiplicity matches
                         for args in matches {
-                            models.push(self.eval_to_model(args, Some(init), context)?);
+                            models.push(self.eval_to_model(
+                                call_src_ref.clone(),
+                                symbol.clone(),
+                                args,
+                                Some(init),
+                                context,
+                            )?);
                         }
                         initialized = true;
                         break;

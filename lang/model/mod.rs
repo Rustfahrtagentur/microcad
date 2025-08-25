@@ -10,7 +10,6 @@ mod inner;
 pub mod iter;
 pub mod models;
 pub mod operation;
-pub mod origin;
 pub mod output;
 pub mod properties;
 pub mod render;
@@ -23,7 +22,6 @@ pub use inner::*;
 pub use iter::*;
 pub use models::*;
 pub use operation::*;
-pub use origin::*;
 pub use output::*;
 pub use properties::*;
 pub use workpiece::*;
@@ -33,10 +31,7 @@ use derive_more::{Deref, DerefMut};
 use microcad_core::BooleanOp;
 
 use crate::{
-    diag::WriteToFile,
-    rc::RcMut,
-    syntax::{Identifier, SourceFile},
-    tree_display::*,
+    diag::WriteToFile, rc::RcMut, src_ref::SrcReferrer, syntax::Identifier, tree_display::*,
     value::Value,
 };
 
@@ -135,22 +130,8 @@ impl Model {
     /// Find children model placeholder in model descendants.
     pub fn find_children_placeholder(&self) -> Option<Model> {
         self.descendants().find(|n| {
-            n.borrow().id.is_none() && matches!(n.0.borrow().element, Element::ChildrenMarker)
+            n.borrow().id.is_none() && matches!(n.0.borrow().element.value, Element::ChildrenMarker)
         })
-    }
-
-    /// Find the original source file of this model
-    pub fn find_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
-        self.ancestors()
-            .find_map(|model| model.borrow().origin.source_file.clone())
-    }
-
-    /// Test if the model has this specific source file.
-    pub fn has_source_file(&self, source_file: &std::rc::Rc<SourceFile>) -> bool {
-        match (source_file.as_ref(), self.find_source_file()) {
-            (a, Some(b)) => a.hash == b.hash,
-            _ => false,
-        }
     }
 
     /// Return inner group if this model only contains a group as single child.
@@ -164,7 +145,7 @@ impl Model {
         }
 
         children.first().and_then(|n| {
-            if let Element::Group = n.0.borrow().element {
+            if let Element::Group = *n.0.borrow().element {
                 Some(n.clone())
             } else {
                 None
@@ -177,16 +158,12 @@ impl Model {
         let self_ = self.borrow();
 
         format!(
-            "{id}{element_type}{origin} -> {output_type}{is_root}",
+            "{id}{element} -> {output_type}{is_root}",
             id = match &self_.id {
                 Some(id) => format!("{id}: "),
                 None => String::new(),
             },
-            element_type = self_.element,
-            origin = match self_.origin.get_creator() {
-                Some(_) => format!(" = {origin}", origin = self_.origin),
-                None => String::new(),
-            },
+            element = *self_.element,
             output_type = self.final_output_type(),
             is_root = if self.parents().next().is_some() {
                 ""
@@ -231,6 +208,12 @@ impl AttributesAccess for Model {
 impl PartialEq for Model {
     fn eq(&self, other: &Self) -> bool {
         self.addr() == other.addr()
+    }
+}
+
+impl SrcReferrer for Model {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        self.borrow().src_ref()
     }
 }
 

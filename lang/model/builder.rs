@@ -3,9 +3,7 @@
 
 //! Model builder.
 
-use microcad_core::{Geometry2D, Geometry3D};
-
-use crate::{eval::*, model::*, rc::*, syntax::*};
+use crate::{eval::*, model::*, src_ref::SrcRef};
 
 /// A builder pattern to build models.
 #[derive(Default)]
@@ -21,51 +19,18 @@ pub struct ModelBuilder {
 ///
 /// All methods in this `impl` block are used to create a new model builder with a specific [`Element`] type.
 impl ModelBuilder {
-    /// Create a new group from a body `{ ... }`.
-    pub fn new_group() -> Self {
+    /// Create a new model with an element.
+    pub fn new(element: Element, src_ref: SrcRef) -> Self {
         Self {
-            root: Default::default(),
+            root: ModelInner::new(element, src_ref),
             ..Default::default()
         }
     }
 
-    /// Create a new workpiece.
-    ///
-    /// This function is used when a call to a workbench definition is evaluated.
-    pub fn new_workpiece(workpiece_kind: WorkbenchKind) -> Self {
-        Self {
-            root: ModelInner::new(Element::Workpiece(workpiece_kind.into())),
-            ..Default::default()
-        }
-    }
-
-    /// Create a new children placeholder
-    pub fn new_children_placeholder() -> Self {
-        Self {
-            root: ModelInner::new(Element::ChildrenMarker),
-            ..Default::default()
-        }
-    }
-
-    pub fn new_builtin_workpiece(builtin_workpiece: BuiltinWorkpiece) -> Self {
-        Self {
-            root: ModelInner::new(Element::BuiltinWorkpiece(builtin_workpiece)),
-            ..Default::default()
-        }
-    }
-}
-
-impl ModelBuilder {
     /// Add multiple children to the model if it matches.
     pub fn add_children(mut self, mut children: Models) -> EvalResult<Self> {
         self.children.append(&mut children);
         Ok(self)
-    }
-
-    /// Set object origin.
-    pub fn origin(mut self, origin: Origin) -> Self {
-        self.root.origin = origin;
-        self
     }
 
     /// Set object attributes.
@@ -83,7 +48,7 @@ impl ModelBuilder {
 
     /// Build a [`Model`].
     pub fn build(mut self) -> Model {
-        if let Element::Workpiece(workpiece) = &mut self.root.element {
+        if let Element::Workpiece(workpiece) = &mut self.root.element.value {
             workpiece.add_properties(self.properties);
         }
 

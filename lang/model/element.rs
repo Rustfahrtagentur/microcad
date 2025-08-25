@@ -4,7 +4,6 @@
 //! Element of a [`Model`].
 
 use crate::{eval::BuiltinWorkpiece, model::*, syntax::*, value::*};
-use microcad_core::*;
 use strum::IntoStaticStr;
 
 /// An element defines the entity of a [`Model`].
@@ -19,15 +18,15 @@ pub enum Element {
     /// A workpiece is created by workbenches.
     Workpiece(Workpiece),
 
-    /// A special element after which children will be nested as siblings.
-    ///
-    /// This element is removed after the children have been inserted.
-    ChildrenMarker,
-
     /// A built-in workpiece.
     ///
     /// A workpiece is created by workbenches.
     BuiltinWorkpiece(BuiltinWorkpiece),
+
+    /// A special element after which children will be nested as siblings.
+    ///
+    /// This element is removed after the children have been inserted.
+    ChildrenMarker,
 }
 
 impl Element {

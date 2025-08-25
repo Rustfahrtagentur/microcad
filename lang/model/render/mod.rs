@@ -14,6 +14,7 @@ use thiserror::Error;
 
 use crate::{model::*, value::ValueError};
 
+/// An error that occurred during rendering.
 #[derive(Debug, Error)]
 pub enum RenderError {
     /// Value error
@@ -21,6 +22,7 @@ pub enum RenderError {
     ValueError(#[from] ValueError),
 }
 
+/// A result from rendering a model.
 pub type RenderResult<T> = Result<T, RenderError>;
 
 impl Model {
@@ -31,14 +33,17 @@ impl Model {
 
     /// Deduce output type from children and set it and return it.
     pub fn deduce_output_type(&self) -> OutputType {
+        todo!("Get output type from element");
+        /*
+        let mut _output_type =
         let self_ = self.borrow();
-        let mut output_type = todo!("Get output type from element");
+
         if output_type == OutputType::NotDetermined {
             let children = &self_.children;
             output_type = children.deduce_output_type();
         }
 
-        output_type
+        output_type*/
     }
 
     /// Fetch output 2d geometries.
@@ -73,7 +78,7 @@ impl Model {
     }
 
     /// Render geometries in 3D.
-    pub fn render_geometry_3d(&self, cache: &mut RenderCache) -> RenderResult<Geometries3D> {
+    pub fn render_geometry_3d(&self, _cache: &mut RenderCache) -> RenderResult<Geometries3D> {
         todo!()
     }
 
@@ -81,7 +86,7 @@ impl Model {
     ///
     /// Rendering the model means that all geometry is calculated and stored
     /// in the in the render cache.
-    pub fn render(&self, resolution: RenderResolution, cache: &mut RenderCache) {
+    pub fn render(&self, resolution: RenderResolution, _cache: &mut RenderCache) {
         /// Set the resolution for this model.
         pub fn set_resolution(model: &Model, resolution: RenderResolution) {
             let new_resolution = {
@@ -108,11 +113,12 @@ impl Operation for Model {
         let mut geometries = Geometries2D::default();
 
         let model_ = &model.borrow();
-        match &model_.element {
+        match &*model_.element {
             Element::Group | Element::Workpiece(_) => {
                 model_.children().try_for_each(|n| -> RenderResult<_> {
-                    Ok(geometries.push(n.process_2d(cache, n)?.as_ref().clone()))
-                });
+                    geometries.push(n.process_2d(cache, n)?.as_ref().clone());
+                    Ok(())
+                })?;
             }
             Element::BuiltinWorkpiece(builtin_workpiece) => {
                 geometries.push(builtin_workpiece.call_2d(cache, model)?.as_ref().clone());
@@ -130,7 +136,7 @@ impl Operation for Model {
         ))))
     }
 
-    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry3D>> {
+    fn process_3d(&self, _cache: &mut RenderCache, _model: &Model) -> RenderResult<Rc<Geometry3D>> {
         todo!();
     }
 }

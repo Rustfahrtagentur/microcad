@@ -8,8 +8,7 @@ use crate::{
     model::{Model, render::RenderCache},
     value::Value,
 };
-use cgmath::SquareMatrix;
-use microcad_core::{Mat4, RenderResolution};
+use microcad_core::RenderResolution;
 
 /// Export attribute, e.g. `#[export: "output.svg"]`.
 #[derive(Clone)]

@@ -161,7 +161,7 @@ impl WriteSvg for Model {
         }
 
         let self_ = self.borrow();
-        match &self_.element {
+        match &self_.element.value {
             Element::Group | Element::Workpiece(_) => {
                 if !self_.is_empty() {
                     writer.begin_group(&node_attr)?;

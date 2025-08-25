@@ -3,7 +3,7 @@
 
 //! Model
 
-use crate::{model::*, resolve::*, src_ref::*, syntax::*};
+use crate::{model::*, src_ref::*, syntax::*};
 
 /// The actual model contents
 #[derive(custom_debug::Debug, Default)]
@@ -18,20 +18,18 @@ pub struct ModelInner {
     /// Children of the model.
     pub children: Models,
     /// Element of the model with [SrcRef].
-    pub element: Element,
+    pub element: Refer<Element>,
     /// Attributes used for export.
     pub attributes: Attributes,
-    /// The symbol (e.g. [`WorkbenchDefinition`]) that created this [`Model`].
-    pub origin: Origin,
     /// The output type of the this model.
     pub output: ModelOutput,
 }
 
 impl ModelInner {
     /// Create a new [`ModelInner`] with a specific element.
-    pub fn new(element: Element) -> Self {
+    pub fn new(element: Element, src_ref: SrcRef) -> Self {
         Self {
-            element,
+            element: Refer::new(element, src_ref),
             ..Default::default()
         }
     }
@@ -43,7 +41,6 @@ impl ModelInner {
             parent: None,
             element: self.element.clone(),
             attributes: self.attributes.clone(),
-            origin: self.origin.clone(),
             output: self.output.clone(),
             ..Default::default()
         }
@@ -58,15 +55,6 @@ impl ModelInner {
     pub fn is_empty(&self) -> bool {
         self.children.is_empty()
     }
-
-    /// Set the information about the creator of this model.
-    ///
-    /// This function is called after the resulting models of a call of a part
-    /// have been retrieved.   
-    pub(crate) fn set_creator(&mut self, creator: Symbol, call_src_ref: SrcRef) {
-        self.origin.set_creator(creator);
-        self.origin.call_src_ref = call_src_ref;
-    }
 }
 
 impl PropertiesAccess for ModelInner {
@@ -76,5 +64,11 @@ impl PropertiesAccess for ModelInner {
 
     fn add_properties(&mut self, props: Properties) {
         self.element.add_properties(props);
+    }
+}
+
+impl SrcReferrer for ModelInner {
+    fn src_ref(&self) -> SrcRef {
+        self.element.src_ref.clone()
     }
 }
