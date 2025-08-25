@@ -187,7 +187,7 @@ impl Locals for Stack {
             .find(|frame| matches!(frame, StackFrame::Workbench(_, _, _)))
         {
             Some(StackFrame::Workbench(model, _, _)) => Ok(model.clone()),
-            _ => unreachable!("missing model in workbench"),
+            _ => Err(EvalError::NoModelInWorkbench),
         }
     }
 

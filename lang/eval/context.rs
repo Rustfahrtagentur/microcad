@@ -146,6 +146,20 @@ impl Context {
     pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
         self.symbol_table.search_paths()
     }
+
+    pub fn get_property(&self, name: &QualifiedName) -> EvalResult<Symbol> {
+        if let Some(id) = name.single_identifier() {
+            match self.get_model() {
+                Ok(model) => Ok(Symbol::new(
+                    SymbolDefinition::Constant(id.clone(), model.get_property(id)),
+                    None,
+                )),
+                Err(err) => Err(err),
+            }
+        } else {
+            Err(EvalError::SymbolNotFound(name.clone()))
+        }
+    }
 }
 
 impl Locals for Context {
@@ -189,9 +203,23 @@ impl Default for Context {
         }
     }
 }
+
 impl Lookup for Context {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        self.symbol_table.lookup(name)
+        log::debug!("Lookup symbol or property '{name}'");
+        let symbol = self.symbol_table.lookup(name);
+        let property = self.get_property(name);
+
+        match (&symbol, &property) {
+            (Ok(_), Err(_)) => symbol,
+            (Err(_), Ok(_)) => property,
+            (Ok(symbol), Ok(property)) => Err(EvalError::AmbiguousProperty(
+                symbol.full_name(),
+                property.id(),
+            )),
+            // throw error from lookup on any error
+            (Err(_), Err(_)) => symbol,
+        }
     }
 }
 

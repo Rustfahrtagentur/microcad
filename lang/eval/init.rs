@@ -5,12 +5,7 @@ use crate::{eval::*, model::*, syntax::*};
 
 impl InitDefinition {
     /// Evaluate a call to the init definition
-    pub fn eval(
-        &self,
-        plan: &ParameterList,
-        args: Tuple,
-        context: &mut Context,
-    ) -> EvalResult<Properties> {
+    pub fn eval(&self, plan: &ParameterList, args: Tuple, context: &mut Context) -> EvalResult<()> {
         context.grant(self)?;
         let model = context.get_model()?;
         context.scope(StackFrame::Init(args.into()), |context| {
@@ -29,7 +24,7 @@ impl InitDefinition {
                     .collect();
 
                 model.borrow_mut().add_properties(props.clone());
-                Ok(props)
+                Ok(())
             } else {
                 Err(EvalError::BuildingPlanIncomplete(
                     not_found.iter().map(|(id, _)| (*id).clone()).collect(),

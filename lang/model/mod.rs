@@ -220,6 +220,17 @@ impl Model {
     pub fn ancestors(&self) -> Ancestors {
         Ancestors::new(self.clone())
     }
+
+    pub fn get_property(&self, id: &Identifier) -> Value {
+        match self.borrow().element.get_property(id) {
+            Some(value) => value.clone(),
+            None => Value::None,
+        }
+    }
+
+    pub fn add_properties(&mut self, props: Properties) {
+        self.borrow_mut().element.add_properties(props)
+    }
 }
 
 impl AttributesAccess for Model {
