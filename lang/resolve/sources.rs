@@ -236,7 +236,7 @@ impl std::fmt::Display for Sources {
                 .name_from_index(index)
                 .unwrap_or(QualifiedName::no_ref(vec![]));
             let hash = source_file.hash;
-            writeln!(f, "[{index}] {name} {hash:#x} {filename}")?;
+            writeln!(f, "[{index}] {name:?} {hash:#x} {filename}")?;
         }
         Ok(())
     }
