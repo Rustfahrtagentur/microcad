@@ -4,11 +4,10 @@
 //! Work piece element
 
 use crate::{
-    eval::{EvalError, EvalResult},
-    model::{OutputType, Properties, PropertiesAccess},
-    resolve::Symbol,
+    eval::*,
+    model::*,
     syntax::{Identifier, WorkbenchKind},
-    value::{Tuple, Value},
+    value::Value,
 };
 
 /// A workpiece is an element produced by a workbench.
@@ -18,10 +17,8 @@ pub struct Workpiece {
     pub kind: WorkbenchKind,
     /// Workpiece properties.
     pub properties: Properties,
-    /// Workpiece arguments.
-    pub args: Tuple,
     /// Creator symbol.
-    pub creator: Symbol,
+    pub creator: Creator,
 }
 
 impl Workpiece {

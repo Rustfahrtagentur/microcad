@@ -4,7 +4,7 @@
 //! Write primitives to STL ([`WriteSvg`] trait implementations).
 
 use microcad_core::{Geometry3D, Manifold, Transformed3D, TriangleMesh};
-use microcad_lang::model::{Element, Model, OutputType};
+use microcad_lang::model::{Model, OutputType};
 
 use crate::stl::{StlWriter, WriteStl};
 

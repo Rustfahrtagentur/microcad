@@ -14,8 +14,7 @@ impl WorkbenchDefinition {
     fn eval_to_model<'a>(
         &'a self,
         call_src_ref: SrcRef,
-        creator: Symbol,
-        arguments: Tuple,
+        creator: Creator,
         init: Option<&'a InitDefinition>,
         context: &mut Context,
     ) -> EvalResult<Model> {
@@ -25,13 +24,16 @@ impl WorkbenchDefinition {
             kind = self.kind
         );
 
+        let arguments = creator.arguments.clone();
+
         // Create model
         let model = ModelBuilder::new(
             Element::Workpiece(Workpiece {
                 kind: self.kind,
 
                 // copy all arguments which are part of the building plan to properties
-                properties: arguments
+                properties: creator
+                    .arguments
                     .named_iter()
                     .filter_map(|(id, arg)| {
                         if self.plan.contains_key(id) {
@@ -41,7 +43,6 @@ impl WorkbenchDefinition {
                         }
                     })
                     .collect(),
-                args: arguments.clone(),
                 creator,
             }),
             call_src_ref,
@@ -144,8 +145,7 @@ impl WorkbenchDefinition {
                 for args in matches {
                     models.push(self.eval_to_model(
                         call_src_ref.clone(),
-                        symbol.clone(),
-                        args,
+                        Creator::new(args, symbol.clone()),
                         None,
                         context,
                     )?);
@@ -174,8 +174,7 @@ impl WorkbenchDefinition {
                         for args in matches {
                             models.push(self.eval_to_model(
                                 call_src_ref.clone(),
-                                symbol.clone(),
-                                args,
+                                Creator::new(args, symbol.clone()),
                                 Some(init),
                                 context,
                             )?);
