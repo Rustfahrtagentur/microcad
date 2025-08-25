@@ -40,7 +40,11 @@ impl WorkbenchDefinition {
         log::trace!("{:?}", non_properties);
 
         context.scope(
-            StackFrame::Workbench(model, self.id.clone(), non_properties.into_iter().collect()),
+            StackFrame::Workbench(
+                model,
+                self.id.clone(),
+                non_properties.clone().into_iter().collect(),
+            ),
             |context| {
                 let model = context.get_model()?;
 
@@ -51,7 +55,9 @@ impl WorkbenchDefinition {
                         id = self.id,
                         kind = self.kind
                     );
-                    if let Err(err) = init.eval(&self.plan, arguments.clone(), context) {
+                    if let Err(err) =
+                        init.eval(&self.plan, non_properties.into_iter().collect(), context)
+                    {
                         context.error(self, err)?;
                     }
                 }
