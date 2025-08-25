@@ -20,6 +20,11 @@ fn lines_with(code: &str, marker: &str) -> std::collections::HashSet<usize> {
 }
 
 #[allow(dead_code)]
+pub fn init() {
+    let _ = env_logger::builder().try_init();
+}
+
+#[allow(dead_code)]
 pub fn run_test(
     name: &str,
     mode: &str,
@@ -38,6 +43,8 @@ pub fn run_test(
     use microcad_builtin::*;
     use microcad_lang::diag::*;
     use microcad_lang::syntax::*;
+
+    crate::markdown_test::init();
 
     log::info!("Running test '{name}':\n\n{code}");
 
