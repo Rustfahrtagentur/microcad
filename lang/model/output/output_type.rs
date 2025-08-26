@@ -4,7 +4,7 @@
 //! Export attribute.
 
 /// The output type of the [`crate::model::Model`].
-#[derive(Debug, Clone, Copy, Default, PartialEq)]
+#[derive(Clone, Copy, Default, PartialEq)]
 pub enum OutputType {
     /// The output type has not yet been determined.
     #[default]
@@ -35,7 +35,7 @@ impl OutputType {
     }
 }
 
-impl std::fmt::Display for OutputType {
+impl std::fmt::Debug for OutputType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
@@ -44,7 +44,22 @@ impl std::fmt::Display for OutputType {
                 Self::NotDetermined => crate::invalid!(UNKNOWN),
                 Self::Geometry2D => "2D",
                 Self::Geometry3D => "3D",
-                Self::InvalidMixed => crate::invalid!(OUTPUT),
+                Self::InvalidMixed => crate::invalid_no_ansi!(OUTPUT),
+            }
+        )
+    }
+}
+
+impl std::fmt::Display for OutputType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match &self {
+                Self::NotDetermined => "Undetermined",
+                Self::Geometry2D => "2D",
+                Self::Geometry3D => "3D",
+                Self::InvalidMixed => crate::invalid_no_ansi!(OUTPUT),
             }
         )
     }
