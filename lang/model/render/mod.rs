@@ -28,7 +28,7 @@ pub type RenderResult<T> = Result<T, RenderError>;
 impl Model {
     /// Return output type.
     pub fn final_output_type(&self) -> OutputType {
-        self.borrow().output.output_type()
+        self.deduce_output_type()
     }
 
     /// Deduce output type from children and set it and return it.

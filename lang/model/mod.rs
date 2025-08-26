@@ -166,7 +166,7 @@ impl Model {
                 None => String::new(),
             },
             element = *self_.element,
-            output_type = self.final_output_type(),
+            output_type = self.deduce_output_type(),
             is_root = if self.parents().next().is_some() {
                 ""
             } else {

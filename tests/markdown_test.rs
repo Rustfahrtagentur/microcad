@@ -222,7 +222,7 @@ pub fn run_test(
 
                         let _ = fs::hard_link("images/ok.svg", banner);
                         writeln!(log_out, "-- Test Result --\nOK").expect("output error");
-                        match model.final_output_type() {
+                        match model.deduce_output_type() {
                             OutputType::Geometry2D => {
                                 Export {
                                     filename: format!("{out_filename}.svg").into(),
