@@ -5,6 +5,7 @@ use std::rc::Rc;
 
 use microcad_core::RenderResolution;
 use microcad_export::{stl::StlExporter, svg::SvgExporter};
+use microcad_lang::tree_display::FormatTree;
 
 fn lines_with(code: &str, marker: &str) -> std::collections::HashSet<usize> {
     code.lines()
@@ -226,6 +227,10 @@ pub fn run_test(
                     // test expected to succeed and succeeds with no errors
                     (Ok(model), false, false) => {
                         use microcad_lang::model::{ExportCommand as Export, OutputType};
+
+                        // get print output
+                        write!(log_out, "-- Model --\n{}\n", FormatTree(&model))
+                            .expect("output error");
 
                         let _ = fs::hard_link("images/ok.svg", banner);
                         writeln!(log_out, "-- Test Result --\nOK").expect("output error");
