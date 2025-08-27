@@ -13,16 +13,16 @@
 -- Output --
 -- Errors --
 error: Workbench plan incomplete. Missing properties: radius
-  ---> <FROM STR>:2:5
+  ---> <FROM STR>:2:11
      |
    2 |     init( width: Length ) { } // error: misses to set `radius` from building plan
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+     |           ^^^^^
      |
 warning: The sketch workbench will produce no 2D output.
   ---> <FROM STR>:1:1
      |
    1 | sketch Wheel(radius: Length) { // warning (no output)
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAILED AS EXPECTED

@@ -34,5 +34,9 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> Undetermined (root)
+    Group -> Undetermined
+
 -- Test Result --
 OK

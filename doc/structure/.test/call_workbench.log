@@ -17,5 +17,21 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Operation = std::ops::translate(x: 10mm, y: 0mm, z: 0mm) -> 2D
+      x : 10mm
+      y : 0mm
+      z : 0mm
+      Transform = __builtin::ops::translate(x: 10, y: 0, z: 0) -> 2D
+        Sketch = <NO ID>::Square(size: 20mm) -> 2D
+          size : 20mm
+          Sketch = std::geo2d::Rect(size: 20mm) -> 2D
+            height : 20mm
+            width : 20mm
+            x : -10mm
+            y : -10mm
+            Primitive2D(Rect(RECT(-10.0 -10.0,10.0 10.0))) = __builtin::geo2d::Rect(height: …
+
 -- Test Result --
 OK

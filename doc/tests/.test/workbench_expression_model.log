@@ -10,5 +10,10 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Sketch = <NO ID>::K() -> 2D
+      Primitive2D(Circle(Circle { radius: 1.0, offset: Vector2 [0.0, 0.0] })) = __buil…
+
 -- Test Result --
 OK

@@ -17,5 +17,22 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Sketch = <NO ID>::MySketch(a: 1) -> 2D
+      a : Integer = 1
+      Group -> 2D
+        Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 1mm) -> 2D
+          center : Tuple = (x: 0mm, y: 0mm)
+          radius : 1mm
+          Primitive2D(Circle(Circle { radius: 1.0, offset: Vector2 [0.0, 0.0] })) = __buil…
+    Sketch = <NO ID>::MySketch(a: 2) -> 2D
+      a : Integer = 2
+      Group -> 2D
+        Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 4mm) -> 2D
+          center : Tuple = (x: 0mm, y: 0mm)
+          radius : 4mm
+          Primitive2D(Circle(Circle { radius: 4.0, offset: Vector2 [0.0, 0.0] })) = __buil…
+
 -- Test Result --
 OK

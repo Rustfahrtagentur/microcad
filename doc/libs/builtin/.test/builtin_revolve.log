@@ -12,5 +12,14 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 3D (root)
+    Operation(Revolve { circular_segments: 64, revolve_degrees: 360.0 }) = __builtin…
+      Transform = __builtin::ops::translate(x: 20, y: 0, z: 0) -> Undetermined
+        Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 10mm) -> 2D
+          center : Tuple = (x: 0mm, y: 0mm)
+          radius : 10mm
+          Primitive2D(Circle(Circle { radius: 10.0, offset: Vector2 [0.0, 0.0] })) = __bui…
+
 -- Test Result --
 OK

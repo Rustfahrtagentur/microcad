@@ -25,14 +25,14 @@
 19: std::print("inner: {t.inner}");
 
 -- Output --
-outer: 10mm
+outer: <INVALID VALUE>
 inner: <INVALID VALUE>
 -- Errors --
-error: Property not found: inner
-  ---> <FROM STR>:19:21
+error: Symbol inner not found.
+  ---> <FROM STR>:15:5
      |
-  19 | std::print("inner: {t.inner}");
-     |                     ^^^^^^^
+  15 | t = Wheel(1cm);
+     |     ^^^^^^^^^^
      |
 -- Test Result --
 TODO

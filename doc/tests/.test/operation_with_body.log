@@ -13,5 +13,28 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Operation = std::ops::translate(x: 0mm, y: -17mm, z: 0mm) -> 2D
+      x : 0mm
+      y : -17mm
+      z : 0mm
+      Transform = __builtin::ops::translate(x: 0, y: -17, z: 0) -> 2D
+        Group -> 2D
+          Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 5mm) -> 2D
+            center : Tuple = (x: 0mm, y: 0mm)
+            radius : 5mm
+            Primitive2D(Circle(Circle { radius: 5.0, offset: Vector2 [0.0, 0.0] })) = __buil…
+    Operation = std::ops::translate(x: 0mm, y: 17mm, z: 0mm) -> 2D
+      x : 0mm
+      y : 17mm
+      z : 0mm
+      Transform = __builtin::ops::translate(x: 0, y: 17, z: 0) -> 2D
+        Group -> 2D
+          Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 5mm) -> 2D
+            center : Tuple = (x: 0mm, y: 0mm)
+            radius : 5mm
+            Primitive2D(Circle(Circle { radius: 5.0, offset: Vector2 [0.0, 0.0] })) = __buil…
+
 -- Test Result --
 OK

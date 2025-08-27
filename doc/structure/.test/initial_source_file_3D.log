@@ -9,5 +9,11 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 3D (root)
+    Part = std::geo3d::Sphere(radius: 10mm) -> 3D
+      radius : 10mm
+      Primitive3D(Sphere) = __builtin::geo3d::Sphere(radius: 10) -> 3D
+
 -- Test Result --
 OK

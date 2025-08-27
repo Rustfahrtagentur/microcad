@@ -20,7 +20,11 @@ warning: The sketch workbench will produce no 2D output.
   ---> <FROM STR>:1:1
      |
    1 | sketch K() {
-     | ^^^^^^^^^^^^
+     | ^^^^^^^^^^
      |
+-- Model --
+  Group -> Undetermined (root)
+    Sketch = <NO ID>::K() -> Undetermined
+
 -- Test Result --
 OK

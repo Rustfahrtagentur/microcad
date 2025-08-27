@@ -10,5 +10,10 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> Undetermined (root)
+    Group -> Undetermined
+      ChildrenMarker -> Undetermined
+
 -- Test Result --
 OK

@@ -8,5 +8,20 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Operation(Intersection) -> 2D
+      Group -> 2D
+        Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 3mm) -> 2D
+          center : Tuple = (x: 0mm, y: 0mm)
+          radius : 3mm
+          Primitive2D(Circle(Circle { radius: 3.0, offset: Vector2 [0.0, 0.0] })) = __buil…
+        Sketch = std::geo2d::Rect(height: 2mm, width: 3mm) -> 2D
+          height : 2mm
+          width : 3mm
+          x : -1.5mm
+          y : -1mm
+          Primitive2D(Rect(RECT(-1.5 -1.0,1.5 1.0))) = __builtin::geo2d::Rect(height: 2, w…
+
 -- Test Result --
 OK

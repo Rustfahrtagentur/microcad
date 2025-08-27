@@ -9,5 +9,15 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 3D (root)
+    Operation = std::ops::extrude(height: 20mm) -> 3D
+      height : 20mm
+      Operation(Extrude { height: 20.0, n_divisions: 0, twist_degrees: 0.0, scale_top_…
+        Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 20mm) -> 2D
+          center : Tuple = (x: 0mm, y: 0mm)
+          radius : 20mm
+          Primitive2D(Circle(Circle { radius: 20.0, offset: Vector2 [0.0, 0.0] })) = __bui…
+
 -- Test Result --
 OK

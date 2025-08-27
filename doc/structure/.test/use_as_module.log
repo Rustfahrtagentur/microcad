@@ -12,5 +12,12 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Sketch = std::geo2d::Circle(c: (x: 0mm, y: 0mm), r: 4mm) -> 2D
+      center : Tuple = (x: 0mm, y: 0mm)
+      radius : 4mm
+      Primitive2D(Circle(Circle { radius: 4.0, offset: Vector2 [0.0, 0.0] })) = __buil…
+
 -- Test Result --
 OK

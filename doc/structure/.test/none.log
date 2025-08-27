@@ -9,5 +9,17 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 3D (root)
+    Part = std::geo3d::Sphere(radius: 40mm) -> 3D
+      radius : 40mm
+      Primitive3D(Sphere) = __builtin::geo3d::Sphere(radius: 40) -> 3D
+    Part = std::geo3d::Cube(size: 40mm) -> 3D
+      size_x : 40mm
+      size_y : 40mm
+      size_z : 40mm
+      Transform = __builtin::ops::translate(x: -20, y: -20, z: -20) -> 3D
+        Primitive3D(Cube) = __builtin::geo3d::Cube(size_x: 40, size_y: 40, size_z: 40) -…
+
 -- Test Result --
 OK

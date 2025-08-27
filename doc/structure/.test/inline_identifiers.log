@@ -10,5 +10,14 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Sketch = std::geo2d::Rect(height: 2mm, width: 2mm) -> 2D
+      height : 2mm
+      width : 2mm
+      x : -1mm
+      y : -1mm
+      Primitive2D(Rect(RECT(-1.0 -1.0,1.0 1.0))) = __builtin::geo2d::Rect(height: 2, w…
+
 -- Test Result --
 OK

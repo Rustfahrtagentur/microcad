@@ -13,5 +13,14 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Sketch = <NO ID>::Wheel(radius: 1mm) -> 2D
+      radius : 1mm
+      Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 1mm) -> 2D
+        center : Tuple = (x: 0mm, y: 0mm)
+        radius : 1mm
+        Primitive2D(Circle(Circle { radius: 1.0, offset: Vector2 [0.0, 0.0] })) = __buil…
+
 -- Test Result --
 OK

@@ -23,13 +23,18 @@ warning: The part workbench will produce no 3D output.
   ---> <FROM STR>:4:13
      |
    4 |             part M1() {}
-     |             ^^^^^^^^^^^^
+     |             ^^^^^^^^^
      |
 warning: The part workbench will produce no 3D output.
   ---> <FROM STR>:8:5
      |
    8 |     part M2() {}
-     |     ^^^^^^^^^^^^
+     |     ^^^^^^^^^
      |
+-- Model --
+  Group -> Undetermined (root)
+    Part = <NO ID>::a::b::c::M1() -> Undetermined
+    Part = <NO ID>::a::M2() -> Undetermined
+
 -- Test Result --
 OK

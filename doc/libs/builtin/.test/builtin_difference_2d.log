@@ -14,5 +14,14 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Operation(Difference) = __builtin::ops::difference() -> 2D
+      #[color = rgba(1, 0, 0, 1)]
+      Group -> 2D
+        Transform = __builtin::ops::translate(x: 1, y: 1, z: 0) -> 2D
+          Primitive2D(Circle(Circle { radius: 3.0, offset: Vector2 [0.0, 0.0] })) = __buil…
+        Primitive2D(Rect(RECT(0.0 0.0,3.0 3.0))) = __builtin::geo2d::Rect(height: 3, wid…
+
 -- Test Result --
 OK

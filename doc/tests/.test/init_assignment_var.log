@@ -14,7 +14,12 @@ warning: The sketch workbench will produce no 2D output.
   ---> <FROM STR>:1:1
      |
    1 | sketch K() { init(l:Length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     | ^^^^^^^^^^
      |
+-- Model --
+  Group -> Undetermined (root)
+    Sketch = <NO ID>::K(l: 10mm) -> Undetermined
+      a : Integer = 1
+
 -- Test Result --
 OK

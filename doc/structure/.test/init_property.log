@@ -26,5 +26,34 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Sketch = <NO ID>::Wheel(radius: 50mm, thickness: 10mm) -> 2D
+      radius : 50mm
+      thickness : 10mm
+      Operation(Difference) -> 2D
+        Group -> 2D
+          Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 50mm) -> 2D
+            center : Tuple = (x: 0mm, y: 0mm)
+            radius : 50mm
+            Primitive2D(Circle(Circle { radius: 50.0, offset: Vector2 [0.0, 0.0] })) = __bui…
+          Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 40mm) -> 2D
+            center : Tuple = (x: 0mm, y: 0mm)
+            radius : 40mm
+            Primitive2D(Circle(Circle { radius: 40.0, offset: Vector2 [0.0, 0.0] })) = __bui…
+    Sketch = <NO ID>::Wheel(diameter: 100mm, thickness: 10mm) -> 2D
+      radius : 50mm
+      thickness : 10mm
+      Operation(Difference) -> 2D
+        Group -> 2D
+          Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 50mm) -> 2D
+            center : Tuple = (x: 0mm, y: 0mm)
+            radius : 50mm
+            Primitive2D(Circle(Circle { radius: 50.0, offset: Vector2 [0.0, 0.0] })) = __bui…
+          Sketch = std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 40mm) -> 2D
+            center : Tuple = (x: 0mm, y: 0mm)
+            radius : 40mm
+            Primitive2D(Circle(Circle { radius: 40.0, offset: Vector2 [0.0, 0.0] })) = __bui…
+
 -- Test Result --
 OK

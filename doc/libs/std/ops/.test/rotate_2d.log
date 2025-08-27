@@ -8,5 +8,17 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Operation = std::ops::rotate(angle: 0.7853981633974483π, axis: (x: 0, y: 0, z: 1…
+      matrix : Matrix = Matrix3 [[0.7071067811865476, 0.7071067811865475, 0.0], [-0.7071067811865475, 0.7071067811865476, 0.0], [0.0, 0.0, 1.0]]
+      Transform = __builtin::ops::rotate(matrix: Matrix3 [[0.7071067811865476, 0.70710…
+        Sketch = std::geo2d::Rect(size: 30mm) -> 2D
+          height : 30mm
+          width : 30mm
+          x : -15mm
+          y : -15mm
+          Primitive2D(Rect(RECT(-15.0 -15.0,15.0 15.0))) = __builtin::geo2d::Rect(height: …
+
 -- Test Result --
 OK

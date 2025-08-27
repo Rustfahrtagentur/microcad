@@ -16,5 +16,9 @@ warning: This expression statement did not produce any model
    2 |   1 + 2;
      |   ^^^^^^
      |
+-- Model --
+  Group -> Undetermined (root)
+    Group -> Undetermined
+
 -- Test Result --
 OK

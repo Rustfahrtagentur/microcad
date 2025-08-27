@@ -8,5 +8,9 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Primitive2D(Circle(Circle { radius: 1.0, offset: Vector2 [0.0, 0.0] })) = __buil…
+
 -- Test Result --
 OK

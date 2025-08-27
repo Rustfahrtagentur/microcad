@@ -13,5 +13,12 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Transform = __builtin::ops::translate(x: 15, y: 0, z: 0) -> 2D
+      #[svg = CustomCommand { id: svg, arguments: Tuple { named: {fill: String = "", style: String = "fill:red"}, unnamed: {}, src_ref: 3:10 (28..46) in 0x6342015ff637821e } }]
+      Transform = __builtin::ops::translate(x: 0, y: 15, z: 0) -> 2D
+        Primitive2D(Rect(RECT(0.0 0.0,10.0 10.0))) = __builtin::geo2d::Rect(height: 10, …
+
 -- Test Result --
 OK

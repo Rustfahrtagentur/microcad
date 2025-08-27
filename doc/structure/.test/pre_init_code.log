@@ -29,11 +29,29 @@
 
 -- Output --
 -- Errors --
-error: Property not found: diameter
+error: Ambiguous symbol FACTOR might be one of the following:
+[38;2;96;96;96mFACTOR (constant) = 2 [FACTOR][39m
+[38;2;96;96;96mFACTOR (constant) = <INVALID VALUE> [FACTOR][39m
+
+  ---> <FROM STR>:21:26
+     |
+  21 | __builtin::debug::assert(Wheel(5cm).radius == 5cm);
+     |                          ^^^^^^^^^^
+     |
+error: Missing arguments: v
+  ---> <FROM STR>:21:26
+     |
+  21 | __builtin::debug::assert(Wheel(5cm).radius == 5cm);
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Ambiguous symbol FACTOR might be one of the following:
+[38;2;96;96;96mFACTOR (constant) = 2 [FACTOR][39m
+[38;2;96;96;96mFACTOR (constant) = <INVALID VALUE> [FACTOR][39m
+
   ---> <FROM STR>:22:26
      |
   22 | __builtin::debug::assert(Wheel(5cm).diameter == 10cm);
-     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |                          ^^^^^^^^^^
      |
 error: Missing arguments: v
   ---> <FROM STR>:22:26

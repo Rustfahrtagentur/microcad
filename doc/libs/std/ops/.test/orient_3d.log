@@ -12,5 +12,41 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 3D (root)
+    Operation = std::ops::orient(v: (x: 1, y: 0, z: 0)) -> 3D
+      v : Tuple = (x: 1, y: 0, z: 0)
+      Transform = __builtin::ops::orient(x: 1, y: 0, z: 0) -> 3D
+        Part = std::geo3d::Cylinder(d: 35mm, h: 50mm) -> 3D
+          height : 50mm
+          offset : -25mm
+          r : 17.5mm
+          radius_bottom : 17.5mm
+          radius_top : 17.5mm
+          Transform = __builtin::ops::translate(x: 0, y: 0, z: -25) -> 3D
+            Primitive3D(Cylinder) = __builtin::geo3d::Cylinder(height: 50, radius_bottom: 17…
+    Operation = std::ops::orient(v: (x: 0, y: 1, z: 0)) -> 3D
+      v : Tuple = (x: 0, y: 1, z: 0)
+      Transform = __builtin::ops::orient(x: 0, y: 1, z: 0) -> 3D
+        Part = std::geo3d::Cylinder(d: 35mm, h: 50mm) -> 3D
+          height : 50mm
+          offset : -25mm
+          r : 17.5mm
+          radius_bottom : 17.5mm
+          radius_top : 17.5mm
+          Transform = __builtin::ops::translate(x: 0, y: 0, z: -25) -> 3D
+            Primitive3D(Cylinder) = __builtin::geo3d::Cylinder(height: 50, radius_bottom: 17…
+    Operation = std::ops::orient(v: (x: 0, y: 0, z: 1)) -> 3D
+      v : Tuple = (x: 0, y: 0, z: 1)
+      Transform = __builtin::ops::orient(x: 0, y: 0, z: 1) -> 3D
+        Part = std::geo3d::Cylinder(d: 35mm, h: 50mm) -> 3D
+          height : 50mm
+          offset : -25mm
+          r : 17.5mm
+          radius_bottom : 17.5mm
+          radius_top : 17.5mm
+          Transform = __builtin::ops::translate(x: 0, y: 0, z: -25) -> 3D
+            Primitive3D(Cylinder) = __builtin::geo3d::Cylinder(height: 50, radius_bottom: 17…
+
 -- Test Result --
 OK

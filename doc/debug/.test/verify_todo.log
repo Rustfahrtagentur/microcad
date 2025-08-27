@@ -20,5 +20,9 @@ info: a is zero
    4 |     std::log::info("a is zero");
      |                    ^^^^^^^^^^^
      |
+-- Model --
+  Group -> Undetermined (root)
+    Group -> Undetermined
+
 -- Test Result --
 OK
