@@ -39,7 +39,7 @@ impl WorkbenchDefinition {
         // Create model
         let model = ModelBuilder::new(
             Element::Workpiece(Workpiece {
-                kind: self.kind,
+                kind: *self.kind,
                 // copy all arguments which are part of the building plan to properties
                 properties: properties.into_iter().collect(),
                 creator,

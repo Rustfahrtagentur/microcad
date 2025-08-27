@@ -3,12 +3,12 @@
 
 use crate::{find_rule, find_rule_exact, parse::*, parser::*, rc::*, syntax::*};
 
-impl Parse for WorkbenchKind {
+impl Parse for Refer<WorkbenchKind> {
     fn parse(pair: Pair) -> ParseResult<Self> {
         match pair.as_str() {
-            "part" => Ok(Self::Part),
-            "sketch" => Ok(Self::Sketch),
-            "op" => Ok(Self::Operation),
+            "part" => Ok(Refer::new(WorkbenchKind::Part, pair.into())),
+            "sketch" => Ok(Refer::new(WorkbenchKind::Sketch, pair.into())),
+            "op" => Ok(Refer::new(WorkbenchKind::Operation, pair.into())),
             _ => Err(ParseError::UnexpectedToken),
         }
     }

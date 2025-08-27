@@ -3,19 +3,14 @@
 
 //! Parameter list syntax element
 
-use crate::{ord_map::*, syntax::*};
+use crate::{ord_map::*, src_ref::*, syntax::*};
 use derive_more::{Deref, DerefMut};
 
 /// Parameter list
 #[derive(Clone, Debug, Default, Deref, DerefMut)]
-pub struct ParameterList(OrdMap<Identifier, Parameter>);
+pub struct ParameterList(pub Refer<OrdMap<Identifier, Parameter>>);
 
 impl ParameterList {
-    /// Create new *parameter list* from a map of [`Parameter`]s.
-    pub fn new(value: OrdMap<Identifier, Parameter>) -> Self {
-        Self(value)
-    }
-
     /// Return ids of all parameters
     pub fn ids(&self) -> impl Iterator<Item = Identifier> {
         self.keys().cloned()
@@ -24,6 +19,12 @@ impl ParameterList {
     /// Return if given identifier is in parameter list
     pub fn contains_key(&self, id: &Identifier) -> bool {
         self.iter().any(|p| *id == p.id)
+    }
+}
+
+impl SrcReferrer for ParameterList {
+    fn src_ref(&self) -> SrcRef {
+        self.0.src_ref.clone()
     }
 }
 

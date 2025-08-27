@@ -44,7 +44,7 @@ pub struct WorkbenchDefinition {
     /// Visibility from outside modules.
     pub visibility: Visibility,
     /// Workbench kind.
-    pub kind: WorkbenchKind,
+    pub kind: Refer<WorkbenchKind>,
     /// Workbench name.
     pub id: Identifier,
     /// Workbench's building plan.
