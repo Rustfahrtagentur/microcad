@@ -150,7 +150,7 @@ impl Stack {
 impl Locals for Stack {
     fn open(&mut self, frame: StackFrame) {
         if let Some(id) = frame.id() {
-            log::trace!("Opening {} stack frame '{id}'", frame.kind_str());
+            log::trace!("Opening {} stack frame '{id:?}'", frame.kind_str());
         } else {
             log::trace!("Opening {} stack frame", frame.kind_str());
         }
@@ -193,7 +193,7 @@ impl Locals for Stack {
 
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         // search from inner scope to root scope to shadow outside locals
-        for frame in self.0.iter().rev() {
+        for (n, frame) in self.0.iter().rev().enumerate() {
             match frame {
                 StackFrame::Source(_, locals)
                 | StackFrame::Body(locals)
@@ -205,12 +205,18 @@ impl Locals for Stack {
                         return Ok(local.clone());
                     }
                 }
-                // stop stack lookup at calls
+                // stop stack lookup at  modules
                 StackFrame::Module(_, _) => {
-                    log::trace!("stop at call frame");
+                    log::trace!("stop at module frame");
                     break;
                 }
-                StackFrame::Call { .. } => (),
+                // stop stack lookup at calls
+                StackFrame::Call { .. } => {
+                    if n > 0 {
+                        log::trace!("stop at call frame");
+                        break;
+                    }
+                }
             }
         }
         Err(EvalError::LocalNotFound(id.clone()))

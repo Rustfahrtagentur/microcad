@@ -312,8 +312,7 @@ impl GetSourceByHash for Context {
 impl std::fmt::Display for Context {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Ok(model) = self.get_model() {
-            write!(f, "\nModel:\n")?;
-            model.tree_print(f, 4.into())?;
+            write!(f, "\nModel:\n{}", FormatTree(&model))?;
         }
         if self.has_errors() {
             writeln!(f, "{}\nErrors:", self.symbol_table)?;

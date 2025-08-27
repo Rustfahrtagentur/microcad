@@ -8,7 +8,7 @@ impl InitDefinition {
     pub fn eval(&self, plan: &ParameterList, args: Tuple, context: &mut Context) -> EvalResult<()> {
         context.grant(self)?;
         let model = context.get_model()?;
-        context.scope(StackFrame::Init(args.into()), |context| {
+        context.scope(StackFrame::Init(args.clone().into()), |context| {
             // avoid body stack frame
             let _: Value = self.body.statements.eval(context)?;
 
@@ -32,9 +32,12 @@ impl InitDefinition {
                 model.borrow_mut().add_properties(props.clone());
                 Ok(())
             } else {
-                Err(EvalError::BuildingPlanIncomplete(
-                    not_found.iter().map(|(id, _)| (*id).clone()).collect(),
-                ))
+                context.error(
+                    args,
+                    EvalError::BuildingPlanIncomplete(
+                        not_found.iter().map(|(id, _)| (*id).clone()).collect(),
+                    ),
+                )
             }
         })
     }
