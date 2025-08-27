@@ -34,7 +34,7 @@ impl WorkbenchDefinition {
         log::trace!("Non-Properties:\n{:?}", non_properties);
 
         // Create model
-        let model = ModelBuilder::new_workpiece(self.kind)
+        let model = ModelBuilder::new_workpiece(*self.kind)
             .origin(Origin::new(arguments.clone()))
             .attributes(self.attribute_list.eval(context)?)
             .properties(properties.into_iter().collect())

@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{parse::*, parser::*};
+use crate::{ord_map::*, parse::*, parser::*};
 
 /// Short cut to create a `ParameterList` instance
 impl Parse for Parameter {
@@ -47,7 +47,8 @@ impl Parse for Parameter {
 impl Parse for ParameterList {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::parameter_list);
-        let mut parameters = ParameterList::default();
+
+        let mut parameters: OrdMap<_, _> = Default::default();
 
         for pair in pair.inner() {
             parameters
@@ -55,6 +56,6 @@ impl Parse for ParameterList {
                 .map_err(ParseError::DuplicateIdentifier)?;
         }
 
-        Ok(parameters)
+        Ok(ParameterList(Refer::new(parameters, pair.src_ref())))
     }
 }
