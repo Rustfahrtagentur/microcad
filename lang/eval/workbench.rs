@@ -76,8 +76,7 @@ impl WorkbenchDefinition {
                             let result = workpiece.check_output_type(output_type);
                             match result {
                                 Ok(()) => {}
-                                Err(EvalError::WorkbenchNoOutput(_, _)) => {
-                                    context.warning(self, result.expect_err("Error"))?;
+                                Err(EvalError::WorkbenchNoOutput(..)) => {
                                 }
                                 result => {
                                     context.error(self, result.expect_err("Error"))?;

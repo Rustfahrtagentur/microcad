@@ -164,7 +164,7 @@ impl Context {
 
     pub fn is_init(&mut self) -> bool {
         if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
-            matches!(stack_frame, StackFrame::Init(_))
+            matches!(stack_frame, StackFrame::Init(..))
         } else {
             false
         }
@@ -359,10 +359,7 @@ impl ExporterAccess for Context {
 impl Grant<WorkbenchDefinition> for Context {
     fn grant(&mut self, statement: &WorkbenchDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
-            matches!(
-                stack_frame,
-                StackFrame::Source(_, _) | StackFrame::Module(_, _)
-            )
+            matches!(stack_frame, StackFrame::Source(..) | StackFrame::Module(..))
         } else {
             false
         };
@@ -380,10 +377,7 @@ impl Grant<WorkbenchDefinition> for Context {
 impl Grant<ModuleDefinition> for Context {
     fn grant(&mut self, statement: &ModuleDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
-            matches!(
-                stack_frame,
-                StackFrame::Source(_, _) | StackFrame::Module(_, _)
-            )
+            matches!(stack_frame, StackFrame::Source(..) | StackFrame::Module(..))
         } else {
             false
         };
@@ -445,7 +439,7 @@ impl Grant<UseStatement> for Context {
 impl Grant<ReturnStatement> for Context {
     fn grant(&mut self, statement: &ReturnStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
-            matches!(stack_frame, StackFrame::Function(_))
+            matches!(stack_frame, StackFrame::Function(..))
         } else {
             false
         };
@@ -462,10 +456,10 @@ impl Grant<IfStatement> for Context {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
-                StackFrame::Source(_, _)
-                    | StackFrame::Workbench(_, _, _)
-                    | StackFrame::Body(_)
-                    | StackFrame::Function(_)
+                StackFrame::Source(..)
+                    | StackFrame::Workbench(..)
+                    | StackFrame::Body(..)
+                    | StackFrame::Function(..)
             )
         } else {
             false
@@ -485,21 +479,21 @@ impl Grant<AssignmentStatement> for Context {
                 Qualifier::Var => {
                     matches!(
                         stack_frame,
-                        StackFrame::Source(_, _)
-                            | StackFrame::Body(_)
-                            | StackFrame::Workbench(_, _, _)
-                            | StackFrame::Init(_)
-                            | StackFrame::Function(_)
+                        StackFrame::Source(..)
+                            | StackFrame::Body(..)
+                            | StackFrame::Workbench(..)
+                            | StackFrame::Init(..)
+                            | StackFrame::Function(..)
                     )
                 }
                 Qualifier::Const => matches!(
                     stack_frame,
-                    StackFrame::Source(_, _)
-                        | StackFrame::Module(_, _)
-                        | StackFrame::Workbench(_, _, _)
-                        | StackFrame::Function(_)
+                    StackFrame::Source(..)
+                        | StackFrame::Module(..)
+                        | StackFrame::Workbench(..)
+                        | StackFrame::Function(..)
                 ),
-                Qualifier::Prop => matches!(stack_frame, StackFrame::Workbench(_, _, _)),
+                Qualifier::Prop => matches!(stack_frame, StackFrame::Workbench(..)),
             }
         } else {
             false
@@ -517,10 +511,10 @@ impl Grant<ExpressionStatement> for Context {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
-                StackFrame::Source(_, _)
-                    | StackFrame::Body(_)
-                    | StackFrame::Workbench(_, _, _)
-                    | StackFrame::Function(_)
+                StackFrame::Source(..)
+                    | StackFrame::Body(..)
+                    | StackFrame::Workbench(..)
+                    | StackFrame::Function(..)
             )
         } else {
             false
@@ -536,7 +530,7 @@ impl Grant<ExpressionStatement> for Context {
 impl Grant<Marker> for Context {
     fn grant(&mut self, statement: &Marker) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
-            matches!(stack_frame, StackFrame::Workbench(_, _, _))
+            matches!(stack_frame, StackFrame::Workbench(..))
         } else {
             false
         };
@@ -553,7 +547,7 @@ impl Grant<crate::syntax::Attribute> for Context {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(
                 stack_frame,
-                StackFrame::Source(_, _) | StackFrame::Body(_) | StackFrame::Workbench(_, _, _)
+                StackFrame::Source(..) | StackFrame::Body(..) | StackFrame::Workbench(..)
             )
         } else {
             false

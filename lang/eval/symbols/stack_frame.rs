@@ -51,17 +51,13 @@ impl StackFrame {
     /// Return stack frame kind as str
     pub fn kind_str(&self) -> &'static str {
         match self {
-            StackFrame::Source(_, _) => "source",
-            StackFrame::Module(_, _) => "module",
-            StackFrame::Init(_) => "init",
-            StackFrame::Workbench(_, _, _) => "workbench",
-            StackFrame::Body(_) => "body",
-            StackFrame::Function(_) => "function",
-            StackFrame::Call {
-                symbol: _,
-                args: _,
-                src_ref: _,
-            } => "call",
+            StackFrame::Source(..) => "source",
+            StackFrame::Module(..) => "module",
+            StackFrame::Init(..) => "init",
+            StackFrame::Workbench(..) => "workbench",
+            StackFrame::Body(..) => "body",
+            StackFrame::Function(..) => "function",
+            StackFrame::Call { .. } => "call",
         }
     }
 
@@ -169,12 +165,12 @@ impl StackFrame {
         idx: usize,
     ) -> std::fmt::Result {
         match self {
-            StackFrame::Source(_identifier, _locals) => todo!(),
-            StackFrame::Module(_identifier, _locals) => todo!(),
-            StackFrame::Init(_locals) => todo!(),
-            StackFrame::Workbench(_kind, _identifier, _locals) => todo!(),
-            StackFrame::Body(_locals) => todo!(),
-            StackFrame::Function(_locals) => todo!(),
+            StackFrame::Source(..) => todo!(),
+            StackFrame::Module(..) => todo!(),
+            StackFrame::Init(..) => todo!(),
+            StackFrame::Workbench(..) => todo!(),
+            StackFrame::Body(..) => todo!(),
+            StackFrame::Function(..) => todo!(),
             StackFrame::Call {
                 symbol,
                 args,

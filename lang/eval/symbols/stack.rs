@@ -62,10 +62,10 @@ impl Stack {
         let mut ids: Vec<Identifier> = Vec::new();
         for frame in self.0.iter().rev() {
             match frame {
-                StackFrame::Source(id, _)
-                | StackFrame::Module(id, _)
-                | StackFrame::Workbench(_, id, _) => ids.push(id.clone()),
-                StackFrame::Init(_) | StackFrame::Body(_) | StackFrame::Function(_) => (),
+                StackFrame::Source(id, ..)
+                | StackFrame::Module(id, ..)
+                | StackFrame::Workbench(_, id, ..) => ids.push(id.clone()),
+                StackFrame::Init(..) | StackFrame::Body(..) | StackFrame::Function(..) => (),
                 StackFrame::Call { symbol, .. } => {
                     // RULE: builtins run in the callers context - so skip builtin call frames
                     if !symbol.is_builtin() {
@@ -83,7 +83,7 @@ impl Stack {
         let mut ids: Vec<Identifier> = Vec::new();
         for frame in self.0.iter().rev() {
             match frame {
-                StackFrame::Source(id, _) | StackFrame::Module(id, _) => {
+                StackFrame::Source(id, ..) | StackFrame::Module(id, ..) => {
                     if ids.is_empty() {
                         // return none if we haven't found a workbench yet
                         return None;
@@ -94,7 +94,7 @@ impl Stack {
                 }
                 StackFrame::Workbench(_, id, _) => ids.push(id.clone()),
                 // ignore frames without ids
-                StackFrame::Init(_) | StackFrame::Body(_) | StackFrame::Function(_) => (),
+                StackFrame::Init(..) | StackFrame::Body(_) | StackFrame::Function(_) => (),
                 StackFrame::Call { symbol, .. } => {
                     //  finish name
                     ids.extend(symbol.full_base().iter().cloned().rev());
@@ -210,12 +210,7 @@ impl Locals for Stack {
                     log::trace!("stop at call frame");
                     break;
                 }
-                // skip any of these
-                StackFrame::Call {
-                    symbol: _,
-                    args: _,
-                    src_ref: _,
-                } => (),
+                StackFrame::Call { .. } => (),
             }
         }
         Err(EvalError::LocalNotFound(id.clone()))
