@@ -278,7 +278,9 @@ impl TreeDisplay for Model {
         )?;
         tree_state.indent();
         let self_ = self.borrow();
-        self_.get_properties().tree_print(f, tree_state)?;
+        if let Some(properties) = self_.get_properties() {
+            properties.tree_print(f, tree_state)?;
+        }
         self_.attributes.tree_print(f, tree_state)?;
         self_.children.tree_print(f, tree_state)
     }
