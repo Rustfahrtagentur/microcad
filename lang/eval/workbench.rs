@@ -68,7 +68,7 @@ impl WorkbenchDefinition {
                     if let Err(err) =
                         init.eval(&self.plan, non_properties.into_iter().collect(), context)
                     {
-                        context.error(self, err)?;
+                        context.error(self.src_ref_head(), err)?;
                     }
                 }
 
@@ -86,11 +86,13 @@ impl WorkbenchDefinition {
                             let result = workpiece.check_output_type(output_type);
                             match result {
                                 Ok(()) => {}
-                                Err(EvalError::WorkbenchNoOutput(_, _)) => {
-                                    context.warning(self, result.expect_err("Error"))?;
+                                Err(EvalError::WorkbenchNoOutput(..)) => {
+                                    context
+                                        .warning(self.src_ref_head(), result.expect_err("Error"))?;
                                 }
                                 result => {
-                                    context.error(self, result.expect_err("Error"))?;
+                                    context
+                                        .error(self.src_ref_head(), result.expect_err("Error"))?;
                                 }
                             }
                         }

@@ -55,6 +55,15 @@ pub struct WorkbenchDefinition {
     pub src_ref: SrcRef,
 }
 
+impl WorkbenchDefinition {
+    /// Return the source code reference of the head of the definition.
+    ///
+    /// This excludes any attribute, visibility and body.
+    pub fn src_ref_head(&self) -> SrcRef {
+        SrcRef::merge(&self.kind, &self.plan)
+    }
+}
+
 impl<'a> Initialized<'a> for WorkbenchDefinition {
     fn statements(&'a self) -> std::slice::Iter<'a, Statement> {
         self.body.statements.iter()
