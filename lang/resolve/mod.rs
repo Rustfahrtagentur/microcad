@@ -147,11 +147,7 @@ impl Resolve for InitDefinition {
 
 impl Resolve<Option<(Identifier, Symbol)>> for UseStatement {
     fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
-        match self.visibility {
-            Visibility::Private => Ok(None),
-            // Public symbols are put into resolving symbol map
-            Visibility::Public => self.decl.resolve(parent),
-        }
+        self.decl.resolve(parent)
     }
 }
 
@@ -213,7 +209,10 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
                     ),
                 )))
             }
-            UseDeclaration::UseAll(_) => Ok(None),
+            UseDeclaration::UseAll(from) => Ok(Some((
+                Identifier::every(from),
+                Symbol::new(SymbolDefinition::UseAll(from.clone()), Some(parent.clone())),
+            ))),
             UseDeclaration::UseAlias(name, alias) => Ok(Some((
                 alias.clone(),
                 Symbol::new(

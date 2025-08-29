@@ -71,6 +71,15 @@ impl SymbolMap {
         Err(ResolveError::SymbolNotFound(name.clone()))
     }
 
+    /// Search for a symbol in symbol map.
+    pub fn find_all(&self, f: fn(&SymbolDefinition) -> bool) -> Vec<Symbol> {
+        let mut result = vec![];
+        self.iter()
+            .filter(|(_, symbol)| f(&symbol.borrow().def))
+            .for_each(|(_, symbol)| result.append(&mut symbol.find_all(f)));
+        result
+    }
+
     /// detach children from their parent
     pub fn detach_from_parent(mut self) -> Self {
         for child in self.iter_mut() {

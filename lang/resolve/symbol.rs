@@ -233,6 +233,14 @@ impl Symbol {
     pub fn is_builtin(&self) -> bool {
         matches!(self.borrow().def, SymbolDefinition::Builtin(..))
     }
+
+    pub fn find_all(&self, f: fn(&SymbolDefinition) -> bool) -> Vec<Symbol> {
+        let mut result = vec![];
+        if f(&self.borrow().def) {
+            result.push(self.clone());
+        }
+        self.borrow().children.find_all(f)
+    }
 }
 
 impl FullyQualify for Symbol {

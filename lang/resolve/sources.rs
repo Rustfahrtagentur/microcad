@@ -135,6 +135,11 @@ impl Sources {
                 Ok(())
             })?;
 
+        symbols.search(|(id, symbol)| match &symbol.borrow().def {
+            SymbolDefinition::UseAll(qualified_name) => todo!(),
+            _ => (),
+        });
+
         Ok(symbols)
     }
 

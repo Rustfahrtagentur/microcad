@@ -9,7 +9,7 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{Id, parse::*, parser::Parser, src_ref::*, syntax::*};
+use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
 
 /// µcad identifier
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -36,6 +36,11 @@ impl Identifier {
     /// Make empty (invalid) id
     pub fn none() -> Self {
         Self(Refer::none("".into()))
+    }
+
+    /// Special identifier matching every id
+    pub fn every(src_ref: &impl SrcReferrer) -> Self {
+        Self(Refer::new("*".into(), src_ref.src_ref()))
     }
 
     /// Create new identifier with a new unique name.
