@@ -525,7 +525,7 @@ Cap(width, height);
 The knobs of the brick are simple circles with a diameter of `4.8mm`.
 We can easily construct a grid with circles via multiplicity:
 
-```mcad,tutorial_part_knobs
+```mcad,tutorial_part_circle
 const SPACING = 8mm;
 
 std::geo2d::Circle(d = 4.8mm, c = (x = [0..2] * SPACING, y = [0..4] * SPACING));
@@ -616,7 +616,7 @@ This can be achieved by *extrusion* and the corresponding µcad operation is cal
 
 As a first example, let's take the cap of brick and extrude with a `height = 1.0mm`.
 
-```µcad,tutorial_part_cap
+```µcad,tutorial_part_extrude_cap
 use Rect as Cap;
 use std::ops::extrude;
 
