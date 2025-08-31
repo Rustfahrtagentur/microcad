@@ -482,7 +482,7 @@ use std::ops::*;
 
 const SPACING = 8mm;
 
-sketch Base(width: Length, height Length, wall_width = 1.2mm) {
+sketch Base(width: Length, height: Length, wall_width = 1.2mm) {
     frame = Frame(width, height, thickness = wall_width);
     struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
         .translate(y = [0..3] * SPACING)
@@ -515,6 +515,10 @@ The `Cap` is nothing more than a rectangle. We do not have to define a specific 
 
 ```µcad,tutorial_part_cap
 use std::geo2d::Rect as Cap;
+
+width = 15.8mm;
+height = 31.8mm;
+
 Cap(width, height);
 ```
 
@@ -601,6 +605,7 @@ use std::math::*;
 use std::ops::*;
 use std::geo3d::*;
 
+size = 40mm;
 body = Sphere(r = size / 1.5) & Cube(size);
 holes = Cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
 body - holes;
@@ -617,7 +622,7 @@ This can be achieved by *extrusion* and the corresponding µcad operation is cal
 As a first example, let's take the cap of brick and extrude with a `height = 1.0mm`.
 
 ```µcad,tutorial_part_extrude_cap
-use Rect as Cap;
+use std::geo2d::Rect as Cap;
 use std::ops::extrude;
 
 width = 15.8mm;
@@ -635,6 +640,11 @@ Notice that `height = 1.0` will extrude will in Z axis.
 Let's create a first draft for the brick by taking the base sketch and using it in the `LegoBrick` part:
 
 ```µcad,tutorial_part_base
+use std::geo2d::*;
+use std::ops::*;
+
+const SPACING = 8mm;
+
 sketch Base(width: Length, height: Length) {
     wall_width = 1.2mm;
     frame = Frame(width, height, thickness = wall_width);
