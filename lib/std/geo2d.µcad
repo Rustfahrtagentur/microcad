@@ -57,7 +57,7 @@ sketch Rect(width: Length, height: Length, x: Length, y: Length) {
 
 /// A frame with a thickness.
 sketch Frame(width: Length, height: Length, thickness: Length) {
-    std::debug::assert(thickness > 0.0, "Thickness must be a positive number.");
+    std::debug::assert(thickness > 0.0mm, "Thickness must be a positive number (thickness = {thickness})");
     Rect(width, height) - Rect(width = width - 2*thickness, height = height - 2*thickness)
 }
 
