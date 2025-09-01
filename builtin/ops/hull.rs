@@ -17,18 +17,20 @@ pub struct Hull;
 
 impl Operation for Hull {
     fn process_2d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry2D>> {
+        let model_ = model.borrow();
+        let output = model_.output.as_ref().expect("Some render output");
+
         Ok(Rc::new(Geometry2D::Polygon(
-            model
-                .render_geometry_2d(cache)?
-                .hull(&model.borrow().output.resolution),
+            model.render_geometry_2d(cache)?.hull(&output.resolution()),
         )))
     }
 
     fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry3D>> {
+        let model_ = model.borrow();
+        let output = model_.output.as_ref().expect("Some render output");
+
         Ok(Rc::new(Geometry3D::Manifold(Rc::new(
-            model
-                .render_geometry_3d(cache)?
-                .hull(&model.borrow().output.resolution),
+            model.render_geometry_3d(cache)?.hull(&output.resolution()),
         ))))
     }
 }

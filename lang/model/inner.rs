@@ -3,6 +3,8 @@
 
 //! Model
 
+use microcad_core::RenderResolution;
+
 use crate::{model::*, src_ref::*, syntax::*};
 
 /// The actual model contents
@@ -22,7 +24,7 @@ pub struct ModelInner {
     /// Attributes used for export.
     pub attributes: Attributes,
     /// The output type of the this model.
-    pub output: ModelOutput,
+    pub output: Option<RenderOutput>,
 }
 
 impl ModelInner {
@@ -54,6 +56,17 @@ impl ModelInner {
     /// Return if ,model has no children.
     pub fn is_empty(&self) -> bool {
         self.children.is_empty()
+    }
+
+    pub fn resolution(&self) -> RenderResolution {
+        let output = self.output.as_ref().expect("Some render output.");
+
+        match output {
+            RenderOutput::Geometry2D { resolution, .. }
+            | RenderOutput::Geometry3D { resolution, .. } => {
+                resolution.as_ref().expect("Some resolution.").clone()
+            }
+        }
     }
 }
 

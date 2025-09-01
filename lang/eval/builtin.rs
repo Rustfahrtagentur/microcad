@@ -92,7 +92,11 @@ pub struct BuiltinWorkpiece {
 }
 
 impl BuiltinWorkpiece {
-    pub fn call_2d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry2D>> {
+    pub fn render_2d(
+        &self,
+        cache: &mut RenderCache,
+        model: &Model,
+    ) -> RenderResult<Rc<Geometry2D>> {
         Ok(match (self.f)(&self.args)? {
             BuiltinWorkpieceOutput::Geometry2D(geo2d) => Rc::new(geo2d),
             BuiltinWorkpieceOutput::Geometry3D(_) => todo!(),

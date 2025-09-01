@@ -29,9 +29,11 @@ impl Operation for Revolve {
         use std::rc::Rc;
         let geometries = model.render_geometry_2d(cache)?;
 
-        let multi_polygon_data = geo2d::multi_polygon_to_vec(
-            &geometries.render_to_multi_polygon(&model.borrow().output.resolution),
-        );
+        let model_ = model.borrow();
+        let output = model_.output.as_ref().expect("Some render output");
+
+        let multi_polygon_data =
+            geo2d::multi_polygon_to_vec(&geometries.render_to_multi_polygon(&output.resolution()));
         let multi_polygon_data: Vec<_> = multi_polygon_data
             .iter()
             .map(|ring| ring.as_slice())

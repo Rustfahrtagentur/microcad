@@ -23,7 +23,7 @@ impl Operation for BooleanOp {
                 Some(model) => model.render_geometry_2d(cache),
                 None => model.render_geometry_2d(cache),
             }?
-            .boolean_op(&model.borrow().output.resolution, self),
+            .boolean_op(&model.borrow().resolution(), self),
         )))
     }
 
@@ -33,7 +33,7 @@ impl Operation for BooleanOp {
                 Some(model) => model.render_geometry_3d(cache),
                 None => model.render_geometry_3d(cache),
             }?
-            .boolean_op(&model.borrow().output.resolution, self),
+            .boolean_op(&model.borrow().resolution(), self),
         )))
     }
 }

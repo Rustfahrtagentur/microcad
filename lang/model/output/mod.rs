@@ -6,75 +6,133 @@
 mod geometry_output;
 mod output_type;
 
+use std::rc::Rc;
+
+use cgmath::SquareMatrix;
 pub use geometry_output::*;
 pub use output_type::*;
 
-use cgmath::SquareMatrix;
-use microcad_core::{Mat3, Mat4, RenderResolution};
+use microcad_core::{Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
+
+use crate::model::{Model, render::RenderResult};
 
 /// The model output when a model has been processed.
 #[derive(Debug, Clone)]
-pub struct ModelOutput {
-    /// The output geometry.
-    pub geometry: GeometryOutput,
-    /// World transformation matrix.
-    pub world_matrix: Mat4,
-    /// Local transformation matrix.
-    pub local_matrix: Mat4,
-    /// The render resolution, calculated from transformation matrix.
-    pub resolution: RenderResolution,
+pub enum RenderOutput {
+    Geometry2D {
+        /// Local transformation matrix.
+        local_matrix: Mat3,
+        /// World transformation matrix.
+        world_matrix: Option<Mat3>,
+        /// The render resolution, calculated from transformation matrix.
+        resolution: Option<RenderResolution>,
+        /// The output geometry.
+        geometry: Option<Rc<Geometry2D>>,
+    },
+
+    Geometry3D {
+        /// Local transformation matrix.
+        local_matrix: Mat4,
+        /// World transformation matrix.
+        world_matrix: Option<Mat4>,
+        /// The render resolution, calculated from transformation matrix.
+        resolution: Option<RenderResolution>,
+        /// The output geometry.
+        geometry: Option<Rc<Geometry3D>>,
+    },
 }
 
-impl ModelOutput {
-    /// Create a new model output from model output type.
-    pub fn new(ty: OutputType) -> Self {
-        let geometry = match ty {
-            OutputType::NotDetermined => GeometryOutput::None,
-            OutputType::Geometry2D => GeometryOutput::Geometry2D(None),
-            OutputType::Geometry3D => GeometryOutput::Geometry3D(None),
-            OutputType::InvalidMixed => GeometryOutput::Invalid,
-        };
+impl RenderOutput {
+    pub fn new(model: &Model) -> RenderResult<Option<Self>> {
+        let output_type = model.deduce_output_type();
 
-        Self {
-            geometry,
-            ..Default::default()
+        Ok(match output_type {
+            OutputType::Geometry2D => {
+                let local_matrix = model
+                    .borrow()
+                    .element
+                    .get_affine_transform()?
+                    .map(|affine_transform| affine_transform.mat2d())
+                    .unwrap_or(Mat3::identity());
+
+                Some(RenderOutput::Geometry2D {
+                    local_matrix,
+                    world_matrix: None,
+                    resolution: None,
+                    geometry: None,
+                })
+            }
+
+            OutputType::Geometry3D => {
+                let local_matrix = model
+                    .borrow()
+                    .element
+                    .get_affine_transform()?
+                    .map(|affine_transform| affine_transform.mat3d())
+                    .unwrap_or(Mat4::identity());
+
+                Some(RenderOutput::Geometry3D {
+                    local_matrix,
+                    world_matrix: None,
+                    resolution: None,
+                    geometry: None,
+                })
+            }
+            _ => None,
+        })
+    }
+
+    pub fn set_world_matrix(&mut self, m: Mat4) {
+        match self {
+            RenderOutput::Geometry2D { world_matrix, .. } => *world_matrix = Some(mat4_to_mat3(&m)),
+            RenderOutput::Geometry3D { world_matrix, .. } => {
+                *world_matrix = Some(m);
+            }
         }
     }
 
-    /// Get model output type from geometry.
-    pub fn output_type(&self) -> OutputType {
-        self.geometry.model_output_type()
+    pub fn resolution(&self) -> RenderResolution {
+        match self {
+            RenderOutput::Geometry2D { resolution, .. }
+            | RenderOutput::Geometry3D { resolution, .. } => {
+                resolution.as_ref().expect("Resolution").clone()
+            }
+        }
     }
 
-    /// Local 2D transformation matrix (from 3D matrix).
-    pub fn local_matrix_2d(&self) -> Mat3 {
-        let m = &self.local_matrix;
-        Mat3::from_cols(m.x.truncate_n(2), m.y.truncate_n(2), m.w.truncate_n(2))
+    pub fn set_resolution(&mut self, render_resolution: RenderResolution) {
+        match self {
+            RenderOutput::Geometry2D { resolution, .. }
+            | RenderOutput::Geometry3D { resolution, .. } => *resolution = Some(render_resolution),
+        }
     }
 
-    /// World 2D transformation matrix (from 3D matrix).
-    pub fn world_matrix_2d(&self) -> Mat3 {
-        let m = &self.world_matrix;
-        Mat3::from_cols(m.x.truncate_n(2), m.y.truncate_n(2), m.w.truncate_n(2))
-    }
-    /// Local 3D transformation matrix.
-    pub fn local_matrix_3d(&self) -> Mat4 {
-        self.local_matrix
+    pub fn local_matrix(&self) -> Mat4 {
+        match self {
+            RenderOutput::Geometry2D { local_matrix, .. } => mat3_to_mat4(local_matrix),
+            RenderOutput::Geometry3D { local_matrix, .. } => *local_matrix,
+        }
     }
 
-    /// World 3D transformation matrix.
-    pub fn world_matrix_3d(&self) -> Mat4 {
-        self.world_matrix
+    pub fn world_matrix(&self) -> Mat4 {
+        match self {
+            RenderOutput::Geometry2D { world_matrix, .. } => {
+                mat3_to_mat4(&world_matrix.expect("World matrix"))
+            }
+            RenderOutput::Geometry3D { world_matrix, .. } => world_matrix.expect("World matrix"),
+        }
     }
 }
 
-impl Default for ModelOutput {
-    fn default() -> Self {
-        Self {
-            geometry: Default::default(),
-            world_matrix: microcad_core::Mat4::identity(),
-            local_matrix: microcad_core::Mat4::identity(),
-            resolution: Default::default(),
-        }
-    }
+fn mat4_to_mat3(m: &Mat4) -> Mat3 {
+    Mat3::from_cols(m.x.truncate_n(2), m.y.truncate_n(2), m.w.truncate_n(2))
+}
+
+fn mat3_to_mat4(m: &Mat3) -> Mat4 {
+    Mat4::new(
+        m.x.x, m.x.y, 0.0, m.x.z, // First column: X basis + X translation
+        m.y.x, m.y.y, 0.0, m.y.z, // Second column: Y basis + Y translation
+        0.0, 0.0, 1.0, 0.0, // Z axis: identity (no change)
+        0.0, 0.0, 0.0, 1.0, // Homogeneous row
+    )
 }

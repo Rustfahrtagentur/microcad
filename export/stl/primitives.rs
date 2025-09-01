@@ -37,8 +37,9 @@ impl WriteStl for Model {
         assert_eq!(self.final_output_type(), OutputType::Geometry3D);
 
         let self_ = self.borrow();
-        let world_matrix = self_.output.world_matrix;
-        let render_resolution = self_.output.resolution.clone();
+        let output = self_.output.as_ref().expect("Render output");
+        let world_matrix = output.world_matrix();
+        let render_resolution = output.resolution().clone();
 
         // Render all output geometries.
         self.fetch_output_geometry_3d()

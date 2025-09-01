@@ -9,10 +9,11 @@ use std::rc::Rc;
 
 pub use cache::*;
 
+use cgmath::SquareMatrix;
 use microcad_core::*;
 use thiserror::Error;
 
-use crate::{model::*, value::ValueError};
+use crate::{eval::BuiltinWorkbenchKind, model::*, value::ValueError};
 
 /// An error that occurred during rendering.
 #[derive(Debug, Error)]
@@ -59,19 +60,7 @@ impl Model {
 
     /// Render geometries in 2D.
     pub fn render_geometry_2d(&self, cache: &mut RenderCache) -> RenderResult<Geometries2D> {
-        self.borrow().children.iter().try_fold(
-            Default::default(),
-            |mut geometries: Geometries2D, model| {
-                let model_ = model.borrow();
-                let mat = model_.output.local_matrix_2d();
-                geometries.push(
-                    model
-                        .process_2d(cache, model)?
-                        .transformed_2d(&model_.output.resolution, &mat),
-                );
-                Ok(geometries)
-            },
-        )
+        todo!()
     }
 
     /// Render geometries in 3D.
@@ -83,14 +72,50 @@ impl Model {
     ///
     /// Rendering the model means that all geometry is calculated and stored
     /// in the in the render cache.
-    pub fn render(&self, resolution: RenderResolution, _cache: &mut RenderCache) {
+    pub fn render(
+        &self,
+        resolution: RenderResolution,
+        _cache: &mut RenderCache,
+    ) -> RenderResult<()> {
+        pub fn create_render_output(model: &Model) -> RenderResult<()> {
+            let output = RenderOutput::new(model)?;
+            {
+                let mut model_ = model.borrow_mut();
+                model_.output = output;
+            };
+
+            model
+                .borrow()
+                .children
+                .iter()
+                .try_for_each(|model| create_render_output(model))
+        }
+
+        pub fn set_world_matrix(model: &Model, matrix: Mat4) -> RenderResult<()> {
+            let world_matrix = {
+                let mut model_ = model.borrow_mut();
+                let output = model_.output.as_mut().expect("Output");
+                let world_matrix = matrix * output.local_matrix();
+                output.set_world_matrix(world_matrix);
+                world_matrix
+            };
+
+            model
+                .borrow()
+                .children
+                .iter()
+                .try_for_each(|model| set_world_matrix(model, world_matrix))
+        }
+
         /// Set the resolution for this model.
         pub fn set_resolution(model: &Model, resolution: RenderResolution) {
             let new_resolution = {
                 let mut model_ = model.borrow_mut();
-                let new_resolution = resolution * model_.output.world_matrix;
-                model_.output.resolution = new_resolution.clone();
-                new_resolution
+                let output = model_.output.as_mut().expect("Output");
+
+                let resolution = resolution * output.world_matrix();
+                output.set_resolution(resolution.clone());
+                resolution
             };
 
             model.borrow().children.iter().for_each(|model| {
@@ -98,80 +123,47 @@ impl Model {
             });
         }
 
-        //set_matrix(self, Mat4::identity());
-        set_resolution(self, resolution);
+        pub fn render_geometry(model: &Model) {
+            let mut model_ = model.borrow_mut();
+            // Bottom up search
+            model_.children.iter().for_each(|model| {
+                render_geometry(model);
+            });
 
-        todo!("Implement render algorithm")
-    }
-}
+            let mut output = model_.output.as_mut().expect("Output");
 
-impl Operation for Model {
-    fn process_2d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry2D>> {
-        let mut geometries = Geometries2D::default();
-
-        let model_ = &model.borrow();
-        match &*model_.element {
-            Element::Group | Element::Workpiece(_) => {
-                model_.children().try_for_each(|n| -> RenderResult<_> {
-                    geometries.push(n.process_2d(cache, n)?.as_ref().clone());
-                    Ok(())
-                })?;
+            match output {
+                RenderOutput::Geometry2D {
+                    local_matrix,
+                    world_matrix,
+                    resolution,
+                    geometry,
+                } => {
+                    todo!();
+                    //*geometry = Some(element.render_2d());
+                }
+                RenderOutput::Geometry3D {
+                    local_matrix,
+                    world_matrix,
+                    resolution,
+                    geometry,
+                } => todo!(),
             }
-            Element::BuiltinWorkpiece(builtin_workpiece) => {
-                geometries.push(builtin_workpiece.call_2d(cache, model)?.as_ref().clone());
-                // TODO: Pass children geometry, too?
-                //model_
-                //    .children()
-                //    .for_each(|n| geometries.push(n.process_2d(cache, n).as_ref().clone()));
-            }
-            _ => {}
         }
 
-        Ok(Rc::new(Geometry2D::Collection(geometries.transformed_2d(
-            &model_.output.resolution,
-            &model_.output.local_matrix_2d(),
-        ))))
-    }
+        // Create specific render output with local matrix.
+        create_render_output(self);
 
-    fn process_3d(&self, _cache: &mut RenderCache, _model: &Model) -> RenderResult<Rc<Geometry3D>> {
-        todo!();
-    }
-}
+        // Calculate the world matrix.
+        set_world_matrix(self, Mat4::identity());
 
-impl FetchBounds2D for Model {
-    fn fetch_bounds_2d(&self) -> Bounds2D {
-        let mut bounds = Bounds2D::default();
+        // Calculate the resolution for the model.
+        set_resolution(self, resolution);
 
-        self.descendants().for_each(|model| {
-            let output = &model.borrow().output;
-            if let GeometryOutput::Geometry2D(Some(geometry)) = &output.geometry {
-                let mat = output.world_matrix_2d();
-                let resolution = &output.resolution;
-                bounds = bounds
-                    .clone()
-                    .extend(geometry.fetch_bounds_2d().transformed_2d(resolution, &mat));
-            }
-        });
+        eprintln!("Tree:\n{}", FormatTree(self));
 
-        bounds
-    }
-}
+        // Now we can render the geometry
 
-impl FetchBounds3D for Model {
-    fn fetch_bounds_3d(&self) -> Bounds3D {
-        self.descendants()
-            .fold(Bounds3D::default(), |mut bounds, model| {
-                let output = &model.borrow().output;
-                if let GeometryOutput::Geometry3D(Some(geometries)) = &output.geometry {
-                    let mat = output.world_matrix_3d();
-                    let resolution = &output.resolution;
-                    bounds = bounds.clone().extend(
-                        geometries
-                            .fetch_bounds_3d()
-                            .transformed_3d(resolution, &mat),
-                    );
-                }
-                bounds
-            })
+        todo!("Implement render algorithm")
     }
 }

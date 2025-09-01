@@ -5,10 +5,10 @@
 
 use std::io::BufWriter;
 
-use microcad_core::{theme::Theme, Color, Scalar};
-use microcad_lang::{builtin::*, model::*, parameter, value::*, Id};
+use microcad_core::{Color, Scalar, theme::Theme};
+use microcad_lang::{Id, builtin::*, model::*, parameter, value::*};
 
-use crate::svg::{writer::SvgWriter, SvgTagAttributes, WriteSvg};
+use crate::svg::{SvgTagAttributes, WriteSvg, writer::SvgWriter};
 
 /// SVG Exporter
 pub struct SvgExporter;
@@ -91,7 +91,9 @@ impl Exporter for SvgExporter {
     }
 
     fn export(&self, model: &Model, filename: &std::path::Path) -> Result<Value, ExportError> {
-        use microcad_core::FetchBounds2D;
+        todo!()
+        /*
+                use microcad_core::FetchBounds2D;
 
         if let Some(content_rect) = model.fetch_bounds_2d().rect() {
             log::debug!("Exporting into SVG file {filename:?}");
@@ -108,7 +110,7 @@ impl Exporter for SvgExporter {
 
             model.write_svg(&mut writer, &SvgTagAttributes::default())?;
         }
-        Ok(Value::None)
+        Ok(Value::None)*/
     }
 
     fn output_type(&self) -> OutputType {
