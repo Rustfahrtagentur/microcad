@@ -19,7 +19,7 @@ pub use resolution::ResolutionAttribute;
 
 use crate::{create_tuple_value, syntax::*, value::*};
 
-use microcad_core::{theme::Theme, Color, Size2};
+use microcad_core::{Color, Size2, theme::Theme};
 
 /// A custom command attribute from an exporter, e.g.: `svg = (style = "fill:none")`
 #[derive(Clone, Debug)]
@@ -145,6 +145,17 @@ pub trait AttributesAccess {
         match self.get_single_attribute(id) {
             Some(attribute) => attribute.into(),
             None => Value::None,
+        }
+    }
+
+    /// Get resolution attribute.
+    fn get_resolution(&self) -> Option<ResolutionAttribute> {
+        match self.get_single_attribute(&Identifier::no_ref("resolution")) {
+            Some(value) => match value {
+                Attribute::Resolution(resolution) => Some(resolution),
+                _ => unreachable!(),
+            },
+            None => None,
         }
     }
 
