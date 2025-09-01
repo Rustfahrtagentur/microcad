@@ -1,4 +1,4 @@
-# Translate `std::ops::tration`
+# Translate `std::ops::translation`
 
 We can translate objects in 2D and 3D using `std::ops::transate`:
 
