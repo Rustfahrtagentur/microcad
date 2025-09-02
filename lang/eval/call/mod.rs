@@ -4,18 +4,14 @@
 //! µcad Call related evaluation entities
 
 #[macro_use]
-mod argument_value;
 mod argument;
-mod argument_value_list;
 mod call_method;
 mod call_trait;
 
-pub use argument_value::*;
-pub use argument_value_list::*;
 pub use call_method::*;
 pub use call_trait::*;
 
-use crate::{eval::*, syntax::*};
+use crate::{eval::*, syntax::*, value::*};
 
 use thiserror::Error;
 
