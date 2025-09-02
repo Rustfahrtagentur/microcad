@@ -39,9 +39,9 @@ and is mentioned just once which makes changes in the code more easy.
 If we examine the syntax of the above example, we can see the following things:
 
 * Names of sketches are commonly written in `PascalCase`, starting with a capital letter.
-* The sketch `Base` has 3 parameters `width`, `height` and `wall_width`. These parameters are called *building plan*.
+* The sketch `Base` has 3 parameters `width`, `height` and `thickness`. These parameters are called *building plan*.
 * `width` and `height` have the type `Length` and no default value, they are *required*.
-* `wall_width` is also of type value, but implicitly, because we have a default value `1.2mm`.
+* `thickness` is also of type value, but implicitly, because we have a default value `1.2mm`.
 * The body `{ ... }` of `Base` constructs the actual geometry.
 * `Base(width = 15.8mm, height = 31.8mm)` is a call of the sketch.
 

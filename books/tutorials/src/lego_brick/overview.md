@@ -11,8 +11,8 @@ use std::ops::*;
 const SPACING = 8mm;
 
 sketch Base(width: Length, height: Length) {
-    wall_width = 1.2mm;
-    frame = Frame(width, height, thickness = wall_width);
+    thickness = 1.2mm;
+    frame = Frame(width, height, thickness);
     struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
         .translate(x = [0..3] * SPACING)
         .center();

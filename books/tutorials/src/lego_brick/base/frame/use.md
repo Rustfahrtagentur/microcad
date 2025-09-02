@@ -26,6 +26,6 @@ height = 15.8mm;
 }.difference();
 ```
 
-![test](.test/use-out.svg)
+![Picture](.test/use-out.svg)
 
 As you can see, this makes the code much simpler and clearer.

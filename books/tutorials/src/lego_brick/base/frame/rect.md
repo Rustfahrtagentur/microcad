@@ -55,7 +55,7 @@ Now, we can execute the export command from the command line tool:
 microcad export lego_brick.µcad
 ```
 
-The `export` command will produce an *Scalable Vector Graphic* (SVG) file named `lego_brick.svg`
+The `export` command will produce a *Scalable Vector Graphic* (SVG) file named `lego_brick.svg`
 next to the `lego_brick.µcad` file.
 By default, all 2D geometries are exported to *SVG*.
 

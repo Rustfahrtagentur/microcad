@@ -11,7 +11,7 @@ First you may need to install rust like described at
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-### Install microcad
+## Install microcad
 
 Then execute this command on the shell to install microcad.
 

@@ -19,7 +19,7 @@ pub struct SourceFile {
 
     /// Hash of the source file
     ///
-    /// This hash is calculated from the the source code itself
+    /// This hash is calculated from the source code itself
     /// This is used to map `SrcRef` -> `SourceFile`
     pub hash: u64,
 }

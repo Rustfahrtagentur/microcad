@@ -1,4 +1,4 @@
-# Creating the the frame
+# Creating the frame
 
 The first geometry we want to construct is the frame of the brick's base.
 It consists of an outer and an inner rectangle.
