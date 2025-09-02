@@ -6,16 +6,24 @@
 //! Every evaluation of any *symbol* leads to a [`Value`] which then might continued
 //! to process or ends up as the overall evaluation result.
 
+mod argument_value;
+mod argument_value_list;
 mod array;
 mod matrix;
+mod parameter_value;
+mod parameter_value_list;
 mod quantity;
 mod tuple;
 mod value_access;
 mod value_error;
 mod value_list;
 
+pub use argument_value::*;
+pub use argument_value_list::*;
 pub use array::*;
 pub use matrix::*;
+pub use parameter_value::*;
+pub use parameter_value_list::*;
 pub use quantity::*;
 pub use tuple::*;
 pub use value_access::*;
