@@ -157,7 +157,7 @@ fn rotate_around_axis() -> Symbol {
         ) {
             Ok(ref args) => {
                 let angle = get_angle(args, "angle");
-                let axis = Vec3::new(args.get("x")?, args.get("y")?, args.get("z")?);
+                let axis = Vec3::new(args.get("x"), args.get("y"), args.get("z"));
 
                 let matrix = Mat3::from_axis_angle(axis, angle);
                 Ok(Value::Matrix(Box::new(Matrix::Matrix3(matrix))))

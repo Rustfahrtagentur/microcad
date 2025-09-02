@@ -1,9 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use geo::coord;
-use microcad_core::*;
-use microcad_lang::{eval::*, parameter, value::*};
+use microcad_lang::builtin::*;
 
 pub struct Line;
 
@@ -17,12 +15,15 @@ impl BuiltinWorkbenchDefinition for Line {
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        use geo::coord;
+        use microcad_core::*;
+
         &|args| {
             let (x0, y0, x1, y1) = (
-                args.get("x0")?,
-                args.get("y0")?,
-                args.get("x1")?,
-                args.get("y1")?,
+                args.get("x0"),
+                args.get("y0"),
+                args.get("x1"),
+                args.get("y1"),
             );
 
             Ok(BuiltinWorkpieceOutput::Geometry2D(Geometry2D::Line(

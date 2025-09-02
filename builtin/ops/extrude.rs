@@ -1,20 +1,11 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::rc::Rc;
-
 use microcad_core::*;
-use microcad_lang::{
-    eval::*,
-    model::{
-        render::{RenderCache, RenderResult},
-        *,
-    },
-    parameter,
-    value::*,
-};
+use microcad_lang::{builtin::*, model::*, render::*};
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct Extrude {
     height: Scalar,
     n_divisions: Integer,
@@ -28,7 +19,9 @@ impl Operation for Extrude {
         OutputType::Geometry3D
     }
 
-    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry3D>> {
+    fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        todo!()
+        /*
         use std::rc::Rc;
         let geometries = model.render_geometry_2d(cache)?;
 
@@ -49,7 +42,7 @@ impl Operation for Extrude {
             self.twist_degrees,
             self.scale_top_x,
             self.scale_top_y,
-        )))))
+        )))))*/
     }
 }
 
@@ -65,16 +58,16 @@ impl BuiltinWorkbenchDefinition for Extrude {
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
         &|args| {
             Ok(BuiltinWorkpieceOutput::Operation(Box::new(Extrude {
-                height: args.get("height")?,
-                n_divisions: args.get("n_divisions")?,
-                twist_degrees: args.get("twist_degrees")?,
-                scale_top_x: args.get("scale_top_x")?,
-                scale_top_y: args.get("scale_top_y")?,
+                height: args.get("height"),
+                n_divisions: args.get("n_divisions"),
+                twist_degrees: args.get("twist_degrees"),
+                scale_top_x: args.get("scale_top_x"),
+                scale_top_y: args.get("scale_top_y"),
             })))
         }
     }
 
-    fn parameters() -> microcad_lang::eval::ParameterValueList {
+    fn parameters() -> ParameterValueList {
         [
             parameter!(height: Scalar),
             parameter!(n_divisions: Integer),

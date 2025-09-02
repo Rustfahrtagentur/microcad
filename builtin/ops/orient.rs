@@ -1,8 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_core::Vec3;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{builtin::*, model::*};
 
 /// Builtin definition to orient an object towards an axis.
 #[derive(Debug)]
@@ -18,12 +17,13 @@ impl BuiltinWorkbenchDefinition for Orient {
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        use microcad_core::Vec3;
         &|args| {
             Ok(BuiltinWorkpieceOutput::Transform(
                 AffineTransform::Rotation(crate::math::orient_z_to(Vec3::new(
-                    args.get("x")?,
-                    args.get("y")?,
-                    args.get("z")?,
+                    args.get("x"),
+                    args.get("y"),
+                    args.get("z"),
                 ))),
             ))
         }

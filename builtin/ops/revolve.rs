@@ -1,20 +1,11 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::rc::Rc;
-
 use microcad_core::*;
-use microcad_lang::{
-    eval::*,
-    model::{
-        render::{RenderCache, RenderResult},
-        *,
-    },
-    parameter,
-    value::*,
-};
+use microcad_lang::{builtin::*, model::*, render::*};
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct Revolve {
     circular_segments: Integer,
     revolve_degrees: Scalar,
@@ -25,8 +16,9 @@ impl Operation for Revolve {
         OutputType::Geometry3D
     }
 
-    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry3D>> {
-        use std::rc::Rc;
+    fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        todo!()
+        /*use std::rc::Rc;
         let geometries = model.render_geometry_2d(cache)?;
 
         let model_ = model.borrow();
@@ -43,7 +35,7 @@ impl Operation for Revolve {
             &multi_polygon_data,
             self.circular_segments as u32,
             self.revolve_degrees,
-        )))))
+        )))))*/
     }
 }
 
@@ -59,8 +51,8 @@ impl BuiltinWorkbenchDefinition for Revolve {
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
         &|args| {
             Ok(BuiltinWorkpieceOutput::Operation(Box::new(Revolve {
-                circular_segments: args.get("circular_segments")?,
-                revolve_degrees: args.get("revolve_degrees")?,
+                circular_segments: args.get("circular_segments"),
+                revolve_degrees: args.get("revolve_degrees"),
             })))
         }
     }

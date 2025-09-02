@@ -1,8 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_core::*;
-use microcad_lang::{eval::*, parameter, value::*};
+use microcad_lang::builtin::*;
 
 pub struct Cylinder;
 
@@ -16,12 +15,13 @@ impl BuiltinWorkbenchDefinition for Cylinder {
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        use microcad_core::*;
         &|args| {
             Ok(BuiltinWorkpieceOutput::Geometry3D(Geometry3D::Cylinder(
                 geo3d::Cylinder {
-                    radius_bottom: args.get("radius_bottom")?,
-                    radius_top: args.get("radius_top")?,
-                    height: args.get("height")?,
+                    radius_bottom: args.get("radius_bottom"),
+                    radius_top: args.get("radius_top"),
+                    height: args.get("height"),
                 },
             )))
         }

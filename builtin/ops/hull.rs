@@ -1,37 +1,33 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::rc::Rc;
+//! Builtin hull operation.
 
-use microcad_core::*;
-use microcad_lang::{
-    eval::*,
-    model::{
-        render::{RenderCache, RenderResult},
-        *,
-    },
-};
+use microcad_lang::{builtin::*, render::*};
 
 #[derive(Debug)]
 pub struct Hull;
 
 impl Operation for Hull {
-    fn process_2d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry2D>> {
+    fn process_2d(&self, _context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
+        todo!()
+        /*
         let model_ = model.borrow();
         let output = model_.output.as_ref().expect("Some render output");
 
         Ok(Rc::new(Geometry2D::Polygon(
             model.render_geometry_2d(cache)?.hull(&output.resolution()),
-        )))
+        ))) */
     }
 
-    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry3D>> {
-        let model_ = model.borrow();
+    fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        todo!()
+        /*let model_ = model.borrow();
         let output = model_.output.as_ref().expect("Some render output");
 
         Ok(Rc::new(Geometry3D::Manifold(Rc::new(
             model.render_geometry_3d(cache)?.hull(&output.resolution()),
-        ))))
+        ))))*/
     }
 }
 
