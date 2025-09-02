@@ -1,0 +1,77 @@
+-- Test --
+  first_version
+  ../books/tutorials/src/lego_brick/part/first.md:10
+
+-- Code --
+
+ 1: use std::ops::*;
+ 2: use std::geo2d::*;
+ 3: 
+ 4: const SPACING = 8mm;
+ 5: 
+ 6: sketch Base(width: Length, height: Length) {
+ 7:     thickness = 1.2mm;
+ 8:     frame = Frame(width, height, thickness);
+ 9:     struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
+10:         .translate(y = [-1..1] * SPACING)
+11:         .center();
+12:     frame | struts;
+13: }
+14: 
+15: use Rect as Cap;
+16: 
+17: sketch Knobs() {
+18:     center = (x = [0..3] * SPACING, y = [0..1] * SPACING);
+19:     Circle(diameter = 4.8mm, center).center();
+20: }
+21: 
+22: part LegoBrick(base_height = 9.6mm) {
+23:     width = 15.8mm;
+24:     height = 31.8mm;
+25:     top_thickness = 1.0mm;
+26: 
+27:     base = Base(width, height)
+28:         .extrude(base_height);
+29: 
+30:     cap = Cap(width, height)
+31:         .extrude(top_thickness)
+32:         .translate(z = base_height - top_thickness);
+33: 
+34:     knobs = Knobs()
+35:         .extrude(1.7mm)
+36:         .translate(z = base_height);
+37: 
+38:     // Combine all components
+39:     base | cap | knobs;
+40: }
+41: 
+42: LegoBrick();
+
+-- Output --
+-- Errors --
+error: Symbol center not found.
+  ---> <FROM STR>:11:10
+     |
+  11 |         .center();
+     |          ^^^^^^
+     |
+error: Symbol `center` cannot be called (constant) = (x: [0mm, 8mm, 16mm], y: [0mm]).
+  ---> <FROM STR>:19:38
+     |
+  19 |     Circle(diameter = 4.8mm, center).center();
+     |                                      ^^^^^^
+     |
+warning: This expression statement did not produce any model
+  ---> <FROM STR>:19:5
+     |
+  19 |     Circle(diameter = 4.8mm, center).center();
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+warning: The sketch workbench will produce no 2D output.
+  ---> <FROM STR>:17:1
+     |
+  17 | sketch Knobs() {
+     | ^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAIL

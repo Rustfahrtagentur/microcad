@@ -10,8 +10,10 @@ This will create a file `lego_brick.µcad`.
 
 Let's open this file in VSCode:
 
+[![test](.test/create.svg)](.test/create.log)
+
 ```µcad,create
-// µcad generated file
+// microcad generated file
 
 sketch YourSketch( /* your building plan */ ) {
     // your code

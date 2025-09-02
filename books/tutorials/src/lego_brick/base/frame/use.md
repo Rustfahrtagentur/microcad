@@ -11,7 +11,9 @@ Writing `std::ops` and `std::geo2d` in front of each element seems redundant and
 Luckily, µcad has syntax element called [*use statements*](../structure/use.md).
 This means, from the previous code, we can simply write:
 
-```µcad,tutorial_2d_use
+[![test](.test/use.svg)](.test/use.log)
+
+```µcad,use
 use std::geo2d::Rect;
 use std::ops::difference;
 
@@ -23,5 +25,7 @@ height = 15.8mm;
     Rect(width = width - 2 * thickness, height = height - 2 * thickness);
 }.difference();
 ```
+
+![test](.test/use-out.svg)
 
 As you can see, this makes the code much simpler and clearer.

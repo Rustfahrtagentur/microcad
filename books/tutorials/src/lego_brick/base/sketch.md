@@ -14,19 +14,23 @@ There *three* kinds of workbenches:
 
 Let's *encapsulate* the construction of the frame into a `sketch` workbench called `Base`.
 
-```µcad,tutorial_sketch_base
+[![test](.test/base.svg)](.test/base.log)
+
+```µcad,base
 use std::geo2d::*;
 use std::ops::*;
 
 sketch Base(width: Length, height: Length, thickness = 1.2mm) {
     frame = Frame(width, height, thickness);
-    struts = Ring(outer = 6.51mm, inner = 4.8mm)
-             .translate(x = [-1..1] * 8mm);
+    struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
+             .translate(x = [-1..2] * 8mm);
     frame | struts;
 }
 
-Base(width = 15.8mm, height = 31.8mm);
+Base(width = 31.8mm, height = 15.8mm);
 ```
+
+![Picture](.test/base-out.svg)
 
 You may see that we do not even need extra value stores for our measures.
 Written like above it seems like every measure is related to a meaningful name
@@ -53,6 +57,5 @@ If we draw an analogy to natural language, we can summarize:
 * Assignments `a = Rect(...)` are used to give things a unique name: `"a" is a rectangle`.
 
 This analogy helps illustrate how the µcad syntax is designed to be both readable and logical, resembling the structure of natural language in a way that makes the code easier to understand.
-
 
 Now, we have seen all concepts to actually design our Lego brick in 3D.

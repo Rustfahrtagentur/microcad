@@ -6,7 +6,12 @@ use scan_dir::ScanDir;
 use std::fs;
 
 fn main() -> std::io::Result<()> {
-    let search_path = "./doc";
+    scan_path("./doc")?;
+    scan_path("./books")?;
+    Ok(())
+}
+
+fn scan_path(search_path: &str) -> std::io::Result<()> {
     let extensions = [".md"];
 
     let re_test = Regex::new(r"\[!\[test\].*\n\n").unwrap();

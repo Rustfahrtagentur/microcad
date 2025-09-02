@@ -4,7 +4,9 @@ During the design process, we will add more geometry to our design.
 Therefore, it is useful to identify each sub-geometry by a name.
 In the next we want to give the rectangle a name `outer`, so we can identify it more easily:
 
-```µcad,tutorial_2d_assignment
+[![test](.test/assignment.svg)](.test/assignment.log)
+
+```µcad,assignment
 outer = std::geo2d::Rect(width = 31.8mm, height = 15.8mm);
 ```
 
@@ -16,17 +18,23 @@ you will notice that nothing is exported.
 Why? Because in µcad, assignments are not part of the output geometry.
 A second statement `outer;` is needed to output the geometry stored in the `outer` variable.
 
-```µcad,tutorial_2d_output
+[![test](.test/output.svg)](.test/output.log)
+
+```µcad,output
 outer = std::geo2d::Rect(width = 31.8mm, height = 15.8mm);
 outer;
 ```
+
+![Picture](.test/output-out.svg)
 
 Naming the rectangles leads to some better readability but the code will get quite a bit longer, because
 for each rectangle we now need a second statement to render them.
 
 This makes more sense, if you use an *Operator* (`-`) instead of an *Operation* (`subtract()`).
 
-```µcad,tutorial_2d_operator
+[![test](.test/operator.svg)](.test/operator.log)
+
+```µcad,operator
 use std::geo2d::Rect;
 
 thickness = 1.2mm;
@@ -40,6 +48,8 @@ inner = Rect(width = width - 2 * thickness, height = height - 2 * thickness);
 // what was { .. }.subtract() before:
 outer - inner;
 ```
+
+![Picture](.test/operator-out.svg)
 
 Now any reader can easily understand what's going on.
 

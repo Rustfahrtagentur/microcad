@@ -1,0 +1,15 @@
+-- Test --
+  ranges
+  ../books/tutorials/src/lego_brick/base/struts/range.md:7
+
+-- Code --
+
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: (Circle(d = 6.51mm) - Circle(d = 4.8mm)).translate(x = [-1..2] * 8mm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

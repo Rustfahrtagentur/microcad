@@ -1,0 +1,13 @@
+-- Test --
+  inner
+  ../books/tutorials/src/lego_brick/base/frame/rect.md:25
+
+-- Code --
+
+ 1: thickness = 1.2mm;
+ 2: std::geo2d::Rect(width = 31.8mm - 2 * thickness, height = 15.8mm - 2 * thickness);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

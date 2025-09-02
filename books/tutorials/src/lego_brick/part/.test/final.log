@@ -1,0 +1,81 @@
+-- Test --
+  final
+  ../books/tutorials/src/lego_brick/part/final.md:15
+
+-- Code --
+
+ 1: use std::ops::*;
+ 2: use std::geo2d::*;
+ 3: 
+ 4: const SPACING = 8mm;
+ 5: 
+ 6: op grid(rows: Integer, columns: Integer) {
+ 7:     @children
+ 8:         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
+ 9:         .center()
+10: }
+11: 
+12: sketch Base(rows: Integer, columns: Integer, width: Length, height: Length) {
+13:     thickness = 1.2mm;
+14:     frame = Frame(width, height, thickness);
+15:     struts = Ring(outer = 6.51mm, inner = 4.8mm)
+16:         .grid(rows = rows - 1, columns = columns - 1);
+17:     frame | struts;
+18: }
+19: 
+20: use Rect as Cap;
+21: 
+22: sketch Knobs(rows: Integer, columns: Integer) {
+23:     Circle(d = 4.8mm).grid(rows, columns);
+24: }
+25: 
+26: part LegoBrick(rows = 4, columns = 2, base_height = 9.6mm) {
+27:     width = rows * SPACING - 0.2mm;
+28:     height = columns * SPACING - 0.2mm;
+29:     cap_thickness = 1.0mm;
+30: 
+31:     base = Base(rows, columns, width, height)
+32:         .extrude(base_height - cap_thickness);
+33: 
+34:     cap = Cap(width, height)
+35:         .extrude(cap_thickness)
+36:         .translate(z = base_height - cap_thickness);
+37: 
+38:     knobs = Knobs(rows, columns)
+39:         .extrude(1.7mm)
+40:         .translate(z = base_height);
+41: 
+42:     base | cap | knobs;
+43: }
+44: 
+45: // render a brick with default values
+46: LegoBrick();
+
+-- Output --
+-- Errors --
+error: Symbol center not found.
+  ---> <FROM STR>:9:10
+     |
+   9 |         .center()
+     |          ^^^^^^
+     |
+warning: This expression statement did not produce any model
+  ---> <FROM STR>:7:5
+     |
+   7 |     @children
+     |     ^^^^^^^^^^^^^
+     |
+error: Symbol center not found.
+  ---> <FROM STR>:9:10
+     |
+   9 |         .center()
+     |          ^^^^^^
+     |
+warning: This expression statement did not produce any model
+  ---> <FROM STR>:7:5
+     |
+   7 |     @children
+     |     ^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAIL

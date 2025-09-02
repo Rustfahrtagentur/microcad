@@ -1,0 +1,42 @@
+-- Test --
+  custom_op
+  ../books/tutorials/src/lego_brick/part/custom_op.md:33
+
+-- Code --
+
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: const SPACING = 8mm;
+ 5: 
+ 6: op grid(rows: Integer, columns: Integer) {
+ 7:     @children
+ 8:         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
+ 9:         .center()
+10: }
+11: 
+12: sketch Base(
+13:     rows: Integer,
+14:     columns: Integer,
+15:     width: Length,
+16:     height: Length
+17: ) {
+18:     thickness = 1.2mm,
+19:     frame = Frame(width, height, thickness);
+20:     struts = (Ring(outer = 6.51mm, inner = 4.8mm)).grid(rows, columns);
+21:     frame | struts;
+22: }
+23: 
+24: sketch Knobs(rows: Integer, columns: Integer) {
+25:     Circle(d = 4.8mm).grid(rows, columns);
+26: }
+
+-- Parse Error --
+Parser error:   --> 18:22
+   |
+18 |     thickness = 1.2mm,
+   |                      ^---
+   |
+   = expected single_line_comment, array_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersection, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
+-- Test Result --
+FAIL

@@ -1,0 +1,13 @@
+-- Test --
+  output
+  ../books/tutorials/src/lego_brick/base/frame/naming.md:23
+
+-- Code --
+
+ 1: outer = std::geo2d::Rect(width = 31.8mm, height = 15.8mm);
+ 2: outer;
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

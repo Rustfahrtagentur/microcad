@@ -1,0 +1,15 @@
+-- Test --
+  cap
+  ../books/tutorials/src/lego_brick/caps_knobs.md:12
+
+-- Code --
+
+ 1: // alias Rect as Cap
+ 2: use std::geo2d::Rect as Cap;
+ 3: 
+ 4: Cap(width = 31.8mm, height = 15.8mm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

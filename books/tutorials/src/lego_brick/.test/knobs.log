@@ -1,0 +1,35 @@
+-- Test --
+  knobs
+  ../books/tutorials/src/lego_brick/caps_knobs.md:67
+
+-- Code --
+
+ 1: sketch Knobs(diameter = 4.8mm) {
+ 2:     std::geo2d::Circle(d = 4.8mm, c = (x = [0..3] * 8mm, y = [0..1] * 8mm))
+ 3:         .center();
+ 4: }
+ 5: 
+ 6: Knobs();
+
+-- Output --
+-- Errors --
+error: Symbol center not found.
+  ---> <FROM STR>:3:10
+     |
+   3 |         .center();
+     |          ^^^^^^
+     |
+warning: This expression statement did not produce any model
+  ---> <FROM STR>:2:5
+     |
+   2 |     std::geo2d::Circle(d = 4.8mm, c = (x = [0..3] * 8mm, y = [0..1] * 8mm))
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+warning: The sketch workbench will produce no 2D output.
+  ---> <FROM STR>:1:1
+     |
+   1 | sketch Knobs(diameter = 4.8mm) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAIL

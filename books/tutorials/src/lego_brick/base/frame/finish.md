@@ -11,6 +11,8 @@ Fortunately, µcad has a ready-to-go sketch to construct a frame geometry like w
 in the `std` library: the `Frame` sketch.
 Using it, we can achieve the same result as before but with a much simpler expression:
 
+[![test](.test/frame.svg)](.test/frame.log)
+
 ```µcad,frame
 // Include all from std::geo2d using * (including Frame)
 use std::geo2d::*;
@@ -20,13 +22,15 @@ width = 31.8mm;
 height = 15.8mm;
 
 // Construct a frame
-frame = Frame(width, height, thickness);
+Frame(width, height, thickness);
 ```
+
+![Picture](.test/frame-out.svg)
 
 Because `Frame` has three parameters called exactly like our value names,
 we do not need to write parameter names at all here.
 This is called *auto-matching* and prevents us from having to write this:
 
 ```µcad
-frame = Frame(width = width, height = height, thickness = thickness);
+Frame(width = width, height = height, thickness = thickness);
 ```

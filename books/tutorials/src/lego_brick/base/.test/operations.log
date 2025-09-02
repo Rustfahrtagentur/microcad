@@ -1,0 +1,22 @@
+-- Test --
+  operations
+  ../books/tutorials/src/lego_brick/base/union.md:11
+
+-- Code --
+
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: wall_width = 1.2mm;
+ 5: width = 31.8mm;
+ 6: height = 15.8mm;
+ 7: frame = Frame(width, height, thickness = wall_width);
+ 8: struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
+ 9:              .translate(x = [-1..2] * 8mm);
+10: 
+11: frame | struts;
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

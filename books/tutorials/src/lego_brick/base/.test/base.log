@@ -1,0 +1,22 @@
+-- Test --
+  base
+  ../books/tutorials/src/lego_brick/base/sketch.md:19
+
+-- Code --
+
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: sketch Base(width: Length, height: Length, thickness = 1.2mm) {
+ 5:     frame = Frame(width, height, thickness);
+ 6:     struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
+ 7:              .translate(x = [-1..2] * 8mm);
+ 8:     frame | struts;
+ 9: }
+10: 
+11: Base(width = 31.8mm, height = 15.8mm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

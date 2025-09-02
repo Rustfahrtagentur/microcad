@@ -1,0 +1,12 @@
+-- Test --
+  rect
+  ../books/tutorials/src/lego_brick/base/frame/rect.md:10
+
+-- Code --
+
+ 1: std::geo2d::Rect(width = 31.8mm, height = 15.8mm);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

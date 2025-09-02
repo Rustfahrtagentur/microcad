@@ -8,7 +8,9 @@ the same file but to build a frame from this we need to combine them.
 The first step is to bundle the rectangles into a group with curly brackets `{}`.
 So let's put some around the frame's rectangles.
 
-```µcad,tutorial_2d_group
+[![test](.test/group.svg)](.test/group.log)
+
+```µcad,group
 thickness = 1.2mm;
 width = 31.8mm;
 height = 15.8mm;
@@ -17,6 +19,8 @@ height = 15.8mm;
     std::geo2d::Rect(width = width - 2 * thickness, height = height - 2 * thickness);
 }
 ```
+
+![Picture](.test/group-out.svg)
 
 As you can see, there is no `;` after the braces.
 
@@ -28,7 +32,9 @@ by using an *operation*:
 In µcad, the operation to subtract a geometry from one another is called [`subtract`](../libs/std/ops/subtract.md).
 On our case, we want to subtract the outer part by the inner part in our frame group:
 
-```µcad,tutorial_2d_difference
+[![test](.test/difference.svg)](.test/difference.log)
+
+```µcad,difference
 thickness = 1.2mm;
 width = 31.8mm;
 height = 15.8mm;
@@ -37,5 +43,7 @@ height = 15.8mm;
     std::geo2d::Rect(width = width - 2 * thickness, height = height - 2 * thickness);
 }.std::ops::difference();   // Apply the operation.
 ```
+
+![Picture](.test/difference-out.svg)
 
 Now the semicolon is back, because we added the operation.

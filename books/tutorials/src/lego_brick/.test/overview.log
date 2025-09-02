@@ -1,0 +1,67 @@
+-- Test --
+  overview
+  ../books/tutorials/src/lego_brick/overview.md:7
+
+-- Code --
+
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: const SPACING = 8mm;
+ 5: 
+ 6: sketch Base(width: Length, height: Length) {
+ 7:     wall_width = 1.2mm;
+ 8:     frame = Frame(width, height, thickness = wall_width);
+ 9:     struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
+10:         .translate(x = [0..3] * SPACING)
+11:         .center();
+12:     frame | struts;
+13: }
+14: 
+15: use Rect as Cap;
+16: 
+17: sketch Knobs() {
+18:     Circle(d = 4.8mm, center = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
+19: }
+20: 
+21: width = 15.8mm;
+22: height = 31.8mm;
+23: 
+24: Base(width, height);
+25: Cap(width, height);
+26: Knobs();
+
+-- Output --
+-- Errors --
+error: Symbol center not found.
+  ---> <FROM STR>:11:10
+     |
+  11 |         .center();
+     |          ^^^^^^
+     |
+error: Workbench Circle cannot find initialization for those arguments
+  ---> <FROM STR>:18:12
+     |
+  18 |     Circle(d = 4.8mm, center = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
+     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol center not found.
+  ---> <FROM STR>:18:78
+     |
+  18 |     Circle(d = 4.8mm, center = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
+     |                                                                              ^^^^^^
+     |
+warning: This expression statement did not produce any model
+  ---> <FROM STR>:18:5
+     |
+  18 |     Circle(d = 4.8mm, center = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+warning: The sketch workbench will produce no 2D output.
+  ---> <FROM STR>:17:1
+     |
+  17 | sketch Knobs() {
+     | ^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAIL

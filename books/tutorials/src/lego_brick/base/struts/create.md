@@ -7,7 +7,9 @@ The shape of each strut remains the same - they’re simply offset horizontally 
 From the concept we know already, a first solution could be to write the strut three times
 and translating them using `std::ops::translate()`.
 
-```µcad,tutorial_sketch_multiple
+[![test](.test/multiple.svg)](.test/multiple.log)
+
+```µcad,multiple
 use std::geo2d::*;
 use std::ops::*;
 
@@ -15,6 +17,8 @@ Circle(d = 6.51mm) - Circle(d =  4.8mm);
 (Circle(d = 6.51mm) - Circle(d =  4.8mm)).translate(x = 8mm);
 (Circle(d = 6.51mm) - Circle(d =  4.8mm)).translate(x = -8mm);
 ```
+
+![Picture](.test/multiple-out.svg)
 
 The code above produces the expected result. However, the code is quite repetitive.
 We could improve it slightly by storing the expression `Circle(d = 6.51mm) - Circle(d = 4.8mm)` in a variable, say `strut`.

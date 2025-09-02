@@ -5,17 +5,19 @@ Let's make a brick out of our `Base`, the `Knobs` and the `Cap` sketch and integ
 We extrude `Base`, `Knobs` and `Cap` and translate it in Z direction if necessary.
 Afterwards, we combine the three components by the `|` operator.
 
-```µcad,tutorial_part_result
+[![test](.test/first_version.svg)](.test/first_version.log)
+
+```µcad,first_version
 use std::ops::*;
 use std::geo2d::*;
 
-spacing = 8mm;
+const SPACING = 8mm;
 
 sketch Base(width: Length, height: Length) {
     thickness = 1.2mm;
     frame = Frame(width, height, thickness);
     struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
-        .translate(y = [-1..1] * spacing)
+        .translate(y = [-1..1] * SPACING)
         .center();
     frame | struts;
 }
@@ -23,7 +25,8 @@ sketch Base(width: Length, height: Length) {
 use Rect as Cap;
 
 sketch Knobs() {
-    Circle(diameter = 4.8mm, center = (x = [0..3] * spacing, y = [0..1] * spacing)).center();
+    center = (x = [0..3] * SPACING, y = [0..1] * SPACING);
+    Circle(diameter = 4.8mm, center).center();
 }
 
 part LegoBrick(base_height = 9.6mm) {
@@ -51,4 +54,4 @@ LegoBrick();
 
 When we take the code snippet above and export it, instead of an SVG, an STL file will be exported:
 
-![Picture]()
+![Picture](.test/first_version-out.svg)

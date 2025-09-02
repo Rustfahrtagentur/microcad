@@ -5,9 +5,13 @@ Maybe you already question yourself if there is something similar to `std::geo2d
 And yes there is, and it's called `std::geo2d::Ring`.
 So let's shorten our strut code a last time:
 
-```µcad,tutorial_struts_ring
+[![test](.test/ring.svg)](.test/ring.log)
+
+```µcad,ring
 use std::geo2d::*;
 use std::ops::*;
 
-Ring(outer = 6.51mm, inner = 4.8mm).translate(x = [-1..1] * 8mm);
+Ring(outer_d = 6.51mm, inner_d = 4.8mm).translate(x = [-1..2] * 8mm);
 ```
+
+![Picture](.test/ring-out.svg)

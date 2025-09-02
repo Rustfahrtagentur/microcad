@@ -5,9 +5,13 @@ To construct a rectangle in µcad, we use a sketch with the name `std::geo2d::Re
 Open the `lego_brick.µcad` file you have created before, delete all contents and
 replace it with the following single statement:
 
-```µcad,tutorial_2d_rect
+[![test](.test/rect.svg)](.test/rect.log)
+
+```µcad,rect
 std::geo2d::Rect(width = 31.8mm, height = 15.8mm);
 ```
+
+![Picture](.test/rect-out.svg)
 
 The statement above [calls](../structure/calls.md) a built-in sketch, `std::geo2d::Rect`,
 with the parameters `width` and `height` set to our measures.
@@ -16,10 +20,14 @@ Executing this statement will eventually construct the actual geometry.
 
 Like the outer frame, the inner frame is a `std::geo2d::Rect` too:
 
-```µcad,tutorial_2d_inner
+[![test](.test/inner.svg)](.test/inner.log)
+
+```µcad,inner
 thickness = 1.2mm;
 std::geo2d::Rect(width = 31.8mm - 2 * thickness, height = 15.8mm - 2 * thickness);
 ```
+
+![Picture](.test/inner-out.svg)
 
 We have defined a new value `thickness = 1.2mm` to store the frame's wall thickness.
 Then we construct a rectangle by taking the original width and height and subtracting
@@ -29,13 +37,17 @@ Now, we are able to output the inner and outer geometry at the same time.
 Similar to the `thickness = 1.2mm`, we also assign `width` and `height` their respective
 values to shorten the code:
 
-```µcad,tutorial_2d_inner_outer
+[![test](.test/inner_outer.svg)](.test/inner_outer.log)
+
+```µcad,inner_outer
 thickness = 1.2mm;
 width = 31.8mm;
 height = 15.8mm;
 std::geo2d::Rect(width, height);
 std::geo2d::Rect(width = width - 2 * thickness, height = height - 2 * thickness);
 ```
+
+![Picture](.test/inner_outer-out.svg)
 
 Now, we can execute the export command from the command line tool:
 
@@ -46,8 +58,6 @@ microcad export lego_brick.µcad
 The `export` command will produce an *Scalable Vector Graphic* (SVG) file named `lego_brick.svg`
 next to the `lego_brick.µcad` file.
 By default, all 2D geometries are exported to *SVG*.
-
-![Picture](lego_brick.svg)
 
 Congratulations, you have exported your first 2D geometry with µcad!
 

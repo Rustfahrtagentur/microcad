@@ -1,0 +1,23 @@
+-- Test --
+  operator
+  ../books/tutorials/src/lego_brick/base/frame/naming.md:37
+
+-- Code --
+
+ 1: use std::geo2d::Rect;
+ 2: 
+ 3: thickness = 1.2mm;
+ 4: width = 31.8mm;
+ 5: height = 15.8mm;
+ 6: 
+ 7: // name both rectangles
+ 8: outer = Rect(width, height);
+ 9: inner = Rect(width = width - 2 * thickness, height = height - 2 * thickness);
+10: 
+11: // what was { .. }.subtract() before:
+12: outer - inner;
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK

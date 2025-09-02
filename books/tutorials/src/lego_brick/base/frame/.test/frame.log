@@ -1,0 +1,20 @@
+-- Test --
+  frame
+  ../books/tutorials/src/lego_brick/base/frame/finish.md:16
+
+-- Code --
+
+ 1: // Include all from std::geo2d using * (including Frame)
+ 2: use std::geo2d::*;
+ 3: 
+ 4: thickness = 1.2mm;
+ 5: width = 31.8mm;
+ 6: height = 15.8mm;
+ 7: 
+ 8: // Construct a frame
+ 9: Frame(width, height, thickness);
+
+-- Output --
+-- Errors --
+-- Test Result --
+OK
