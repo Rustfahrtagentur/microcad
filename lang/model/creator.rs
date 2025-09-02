@@ -8,14 +8,26 @@ use crate::{resolve::Symbol, value::Tuple};
 /// A creator is the origin  
 #[derive(Debug, Clone)]
 pub struct Creator {
-    /// Workpiece arguments.
-    pub arguments: Tuple,
     /// Symbol.
     pub symbol: Symbol,
+    /// Workpiece arguments.
+    pub arguments: Tuple,
 }
 
 impl Creator {
-    pub fn new(arguments: Tuple, symbol: Symbol) -> Self {
-        Self { arguments, symbol }
+    /// New creator.
+    pub fn new(symbol: Symbol, arguments: Tuple) -> Self {
+        Self { symbol, arguments }
+    }
+}
+
+impl std::fmt::Display for Creator {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{symbol}{arguments}",
+            symbol = self.symbol,
+            arguments = self.arguments
+        )
     }
 }
