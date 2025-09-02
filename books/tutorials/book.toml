@@ -1,0 +1,5 @@
+[book]
+authors = ["Patrick Hoffmann"]
+language = "en"
+src = "src"
+title = "Microcad Tutorials"
