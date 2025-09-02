@@ -11,9 +11,8 @@ mod inner;
 pub mod iter;
 pub mod models;
 pub mod operation;
-pub mod output;
+pub mod output_type;
 pub mod properties;
-pub mod render;
 pub mod workpiece;
 
 pub use attribute::*;
@@ -24,7 +23,7 @@ pub use inner::*;
 pub use iter::*;
 pub use models::*;
 pub use operation::*;
-pub use output::*;
+pub use output_type::*;
 pub use properties::*;
 pub use workpiece::*;
 
@@ -134,6 +133,18 @@ impl Model {
         self.descendants().find(|n| {
             n.borrow().id.is_none() && matches!(n.0.borrow().element.value, Element::ChildrenMarker)
         })
+    }
+
+    /// Deduce output type from children and set it and return it.
+    pub fn deduce_output_type(&self) -> OutputType {
+        let self_ = self.borrow();
+        let mut output_type = self_.element.output_type();
+        if output_type == OutputType::NotDetermined {
+            let children = &self_.children;
+            output_type = children.deduce_output_type();
+        }
+
+        output_type
     }
 
     /// Return inner group if this model only contains a group as single child.

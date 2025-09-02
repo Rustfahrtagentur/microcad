@@ -3,12 +3,7 @@
 
 //! Element of a [`Model`].
 
-use crate::{
-    eval::{BuiltinWorkbenchKind, BuiltinWorkpiece, BuiltinWorkpieceOutput},
-    model::*,
-    syntax::*,
-    value::*,
-};
+use crate::{builtin::*, model::*, syntax::*, value::*};
 use strum::IntoStaticStr;
 
 /// An element defines the entity of a [`Model`].
@@ -51,24 +46,6 @@ impl Element {
                 }
             },
             Element::Group | Element::ChildrenMarker => OutputType::NotDetermined,
-        }
-    }
-
-    /// Fetch the local matrix
-    pub fn get_affine_transform(&self) -> render::RenderResult<Option<AffineTransform>> {
-        match &self {
-            Element::BuiltinWorkpiece(builtin_workpiece) => match builtin_workpiece.kind {
-                BuiltinWorkbenchKind::Transform => {
-                    match (builtin_workpiece.f)(&builtin_workpiece.args)? {
-                        BuiltinWorkpieceOutput::Transform(affine_transform) => {
-                            Ok(Some(affine_transform))
-                        }
-                        _ => unreachable!(),
-                    }
-                }
-                _ => Ok(None),
-            },
-            _ => Ok(None),
         }
     }
 

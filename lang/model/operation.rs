@@ -1,14 +1,9 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Algorithm
+//! Operation trait.
 
-use std::rc::Rc;
-
-use crate::model::{
-    render::{RenderCache, RenderResult},
-    *,
-};
+use crate::{model::*, render::*};
 use microcad_core::*;
 
 /// Operation trait.
@@ -21,12 +16,12 @@ pub trait Operation: std::fmt::Debug {
     }
 
     /// Process the model.
-    fn process_2d(&self, _cache: &mut RenderCache, _model: &Model) -> RenderResult<Rc<Geometry2D>> {
+    fn process_2d(&self, _context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         unimplemented!()
     }
 
     /// Process the model.
-    fn process_3d(&self, _cache: &mut RenderCache, _model: &Model) -> RenderResult<Rc<Geometry3D>> {
+    fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
         unimplemented!()
     }
 }

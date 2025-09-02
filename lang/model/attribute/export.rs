@@ -5,7 +5,8 @@
 
 use crate::{
     builtin::{ExportError, Exporter},
-    model::{Model, render::RenderCache},
+    model::Model,
+    render::RenderContext,
     value::Value,
 };
 use microcad_core::RenderResolution;
@@ -24,11 +25,11 @@ pub struct ExportCommand {
 impl ExportCommand {
     /// Export the model. By the settings in the attribute.
     pub fn export(&self, model: &Model) -> Result<Value, ExportError> {
-        let mut render_cache = RenderCache::new();
+        let mut render_context = RenderContext::init(model, RenderResolution::default())?;
 
-        model.render(RenderResolution::default(), &mut render_cache);
-
-        self.exporter.export(model, &self.filename)
+        use crate::render::Render;
+        self.exporter
+            .export(&model.render(&mut render_context)?, &self.filename)
     }
 }
 

@@ -3,9 +3,19 @@
 
 //! Model
 
-use microcad_core::RenderResolution;
+use crate::{model::*, render::*, src_ref::*, syntax::*};
 
-use crate::{model::*, src_ref::*, syntax::*};
+/// Render state of the model.
+pub enum ModelRenderState {
+    /// The model has not been rendered.
+    /// Model output is [`None`].
+    Pending,
+    /// The model has been prerendered via [`Model::prerender`]
+    /// Model output is [`Some`], but there is no geometry.
+    Preparing,
+    /// Rendering is completed.
+    Complete,
+}
 
 /// The actual model contents
 #[derive(custom_debug::Debug, Default)]
@@ -36,6 +46,21 @@ impl ModelInner {
         }
     }
 
+    /// Return render state of the model.
+    pub fn render_state(&self) -> ModelRenderState {
+        match &self.output {
+            Some(RenderOutput::Geometry2D { geometry, .. }) => match geometry {
+                Some(_) => ModelRenderState::Complete,
+                None => ModelRenderState::Preparing,
+            },
+            Some(RenderOutput::Geometry3D { geometry, .. }) => match geometry {
+                Some(_) => ModelRenderState::Complete,
+                None => ModelRenderState::Preparing,
+            },
+            None => ModelRenderState::Pending,
+        }
+    }
+
     /// Clone only the content of this model without children and parent.
     pub fn clone_content(&self) -> Self {
         Self {
@@ -58,15 +83,19 @@ impl ModelInner {
         self.children.is_empty()
     }
 
-    pub fn resolution(&self) -> RenderResolution {
-        let output = self.output.as_ref().expect("Some render output.");
+    /// Return element of this model.
+    pub fn element(&self) -> &Element {
+        &self.element
+    }
 
-        match output {
-            RenderOutput::Geometry2D { resolution, .. }
-            | RenderOutput::Geometry3D { resolution, .. } => {
-                resolution.as_ref().expect("Some resolution.").clone()
-            }
-        }
+    /// Returns the render output, panics if there is no render output.
+    pub fn output(&self) -> &RenderOutput {
+        self.output.as_ref().expect("Render output")
+    }
+
+    /// Returns the mutable render output, panics if there is no render output.
+    pub fn output_mut(&mut self) -> &mut RenderOutput {
+        self.output.as_mut().expect("Render output")
     }
 }
 
