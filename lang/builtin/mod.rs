@@ -8,12 +8,15 @@ pub mod file_io;
 pub mod import;
 pub mod module_builder;
 pub mod operation;
+pub mod workpiece;
 
 pub use export::*;
 pub use file_io::*;
 pub use import::*;
-use microcad_core::*;
 pub use module_builder::*;
+pub use workpiece::*;
+
+use microcad_core::*;
 
 use crate::{ty::*, value::*};
 
@@ -121,13 +124,22 @@ impl From<BuiltinValueHelper> for Value {
     }
 }
 
+// Re-export symbols
+pub use crate::model::Operation;
+pub use crate::parameter;
+pub use crate::resolve::Symbol;
+pub use crate::syntax::Identifier;
+pub use crate::value::ParameterValue;
+pub use crate::value::ParameterValueList;
+pub use crate::value::ValueAccess;
+
 /// Shortcut to create a `ParameterValue`
 #[macro_export]
 macro_rules! parameter {
     ($id:ident) => {
         (
-            $crate::syntax::Identifier::no_ref(stringify!($id)),
-            $crate::eval::ParameterValue {
+            $crate::builtin::Identifier::no_ref(stringify!($id)),
+            $crate::value::ParameterValue {
                 src_ref: $crate::src_ref::SrcRef(None),
                 ..Default::default()
             },
@@ -136,7 +148,7 @@ macro_rules! parameter {
     ($id:ident: $ty:ident) => {
         (
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            $crate::eval::ParameterValue {
+            $crate::value::ParameterValue {
                 specified_type: Some($crate::builtin::BuiltinTypeHelper::$ty.into()),
                 src_ref: $crate::src_ref::SrcRef(None),
                 ..Default::default()
@@ -146,7 +158,7 @@ macro_rules! parameter {
     ($id:ident: $ty:ident = $value:expr) => {
         (
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            $crate::eval::ParameterValue {
+            $crate::value::ParameterValue {
                 specified_type: Some($crate::builtin::BuiltinTypeHelper::$ty.into()),
                 default_value: Some($crate::builtin::BuiltinValueHelper::$ty($value).into()),
                 src_ref: $crate::src_ref::SrcRef(None),
@@ -156,7 +168,7 @@ macro_rules! parameter {
     ($id:ident = $value:expr) => {
         (
             $crate::syntax::Identifier::no_ref(stringify!($id)),
-            $crate::eval::ParameterValue {
+            $crate::value::ParameterValue {
                 default_value: Some($value),
                 ..Default::default()
             },

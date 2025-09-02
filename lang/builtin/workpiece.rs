@@ -3,19 +3,12 @@
 
 //! Builtin function evaluation entity
 
-use std::rc::Rc;
-
 use custom_debug::Debug;
 use microcad_core::{Geometry2D, Geometry3D};
 use strum::Display;
 
 use crate::{
-    eval::*,
-    model::{
-        render::{RenderCache, RenderResult},
-        *,
-    },
-    syntax::*,
+    eval::*, model::*, render::RenderResult, resolve::Symbol, src_ref::SrcRef, syntax::*, value::*,
 };
 
 /// Builtin function type
@@ -71,38 +64,37 @@ pub enum BuiltinWorkbenchKind {
     Operation,
 }
 
-/// The output of a
+/// The return value when calling a built-in workpiece.
 pub enum BuiltinWorkpieceOutput {
+    /// 2D geometry output.
     Geometry2D(Geometry2D),
+    /// 3D geometry output.
     Geometry3D(Geometry3D),
+    /// Transformation.
     Transform(AffineTransform),
+    /// Operation.
     Operation(Box<dyn Operation>),
 }
 
-/// Builtin sketch function type
+/// Builtin sketch function type.
 pub type BuiltinWorkpieceFn = dyn Fn(&Tuple) -> RenderResult<BuiltinWorkpieceOutput>;
 
+/// The built-in workpiece.
 #[derive(Clone, Debug)]
 pub struct BuiltinWorkpiece {
+    /// Kind of the workpiece.
     pub kind: BuiltinWorkbenchKind,
-    pub creator: Symbol,
-    pub args: Tuple,
+    /// Creator symbol.
+    pub creator: Creator,
+    /// The function that will be called when the workpiece is rendered.
     #[debug(skip)]
     pub f: &'static BuiltinWorkpieceFn,
 }
 
 impl BuiltinWorkpiece {
-    pub fn render_2d(
-        &self,
-        cache: &mut RenderCache,
-        model: &Model,
-    ) -> RenderResult<Rc<Geometry2D>> {
-        Ok(match (self.f)(&self.args)? {
-            BuiltinWorkpieceOutput::Geometry2D(geo2d) => Rc::new(geo2d),
-            BuiltinWorkpieceOutput::Geometry3D(_) => todo!(),
-            BuiltinWorkpieceOutput::Transform(_) => todo!(),
-            BuiltinWorkpieceOutput::Operation(operation) => operation.process_2d(cache, model)?,
-        })
+    /// Call the workpiece with its arguments.
+    pub fn call(&self) -> RenderResult<BuiltinWorkpieceOutput> {
+        (self.f)(&self.creator.arguments)
     }
 }
 
@@ -110,10 +102,9 @@ impl std::fmt::Display for BuiltinWorkpiece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(
             f,
-            "{kind} {symbol}{args}",
+            "{kind} {creator}",
             kind = self.kind,
-            symbol = self.creator,
-            args = self.args
+            creator = self.creator,
         )
     }
 }
@@ -129,11 +120,11 @@ pub trait BuiltinWorkbenchDefinition {
     /// The function that generates an output from the workpiece.
     fn workpiece_function() -> &'static BuiltinWorkpieceFn;
 
+    /// Construct the workpiece from an argument tuple.
     fn workpiece(args: &Tuple) -> BuiltinWorkpiece {
         BuiltinWorkpiece {
             kind: Self::kind(),
-            creator: Self::symbol(),
-            args: args.clone(),
+            creator: Creator::new(Self::symbol(), args.clone()),
             f: Self::workpiece_function(),
         }
     }

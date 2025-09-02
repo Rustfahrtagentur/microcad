@@ -5,39 +5,39 @@
 
 use std::rc::Rc;
 
-use microcad_core::{BooleanOp, Geometry2D, Geometry3D};
+use microcad_core::{BooleanOp, Geometry2D};
 
-use crate::{
-    eval::*,
-    model::{
-        render::{RenderCache, RenderResult},
-        *,
-    },
-    value::Tuple,
-};
+use crate::{builtin::*, model::*, render::*, value::Tuple};
 
 impl Operation for BooleanOp {
-    fn process_2d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry2D>> {
-        Ok(Rc::new(Geometry2D::MultiPolygon(
-            match model.into_group() {
-                Some(model) => model.render_geometry_2d(cache),
-                None => model.render_geometry_2d(cache),
-            }?
-            .boolean_op(&model.borrow().resolution(), self),
-        )))
+    fn process_2d(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
+        context.update_2d(|context, model, resolution| {
+            let geometry: Geometry2DOutput = model.render(context)?;
+            match geometry {
+                Some(output) => match output.as_ref() {
+                    Geometry2D::Collection(geometries) => Ok(Some(Rc::new(
+                        Geometry2D::MultiPolygon(geometries.boolean_op(&resolution, self)),
+                    ))),
+                    output => Ok(Some(Rc::new(output.clone()))),
+                },
+                output => Ok(output),
+            }
+        })
     }
 
-    fn process_3d(&self, cache: &mut RenderCache, model: &Model) -> RenderResult<Rc<Geometry3D>> {
-        Ok(Rc::new(Geometry3D::Manifold(
+    fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        todo!()
+        /*Ok(Rc::new(Geometry3D::Manifold(
             match model.into_group() {
-                Some(model) => model.render_geometry_3d(cache),
-                None => model.render_geometry_3d(cache),
+                Some(model) => model.prerender(cache),
+                None => model.prerender(cache),
             }?
             .boolean_op(&model.borrow().resolution(), self),
-        )))
+        )))*/
     }
 }
 
+/// Union operation.
 pub struct Union;
 
 impl BuiltinWorkbenchDefinition for Union {
@@ -58,6 +58,7 @@ impl BuiltinWorkbenchDefinition for Union {
     }
 }
 
+/// Difference operation.
 pub struct Difference;
 
 impl BuiltinWorkbenchDefinition for Difference {
@@ -78,6 +79,7 @@ impl BuiltinWorkbenchDefinition for Difference {
     }
 }
 
+/// Intersection operation.
 pub struct Intersection;
 
 impl BuiltinWorkbenchDefinition for Intersection {
