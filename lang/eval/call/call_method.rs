@@ -91,7 +91,7 @@ impl CallMethod<Models> for Models {
                     try_nest(name, context, self, op)?
                 }
                 SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
-                    Value::Models(models) => try_nest(&name, context, self, models)?,
+                    Value::Models(models) => try_nest(name, context, self, models)?,
                     value => panic!("Builtin call returned {value} but no models."),
                 },
                 def => {

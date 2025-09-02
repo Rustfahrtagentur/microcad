@@ -115,11 +115,11 @@ impl WorkbenchDefinition {
         &self,
         call_src_ref: SrcRef,
         symbol: Symbol,
-        args: &ArgumentValueList,
+        arguments: &ArgumentValueList,
         context: &mut Context,
     ) -> EvalResult<Models> {
         log::debug!(
-            "Workbench {call} {kind} {id:?}({args})",
+            "Workbench {call} {kind} {id:?}({arguments})",
             call = crate::mark!(CALL),
             id = self.id,
             kind = self.kind
@@ -131,7 +131,7 @@ impl WorkbenchDefinition {
         let plan = self.plan.eval(context)?;
 
         // try to match arguments with the building plan
-        match ArgumentMatch::find_multi_match(args, &plan) {
+        match ArgumentMatch::find_multi_match(arguments, &plan) {
             Ok(matches) => {
                 log::debug!(
                     "Building plan matches: {}",
@@ -142,10 +142,10 @@ impl WorkbenchDefinition {
                         .join("\n")
                 );
                 // evaluate models for all multiplicity matches
-                for args in matches {
+                for arguments in matches {
                     models.push(self.eval_to_model(
                         call_src_ref.clone(),
-                        Creator::new(args, symbol.clone()),
+                        Creator::new(symbol.clone(), arguments),
                         None,
                         context,
                     )?);
@@ -160,7 +160,7 @@ impl WorkbenchDefinition {
                 // find an initializer that matches the arguments
                 for init in self.inits() {
                     if let Ok(matches) =
-                        ArgumentMatch::find_multi_match(args, &init.parameters.eval(context)?)
+                        ArgumentMatch::find_multi_match(arguments, &init.parameters.eval(context)?)
                     {
                         log::debug!(
                             "Initializer matches: {}",
@@ -171,10 +171,10 @@ impl WorkbenchDefinition {
                                 .join("\n")
                         );
                         // evaluate models for all multiplicity matches
-                        for args in matches {
+                        for arguments in matches {
                             models.push(self.eval_to_model(
                                 call_src_ref.clone(),
-                                Creator::new(args, symbol.clone()),
+                                Creator::new(symbol.clone(), arguments),
                                 Some(init),
                                 context,
                             )?);
@@ -184,7 +184,7 @@ impl WorkbenchDefinition {
                     }
                 }
                 if !initialized {
-                    context.error(args, EvalError::NoInitializationFound(self.id.clone()))?;
+                    context.error(arguments, EvalError::NoInitializationFound(self.id.clone()))?;
                 }
             }
         }
