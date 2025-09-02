@@ -3,9 +3,8 @@
 
 //! Render cache.
 
-use core::fmt;
 use std::{
-    hash::{DefaultHasher, Hash, Hasher},
+    hash::{Hash, Hasher},
     rc::Rc,
 };
 
@@ -21,7 +20,7 @@ impl Hash for RenderHash {
     }
 }
 
-pub trait RenderHashable: fmt::Display {
+/*pub trait RenderHashable: fmt::Display {
     fn hash(&self) -> RenderHash {
         let mut hasher = DefaultHasher::new();
         self.to_string().hash(&mut hasher);
@@ -39,7 +38,7 @@ impl<T: RenderHashable> RenderHashed<T> {
         let hash = inner.hash();
         Self { inner, hash }
     }
-}
+}*/
 
 /// An item in the [`RenderCache`].
 pub enum RenderCacheItem {

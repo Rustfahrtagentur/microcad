@@ -3,46 +3,53 @@
 
 //! Model output types.
 
-mod geometry_output;
-mod output_type;
-
 use std::rc::Rc;
 
 use cgmath::SquareMatrix;
-pub use geometry_output::*;
-pub use output_type::*;
 
 use microcad_core::{Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
 
-use crate::model::{Model, render::RenderResult};
+use crate::{
+    model::{Model, OutputType},
+    render::RenderResult,
+};
+
+/// Geometry 2D type alias.
+pub type Geometry2DOutput = Option<Rc<Geometry2D>>;
+
+/// Geometry 3D type alias.
+pub type Geometry3DOutput = Option<Rc<Geometry3D>>;
 
 /// The model output when a model has been processed.
 #[derive(Debug, Clone)]
 pub enum RenderOutput {
+    /// 2D render output.
     Geometry2D {
         /// Local transformation matrix.
-        local_matrix: Mat3,
+        local_matrix: Option<Mat3>,
         /// World transformation matrix.
         world_matrix: Option<Mat3>,
         /// The render resolution, calculated from transformation matrix.
         resolution: Option<RenderResolution>,
         /// The output geometry.
-        geometry: Option<Rc<Geometry2D>>,
+        geometry: Geometry2DOutput,
     },
 
+    /// 3D render output.
     Geometry3D {
         /// Local transformation matrix.
-        local_matrix: Mat4,
+        local_matrix: Option<Mat4>,
         /// World transformation matrix.
         world_matrix: Option<Mat4>,
         /// The render resolution, calculated from transformation matrix.
         resolution: Option<RenderResolution>,
         /// The output geometry.
-        geometry: Option<Rc<Geometry3D>>,
+        geometry: Geometry3DOutput,
     },
 }
 
 impl RenderOutput {
+    /// Create new render output for model.
     pub fn new(model: &Model) -> RenderResult<Option<Self>> {
         let output_type = model.deduce_output_type();
 
@@ -56,7 +63,7 @@ impl RenderOutput {
                     .unwrap_or(Mat3::identity());
 
                 Some(RenderOutput::Geometry2D {
-                    local_matrix,
+                    local_matrix: Some(local_matrix),
                     world_matrix: None,
                     resolution: None,
                     geometry: None,
@@ -72,7 +79,7 @@ impl RenderOutput {
                     .unwrap_or(Mat4::identity());
 
                 Some(RenderOutput::Geometry3D {
-                    local_matrix,
+                    local_matrix: Some(local_matrix),
                     world_matrix: None,
                     resolution: None,
                     geometry: None,
@@ -82,6 +89,7 @@ impl RenderOutput {
         })
     }
 
+    /// Set the world matrix for render output.
     pub fn set_world_matrix(&mut self, m: Mat4) {
         match self {
             RenderOutput::Geometry2D { world_matrix, .. } => *world_matrix = Some(mat4_to_mat3(&m)),
@@ -91,6 +99,15 @@ impl RenderOutput {
         }
     }
 
+    /// Set the 2D geometry as render output.
+    pub fn set_geometry_2d(&mut self, geo: Geometry2DOutput) {
+        match self {
+            RenderOutput::Geometry2D { geometry, .. } => *geometry = geo,
+            RenderOutput::Geometry3D { .. } => unreachable!(),
+        }
+    }
+
+    /// Get render resolution.
     pub fn resolution(&self) -> RenderResolution {
         match self {
             RenderOutput::Geometry2D { resolution, .. }
@@ -100,6 +117,7 @@ impl RenderOutput {
         }
     }
 
+    /// Set render resolution.
     pub fn set_resolution(&mut self, render_resolution: RenderResolution) {
         match self {
             RenderOutput::Geometry2D { resolution, .. }
@@ -107,13 +125,17 @@ impl RenderOutput {
         }
     }
 
-    pub fn local_matrix(&self) -> Mat4 {
+    /// Local matrix.
+    pub fn local_matrix(&self) -> Option<Mat4> {
         match self {
-            RenderOutput::Geometry2D { local_matrix, .. } => mat3_to_mat4(local_matrix),
+            RenderOutput::Geometry2D { local_matrix, .. } => {
+                local_matrix.as_ref().map(mat3_to_mat4)
+            }
             RenderOutput::Geometry3D { local_matrix, .. } => *local_matrix,
         }
     }
 
+    /// Get world matrix.
     pub fn world_matrix(&self) -> Mat4 {
         match self {
             RenderOutput::Geometry2D { world_matrix, .. } => {
