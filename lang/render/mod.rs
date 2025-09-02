@@ -142,7 +142,7 @@ impl Model {
 /// The current model in the context has not changed.
 /// If the geometry is already in the cache, the geometry in the cache will be returned.
 impl Render<Geometry2DOutput> for Model {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Option<Rc<Geometry2D>>> {
+    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         context.with_model(self.clone(), |context| {
             let model = context.model();
             let geometry = {
