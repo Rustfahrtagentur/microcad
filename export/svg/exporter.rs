@@ -3,12 +3,8 @@
 
 //! Scalable Vector Graphics (SVG) export
 
-use std::io::BufWriter;
-
 use microcad_core::{Color, Scalar, theme::Theme};
 use microcad_lang::{Id, builtin::*, model::*, parameter, value::*};
-
-use crate::svg::{SvgTagAttributes, WriteSvg, writer::SvgWriter};
 
 /// SVG Exporter
 pub struct SvgExporter;
@@ -81,7 +77,7 @@ impl SvgExporter {
 }
 
 impl Exporter for SvgExporter {
-    fn model_parameters(&self) -> microcad_lang::eval::ParameterValueList {
+    fn model_parameters(&self) -> microcad_lang::value::ParameterValueList {
         [
             parameter!(style: String = String::new()),
             parameter!(fill: String = String::new()),
@@ -90,7 +86,7 @@ impl Exporter for SvgExporter {
         .collect()
     }
 
-    fn export(&self, model: &Model, filename: &std::path::Path) -> Result<Value, ExportError> {
+    fn export(&self, _model: &Model, _filename: &std::path::Path) -> Result<Value, ExportError> {
         todo!()
         /*
                 use microcad_core::FetchBounds2D;

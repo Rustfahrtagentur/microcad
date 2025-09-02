@@ -87,7 +87,7 @@ impl ExportArgs {
         exporters: &ExporterRegistry,
     ) -> anyhow::Result<ExportCommand> {
         let default_exporter =
-            Self::default_exporter(&model.final_output_type(), config, exporters);
+            Self::default_exporter(&model.deduce_output_type(), config, exporters);
         let resolution = self.resolution();
 
         match &self.output {

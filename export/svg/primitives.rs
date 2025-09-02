@@ -6,7 +6,7 @@
 use cgmath::{Deg, InnerSpace};
 use geo::{CoordsIter as _, Point, Rect, Translate};
 use microcad_core::*;
-use microcad_lang::model::{Element, Model, OutputType};
+use microcad_lang::{model::Model, render::RenderOutput};
 
 use crate::svg::{attributes::SvgTagAttribute, *};
 
@@ -148,52 +148,30 @@ impl WriteSvgMapped for Geometry2D {}
 
 impl WriteSvg for Model {
     fn write_svg(&self, writer: &mut SvgWriter, attr: &SvgTagAttributes) -> std::io::Result<()> {
-        assert_eq!(self.final_output_type(), OutputType::Geometry2D);
-
         let node_attr = attr
             .clone()
             .apply_from_model(self)
             .insert(SvgTagAttribute::class("entity"));
 
-        // Render all output geometries.
-        if let Some(geometry) = self.fetch_output_geometry_2d() {
-            geometry.write_svg_mapped(writer, &SvgTagAttributes::default())?;
-        }
-
-        let self_ = self.borrow();
-        match &self_.element.value {
-            Element::Group | Element::Workpiece(_) => {
-                if !self_.is_empty() {
-                    writer.begin_group(&node_attr)?;
-                    self_.children().try_for_each(|child| {
-                        child.write_svg(writer, &SvgTagAttributes::default())
-                    })?;
-                    writer.end_group()?;
+        self.descendants()
+            .filter_map(|model| model.borrow().output.clone())
+            .try_for_each(|output| match output {
+                RenderOutput::Geometry2D {
+                    local_matrix,
+                    geometry,
+                    ..
+                } => {
+                    let node_attr = match local_matrix {
+                        Some(attr) => node_attr.clone().insert(SvgTagAttribute::Transform(attr)),
+                        None => node_attr.clone(),
+                    };
+                    match geometry {
+                        Some(geometry) => geometry.write_svg(writer, &node_attr),
+                        None => Ok(()),
+                    }
                 }
-            }
-            /*Element::Transform(affine_transform) => {
-
-
-                if !self_.is_empty() {
-                    let mut mat = affine_transform.mat2d();
-                    mat.z.y = -mat.z.y;
-
-                    writer.begin_group(
-                        &node_attr
-                            .clone()
-                            .insert(attributes::SvgTagAttribute::Transform(mat)),
-                    )?;
-                    self_.children().try_for_each(|child| {
-                        child.write_svg(writer, &SvgTagAttributes::default())
-                    })?;
-                    writer.end_group()?;
-                }
-            }*/
-            Element::BuiltinWorkpiece(_) => todo!(),
-            _ => {}
-        }
-
-        Ok(())
+                RenderOutput::Geometry3D { .. } => Ok(()),
+            })
     }
 }
 

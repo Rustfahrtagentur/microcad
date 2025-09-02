@@ -22,6 +22,7 @@ pub mod ord_map;
 pub mod parse;
 pub mod parser;
 pub mod rc;
+pub mod render;
 pub mod resolve;
 pub mod src_ref;
 pub mod syntax;
@@ -72,11 +73,7 @@ pub fn shorten(what: &str, max_chars: usize) -> String {
             if p == max_chars {
                 Some('…')
             } else if p < max_chars {
-                if ch == '\n' {
-                    Some('⏎')
-                } else {
-                    Some(ch)
-                }
+                if ch == '\n' { Some('⏎') } else { Some(ch) }
             } else {
                 None
             }
