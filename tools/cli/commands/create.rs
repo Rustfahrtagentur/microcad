@@ -26,13 +26,13 @@ impl RunCommand for Create {
             let mut f = std::fs::File::create(path.clone())?;
             f.write_all(
                 r#"// µcad generated file
-use std::*;
 
-sketch Main() {
-  print("Hello µcad");
+sketch YourSketch( /* your building plan */ ) {
+    // your code
 }
 
-Main();
+// create YourSketch
+YourSketch();
 "#
                 .as_bytes(),
             )?;
