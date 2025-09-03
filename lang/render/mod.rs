@@ -330,19 +330,3 @@ impl Render<Geometry3DOutput> for BuiltinWorkpiece {
         })
     }
 }
-
-impl Render<Geometry2DOutput> for Workpiece {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
-        let model = context.model();
-        let model_ = model.borrow();
-        model_.children.render(context)
-    }
-}
-
-impl Render<Geometry3DOutput> for Workpiece {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
-        let model = context.model();
-        let model_ = model.borrow();
-        model_.children.render(context)
-    }
-}
