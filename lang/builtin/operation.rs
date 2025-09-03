@@ -103,9 +103,13 @@ impl BuiltinWorkbenchDefinition for Intersect {
 impl From<BooleanOp> for BuiltinWorkpiece {
     fn from(value: BooleanOp) -> Self {
         match value {
-            BooleanOp::Union => Union::workpiece(&Tuple::default()),
-            BooleanOp::Subtract => Subtract::workpiece(&Tuple::default()),
-            BooleanOp::Intersect => Intersect::workpiece(&Tuple::default()),
+            BooleanOp::Union => Union::workpiece(Creator::new(Union::symbol(), Tuple::default())),
+            BooleanOp::Subtract => {
+                Subtract::workpiece(Creator::new(Subtract::symbol(), Tuple::default()))
+            }
+            BooleanOp::Intersect => {
+                Intersect::workpiece(Creator::new(Intersect::symbol(), Tuple::default()))
+            }
             BooleanOp::Complement => unimplemented!(),
         }
     }

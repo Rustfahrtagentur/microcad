@@ -121,6 +121,10 @@ impl Stack {
         }
         Ok(())
     }
+
+    pub(crate) fn current_symbol(&self) -> Option<Symbol> {
+        self.0.iter().rev().find_map(|frame| frame.symbol())
+    }
 }
 
 impl Locals for Stack {
@@ -265,9 +269,11 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     // test alias
-    assert!(stack
-        .put_local(Some("x".into()), make_int("x".into(), 3))
-        .is_ok());
+    assert!(
+        stack
+            .put_local(Some("x".into()), make_int("x".into(), 3))
+            .is_ok()
+    );
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);

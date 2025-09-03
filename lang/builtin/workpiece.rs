@@ -121,18 +121,18 @@ pub trait BuiltinWorkbenchDefinition {
     fn workpiece_function() -> &'static BuiltinWorkpieceFn;
 
     /// Construct the workpiece from an argument tuple.
-    fn workpiece(args: &Tuple) -> BuiltinWorkpiece {
+    fn workpiece(creator: Creator) -> BuiltinWorkpiece {
         BuiltinWorkpiece {
             kind: Self::kind(),
-            creator: Creator::new(Self::symbol(), args.clone()),
+            creator,
             f: Self::workpiece_function(),
         }
     }
 
     /// Create model from argument map
-    fn model(args: &Tuple) -> Model {
+    fn model(creator: Creator) -> Model {
         ModelBuilder::new(
-            Element::BuiltinWorkpiece(Self::workpiece(args)),
+            Element::BuiltinWorkpiece(Self::workpiece(creator)),
             SrcRef(None),
         )
         .build()
@@ -140,7 +140,7 @@ pub trait BuiltinWorkbenchDefinition {
 
     /// Workbench function
     fn function() -> &'static BuiltinFn {
-        &|params, args, _| {
+        &|params, args, context| {
             log::trace!(
                 "Built-in workbench {call} {id:?}({args})",
                 call = crate::mark!(CALL),
@@ -152,7 +152,7 @@ pub trait BuiltinWorkbenchDefinition {
                     params.expect("A built-in part must have a parameter list"),
                 )?
                 .iter()
-                .map(Self::model)
+                .map(|tuple| Self::model(Creator::new(context.current_symbol(), tuple.clone())))
                 .collect(),
             ))
         }

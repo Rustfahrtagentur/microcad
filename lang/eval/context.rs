@@ -58,6 +58,14 @@ impl Context {
         }
     }
 
+    /// Current symbol, panics if there no current symbol.
+    pub fn current_symbol(&self) -> Symbol {
+        self.symbol_table
+            .stack
+            .current_symbol()
+            .expect("Some symbol")
+    }
+
     /// Create a new context from a source file.
     ///
     /// # Arguments
