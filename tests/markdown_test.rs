@@ -5,7 +5,10 @@ use std::rc::Rc;
 
 use microcad_core::RenderResolution;
 use microcad_export::{stl::StlExporter, svg::SvgExporter};
-use microcad_lang::tree_display::FormatTree;
+use microcad_lang::{
+    render::{Render, RenderContext},
+    tree_display::FormatTree,
+};
 
 fn lines_with(code: &str, marker: &str) -> std::collections::HashSet<usize> {
     code.lines()
@@ -226,14 +229,22 @@ pub fn run_test(
                 match (eval, context.has_errors(), todo) {
                     // test expected to succeed and succeeds with no errors
                     (Ok(model), false, false) => {
-                        use microcad_lang::model::{ExportCommand as Export, OutputType};
+                        use microcad_lang::model::{ExportCommand as Export, Model, OutputType};
 
                         // get print output
                         write!(log_out, "-- Model --\n{}\n", FormatTree(&model))
-                            .expect("output error");
+                            .expect("no output error");
 
                         let _ = fs::hard_link("images/ok.svg", banner);
-                        writeln!(log_out, "-- Test Result --\nOK").expect("output error");
+                        writeln!(log_out, "-- Test Result --\nOK").expect("no output error");
+
+                        let mut render_context =
+                            RenderContext::init(&model, RenderResolution::default())
+                                .expect("no render error");
+
+                        let model: Model =
+                            model.render(&mut render_context).expect("no render error");
+
                         match model.deduce_output_type() {
                             OutputType::Geometry2D => {
                                 Export {
