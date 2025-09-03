@@ -45,12 +45,12 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/building_plan.svg)](../doc/structure/.test/building_plan.log) | [building_plan](../doc/structure/workbench.md) |
 | [![test](../doc/libs/builtin/.test/builtin_debug_assert_false.svg)](../doc/libs/builtin/.test/builtin_debug_assert_false.log) | [builtin_debug_assert_false](../doc/libs/builtin/debug.md) |
 | [![test](../doc/libs/builtin/.test/builtin_debug_assert_true.svg)](../doc/libs/builtin/.test/builtin_debug_assert_true.log) | [builtin_debug_assert_true](../doc/libs/builtin/debug.md) |
-| [![test](../doc/libs/builtin/.test/builtin_difference_2d.svg)](../doc/libs/builtin/.test/builtin_difference_2d.log) | [builtin_difference_2d](../doc/libs/builtin/ops.md) |
-| [![test](../doc/libs/builtin/.test/builtin_difference_3d.svg)](../doc/libs/builtin/.test/builtin_difference_3d.log) | [builtin_difference_3d](../doc/libs/builtin/ops.md) |
 | [![test](../doc/libs/builtin/.test/builtin_extrude.svg)](../doc/libs/builtin/.test/builtin_extrude.log) | [builtin_extrude](../doc/libs/builtin/ops.md) |
 | [![test](../doc/tests/.test/builtin_modules.svg)](../doc/tests/.test/builtin_modules.log) | [builtin_modules](../doc/tests/modules.md) |
 | [![test](../doc/libs/builtin/.test/builtin_print.svg)](../doc/libs/builtin/.test/builtin_print.log) | [builtin_print](../doc/libs/builtin/debug.md) |
 | [![test](../doc/libs/builtin/.test/builtin_revolve.svg)](../doc/libs/builtin/.test/builtin_revolve.log) | [builtin_revolve](../doc/libs/builtin/ops.md) |
+| [![test](../doc/libs/builtin/.test/builtin_subtract_2d.svg)](../doc/libs/builtin/.test/builtin_subtract_2d.log) | [builtin_subtract_2d](../doc/libs/builtin/ops.md) |
+| [![test](../doc/libs/builtin/.test/builtin_subtract_3d.svg)](../doc/libs/builtin/.test/builtin_subtract_3d.log) | [builtin_subtract_3d](../doc/libs/builtin/ops.md) |
 | [![test](../doc/libs/builtin/.test/builtin_translate.svg)](../doc/libs/builtin/.test/builtin_translate.log) | [builtin_translate](../doc/libs/builtin/ops.md) |
 | [![test](../doc/libs/builtin/.test/builtin_translate_twice.svg)](../doc/libs/builtin/.test/builtin_translate_twice.log) | [builtin_translate_twice](../doc/libs/builtin/ops.md) |
 | [![test](../doc/structure/.test/call_function.svg)](../doc/structure/.test/call_function.log) | [call_function](../doc/structure/calls.md) |

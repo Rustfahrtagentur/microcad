@@ -20,5 +20,10 @@ warning: This expression statement did not produce any model
    1 | [
      | ^
      |
+-- Model --
+  Group -> Undetermined (root)
+
 -- Test Result --
 OK
+Could not determine output type.
+Nothing will be exported.

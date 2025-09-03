@@ -26,5 +26,23 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch [30m[105m[1m NO ID [39m[49m[22m::Wheel(radius: 50mm, thickness: 10m…[0m
+      Operation subtract()⏎ -> 2D
+        Group -> 2D
+          sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 50mm) -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 50)⏎ -> 2D
+          sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 40mm) -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 40)⏎ -> 2D
+    sketch [30m[105m[1m NO ID [39m[49m[22m::Wheel(diameter: 100mm, thickness: …[0m
+      Operation subtract()⏎ -> 2D
+        Group -> 2D
+          sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 50mm) -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 50)⏎ -> 2D
+          sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 40mm) -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 40)⏎ -> 2D
+
 -- Test Result --
 OK
+Export successful.

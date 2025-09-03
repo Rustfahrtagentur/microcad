@@ -12,5 +12,15 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch std::geo2d::Rect(size: 42mm) -> 2D
+      #[export = Export: "svg" => rect.svg]
+      Primitive2D __builtin::geo2d::Rect(height: 42, width: 42, x: -21, y: -21)⏎ -> 2D
+    sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), r: 42mm) -> 2D
+      #[export = Export: "svg" => circle.svg]
+      Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 42)⏎ -> 2D
+
 -- Test Result --
 OK
+Export successful.

@@ -15,5 +15,14 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Group -> 2D
+      sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 1mm) -> 2D
+        Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 1)⏎ -> 2D
+      sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 2mm) -> 2D
+        Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 2)⏎ -> 2D
+
 -- Test Result --
 OK
+Export successful.

@@ -9,5 +9,13 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 3D (root)
+    op std::ops::extrude(height: 20mm) -> 3D
+      Operation __builtin::ops::extrude(height: 20, n_divisions: 0, scale_top_x: 1, sc…
+        sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 20mm) -> 2D
+          Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 20)⏎ -> 2D
+
 -- Test Result --
 OK
+Export successful.

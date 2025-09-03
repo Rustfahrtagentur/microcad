@@ -16,5 +16,10 @@ warning: This expression statement did not produce any model
    2 |   1 + 2;
      |   ^^^^^^
      |
+-- Model --
+  Group -> 2D (root)
+    sketch [30m[105m[1m NO ID [39m[49m[22m::K() -> 2D[0m
+
 -- Test Result --
 OK
+Export error: Render error: Nothing to render

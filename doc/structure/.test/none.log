@@ -9,5 +9,14 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 3D (root)
+    part std::geo3d::Sphere(radius: 40mm) -> 3D
+      Primitive3D __builtin::geo3d::Sphere(radius: 40)⏎ -> 3D
+    part std::geo3d::Cube(size: 40mm) -> 3D
+      Transform __builtin::ops::translate(x: -20, y: -20, z: -20)⏎ -> 3D
+        Primitive3D __builtin::geo3d::Cube(size_x: 40, size_y: 40, size_z: 40)⏎ -> 3D
+
 -- Test Result --
 OK
+Export successful.

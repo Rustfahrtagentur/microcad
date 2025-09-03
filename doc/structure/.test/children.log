@@ -9,7 +9,7 @@
  3:     // check number of children
  4:     if @children.count() == 2 {
  5:         // make hole
- 6:         @children.difference(); 
+ 6:         @children.subtract(); 
  7:     } else {
  8:         std::error("punched_disk must get two objects");
  9:     }

@@ -14,5 +14,25 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    op std::ops::translate(x: -4mm, y: -4mm, z: 0mm) -> 2D
+      Transform __builtin::ops::translate(x: -4, y: -4, z: 0)⏎ -> 2D
+        sketch std::geo2d::Rect(height: 2mm, width: 2mm) -> 2D
+          Primitive2D __builtin::geo2d::Rect(height: 2, width: 2, x: -1, y: -1)⏎ -> 2D
+    op std::ops::translate(x: -4mm, y: 4mm, z: 0mm) -> 2D
+      Transform __builtin::ops::translate(x: -4, y: 4, z: 0)⏎ -> 2D
+        sketch std::geo2d::Rect(height: 2mm, width: 2mm) -> 2D
+          Primitive2D __builtin::geo2d::Rect(height: 2, width: 2, x: -1, y: -1)⏎ -> 2D
+    op std::ops::translate(x: 4mm, y: -4mm, z: 0mm) -> 2D
+      Transform __builtin::ops::translate(x: 4, y: -4, z: 0)⏎ -> 2D
+        sketch std::geo2d::Rect(height: 2mm, width: 2mm) -> 2D
+          Primitive2D __builtin::geo2d::Rect(height: 2, width: 2, x: -1, y: -1)⏎ -> 2D
+    op std::ops::translate(x: 4mm, y: 4mm, z: 0mm) -> 2D
+      Transform __builtin::ops::translate(x: 4, y: 4, z: 0)⏎ -> 2D
+        sketch std::geo2d::Rect(height: 2mm, width: 2mm) -> 2D
+          Primitive2D __builtin::geo2d::Rect(height: 2, width: 2, x: -1, y: -1)⏎ -> 2D
+
 -- Test Result --
 OK
+Export successful.

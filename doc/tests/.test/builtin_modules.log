@@ -19,5 +19,11 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 3D (root)
+    part [30m[105m[1m NO ID [39m[49m[22m::a::b::c::M1() -> 3D[0m
+    part [30m[105m[1m NO ID [39m[49m[22m::a::M2() -> 3D[0m
+
 -- Test Result --
 OK
+Export successful.

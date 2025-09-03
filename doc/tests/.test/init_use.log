@@ -10,5 +10,10 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch [30m[105m[1m NO ID [39m[49m[22m::K(l: 10mm) -> 2D[0m
+
 -- Test Result --
 OK
+Export error: Render error: Nothing to render

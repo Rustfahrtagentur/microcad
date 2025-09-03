@@ -24,5 +24,25 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: 0mm, y: 0mm, z: 0mm) -> 2…[0m
+      #[color = rgba(1, 0, 0, 1)]
+      Transform __builtin::ops::translate(x: 0, y: 0, z: 0)⏎ -> 2D
+        Primitive2D __builtin::geo2d::Rect(height: 3, width: 3, x: 0, y: 0)⏎ -> 2D
+    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: 4mm, y: 0mm, z: 0mm) -> 2…[0m
+      #[color = rgba(0, 0, 1, 1)]
+      Transform __builtin::ops::translate(x: 4, y: 0, z: 0)⏎ -> 2D
+        Primitive2D __builtin::geo2d::Rect(height: 3, width: 3, x: 0, y: 0)⏎ -> 2D
+    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: 0mm, y: 4mm, z: 0mm) -> 2…[0m
+      #[color = rgba(0, 1, 0, 1)]
+      Transform __builtin::ops::translate(x: 0, y: 4, z: 0)⏎ -> 2D
+        Primitive2D __builtin::geo2d::Rect(height: 3, width: 3, x: 0, y: 0)⏎ -> 2D
+    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: 4mm, y: 4mm, z: 0mm) -> 2…[0m
+      #[color = rgba(0.5, 0.5, 0.5, 1)]
+      Transform __builtin::ops::translate(x: 4, y: 4, z: 0)⏎ -> 2D
+        Primitive2D __builtin::geo2d::Rect(height: 3, width: 3, x: 0, y: 0)⏎ -> 2D
+
 -- Test Result --
 OK
+Export successful.

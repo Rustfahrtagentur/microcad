@@ -10,5 +10,11 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch [30m[105m[1m NO ID [39m[49m[22m::K() -> 2D[0m
+      ChildrenMarker -> Undetermined
+
 -- Test Result --
 OK
+Export error: Render error: Invalid output type: Undetermined

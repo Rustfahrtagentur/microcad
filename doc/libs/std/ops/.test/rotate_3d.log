@@ -12,5 +12,24 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 3D (root)
+    op std::ops::rotate(x: 1.5707963267948966π, y: 0π, z: 0π) -> 3D
+      Transform __builtin::ops::rotate(matrix: Matrix3 [[1.0, 0.0, 0.0], [0.0, 6.12323…
+        part std::geo3d::Cylinder(d: 20mm, h: 50mm) -> 3D
+          Transform __builtin::ops::translate(x: 0, y: 0, z: -25)⏎ -> 3D
+            Primitive3D __builtin::geo3d::Cylinder(height: 50, radius_bottom: 10, radius_top…
+    op std::ops::rotate(x: 0π, y: 1.5707963267948966π, z: 0π) -> 3D
+      Transform __builtin::ops::rotate(matrix: Matrix3 [[6.123233995736766e-17, 0.0, -…
+        part std::geo3d::Cylinder(d: 20mm, h: 50mm) -> 3D
+          Transform __builtin::ops::translate(x: 0, y: 0, z: -25)⏎ -> 3D
+            Primitive3D __builtin::geo3d::Cylinder(height: 50, radius_bottom: 10, radius_top…
+    op std::ops::rotate(x: 0π, y: 0π, z: 1.5707963267948966π) -> 3D
+      Transform __builtin::ops::rotate(matrix: Matrix3 [[6.123233995736766e-17, 1.0, 0…
+        part std::geo3d::Cylinder(d: 20mm, h: 50mm) -> 3D
+          Transform __builtin::ops::translate(x: 0, y: 0, z: -25)⏎ -> 3D
+            Primitive3D __builtin::geo3d::Cylinder(height: 50, radius_bottom: 10, radius_top…
+
 -- Test Result --
 OK
+Export successful.

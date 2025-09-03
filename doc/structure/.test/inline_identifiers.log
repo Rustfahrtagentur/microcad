@@ -10,5 +10,11 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch std::geo2d::Rect(height: 2mm, width: 2mm) -> 2D
+      Primitive2D __builtin::geo2d::Rect(height: 2, width: 2, x: -1, y: -1)⏎ -> 2D
+
 -- Test Result --
 OK
+Export successful.

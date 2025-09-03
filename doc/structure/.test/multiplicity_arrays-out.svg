@@ -74,20 +74,9 @@
         }
          
         .entity {
-            fill: #191919;
+            fill: rgba(178, 178, 178, 0.70);
             stroke: #191919;
             stroke-width: 0.4;
-        }
-         
-        .entity-stroke {
-            fill: none;
-            stroke: #191919;
-            stroke-width: 0.4;
-        }
-         
-        .entity-fill {
-            fill: #191919;
-            stroke: none;
         }
         
             .active { fill-opacity: 1.0; stroke-opacity: 1.0; }
@@ -95,33 +84,9 @@
         
   </style>
   <g class="entity">
-    <g class="entity">
-      <g class="entity" transform="matrix(1 0 0 1 -4 4)">
-        <g class="entity">
-          <rect x="4" y="4" width="2" height="2"/>
-        </g>
-      </g>
-    </g>
-    <g class="entity">
-      <g class="entity" transform="matrix(1 0 0 1 4 4)">
-        <g class="entity">
-          <rect x="4" y="4" width="2" height="2"/>
-        </g>
-      </g>
-    </g>
-    <g class="entity">
-      <g class="entity" transform="matrix(1 0 0 1 -4 -4)">
-        <g class="entity">
-          <rect x="4" y="4" width="2" height="2"/>
-        </g>
-      </g>
-    </g>
-    <g class="entity">
-      <g class="entity" transform="matrix(1 0 0 1 4 -4)">
-        <g class="entity">
-          <rect x="4" y="4" width="2" height="2"/>
-        </g>
-      </g>
-    </g>
+    <path d="M2,10L2,8L0,8L0,10L2,10 Z  "/>
+    <path d="M10,10L10,8L8,8L8,10L10,10 Z  "/>
+    <path d="M2,2L2,0L0,0L0,2L2,2 Z  "/>
+    <path d="M10,2L10,0L8,0L8,2L10,2 Z  "/>
   </g>
 </svg>
