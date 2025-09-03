@@ -13,7 +13,7 @@ impl BuiltinWorkbenchDefinition for Rotate {
     }
 
     fn kind() -> BuiltinWorkbenchKind {
-        BuiltinWorkbenchKind::Operation
+        BuiltinWorkbenchKind::Transform
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {

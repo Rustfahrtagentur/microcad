@@ -13,7 +13,7 @@ impl BuiltinWorkbenchDefinition for Orient {
     }
 
     fn kind() -> BuiltinWorkbenchKind {
-        BuiltinWorkbenchKind::Operation
+        BuiltinWorkbenchKind::Transform
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {

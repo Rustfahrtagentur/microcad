@@ -14,7 +14,7 @@ impl BuiltinWorkbenchDefinition for Translate {
     }
 
     fn kind() -> BuiltinWorkbenchKind {
-        BuiltinWorkbenchKind::Operation
+        BuiltinWorkbenchKind::Transform
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
