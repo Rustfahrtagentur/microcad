@@ -5,13 +5,11 @@
 
 use std::rc::Rc;
 
-use cgmath::SquareMatrix;
-
 use microcad_core::{Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
 
 use crate::{
     model::{Model, OutputType},
-    render::RenderResult,
+    render::{RenderError, RenderResult},
     tree_display::{TreeDisplay, TreeState},
 };
 
@@ -51,10 +49,10 @@ pub enum RenderOutput {
 
 impl RenderOutput {
     /// Create new render output for model.
-    pub fn new(model: &Model) -> RenderResult<Option<Self>> {
+    pub fn new(model: &Model) -> RenderResult<Self> {
         let output_type = model.deduce_output_type();
 
-        Ok(match output_type {
+        match output_type {
             OutputType::Geometry2D => {
                 let local_matrix = model
                     .borrow()
@@ -62,7 +60,7 @@ impl RenderOutput {
                     .get_affine_transform()?
                     .map(|affine_transform| affine_transform.mat2d());
 
-                Some(RenderOutput::Geometry2D {
+                Ok(RenderOutput::Geometry2D {
                     local_matrix,
                     world_matrix: None,
                     resolution: None,
@@ -77,15 +75,15 @@ impl RenderOutput {
                     .get_affine_transform()?
                     .map(|affine_transform| affine_transform.mat3d());
 
-                Some(RenderOutput::Geometry3D {
+                Ok(RenderOutput::Geometry3D {
                     local_matrix,
                     world_matrix: None,
                     resolution: None,
                     geometry: None,
                 })
             }
-            _ => None,
-        })
+            output_type => Err(RenderError::InvalidOutputType(output_type)),
+        }
     }
 
     /// Set the world matrix for render output.
@@ -100,11 +98,6 @@ impl RenderOutput {
 
     /// Set the 2D geometry as render output.
     pub fn set_geometry_2d(&mut self, geo: Geometry2DOutput) {
-        match &geo {
-            Some(geo) => log::trace!("{}", geo.name()),
-            None => log::trace!("no geo"),
-        }
-
         match self {
             RenderOutput::Geometry2D { geometry, .. } => *geometry = geo,
             RenderOutput::Geometry3D { .. } => unreachable!(),

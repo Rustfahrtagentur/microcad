@@ -228,7 +228,7 @@ pub fn run_test(
                 // check if test awaited to succeed but failed at evaluation
                 match (eval, context.has_errors(), todo) {
                     // test expected to succeed and succeeds with no errors
-                    (Ok(model), false, false) => {
+                    (Ok(mut model), false, false) => {
                         use microcad_lang::model::{ExportCommand as Export, Model, OutputType};
 
                         // get print output
@@ -238,12 +238,13 @@ pub fn run_test(
                         let _ = fs::hard_link("images/ok.svg", banner);
                         writeln!(log_out, "-- Test Result --\nOK").expect("no output error");
 
-                        let mut render_context =
+                        if let Ok(mut render_context) =
                             RenderContext::init(&model, RenderResolution::default())
-                                .expect("no render error");
-
-                        let model: Model =
-                            model.render(&mut render_context).expect("no render error");
+                        {
+                            model = model.render(&mut render_context).expect("No render error");
+                        } else {
+                            write!(log_out, "Nothing to render.").expect("no output error");
+                        }
 
                         match model.deduce_output_type() {
                             OutputType::Geometry2D => {

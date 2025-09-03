@@ -25,7 +25,11 @@ use crate::{
 
 /// An error that occurred during rendering.
 #[derive(Debug, Error)]
-pub enum RenderError {}
+pub enum RenderError {
+    /// Invalid output type.
+    #[error("Invalid output type: {0}")]
+    InvalidOutputType(OutputType),
+}
 
 /// A result from rendering a model.
 pub type RenderResult<T> = Result<T, RenderError>;
@@ -78,7 +82,7 @@ impl Model {
             let output = RenderOutput::new(model)?;
             {
                 let mut model_ = model.borrow_mut();
-                model_.output = output;
+                model_.output = Some(output);
             };
 
             model
@@ -123,11 +127,13 @@ impl Model {
         // Create specific render output with local matrix.
         create_render_output(self)?;
 
-        // Calculate the world matrix.
-        set_world_matrix(self, Mat4::identity())?;
+        if self.deduce_output_type() == OutputType::NotDetermined {
+            // Calculate the world matrix.
+            set_world_matrix(self, Mat4::identity())?;
 
-        // Calculate the resolution for the model.
-        set_resolution(self, resolution);
+            // Calculate the resolution for the model.
+            set_resolution(self, resolution);
+        }
 
         log::trace!("Finished prerender:\n{}", FormatTree(self));
 
@@ -208,6 +214,17 @@ impl Render<Geometry2DOutput> for BuiltinWorkpiece {
     fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         Ok(match self.call()? {
             BuiltinWorkpieceOutput::Geometry2D(geo2d) => Some(Rc::new(geo2d)),
+            BuiltinWorkpieceOutput::Transform(transform) => {
+                let model = context.model();
+                let model_ = model.borrow();
+                let geometry: Geometry2DOutput = model_.children.render(context)?;
+
+                geometry.map(|geometry| {
+                    Rc::new(
+                        geometry.transformed_2d(&context.current_resolution(), &transform.mat2d()),
+                    )
+                })
+            }
             BuiltinWorkpieceOutput::Operation(operation) => operation.process_2d(context)?,
             _ => None,
         })

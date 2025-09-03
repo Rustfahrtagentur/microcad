@@ -12,16 +12,11 @@ use crate::{builtin::*, model::*, render::*, value::Tuple};
 impl Operation for BooleanOp {
     fn process_2d(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         context.update_2d(|context, model, resolution| {
-            let geometry: Geometry2DOutput = model.render(context)?;
-            match geometry {
-                Some(output) => match output.as_ref() {
-                    Geometry2D::Collection(geometries) => Ok(Some(Rc::new(
-                        Geometry2D::MultiPolygon(geometries.boolean_op(&resolution, self)),
-                    ))),
-                    output => Ok(Some(Rc::new(output.clone()))),
-                },
-                output => Ok(output),
-            }
+            let model_ = model.borrow();
+            let geometries: Geometries2D = model_.children.render(context)?;
+            Ok(Some(Rc::new(Geometry2D::MultiPolygon(
+                geometries.boolean_op(&resolution, self),
+            ))))
         })
     }
 
