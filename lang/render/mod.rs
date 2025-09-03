@@ -203,11 +203,11 @@ impl Render<Geometries2D> for Models {
         let mut geometries = Vec::new();
         for model in self.iter() {
             if let Some(geo) = model.render(context)? {
-                geometries.push(geo.as_ref().clone());
+                geometries.push(geo);
             }
         }
 
-        Ok(Geometries2D::new(geometries))
+        Ok(geometries.into_iter().collect())
     }
 }
 

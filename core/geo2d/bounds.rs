@@ -130,6 +130,20 @@ impl From<Size2> for Bounds2D {
     }
 }
 
+impl std::fmt::Display for Bounds2D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.0 {
+            Some(rect) => write!(
+                f,
+                "[{min:?}, {max:?}]",
+                min = rect.min().x_y(),
+                max = rect.max().x_y()
+            ),
+            None => write!(f, "[no bounds]"),
+        }
+    }
+}
+
 /// Trait to return a bounding box of 2D geometry.
 pub trait FetchBounds2D {
     /// Fetch bounds.

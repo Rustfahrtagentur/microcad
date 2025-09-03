@@ -5,6 +5,7 @@
 
 use derive_more::{Deref, DerefMut};
 use geo::{CoordsIter, HasDimensions, LineString, Polygon};
+use std::rc::Rc;
 
 use crate::{
     geo2d::{FetchBounds2D, bounds::Bounds2D},
@@ -13,12 +14,12 @@ use crate::{
 
 /// 2D geometry collection.
 #[derive(Debug, Clone, Default, Deref, DerefMut)]
-pub struct Geometries2D(Vec<Geometry2D>);
+pub struct Geometries2D(Vec<Rc<Geometry2D>>);
 
 impl Geometries2D {
     /// New geometry collection.
     pub fn new(geometries: Vec<Geometry2D>) -> Self {
-        Self(geometries)
+        Self(geometries.into_iter().map(Rc::new).collect())
     }
 
     /// Append another geometry collection.
@@ -57,7 +58,7 @@ impl Geometries2D {
     /// Apply contex hull operation to geometries.
     pub fn hull(&self, resolution: &RenderResolution) -> geo2d::Polygon {
         let mut coords = self.iter().fold(Vec::new(), |mut coords, geo| {
-            match geo {
+            match geo.as_ref() {
                 Geometry2D::LineString(line_string) => {
                     coords.append(&mut line_string.coords_iter().collect())
                 }
@@ -100,6 +101,12 @@ impl Geometries2D {
     }
 }
 
+impl FromIterator<Rc<Geometry2D>> for Geometries2D {
+    fn from_iter<T: IntoIterator<Item = Rc<Geometry2D>>>(iter: T) -> Self {
+        Geometries2D(iter.into_iter().collect())
+    }
+}
+
 impl FetchBounds2D for Geometries2D {
     fn fetch_bounds_2d(&self) -> Bounds2D {
         self.0.iter().fold(Bounds2D::default(), |bounds, geometry| {
@@ -112,7 +119,7 @@ impl Transformed2D for Geometries2D {
     fn transformed_2d(&self, render_resolution: &RenderResolution, mat: &Mat3) -> Self {
         Self(
             self.iter()
-                .map(|geometry| geometry.transformed_2d(render_resolution, mat))
+                .map(|geometry| Rc::new(geometry.transformed_2d(render_resolution, mat)))
                 .collect::<Vec<_>>(),
         )
     }
