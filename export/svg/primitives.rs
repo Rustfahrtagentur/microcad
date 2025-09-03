@@ -153,25 +153,38 @@ impl WriteSvg for Model {
             .apply_from_model(self)
             .insert(SvgTagAttribute::class("entity"));
 
-        self.descendants()
-            .filter_map(|model| model.borrow().output.clone())
-            .try_for_each(|output| match output {
-                RenderOutput::Geometry2D {
-                    local_matrix,
-                    geometry,
-                    ..
-                } => {
-                    let node_attr = match local_matrix {
-                        Some(attr) => node_attr.clone().insert(SvgTagAttribute::Transform(attr)),
-                        None => node_attr.clone(),
-                    };
-                    match geometry {
-                        Some(geometry) => geometry.write_svg(writer, &node_attr),
-                        None => Ok(()),
+        let self_ = self.borrow();
+        let output = self_.output();
+        match output {
+            RenderOutput::Geometry2D {
+                local_matrix,
+                geometry,
+                ..
+            } => {
+                let node_attr = match local_matrix {
+                    Some(matrix) => node_attr
+                        .clone()
+                        .insert(SvgTagAttribute::Transform(*matrix)),
+                    None => node_attr.clone(),
+                };
+
+                writer.begin_group(&node_attr)?;
+
+                match geometry {
+                    Some(geometry) => {
+                        geometry.write_svg_mapped(writer, attr)?;
+                    }
+                    None => {
+                        self_
+                            .children()
+                            .try_for_each(|model| model.write_svg(writer, attr))?;
                     }
                 }
-                RenderOutput::Geometry3D { .. } => Ok(()),
-            })
+
+                writer.end_group()
+            }
+            _ => Ok(()),
+        }
     }
 }
 

@@ -5,7 +5,7 @@
 
 use std::rc::Rc;
 
-use microcad_core::{Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
+use microcad_core::{FetchBounds2D, Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
 
 use crate::{
     model::{Model, OutputType},
@@ -105,12 +105,10 @@ impl RenderOutput {
     }
 
     /// Get render resolution.
-    pub fn resolution(&self) -> RenderResolution {
+    pub fn resolution(&self) -> &Option<RenderResolution> {
         match self {
             RenderOutput::Geometry2D { resolution, .. }
-            | RenderOutput::Geometry3D { resolution, .. } => {
-                resolution.as_ref().expect("Resolution").clone()
-            }
+            | RenderOutput::Geometry3D { resolution, .. } => resolution,
         }
     }
 
@@ -162,28 +160,31 @@ impl std::fmt::Display for RenderOutput {
         match &self {
             RenderOutput::Geometry2D {
                 local_matrix,
-                resolution,
                 geometry,
                 ..
             } => {
                 write!(f, "2D -> ")?;
-                match (geometry, local_matrix) {
-                    (None, None) => write!(f, "nothing to render"),
-                    (None, Some(_)) => {
-                        write!(f, "transform")
-                    }
-                    (Some(geometry), None) => write!(f, "{}", geometry.name()),
-                    (Some(geometry), Some(_)) => write!(f, "transformed {}", geometry.name()),
-                }?;
-
-                if let Some(resolution) = resolution {
-                    write!(f, " {resolution}")?
+                if local_matrix.is_none() && geometry.is_none() {
+                    write!(f, "nothing to render")?;
                 }
-                Ok(())
+                if local_matrix.is_some() {
+                    write!(f, "transform ")?;
+                }
+                if let Some(geometry) = geometry {
+                    write!(
+                        f,
+                        "{} {}",
+                        match geometry.as_ref() {
+                            Geometry2D::Collection(geometries) =>
+                                format!("Collection({} items)", geometries.len()),
+                            geometry => geometry.name().to_string(),
+                        },
+                        geometry.fetch_bounds_2d()
+                    )?;
+                }
             }
             RenderOutput::Geometry3D {
                 local_matrix,
-                resolution,
                 geometry,
                 ..
             } => {
@@ -194,15 +195,15 @@ impl std::fmt::Display for RenderOutput {
                         write!(f, "transform")
                     }
                     (Some(geometry), None) => write!(f, "{}", geometry.name()),
-                    (Some(_), Some(_)) => unreachable!(),
+                    (Some(geometry), Some(_)) => write!(f, "transformed {}", geometry.name()),
                 }?;
-
-                if let Some(resolution) = resolution {
-                    write!(f, " {resolution}")?
-                }
-                Ok(())
             }
         }
+
+        if let Some(resolution) = self.resolution() {
+            write!(f, " {resolution}")?
+        }
+        Ok(())
     }
 }
 

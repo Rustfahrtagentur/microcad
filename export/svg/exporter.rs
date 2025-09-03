@@ -12,16 +12,22 @@ pub struct SvgExporter;
 impl SvgExporter {
     /// Generate SVG style string from theme.
     pub fn theme_to_svg_style(theme: &Theme) -> String {
-        fn fill_stroke_style(class_name: &str, color: Color, stroke_width: Scalar) -> String {
+        fn fill_stroke_style(
+            class_name: &str,
+            fill_color: Color,
+            stroke_color: Color,
+            stroke_width: Scalar,
+        ) -> String {
             format!(
                 r#" 
         .{class_name} {{
-            fill: {color};
-            stroke: {color};
+            fill: {fill_color};
+            stroke: {stroke_color};
             stroke-width: {stroke_width};
         }}
         "#,
-                color = color.to_svg_color()
+                fill_color = fill_color.to_svg_color(),
+                stroke_color = stroke_color.to_svg_color()
             )
         }
 
@@ -55,17 +61,18 @@ impl SvgExporter {
             ("grid", theme.grid, Some(0.2)),
             ("measure", theme.measure, Some(0.2)),
             ("highlight", theme.highlight, Some(0.2)),
-            ("entity", theme.entity, Some(0.4)),
         ]
         .into_iter()
         .fold(String::new(), |mut style, item| {
             if let Some(stroke) = item.2 {
-                style += &fill_stroke_style(item.0, item.1, stroke);
+                style += &fill_stroke_style(item.0, item.1, item.1, stroke);
                 style += &stroke_style(item.0, item.1, stroke)
             }
             style += &fill_style(item.0, item.1);
             style
         });
+
+        style += &fill_stroke_style("entity", theme.entity, theme.outline, 0.4);
 
         style += r#"
             .active { fill-opacity: 1.0; stroke-opacity: 1.0; }

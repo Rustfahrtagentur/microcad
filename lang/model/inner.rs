@@ -90,12 +90,16 @@ impl ModelInner {
 
     /// Returns the render output, panics if there is no render output.
     pub fn output(&self) -> &RenderOutput {
-        self.output.as_ref().expect("Render output")
+        self.output
+            .as_ref()
+            .expect("Render output. You have to prerender() and render() the model first.")
     }
 
     /// Returns the mutable render output, panics if there is no render output.
     pub fn output_mut(&mut self) -> &mut RenderOutput {
-        self.output.as_mut().expect("Render output")
+        self.output
+            .as_mut()
+            .expect("Render output. You have to prerender() and render() the model first.")
     }
 }
 
