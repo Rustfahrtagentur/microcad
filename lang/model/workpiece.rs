@@ -52,9 +52,9 @@ impl Workpiece {
 impl std::fmt::Display for Workpiece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.kind {
-            WorkbenchKind::Part => write!(f, "Part"),
-            WorkbenchKind::Sketch => write!(f, "Sketch"),
-            WorkbenchKind::Operation => write!(f, "Operation"),
+            WorkbenchKind::Part => write!(f, "part {}", self.creator),
+            WorkbenchKind::Sketch => write!(f, "sketch {}", self.creator),
+            WorkbenchKind::Operation => write!(f, "op {}", self.creator),
         }
     }
 }

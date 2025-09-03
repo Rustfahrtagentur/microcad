@@ -46,7 +46,7 @@ impl From<ExportCommand> for Value {
 
 impl std::fmt::Debug for ExportCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(
+        write!(
             f,
             "Export: {id:?} => {filename}",
             id = self.exporter.id(),
@@ -57,7 +57,7 @@ impl std::fmt::Debug for ExportCommand {
 
 impl std::fmt::Display for ExportCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(
+        write!(
             f,
             "\"{filename}\" with exporter `{id}`",
             filename = self.filename.display(),

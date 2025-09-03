@@ -12,6 +12,7 @@ use microcad_core::{Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
 use crate::{
     model::{Model, OutputType},
     render::RenderResult,
+    tree_display::{TreeDisplay, TreeState},
 };
 
 /// Geometry 2D type alias.
@@ -59,11 +60,10 @@ impl RenderOutput {
                     .borrow()
                     .element
                     .get_affine_transform()?
-                    .map(|affine_transform| affine_transform.mat2d())
-                    .unwrap_or(Mat3::identity());
+                    .map(|affine_transform| affine_transform.mat2d());
 
                 Some(RenderOutput::Geometry2D {
-                    local_matrix: Some(local_matrix),
+                    local_matrix,
                     world_matrix: None,
                     resolution: None,
                     geometry: None,
@@ -75,11 +75,10 @@ impl RenderOutput {
                     .borrow()
                     .element
                     .get_affine_transform()?
-                    .map(|affine_transform| affine_transform.mat3d())
-                    .unwrap_or(Mat4::identity());
+                    .map(|affine_transform| affine_transform.mat3d());
 
                 Some(RenderOutput::Geometry3D {
-                    local_matrix: Some(local_matrix),
+                    local_matrix,
                     world_matrix: None,
                     resolution: None,
                     geometry: None,
@@ -101,6 +100,11 @@ impl RenderOutput {
 
     /// Set the 2D geometry as render output.
     pub fn set_geometry_2d(&mut self, geo: Geometry2DOutput) {
+        match &geo {
+            Some(geo) => log::trace!("{}", geo.name()),
+            None => log::trace!("no geo"),
+        }
+
         match self {
             RenderOutput::Geometry2D { geometry, .. } => *geometry = geo,
             RenderOutput::Geometry3D { .. } => unreachable!(),
@@ -157,4 +161,60 @@ fn mat3_to_mat4(m: &Mat3) -> Mat4 {
         0.0, 0.0, 1.0, 0.0, // Z axis: identity (no change)
         0.0, 0.0, 0.0, 1.0, // Homogeneous row
     )
+}
+
+impl std::fmt::Display for RenderOutput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "--> out ")?;
+        match &self {
+            RenderOutput::Geometry2D {
+                local_matrix,
+                resolution,
+                geometry,
+                ..
+            } => {
+                write!(f, "2D -> ")?;
+                match (geometry, local_matrix) {
+                    (None, None) => write!(f, "nothing to render"),
+                    (None, Some(_)) => {
+                        write!(f, "transform")
+                    }
+                    (Some(geometry), None) => write!(f, "{}", geometry.name()),
+                    (Some(_), Some(_)) => unreachable!(),
+                }?;
+
+                if let Some(resolution) = resolution {
+                    write!(f, " {resolution}")?
+                }
+                Ok(())
+            }
+            RenderOutput::Geometry3D {
+                local_matrix,
+                resolution,
+                geometry,
+                ..
+            } => {
+                write!(f, "3D -> ")?;
+                match (geometry, local_matrix) {
+                    (None, None) => write!(f, "nothing to render"),
+                    (None, Some(_)) => {
+                        write!(f, "transform")
+                    }
+                    (Some(geometry), None) => write!(f, "{}", geometry.name()),
+                    (Some(_), Some(_)) => unreachable!(),
+                }?;
+
+                if let Some(resolution) = resolution {
+                    write!(f, " {resolution}")?
+                }
+                Ok(())
+            }
+        }
+    }
+}
+
+impl TreeDisplay for RenderOutput {
+    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
+        writeln!(f, "{:depth$}{self}", "")
+    }
 }

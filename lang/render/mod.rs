@@ -129,7 +129,7 @@ impl Model {
         // Calculate the resolution for the model.
         set_resolution(self, resolution);
 
-        eprintln!("Finished prerender:\n{}", FormatTree(self));
+        log::trace!("Finished prerender:\n{}", FormatTree(self));
 
         Ok(())
     }
@@ -174,8 +174,9 @@ impl Render<Geometry2DOutput> for Model {
 
 impl Render<Model> for Model {
     fn render(&self, context: &mut RenderContext) -> RenderResult<Model> {
-        let geometry: Geometry2DOutput = self.render(context)?;
-        self.borrow_mut().output_mut().set_geometry_2d(geometry);
+        let _: Geometry2DOutput = self.render(context)?;
+        log::trace!("Finished render:\n{}", FormatTree(self));
+
         Ok(self.clone())
     }
 }
@@ -188,6 +189,7 @@ impl Render<Geometries2D> for Models {
                 geometries.push(geo.as_ref().clone());
             }
         }
+
         Ok(Geometries2D::new(geometries))
     }
 }
