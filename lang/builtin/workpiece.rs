@@ -67,9 +67,9 @@ pub enum BuiltinWorkbenchKind {
 /// The return value when calling a built-in workpiece.
 pub enum BuiltinWorkpieceOutput {
     /// 2D geometry output.
-    Geometry2D(Geometry2D),
+    Primitive2D(Geometry2D),
     /// 3D geometry output.
-    Geometry3D(Geometry3D),
+    Primitive3D(Geometry3D),
     /// Transformation.
     Transform(AffineTransform),
     /// Operation.
@@ -84,6 +84,8 @@ pub type BuiltinWorkpieceFn = dyn Fn(&Tuple) -> RenderResult<BuiltinWorkpieceOut
 pub struct BuiltinWorkpiece {
     /// Kind of the workpiece.
     pub kind: BuiltinWorkbenchKind,
+    /// Output type
+    pub output_type: OutputType,
     /// Creator symbol.
     pub creator: Creator,
     /// The function that will be called when the workpiece is rendered.
@@ -117,6 +119,11 @@ pub trait BuiltinWorkbenchDefinition {
     /// The kind of the built-in workbench.
     fn kind() -> BuiltinWorkbenchKind;
 
+    /// The expected output type.
+    fn output_type() -> OutputType {
+        OutputType::NotDetermined
+    }
+
     /// The function that generates an output from the workpiece.
     fn workpiece_function() -> &'static BuiltinWorkpieceFn;
 
@@ -124,6 +131,7 @@ pub trait BuiltinWorkbenchDefinition {
     fn workpiece(creator: Creator) -> BuiltinWorkpiece {
         BuiltinWorkpiece {
             kind: Self::kind(),
+            output_type: Self::output_type(),
             creator,
             f: Self::workpiece_function(),
         }

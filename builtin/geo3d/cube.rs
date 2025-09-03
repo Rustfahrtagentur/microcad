@@ -17,7 +17,7 @@ impl BuiltinWorkbenchDefinition for Cube {
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
         use microcad_core::*;
         &|args| {
-            Ok(BuiltinWorkpieceOutput::Geometry3D(Geometry3D::Cube(
+            Ok(BuiltinWorkpieceOutput::Primitive3D(Geometry3D::Cube(
                 geo3d::Cube {
                     size: Vec3::new(args.get("size_x"), args.get("size_y"), args.get("size_z")),
                 },

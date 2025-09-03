@@ -18,7 +18,7 @@ impl BuiltinWorkbenchDefinition for Circle {
         use microcad_core::*;
 
         &|args| {
-            Ok(BuiltinWorkpieceOutput::Geometry2D(Geometry2D::Circle(
+            Ok(BuiltinWorkpieceOutput::Primitive2D(Geometry2D::Circle(
                 geo2d::Circle {
                     radius: args.get("radius"),
                     offset: (args.get("cx"), args.get("cy")).into(),

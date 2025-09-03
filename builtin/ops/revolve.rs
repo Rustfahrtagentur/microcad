@@ -1,6 +1,8 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use std::rc::Rc;
+
 use microcad_core::*;
 use microcad_lang::{builtin::*, model::*, render::*};
 
@@ -16,26 +18,26 @@ impl Operation for Revolve {
         OutputType::Geometry3D
     }
 
-    fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
-        todo!()
-        /*use std::rc::Rc;
-        let geometries = model.render_geometry_2d(cache)?;
+    fn process_3d(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        context.update_3d(|context, model, resolution| {
+            let model_ = model.borrow();
+            let geometries: Geometries2D = model_.children.render(context)?;
 
-        let model_ = model.borrow();
-        let output = model_.output.as_ref().expect("Some render output");
+            let multi_polygon_data =
+                geo2d::multi_polygon_to_vec(&geometries.render_to_multi_polygon(&resolution));
+            let multi_polygon_data: Vec<_> = multi_polygon_data
+                .iter()
+                .map(|ring| ring.as_slice())
+                .collect();
 
-        let multi_polygon_data =
-            geo2d::multi_polygon_to_vec(&geometries.render_to_multi_polygon(&output.resolution()));
-        let multi_polygon_data: Vec<_> = multi_polygon_data
-            .iter()
-            .map(|ring| ring.as_slice())
-            .collect();
-
-        Ok(Rc::new(Geometry3D::Manifold(Rc::new(Manifold::revolve(
-            &multi_polygon_data,
-            self.circular_segments as u32,
-            self.revolve_degrees,
-        )))))*/
+            Ok(Some(Rc::new(Geometry3D::Manifold(Rc::new(
+                Manifold::revolve(
+                    &multi_polygon_data,
+                    self.circular_segments as u32,
+                    self.revolve_degrees,
+                ),
+            )))))
+        })
     }
 }
 
@@ -46,6 +48,10 @@ impl BuiltinWorkbenchDefinition for Revolve {
 
     fn kind() -> BuiltinWorkbenchKind {
         BuiltinWorkbenchKind::Operation
+    }
+
+    fn output_type() -> OutputType {
+        OutputType::Geometry3D
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {

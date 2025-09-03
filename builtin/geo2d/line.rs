@@ -26,7 +26,7 @@ impl BuiltinWorkbenchDefinition for Line {
                 args.get("y1"),
             );
 
-            Ok(BuiltinWorkpieceOutput::Geometry2D(Geometry2D::Line(
+            Ok(BuiltinWorkpieceOutput::Primitive2D(Geometry2D::Line(
                 geo2d::Line(coord! {x: x0, y: y0}.into(), coord! {x: x1, y: y1}.into()),
             )))
         }

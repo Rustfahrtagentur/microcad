@@ -118,7 +118,7 @@ impl Model {
                 let mut model_ = model.borrow_mut();
                 let output = model_.output.as_mut().expect("Output");
 
-                let resolution = resolution * output.world_matrix();
+                let resolution = resolution * output.local_matrix().unwrap_or(Mat4::identity());
                 output.set_resolution(resolution.clone());
                 resolution
             };
@@ -167,9 +167,9 @@ impl Render<Geometry2DOutput> for Model {
             let model = context.model();
             let geometry = {
                 let model_ = model.borrow();
-                let output = model_.output();
+                let output = model.deduce_output_type();
                 match output {
-                    RenderOutput::Geometry2D { .. } => {
+                    OutputType::Geometry2D => {
                         match model_.element() {
                             // A group geometry will render the child geometry
                             Element::BuiltinWorkpiece(builtin_workpiece) => {
@@ -178,7 +178,7 @@ impl Render<Geometry2DOutput> for Model {
                             _ => model_.children.render(context),
                         }
                     }
-                    RenderOutput::Geometry3D { .. } => Ok(None),
+                    _ => Ok(None),
                 }
             }?;
 
@@ -201,10 +201,9 @@ impl Render<Geometry3DOutput> for Model {
             let model = context.model();
             let geometry = {
                 let model_ = model.borrow();
-                let output = model_.output();
+                let output = model.deduce_output_type();
                 match output {
-                    RenderOutput::Geometry2D { .. } => Ok(None),
-                    RenderOutput::Geometry3D { .. } => {
+                    OutputType::Geometry3D => {
                         match model_.element() {
                             // A group geometry will render the child geometry
                             Element::BuiltinWorkpiece(builtin_workpiece) => {
@@ -213,6 +212,7 @@ impl Render<Geometry3DOutput> for Model {
                             _ => model_.children.render(context),
                         }
                     }
+                    _ => Ok(None),
                 }
             }?;
 
@@ -226,13 +226,15 @@ impl Render<Geometry3DOutput> for Model {
 
 impl Render<Model> for Model {
     fn render(&self, context: &mut RenderContext) -> RenderResult<Model> {
-        let output = self.borrow().output().clone();
-        match output {
-            RenderOutput::Geometry2D { .. } => {
+        match self.deduce_output_type() {
+            OutputType::Geometry2D => {
                 let _: Geometry2DOutput = self.render(context)?;
             }
-            RenderOutput::Geometry3D { .. } => {
+            OutputType::Geometry3D => {
                 let _: Geometry3DOutput = self.render(context)?;
+            }
+            output_type => {
+                log::warn!("Nothing to render: {output_type}");
             }
         }
         log::trace!("Finished render:\n{}", FormatTree(self));
@@ -290,7 +292,7 @@ impl Render<Geometry3DOutput> for Models {
 impl Render<Geometry2DOutput> for BuiltinWorkpiece {
     fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         Ok(match self.call()? {
-            BuiltinWorkpieceOutput::Geometry2D(geo2d) => Some(Rc::new(geo2d)),
+            BuiltinWorkpieceOutput::Primitive2D(geo2d) => Some(Rc::new(geo2d)),
             BuiltinWorkpieceOutput::Transform(transform) => {
                 let model = context.model();
                 let model_ = model.borrow();
@@ -302,7 +304,10 @@ impl Render<Geometry2DOutput> for BuiltinWorkpiece {
                     )
                 })
             }
-            BuiltinWorkpieceOutput::Operation(operation) => operation.process_2d(context)?,
+            BuiltinWorkpieceOutput::Operation(operation) => {
+                log::error!("{}", operation.output_type());
+                operation.process_2d(context)?
+            }
             _ => None,
         })
     }
@@ -311,7 +316,7 @@ impl Render<Geometry2DOutput> for BuiltinWorkpiece {
 impl Render<Geometry3DOutput> for BuiltinWorkpiece {
     fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
         Ok(match self.call()? {
-            BuiltinWorkpieceOutput::Geometry3D(geo3d) => Some(Rc::new(geo3d)),
+            BuiltinWorkpieceOutput::Primitive3D(geo3d) => Some(Rc::new(geo3d)),
             BuiltinWorkpieceOutput::Transform(transform) => {
                 let model = context.model();
                 let model_ = model.borrow();

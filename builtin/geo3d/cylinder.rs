@@ -17,7 +17,7 @@ impl BuiltinWorkbenchDefinition for Cylinder {
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
         use microcad_core::*;
         &|args| {
-            Ok(BuiltinWorkpieceOutput::Geometry3D(Geometry3D::Cylinder(
+            Ok(BuiltinWorkpieceOutput::Primitive3D(Geometry3D::Cylinder(
                 geo3d::Cylinder {
                     radius_bottom: args.get("radius_bottom"),
                     radius_top: args.get("radius_top"),

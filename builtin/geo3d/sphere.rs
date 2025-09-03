@@ -18,7 +18,7 @@ impl BuiltinWorkbenchDefinition for Sphere {
         use microcad_core::*;
 
         &|args| {
-            Ok(BuiltinWorkpieceOutput::Geometry3D(
+            Ok(BuiltinWorkpieceOutput::Primitive3D(
                 geo3d::Geometry3D::Sphere(geo3d::Sphere {
                     radius: args.get("radius"),
                 }),

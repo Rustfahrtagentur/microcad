@@ -24,7 +24,7 @@ impl BuiltinWorkbenchDefinition for Rect {
             let x = args.get("x");
             let y = args.get("y");
 
-            Ok(BuiltinWorkpieceOutput::Geometry2D(Geometry2D::Rect(
+            Ok(BuiltinWorkpieceOutput::Primitive2D(Geometry2D::Rect(
                 geo2d::Rect::new(coord! {x: x, y: y}, coord! {x: x + width, y: y + height}),
             )))
         }

@@ -42,7 +42,7 @@ impl Element {
                 BuiltinWorkbenchKind::Primitive2D => OutputType::Geometry2D,
                 BuiltinWorkbenchKind::Primitive3D => OutputType::Geometry3D,
                 BuiltinWorkbenchKind::Transform | BuiltinWorkbenchKind::Operation => {
-                    OutputType::NotDetermined
+                    builtin_workpiece.output_type
                 }
             },
             Element::Group | Element::ChildrenMarker => OutputType::NotDetermined,
