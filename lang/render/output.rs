@@ -173,7 +173,7 @@ impl std::fmt::Display for RenderOutput {
                         write!(f, "transform")
                     }
                     (Some(geometry), None) => write!(f, "{}", geometry.name()),
-                    (Some(_), Some(_)) => unreachable!(),
+                    (Some(geometry), Some(_)) => write!(f, "transformed {}", geometry.name()),
                 }?;
 
                 if let Some(resolution) = resolution {

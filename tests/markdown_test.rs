@@ -229,7 +229,7 @@ pub fn run_test(
                 match (eval, context.has_errors(), todo) {
                     // test expected to succeed and succeeds with no errors
                     (Ok(mut model), false, false) => {
-                        use microcad_lang::model::{ExportCommand as Export, Model, OutputType};
+                        use microcad_lang::model::{ExportCommand as Export, OutputType};
 
                         // get print output
                         write!(log_out, "-- Model --\n{}\n", FormatTree(&model))

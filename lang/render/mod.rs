@@ -127,17 +127,28 @@ impl Model {
         // Create specific render output with local matrix.
         create_render_output(self)?;
 
-        if self.deduce_output_type() == OutputType::NotDetermined {
-            // Calculate the world matrix.
-            set_world_matrix(self, Mat4::identity())?;
+        // Calculate the world matrix.
+        set_world_matrix(self, Mat4::identity())?;
 
-            // Calculate the resolution for the model.
-            set_resolution(self, resolution);
-        }
+        // Calculate the resolution for the model.
+        set_resolution(self, resolution);
 
         log::trace!("Finished prerender:\n{}", FormatTree(self));
 
         Ok(())
+    }
+}
+
+impl FetchBounds2D for Model {
+    fn fetch_bounds_2d(&self) -> Bounds2D {
+        let self_ = self.borrow();
+        match self_.output() {
+            RenderOutput::Geometry2D { geometry, .. } => match geometry {
+                Some(geometry) => geometry.fetch_bounds_2d(),
+                None => Bounds2D::default(),
+            },
+            RenderOutput::Geometry3D { .. } => Bounds2D::default(),
+        }
     }
 }
 

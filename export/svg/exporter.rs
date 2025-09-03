@@ -104,6 +104,8 @@ impl Exporter for SvgExporter {
             ))?;
 
             model.write_svg(&mut writer, &SvgTagAttributes::default())?;
+        } else {
+            panic!("No bounding box!");
         }
         Ok(Value::None)
     }
