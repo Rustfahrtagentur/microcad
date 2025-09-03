@@ -1,5 +1,5 @@
-pub use __builtin::ops::difference;
-pub use __builtin::ops::intersection;
+pub use __builtin::ops::subtract;
+pub use __builtin::ops::intersect;
 pub use __builtin::ops::union;
 pub use __builtin::ops::hull;
 

@@ -149,7 +149,7 @@ impl Model {
 
     /// Return inner group if this model only contains a group as single child.
     ///
-    /// This function is used when we evaluate operations like `difference() {}` or `hull() {}`.
+    /// This function is used when we evaluate operations like `subtract() {}` or `hull() {}`.
     /// When evaluating these operations, we want to iterate over the group's children.
     pub fn into_group(&self) -> Option<Model> {
         let children = &self.borrow().children;

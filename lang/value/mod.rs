@@ -266,7 +266,7 @@ impl std::ops::Sub for Value {
             // Boolean difference operator for models
             (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
                 lhs.union()
-                    .boolean_op(microcad_core::BooleanOp::Difference, rhs.union()),
+                    .boolean_op(microcad_core::BooleanOp::Subtract, rhs.union()),
             )),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} - {rhs}"))),
         }
@@ -362,7 +362,7 @@ impl std::ops::BitAnd for Value {
     fn bitand(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
-                lhs.union().boolean_op(BooleanOp::Intersection, rhs.union()),
+                lhs.union().boolean_op(BooleanOp::Intersect, rhs.union()),
             )),
             (Value::Bool(lhs), Value::Bool(rhs)) => Ok(Value::Bool(lhs & rhs)),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} & {rhs}"))),

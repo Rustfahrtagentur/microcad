@@ -59,11 +59,11 @@ impl BuiltinWorkbenchDefinition for Union {
 }
 
 /// Difference operation.
-pub struct Difference;
+pub struct Subtract;
 
-impl BuiltinWorkbenchDefinition for Difference {
+impl BuiltinWorkbenchDefinition for Subtract {
     fn id() -> &'static str {
-        "difference"
+        "subtract"
     }
 
     fn kind() -> BuiltinWorkbenchKind {
@@ -73,18 +73,18 @@ impl BuiltinWorkbenchDefinition for Difference {
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
         &|_| {
             Ok(BuiltinWorkpieceOutput::Operation(Box::new(
-                BooleanOp::Difference,
+                BooleanOp::Subtract,
             )))
         }
     }
 }
 
 /// Intersection operation.
-pub struct Intersection;
+pub struct Intersect;
 
-impl BuiltinWorkbenchDefinition for Intersection {
+impl BuiltinWorkbenchDefinition for Intersect {
     fn id() -> &'static str {
-        "intersection"
+        "intersect"
     }
 
     fn kind() -> BuiltinWorkbenchKind {
@@ -94,7 +94,7 @@ impl BuiltinWorkbenchDefinition for Intersection {
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
         &|_| {
             Ok(BuiltinWorkpieceOutput::Operation(Box::new(
-                BooleanOp::Intersection,
+                BooleanOp::Intersect,
             )))
         }
     }
@@ -104,8 +104,8 @@ impl From<BooleanOp> for BuiltinWorkpiece {
     fn from(value: BooleanOp) -> Self {
         match value {
             BooleanOp::Union => Union::workpiece(&Tuple::default()),
-            BooleanOp::Difference => Difference::workpiece(&Tuple::default()),
-            BooleanOp::Intersection => Intersection::workpiece(&Tuple::default()),
+            BooleanOp::Subtract => Subtract::workpiece(&Tuple::default()),
+            BooleanOp::Intersect => Intersect::workpiece(&Tuple::default()),
             BooleanOp::Complement => unimplemented!(),
         }
     }

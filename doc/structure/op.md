@@ -33,7 +33,7 @@ op punched_disk() {
     // check number of children
     if @children.count() == 2 {
         // make hole
-        @children.difference(); 
+        @children.subtract(); 
     } else {
         std::error("punched_disk must get two objects");
     }
@@ -57,7 +57,7 @@ op punch_disk(radius: Length) {
         { 
             @children;
             std::geo2d::Circle(radius);
-        }.difference();
+        }.subtract();
     } else {
         std::error("punch_disk must get one object");
     }

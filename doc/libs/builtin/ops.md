@@ -2,7 +2,7 @@
 
 ## `ops`
 
-### `difference`
+### `subtract`
 
 [![test](.test/builtin_difference_2d.svg)](.test/builtin_difference_2d.log)
 
@@ -13,7 +13,7 @@ use __builtin::*;
 {
     geo2d::Circle(radius = 3.0).ops::translate(x = 1.0, y = 1.0, z = 0.0);
     geo2d::Rect(x = 0.0, y = 0.0, width = 3.0, height = 3.0);
-}.ops::difference();
+}.ops::subtract();
 ```
 
 [![test](.test/builtin_difference_3d.svg)](.test/builtin_difference_3d.log)
@@ -24,12 +24,12 @@ use __builtin::*;
 {
     geo3d::Sphere(radius = 3.0);
     geo3d::Cube(size_x = 3.0, size_y = 3.0, size_z = 3.0);
-}.ops::difference();
+}.ops::subtract();
 ```
 
 ### `union`
 
-### `intersection`
+### `intersect`
 
 ### `hull`
 

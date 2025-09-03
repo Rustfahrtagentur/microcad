@@ -227,7 +227,7 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     let intersection = Geometry2D::Rect(rect).boolean_op(
         &RenderResolution::default(),
         &Geometry2D::Circle(circle.clone()),
-        &BooleanOp::Intersection,
+        &BooleanOp::Intersect,
     );
 
     intersection.write_svg_mapped(

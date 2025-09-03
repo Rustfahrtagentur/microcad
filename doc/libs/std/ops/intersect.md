@@ -18,5 +18,5 @@ std::geo2d::Circle(radius = 3mm) & std::geo2d::Rect(width = 3mm, height = 2mm);
 {
     std::geo2d::Circle(radius = 3mm);
     std::geo2d::Rect(width = 3mm, height = 2mm);
-}.std::ops::intersection();
+}.std::ops::intersect();
 ```

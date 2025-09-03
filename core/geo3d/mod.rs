@@ -22,8 +22,8 @@ impl From<&BooleanOp> for manifold_rs::BooleanOp {
     fn from(op: &BooleanOp) -> Self {
         match op {
             BooleanOp::Union => manifold_rs::BooleanOp::Union,
-            BooleanOp::Intersection => manifold_rs::BooleanOp::Intersection,
-            BooleanOp::Difference => manifold_rs::BooleanOp::Difference,
+            BooleanOp::Intersect => manifold_rs::BooleanOp::Intersection,
+            BooleanOp::Subtract => manifold_rs::BooleanOp::Difference,
             _ => unimplemented!(),
         }
     }

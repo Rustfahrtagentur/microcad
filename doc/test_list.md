@@ -59,8 +59,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/code.svg)](../doc/structure/.test/code.log) | [code](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/code_between_initializers.svg)](../doc/structure/.test/code_between_initializers.log) | [code_between_initializers](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/code_post_init.svg)](../doc/structure/.test/code_post_init.log) | [code_post_init](../doc/structure/workbench.md) |
-| [![test](../doc/libs/std/ops/.test/difference_alt_operator.svg)](../doc/libs/std/ops/.test/difference_alt_operator.log) | [difference_alt_operator](../doc/libs/std/ops/difference.md) |
-| [![test](../doc/libs/std/ops/.test/difference_operator.svg)](../doc/libs/std/ops/.test/difference_operator.log) | [difference_operator](../doc/libs/std/ops/difference.md) |
+| [![test](../doc/libs/std/ops/.test/difference_alt_operator.svg)](../doc/libs/std/ops/.test/difference_alt_operator.log) | [difference_alt_operator](../doc/libs/std/ops/subtract.md) |
+| [![test](../doc/libs/std/ops/.test/difference_operator.svg)](../doc/libs/std/ops/.test/difference_operator.log) | [difference_operator](../doc/libs/std/ops/subtract.md) |
 | [![test](../doc/tests/.test/empty_op.svg)](../doc/tests/.test/empty_op.log) | [empty_op](../doc/tests/semicolon.md) |
 | [![test](../doc/structure/.test/example.svg)](../doc/structure/.test/example.log) | [example](../doc/structure/functions.md) |
 | [![test](../doc/.test/export_attributes.svg)](../doc/.test/export_attributes.log) | [export_attributes](../doc/export.md) |
@@ -105,8 +105,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/initial_source_file_mixed.svg)](../doc/structure/.test/initial_source_file_mixed.log) | [initial_source_file_mixed](../doc/structure/source_files.md) |
 | [![test](../doc/structure/.test/initializers.svg)](../doc/structure/.test/initializers.log) | [initializers](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/inline_identifiers.svg)](../doc/structure/.test/inline_identifiers.log) | [inline_identifiers](../doc/structure/arguments.md) |
-| [![test](../doc/libs/std/ops/.test/intersection_alt_operator.svg)](../doc/libs/std/ops/.test/intersection_alt_operator.log) | [intersection_alt_operator](../doc/libs/std/ops/intersection.md) |
-| [![test](../doc/libs/std/ops/.test/intersection_operator.svg)](../doc/libs/std/ops/.test/intersection_operator.log) | [intersection_operator](../doc/libs/std/ops/intersection.md) |
+| [![test](../doc/libs/std/ops/.test/intersection_alt_operator.svg)](../doc/libs/std/ops/.test/intersection_alt_operator.log) | [intersection_alt_operator](../doc/libs/std/ops/intersect.md) |
+| [![test](../doc/libs/std/ops/.test/intersection_operator.svg)](../doc/libs/std/ops/.test/intersection_operator.log) | [intersection_operator](../doc/libs/std/ops/intersect.md) |
 | [![test](../doc/tests/.test/locals.svg)](../doc/tests/.test/locals.log) | [locals](../doc/tests/locals.md) |
 | [![test](../doc/libs/std/math/.test/math_abs.svg)](../doc/libs/std/math/.test/math_abs.log) | [math_abs](../doc/libs/std/math/README.md) |
 | [![test](../doc/libs/std/math/.test/math_trigonometric.svg)](../doc/libs/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/libs/std/math/README.md) |

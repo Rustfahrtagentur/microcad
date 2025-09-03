@@ -39,7 +39,7 @@ part FootPad(
             .extrude(slot.y)
             .translate(z = height - slot.y);
         
-    }.difference();
+    }.subtract();
 
     holes = {
         Circle(d = corner_hole.lower_d, c = hole_pos)

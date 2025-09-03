@@ -8,7 +8,7 @@ sketch DrillPlate(size = 100mm, hole_size = 10mm) {
         std::geo2d::Rect(size);
         Circle(diameter = hole_size).
             translate(x = [-l,l], y = [-l,l])
-    }.difference()
+    }.subtract()
 }
 
 

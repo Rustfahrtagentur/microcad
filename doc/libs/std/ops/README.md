@@ -21,6 +21,6 @@ Some operations can be written in operator form:
 Currently the following operation are available:
 
 * [union](union.md)
-* [difference](difference.md)
-* [intersection](intersection.md)
+* [subtract](subtract.md)
+* [intersect](intersect.md)
 * [hull](hull.md)

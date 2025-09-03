@@ -20,5 +20,5 @@ use std::*;
 {
     geo2d::Circle(radius = 10mm);
     geo2d::Rect(size = 2mm);
-}.ops::difference();
+}.ops::subtract();
 ```
