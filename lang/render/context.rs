@@ -37,7 +37,7 @@ impl RenderContext {
 
     /// The current model (panics if it is none).
     pub fn model(&self) -> Model {
-        self.model_stack.first().expect("A model").clone()
+        self.model_stack.last().expect("A model").clone()
     }
 
     /// Run the closure `f` within the given `model`.
