@@ -5,7 +5,7 @@
 -- Code --
 
  1: use std::geo2d::Rect;
- 2: use std::ops::difference;
+ 2: use std::ops::subtract;
  3: 
  4: thickness = 1.2mm;
  5: width = 31.8mm;
@@ -13,9 +13,27 @@
  7: {
  8:     Rect(width, height);
  9:     Rect(width = width - 2 * thickness, height = height - 2 * thickness);
-10: }.difference();
+10: }.subtract();
 
 -- Output --
 -- Errors --
+error: Symbol std::ops::subtract not found.
+  ---> <FROM STR>:2:5
+     |
+   2 | use std::ops::subtract;
+     |     ^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol subtract not found.
+  ---> <FROM STR>:10:3
+     |
+  10 | }.subtract();
+     |   ^^^^^^^^
+     |
+warning: This expression statement did not produce any model
+  ---> <FROM STR>:7:1
+     |
+   7 | {
+     | ^
+     |
 -- Test Result --
-OK
+FAIL

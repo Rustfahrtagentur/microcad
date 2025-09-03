@@ -10,8 +10,8 @@
  4: const SPACING = 8mm;
  5: 
  6: sketch Base(width: Length, height: Length) {
- 7:     wall_width = 1.2mm;
- 8:     frame = Frame(width, height, thickness = wall_width);
+ 7:     thickness = 1.2mm;
+ 8:     frame = Frame(width, height, thickness);
  9:     struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
 10:         .translate(x = [0..3] * SPACING)
 11:         .center();

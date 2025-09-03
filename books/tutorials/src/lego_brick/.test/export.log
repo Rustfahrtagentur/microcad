@@ -1,0 +1,28 @@
+-- Test --
+  export
+  ../books/tutorials/src/lego_brick/export.md:14
+
+-- Code --
+
+ 1: mod lego_brick;
+ 2: 
+ 3: use lego_brick::*;
+ 4: 
+ 5: #[export = "lego_brick2x2.stl"]
+ 6: brick2x2 = LegoBrick(rows = 2, columns = 2, base_height = 9.6mm * 2);
+ 7: 
+ 8: #[export = "lego_brick4x2.stl"]
+ 9: brick4x2 = LegoBrick(rows = 4, columns = 2);
+10: 
+11: #[export = "lego-brick5x1.stl"]
+12: brick3x2 = LegoBrick(rows = 5, columns = 1, base_height = 3.2mm);
+
+-- Parse Error --
+Parser error:  --> 1:15
+  |
+1 | mod lego_brick;
+  |               ^---
+  |
+  = expected single_line_comment or body
+-- Test Result --
+FAIL

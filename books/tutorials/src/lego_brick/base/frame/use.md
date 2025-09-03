@@ -1,6 +1,6 @@
 # Use Statement
 
-You might be wondering why we always have to write `std::geo2d::` and `std::ops::` in front of `Rect` and `difference`.
+You might be wondering why we always have to write `std::geo2d::` and `std::ops::` in front of `Rect` and `subtract`.
 This is because builtin sketches (and parts) in µcad are organized within modules in a
 [standard library](../libs/std/README.md).
 `std` is the name of the top module of this library and
@@ -15,7 +15,7 @@ This means, from the previous code, we can simply write:
 
 ```µcad,use
 use std::geo2d::Rect;
-use std::ops::difference;
+use std::ops::subtract;
 
 thickness = 1.2mm;
 width = 31.8mm;
@@ -23,7 +23,7 @@ height = 15.8mm;
 {
     Rect(width, height);
     Rect(width = width - 2 * thickness, height = height - 2 * thickness);
-}.difference();
+}.subtract();
 ```
 
 ![Picture](.test/use-out.svg)

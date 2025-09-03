@@ -28,4 +28,7 @@
     - [Making a concept](./lego_brick/part/concept.md)
     - [Custom operation](./lego_brick/part/custom_op.md)
     - [The final part](./lego_brick/part/final.md)
+  - [External module](./lego_brick/external.md)
+  - [Control Export](./lego_brick/export.md)
+  - [Recap](./lego_brick/recap.md)
   - [Exercises](./lego_brick/exercises.md)
