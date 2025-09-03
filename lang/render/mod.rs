@@ -304,10 +304,7 @@ impl Render<Geometry2DOutput> for BuiltinWorkpiece {
                     )
                 })
             }
-            BuiltinWorkpieceOutput::Operation(operation) => {
-                log::error!("{}", operation.output_type());
-                operation.process_2d(context)?
-            }
+            BuiltinWorkpieceOutput::Operation(operation) => operation.process_2d(context)?,
             _ => None,
         })
     }
