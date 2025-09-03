@@ -4,9 +4,9 @@
 
 ### `subtract`
 
-[![test](.test/builtin_difference_2d.svg)](.test/builtin_difference_2d.log)
+[![test](.test/builtin_subtract_2d.svg)](.test/builtin_subtract_2d.log)
 
-```µcad,builtin_difference_2d
+```µcad,builtin_subtract_2d
 use __builtin::*;
 
 #[color = "red"]
@@ -16,9 +16,9 @@ use __builtin::*;
 }.ops::subtract();
 ```
 
-[![test](.test/builtin_difference_3d.svg)](.test/builtin_difference_3d.log)
+[![test](.test/builtin_subtract_3d.svg)](.test/builtin_subtract_3d.log)
 
-```µcad,builtin_difference_3d
+```µcad,builtin_subtract_3d
 use __builtin::*;
 
 {
