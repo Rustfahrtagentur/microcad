@@ -228,7 +228,7 @@ pub fn run_test(
                 // check if test awaited to succeed but failed at evaluation
                 match (eval, context.has_errors(), todo) {
                     // test expected to succeed and succeeds with no errors
-                    (Ok(mut model), false, false) => {
+                    (Ok(model), false, false) => {
                         use microcad_lang::model::{ExportCommand as Export, OutputType};
 
                         // get print output
@@ -238,36 +238,33 @@ pub fn run_test(
                         let _ = fs::hard_link("images/ok.svg", banner);
                         writeln!(log_out, "-- Test Result --\nOK").expect("no output error");
 
-                        if let Ok(mut render_context) =
-                            RenderContext::init(&model, RenderResolution::default())
-                        {
-                            model = model.render(&mut render_context).expect("No render error");
-                        } else {
-                            write!(log_out, "Nothing to render.").expect("no output error");
-                        }
-
-                        match model.deduce_output_type() {
-                            OutputType::Geometry2D => {
-                                Export {
-                                    filename: format!("{out_filename}.svg").into(),
-                                    resolution: RenderResolution::default(),
-                                    exporter: Rc::new(SvgExporter),
-                                }
-                                .export(&model)
-                                .expect("No error");
+                        let export = match model.deduce_output_type() {
+                            OutputType::Geometry2D => Some(Export {
+                                filename: format!("{out_filename}.svg").into(),
+                                resolution: RenderResolution::default(),
+                                exporter: Rc::new(SvgExporter),
+                            }),
+                            OutputType::Geometry3D => Some(Export {
+                                filename: format!("{out_filename}.stl").into(),
+                                resolution: RenderResolution::coarse(),
+                                exporter: Rc::new(StlExporter),
+                            }),
+                            OutputType::NotDetermined => {
+                                writeln!(log_out, "Could not determine output type.")
+                                    .expect("output error");
+                                None
                             }
-                            OutputType::Geometry3D => {
-                                Export {
-                                    filename: format!("{out_filename}.stl").into(),
-                                    resolution: RenderResolution::coarse(),
-                                    exporter: Rc::new(StlExporter),
-                                }
-                                .export(&model)
-                                .expect("No error");
-                            }
-                            OutputType::NotDetermined => {}
                             _ => panic!("Invalid geometry output"),
+                        };
+
+                        match export {
+                            Some(export) => match export.export(&model) {
+                                Ok(_) => writeln!(log_out, "Export successful."),
+                                Err(error) => writeln!(log_out, "Export error: {error}"),
+                            },
+                            None => writeln!(log_out, "Nothing will be exported."),
                         }
+                        .expect("output error")
                     }
                     // test is todo but succeeds with no errors
                     (Ok(_), false, true) => {

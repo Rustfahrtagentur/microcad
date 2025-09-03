@@ -3,6 +3,8 @@
 
 //! Builtin center operation.
 
+use std::rc::Rc;
+
 use microcad_lang::{builtin::*, render::*};
 
 #[derive(Debug)]
@@ -10,11 +12,12 @@ pub struct Center;
 
 impl Operation for Center {
     fn process_2d(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
-        todo!()
-        /*context.update_2d(|context, model, resolution| {
-            let geometry: Geometry2DOutput = model.render(context)?;
-            geometry.map(|geometry| geometry.center(&resolution))
-        })*/
+        context.update_2d(|context, model, resolution| {
+            let model_ = model.borrow();
+            let geometry: Geometry2DOutput = model_.children.render(context)?;
+            use microcad_core::traits::Center;
+            Ok(geometry.map(|geometry| Rc::new(geometry.center(&resolution))))
+        })
     }
 
     fn process_3d(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {

@@ -48,11 +48,25 @@ impl RenderContext {
         result
     }
 
-    /// Update 2D a geometry if it is not in cache.
+    /// Update a 2D geometry if it is not in cache.
+    ///
+    /// TODO Add cache look up functionality.
     pub fn update_2d(
         &mut self,
         f: impl FnOnce(&mut RenderContext, Model, RenderResolution) -> RenderResult<Geometry2DOutput>,
     ) -> RenderResult<Geometry2DOutput> {
+        let model = self.model();
+        let resolution = self.current_resolution();
+        f(self, model, resolution)
+    }
+
+    /// Update a 3D geometry if it is not in cache.
+    ///
+    /// TODO Add cache look up functionality.
+    pub fn update_3d(
+        &mut self,
+        f: impl FnOnce(&mut RenderContext, Model, RenderResolution) -> RenderResult<Geometry3DOutput>,
+    ) -> RenderResult<Geometry3DOutput> {
         let model = self.model();
         let resolution = self.current_resolution();
         f(self, model, resolution)

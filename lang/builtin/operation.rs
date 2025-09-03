@@ -22,15 +22,16 @@ impl Operation for BooleanOp {
         })
     }
 
-    fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
-        todo!()
-        /*Ok(Rc::new(Geometry3D::Manifold(
-            match model.into_group() {
-                Some(model) => model.prerender(cache),
-                None => model.prerender(cache),
-            }?
-            .boolean_op(&model.borrow().resolution(), self),
-        )))*/
+    fn process_3d(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        context.update_3d(|context, model, resolution| {
+            let model = model.into_group().unwrap_or(model);
+            let model_ = model.borrow();
+            let geometries: Geometries3D = model_.children.render(context)?;
+
+            Ok(Some(Rc::new(Geometry3D::Manifold(
+                geometries.boolean_op(&resolution, self),
+            ))))
+        })
     }
 }
 

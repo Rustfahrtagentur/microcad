@@ -4,7 +4,7 @@
 //! Scalable Vector Graphics (SVG) export
 
 use microcad_core::{Color, Scalar, theme::Theme};
-use microcad_lang::{Id, builtin::*, model::*, parameter, value::*};
+use microcad_lang::{Id, builtin::*, model::*, parameter, render::RenderError, value::*};
 
 /// SVG Exporter
 pub struct SvgExporter;
@@ -111,10 +111,10 @@ impl Exporter for SvgExporter {
             ))?;
 
             model.write_svg(&mut writer, &SvgTagAttributes::default())?;
+            Ok(Value::None)
         } else {
-            panic!("No bounding box!");
+            Err(ExportError::RenderError(RenderError::NothingToRender))
         }
-        Ok(Value::None)
     }
 
     fn output_type(&self) -> OutputType {

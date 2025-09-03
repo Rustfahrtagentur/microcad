@@ -25,7 +25,7 @@ pub struct ExportCommand {
 impl ExportCommand {
     /// Export the model. By the settings in the attribute.
     pub fn export(&self, model: &Model) -> Result<Value, ExportError> {
-        let mut render_context = RenderContext::init(model, RenderResolution::default())?;
+        let mut render_context = RenderContext::init(model, self.resolution.clone())?;
 
         use crate::render::Render;
         self.exporter

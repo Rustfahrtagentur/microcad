@@ -1,6 +1,8 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use crate::traits::Center;
+
 use super::*;
 
 use geo::ConvexHull;
@@ -46,7 +48,7 @@ impl Geometry2D {
     }
 
     /// Apply hull operation.
-    pub fn hull(self, resolution: &RenderResolution) -> Self {
+    pub fn hull(&self, resolution: &RenderResolution) -> Self {
         match self {
             Geometry2D::LineString(line_string) => Geometry2D::Polygon(line_string.convex_hull()),
             Geometry2D::MultiLineString(multi_line_string) => {
@@ -56,8 +58,8 @@ impl Geometry2D {
             Geometry2D::MultiPolygon(multi_polygon) => {
                 Geometry2D::Polygon(multi_polygon.convex_hull())
             }
-            Geometry2D::Rect(rect) => Geometry2D::Rect(rect),
-            Geometry2D::Circle(circle) => Geometry2D::Circle(circle),
+            Geometry2D::Rect(rect) => Geometry2D::Rect(*rect),
+            Geometry2D::Circle(circle) => Geometry2D::Circle(circle.clone()),
             Geometry2D::Line(line) => Geometry2D::Polygon(
                 LineString::new(vec![line.0.into(), line.1.into()]).convex_hull(),
             ),
@@ -118,6 +120,17 @@ impl Transformed2D for Geometry2D {
                 Geometry2D::Line(line) => Self::Line(line.transformed_2d(resolution, mat)),
                 _ => unreachable!("Geometry type not supported"),
             }
+        }
+    }
+}
+
+impl Center for Geometry2D {
+    fn center(&self, resolution: &RenderResolution) -> Self {
+        if let Some(bounds) = self.fetch_bounds_2d().rect() {
+            let d: Vec2 = bounds.center().x_y().into();
+            self.transformed_2d(resolution, &Mat3::from_translation(-d))
+        } else {
+            self.clone()
         }
     }
 }

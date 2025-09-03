@@ -3,6 +3,8 @@
 
 //! 3D Geometry collection
 
+use std::rc::Rc;
+
 use derive_more::{Deref, DerefMut};
 
 use crate::{
@@ -12,12 +14,12 @@ use crate::{
 
 /// 3D geometry collection.
 #[derive(Debug, Clone, Default, Deref, DerefMut)]
-pub struct Geometries3D(Vec<Geometry3D>);
+pub struct Geometries3D(Vec<Rc<Geometry3D>>);
 
 impl Geometries3D {
     /// New geometry collection.
     pub fn new(geometries: Vec<Geometry3D>) -> Self {
-        Self(geometries)
+        Self(geometries.into_iter().map(Rc::new).collect())
     }
 
     /// Append another geometry collection.
@@ -26,11 +28,7 @@ impl Geometries3D {
     }
 
     /// Apply boolean operation on collection and render to manifold.
-    pub fn boolean_op(
-        &self,
-        resolution: &RenderResolution,
-        op: &BooleanOp,
-    ) -> std::rc::Rc<Manifold> {
+    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> Rc<Manifold> {
         let manifold_list: Vec<_> = self
             .0
             .iter()
@@ -46,19 +44,25 @@ impl Geometries3D {
             .collect();
 
         if manifold_list.is_empty() {
-            return std::rc::Rc::new(Manifold::empty());
+            return Rc::new(Manifold::empty());
         }
 
         manifold_list[1..]
             .iter()
             .fold(manifold_list[0].clone(), |acc, other| {
-                std::rc::Rc::new(acc.boolean_op(other, op.into()))
+                Rc::new(acc.boolean_op(other, op.into()))
             })
     }
 
     /// Convex hull.
     pub fn hull(&self, resolution: &RenderResolution) -> Manifold {
         self.render_to_manifold(resolution).hull()
+    }
+}
+
+impl FromIterator<Rc<Geometry3D>> for Geometries3D {
+    fn from_iter<T: IntoIterator<Item = Rc<Geometry3D>>>(iter: T) -> Self {
+        Geometries3D(iter.into_iter().collect())
     }
 }
 
@@ -74,7 +78,7 @@ impl Transformed3D for Geometries3D {
     fn transformed_3d(&self, render_resolution: &RenderResolution, mat: &Mat4) -> Self {
         Self(
             self.iter()
-                .map(|geometry| geometry.transformed_3d(render_resolution, mat))
+                .map(|geometry| Rc::new(geometry.transformed_3d(render_resolution, mat)))
                 .collect::<Vec<_>>(),
         )
     }

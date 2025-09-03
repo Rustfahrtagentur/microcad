@@ -3,7 +3,7 @@
 
 //! Write primitives to STL ([`WriteSvg`] trait implementations).
 
-use microcad_core::{Geometry3D, Manifold, TriangleMesh};
+use microcad_core::{Geometry3D, Manifold, Transformed3D, TriangleMesh};
 use microcad_lang::model::Model;
 
 use crate::stl::{StlWriter, WriteStl};
@@ -33,33 +33,26 @@ impl WriteStl for Geometry3D {
 }
 
 impl WriteStl for Model {
-    fn write_stl(&self, _writer: &mut StlWriter) -> std::io::Result<()> {
-        todo!()
-
-        /*
-        assert_eq!(self.final_output_type(), OutputType::Geometry3D);
-
+    fn write_stl(&self, writer: &mut StlWriter) -> std::io::Result<()> {
         let self_ = self.borrow();
-        let output = self_.output.as_ref().expect("Render output");
-        let world_matrix = output.world_matrix();
-        let render_resolution = output.resolution().clone();
-
-        // Render all output geometries.
-        self.fetch_output_geometry_3d()
-            .iter()
-            .try_for_each(|geometry| {
-                geometry
-                    .transformed_3d(&render_resolution, &world_matrix)
-                    .write_stl(writer)
-            })?;
-
-
-        if !matches!(self_.element, Element::Operation(_)) {
-            self_
-                .children()
-                .try_for_each(|child| child.write_stl(writer))?;
+        let output = self_.output();
+        match output {
+            microcad_lang::render::RenderOutput::Geometry3D {
+                world_matrix,
+                geometry,
+                ..
+            } => {
+                let mat = world_matrix.expect("Some matrix");
+                match geometry {
+                    Some(geometry) => geometry
+                        .transformed_3d(&self_.resolution(), &mat)
+                        .write_stl(writer),
+                    None => self_
+                        .children()
+                        .try_for_each(|model| model.write_stl(writer)),
+                }
+            }
+            _ => Ok(()),
         }
-
-        Ok(())*/
     }
 }

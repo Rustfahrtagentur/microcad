@@ -104,6 +104,14 @@ impl RenderOutput {
         }
     }
 
+    /// Set the 2D geometry as render output.
+    pub fn set_geometry_3d(&mut self, geo: Geometry3DOutput) {
+        match self {
+            RenderOutput::Geometry2D { .. } => unreachable!(),
+            RenderOutput::Geometry3D { geometry, .. } => *geometry = geo,
+        }
+    }
+
     /// Get render resolution.
     pub fn resolution(&self) -> &Option<RenderResolution> {
         match self {

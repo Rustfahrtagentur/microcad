@@ -29,6 +29,10 @@ pub enum RenderError {
     /// Invalid output type.
     #[error("Invalid output type: {0}")]
     InvalidOutputType(OutputType),
+
+    /// Nothing to render.
+    #[error("Nothing to render")]
+    NothingToRender,
 }
 
 /// A result from rendering a model.
@@ -154,10 +158,9 @@ impl FetchBounds2D for Model {
 
 /// This implementation renders a [`Geometry2D`] out of a [`Model`].
 ///
-/// Note: It does *not* attach the output geometry to the model's render output.
-/// It is assumed the model has been pre-rendered.
-/// The current model in the context has not changed.
-/// If the geometry is already in the cache, the geometry in the cache will be returned.
+/// Notes:
+/// * The impl attaches the output geometry to the model's render output.
+/// * It is assumed the model has been pre-rendered.
 impl Render<Geometry2DOutput> for Model {
     fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         context.with_model(self.clone(), |context| {
@@ -169,15 +172,13 @@ impl Render<Geometry2DOutput> for Model {
                     RenderOutput::Geometry2D { .. } => {
                         match model_.element() {
                             // A group geometry will render the child geometry
-                            Element::Group => model_.children.render(context),
-                            Element::Workpiece(workpiece) => workpiece.render(context),
                             Element::BuiltinWorkpiece(builtin_workpiece) => {
                                 builtin_workpiece.render(context)
                             }
-                            Element::ChildrenMarker => unreachable!(),
+                            _ => model_.children.render(context),
                         }
                     }
-                    RenderOutput::Geometry3D { .. } => unreachable!(),
+                    RenderOutput::Geometry3D { .. } => Ok(None),
                 }
             }?;
 
@@ -189,9 +190,51 @@ impl Render<Geometry2DOutput> for Model {
     }
 }
 
+/// This implementation renders a [`Geometry3D`] out of a [`Model`].
+///
+/// Notes:
+/// * The impl attaches the output geometry to the model's render output.
+/// * It is assumed the model has been pre-rendered.
+impl Render<Geometry3DOutput> for Model {
+    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        context.with_model(self.clone(), |context| {
+            let model = context.model();
+            let geometry = {
+                let model_ = model.borrow();
+                let output = model_.output();
+                match output {
+                    RenderOutput::Geometry2D { .. } => Ok(None),
+                    RenderOutput::Geometry3D { .. } => {
+                        match model_.element() {
+                            // A group geometry will render the child geometry
+                            Element::BuiltinWorkpiece(builtin_workpiece) => {
+                                builtin_workpiece.render(context)
+                            }
+                            _ => model_.children.render(context),
+                        }
+                    }
+                }
+            }?;
+
+            self.borrow_mut()
+                .output_mut()
+                .set_geometry_3d(geometry.clone());
+            Ok(geometry)
+        })
+    }
+}
+
 impl Render<Model> for Model {
     fn render(&self, context: &mut RenderContext) -> RenderResult<Model> {
-        let _: Geometry2DOutput = self.render(context)?;
+        let output = self.borrow().output().clone();
+        match output {
+            RenderOutput::Geometry2D { .. } => {
+                let _: Geometry2DOutput = self.render(context)?;
+            }
+            RenderOutput::Geometry3D { .. } => {
+                let _: Geometry3DOutput = self.render(context)?;
+            }
+        }
         log::trace!("Finished render:\n{}", FormatTree(self));
 
         Ok(self.clone())
@@ -221,6 +264,29 @@ impl Render<Geometry2DOutput> for Models {
     }
 }
 
+impl Render<Geometries3D> for Models {
+    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometries3D> {
+        let mut geometries = Vec::new();
+        for model in self.iter() {
+            if let Some(geo) = model.render(context)? {
+                geometries.push(geo);
+            }
+        }
+
+        Ok(geometries.into_iter().collect())
+    }
+}
+
+impl Render<Geometry3DOutput> for Models {
+    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        Ok(match self.len() {
+            0 => None,
+            1 => self.first().expect("One item").render(context)?,
+            _ => Some(Rc::new(Geometry3D::Collection(self.render(context)?))),
+        })
+    }
+}
+
 impl Render<Geometry2DOutput> for BuiltinWorkpiece {
     fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         Ok(match self.call()? {
@@ -242,8 +308,37 @@ impl Render<Geometry2DOutput> for BuiltinWorkpiece {
     }
 }
 
+impl Render<Geometry3DOutput> for BuiltinWorkpiece {
+    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        Ok(match self.call()? {
+            BuiltinWorkpieceOutput::Geometry3D(geo3d) => Some(Rc::new(geo3d)),
+            BuiltinWorkpieceOutput::Transform(transform) => {
+                let model = context.model();
+                let model_ = model.borrow();
+                let geometry: Geometry3DOutput = model_.children.render(context)?;
+
+                geometry.map(|geometry| {
+                    Rc::new(
+                        geometry.transformed_3d(&context.current_resolution(), &transform.mat3d()),
+                    )
+                })
+            }
+            BuiltinWorkpieceOutput::Operation(operation) => operation.process_3d(context)?,
+            _ => None,
+        })
+    }
+}
+
 impl Render<Geometry2DOutput> for Workpiece {
     fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
+        let model = context.model();
+        let model_ = model.borrow();
+        model_.children.render(context)
+    }
+}
+
+impl Render<Geometry3DOutput> for Workpiece {
+    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
         let model = context.model();
         let model_ = model.borrow();
         model_.children.render(context)

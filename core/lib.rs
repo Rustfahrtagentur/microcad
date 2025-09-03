@@ -12,6 +12,7 @@ pub mod geo2d;
 pub mod geo3d;
 pub mod render_resolution;
 pub mod theme;
+pub mod traits;
 
 /// Primitive integer type
 pub type Integer = i64;

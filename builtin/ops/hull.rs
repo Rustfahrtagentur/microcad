@@ -3,21 +3,20 @@
 
 //! Builtin hull operation.
 
+use std::rc::Rc;
+
 use microcad_lang::{builtin::*, render::*};
 
 #[derive(Debug)]
 pub struct Hull;
 
 impl Operation for Hull {
-    fn process_2d(&self, _context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
-        todo!()
-        /*
-        let model_ = model.borrow();
-        let output = model_.output.as_ref().expect("Some render output");
-
-        Ok(Rc::new(Geometry2D::Polygon(
-            model.render_geometry_2d(cache)?.hull(&output.resolution()),
-        ))) */
+    fn process_2d(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
+        context.update_2d(|context, model, resolution| {
+            let model_ = model.borrow();
+            let geometry: Geometry2DOutput = model_.children.render(context)?;
+            Ok(geometry.map(|geometry| Rc::new(geometry.hull(&resolution))))
+        })
     }
 
     fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
