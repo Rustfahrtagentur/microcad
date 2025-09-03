@@ -28,6 +28,11 @@ pub enum Geometry2D {
 }
 
 impl Geometry2D {
+    /// Return name of geometry.
+    pub fn name(&self) -> &'static str {
+        self.into()
+    }
+
     /// Apply boolean operation.
     pub fn boolean_op(
         &self,

@@ -33,6 +33,11 @@ impl std::fmt::Debug for Geometry3D {
 }
 
 impl Geometry3D {
+    /// Return name of geometry.
+    pub fn name(&self) -> &'static str {
+        self.into()
+    }
+
     /// Execute boolean operation.
     pub fn boolean_op(
         &self,
