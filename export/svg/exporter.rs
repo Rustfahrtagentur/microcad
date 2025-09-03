@@ -86,16 +86,15 @@ impl Exporter for SvgExporter {
         .collect()
     }
 
-    fn export(&self, _model: &Model, _filename: &std::path::Path) -> Result<Value, ExportError> {
-        todo!()
-        /*
-                use microcad_core::FetchBounds2D;
+    fn export(&self, model: &Model, filename: &std::path::Path) -> Result<Value, ExportError> {
+        use crate::svg::*;
+        use microcad_core::FetchBounds2D;
 
         if let Some(content_rect) = model.fetch_bounds_2d().rect() {
             log::debug!("Exporting into SVG file {filename:?}");
             let f = std::fs::File::create(filename)?;
             let mut writer = SvgWriter::new_canvas(
-                Box::new(BufWriter::new(f)),
+                Box::new(std::io::BufWriter::new(f)),
                 model.get_size(),
                 *content_rect,
                 None,
@@ -106,7 +105,7 @@ impl Exporter for SvgExporter {
 
             model.write_svg(&mut writer, &SvgTagAttributes::default())?;
         }
-        Ok(Value::None)*/
+        Ok(Value::None)
     }
 
     fn output_type(&self) -> OutputType {
