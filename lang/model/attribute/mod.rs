@@ -4,18 +4,18 @@
 //! Model attributes.
 
 mod attributes;
-mod export;
+mod export_command;
 mod layer;
-mod measure;
-mod resolution;
+mod measure_command;
+mod resolution_attribute;
 
 use std::rc::Rc;
 
 pub use attributes::Attributes;
-pub use export::ExportCommand;
+pub use export_command::ExportCommand;
 pub use layer::Layer;
-pub use measure::MeasureCommand;
-pub use resolution::ResolutionAttribute;
+pub use measure_command::MeasureCommand;
+pub use resolution_attribute::ResolutionAttribute;
 
 use crate::{create_tuple_value, syntax::*, value::*};
 
