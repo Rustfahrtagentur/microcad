@@ -70,8 +70,8 @@
                             Group -> 2D
                               sketch std::geo2d::Rect(height: Length = 15.8mm, width: Length = 31.8mm) -> 2D
                                 Primitive2D __builtin::geo2d::Rect(height: Scalar = 15.8, width: Scalar = 31.8, x: Scalar = -15.9, y: Scalar = -7.9)⏎ -> 2D
-                              sketch std::geo2d::Rect(height: Length = 13.4mm, width: Length = 29.400000000000002mm) -> 2D
-                                Primitive2D __builtin::geo2d::Rect(height: Scalar = 13.4, width: Scalar = 29.400000000000002, x: Scalar = -14.700000000000001, y: Scalar = -…
+                              sketch std::geo2d::Rect(height: Length = 13.4mm, width: Length = 29.4mm) -> 2D
+                                Primitive2D __builtin::geo2d::Rect(height: Scalar = 13.4, width: Scalar = 29.4, x: Scalar = -14.7, y: Scalar = -6.7)⏎ -> 2D
                         op [30m[105m[1m NO ID [39m[49m[22m::grid(columns: Integer = 1, rows: Integer = 3) -> 2D[0m
                           Operation __builtin::ops::align()⏎ -> 2D
                             op std::ops::translate(x: Length = 0mm, y: Length = 0mm, z: Length = 0mm) -> 2D
