@@ -1,6 +1,6 @@
 # Custom operation
 
-The knobs and struts are created using multiplicity and the knobs already use the `center()`
+The knobs and struts are created using multiplicity and the knobs already use the `align()`
 operation and the struts might use this too.
 
 To make placing the elements more generic we will create an operation called `grid`

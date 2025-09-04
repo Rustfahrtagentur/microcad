@@ -39,7 +39,7 @@ std::geo2d::Circle(d = 4.8mm, c = (
 Calculating `x` and `y` is a bit tricky here, because we now have no element in the center anymore
 so we have to subtract `0.5` from all the array values before multiplying with `8mm` to get a centered result.
 
-To avoid this complication we can use the function `center()` which can be applied to any workbench
+To avoid this complication we can use the function `align()` which can be applied to any workbench
 and centers the object to origin.
 
 [![test](.test/cap_align.svg)](.test/cap_align.log)
