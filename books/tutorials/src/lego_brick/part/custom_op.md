@@ -48,7 +48,7 @@ sketch Base(
     width: Length,
     height: Length
 ) {
-    thickness = 1.2mm,
+    thickness = 1.2mm;
     frame = Frame(width, height, thickness);
     struts = (Ring(outer = 6.51mm, inner = 4.8mm)).grid(rows, columns);
     frame | struts;
