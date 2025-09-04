@@ -17,11 +17,11 @@ width = 15.8mm;
 height = 31.8mm;
 
 Cap(width, height)
-    .extrude(z = 1.0mm);
+    .extrude(1.0mm);
 ```
 
 This will create a box with dimensions 15.8 ⨯ 31.8 ⨯ 1.0 mm.
 
-Notice that by using `z = 1.0mm` we will extrude along Z axis about one millimeter.
+Notice that with `std::ops::extrude()` we always will extrude along Z axis.
 
 ![Picture](.test/extrude_cap-out.svg)

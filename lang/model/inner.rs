@@ -10,7 +10,7 @@ pub enum ModelRenderState {
     /// The model has not been rendered.
     /// Model output is [`None`].
     Pending,
-    /// The model has been prerendered via [`Model::prerender`]
+    /// The model has been pre-rendered via [`Model::pre-render`]
     /// Model output is [`Some`], but there is no geometry.
     Preparing,
     /// Rendering is completed.
@@ -92,14 +92,14 @@ impl ModelInner {
     pub fn output(&self) -> &RenderOutput {
         self.output
             .as_ref()
-            .expect("Render output. You have to prerender() and render() the model first.")
+            .expect("Render output. You have to pre-render() and render() the model first.")
     }
 
     /// Returns the mutable render output, panics if there is no render output.
     pub fn output_mut(&mut self) -> &mut RenderOutput {
         self.output
             .as_mut()
-            .expect("Render output. You have to prerender() and render() the model first.")
+            .expect("Render output. You have to pre-render() and render() the model first.")
     }
 }
 

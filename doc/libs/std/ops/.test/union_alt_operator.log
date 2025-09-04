@@ -15,10 +15,10 @@
   Group -> 2D (root)
     Operation __builtin::ops::union()⏎ -> 2D
       Group -> 2D
-        sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 3mm) -> 2D
-          Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 3)⏎ -> 2D
-        sketch std::geo2d::Rect(height: 2mm, width: 3mm) -> 2D
-          Primitive2D __builtin::geo2d::Rect(height: 2, width: 3, x: -1.5, y: -1)⏎ -> 2D
+        sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 3mm) -> 2D
+          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3)⏎ -> 2D
+        sketch std::geo2d::Rect(height: Length = 2mm, width: Length = 3mm) -> 2D
+          Primitive2D __builtin::geo2d::Rect(height: Scalar = 2, width: Scalar = 3, x: Scalar = -1.5, y: Scalar = -1)⏎ -> 2D
 
 -- Test Result --
 OK

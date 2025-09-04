@@ -17,10 +17,10 @@
 -- Errors --
 -- Model --
   Group -> 3D (root)
-    op std::ops::extrude(height: 1mm) -> 3D
-      Operation __builtin::ops::extrude(height: 1, n_divisions: 0, scale_top_x: 1, sca…
-        sketch std::geo2d::Rect(height: 31.8mm, width: 15.8mm) -> 2D
-          Primitive2D __builtin::geo2d::Rect(height: 31.8, width: 15.8, x: -7.9, y: -15.9)…
+    op std::ops::extrude(height: Length = 1mm) -> 3D
+      Operation __builtin::ops::extrude(height: Scalar = 1, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_degr…
+        sketch std::geo2d::Rect(height: Length = 31.8mm, width: Length = 15.8mm) -> 2D
+          Primitive2D __builtin::geo2d::Rect(height: Scalar = 31.8, width: Scalar = 15.8, x: Scalar = -7.9, y: Scalar = -15.9)⏎ -> 2D
 
 -- Test Result --
 OK

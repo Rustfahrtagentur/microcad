@@ -48,7 +48,7 @@ and centers the object to origin.
 std::geo2d::Circle(d = 4.8mm, c = (
         x = [0..3] * 8mm, 
         y = [0..1] * 8mm)
-    ).center();
+    ).align();
 ```
 
 ![Picture](.test/cap_center-out.svg)
@@ -67,7 +67,7 @@ If we pass to array of `Length` to the tuple, we can generate a multiplicity, wh
 ```µcad,knobs
 sketch Knobs(diameter = 4.8mm) {
     std::geo2d::Circle(d = 4.8mm, c = (x = [0..3] * 8mm, y = [0..1] * 8mm))
-        .center();
+        .align();
 }
 
 Knobs();

@@ -9,7 +9,7 @@
  3: op grid(rows: Integer, columns: Integer) {
  4:     @children
  5:         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
- 6:         .center()
+ 6:         .align()
  7: }
 
 -- Output --

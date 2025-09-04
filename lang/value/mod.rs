@@ -377,7 +377,7 @@ impl std::fmt::Display for Value {
             Value::Integer(n) => write!(f, "{n}"),
             Value::Quantity(q) => write!(f, "{q}"),
             Value::Bool(b) => write!(f, "{b}"),
-            Value::String(s) => write!(f, "\"{s}\""),
+            Value::String(s) => write!(f, "{s}"),
             Value::Array(l) => write!(f, "{l}"),
             Value::Tuple(t) => write!(f, "{t}"),
             Value::Matrix(m) => write!(f, "{m}"),

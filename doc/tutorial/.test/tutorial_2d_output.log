@@ -11,8 +11,8 @@
 -- Errors --
 -- Model --
   Group -> 2D (root)
-    sketch std::geo2d::Rect(height: 31.8mm, width: 15.8mm) -> 2D
-      Primitive2D __builtin::geo2d::Rect(height: 31.8, width: 15.8, x: -7.9, y: -15.9)…
+    sketch std::geo2d::Rect(height: Length = 31.8mm, width: Length = 15.8mm) -> 2D
+      Primitive2D __builtin::geo2d::Rect(height: Scalar = 31.8, width: Scalar = 15.8, x: Scalar = -7.9, y: Scalar = -15.9)⏎ -> 2D
 
 -- Test Result --
 OK

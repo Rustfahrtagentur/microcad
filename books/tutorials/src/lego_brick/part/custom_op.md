@@ -14,7 +14,7 @@ const SPACING = 8mm;
 op grid(rows: Integer, columns: Integer) {
     @children
         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
-        .center()
+        .align()
 }
 ```
 
@@ -39,7 +39,7 @@ const SPACING = 8mm;
 op grid(rows: Integer, columns: Integer) {
     @children
         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
-        .center()
+        .align()
 }
 
 sketch Base(

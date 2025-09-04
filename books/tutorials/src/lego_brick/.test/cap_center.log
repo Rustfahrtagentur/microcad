@@ -7,15 +7,15 @@
  1: std::geo2d::Circle(d = 4.8mm, c = (
  2:         x = [0..3] * 8mm, 
  3:         y = [0..1] * 8mm)
- 4:     ).center();
+ 4:     ).align();
 
 -- Output --
 -- Errors --
-error: Symbol center not found.
+error: Symbol align not found.
   ---> <FROM STR>:4:7
      |
-   4 |     ).center();
-     |       ^^^^^^
+   4 |     ).align();
+     |       ^^^^^
      |
 warning: This expression statement did not produce any model
   ---> <FROM STR>:1:1

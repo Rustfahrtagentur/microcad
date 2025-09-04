@@ -168,15 +168,13 @@ impl Model {
 
     /// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
     pub fn signature(&self) -> String {
-        let self_ = self.borrow();
-
         format!(
             "{id}{element} -> {output_type}{is_root}",
-            id = match &self_.id {
+            id = match &self.borrow().id {
                 Some(id) => format!("{id}: "),
                 None => String::new(),
             },
-            element = *self_.element,
+            element = *self.borrow().element,
             output_type = self.deduce_output_type(),
             is_root = if self.parents().next().is_some() {
                 ""

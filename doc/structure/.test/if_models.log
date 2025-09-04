@@ -19,14 +19,14 @@
 -- Errors --
 -- Model --
   Group -> 2D (root)
-    sketch [30m[105m[1m NO ID [39m[49m[22m::MySketch(a: 1) -> 2D[0m
+    sketch [30m[105m[1m NO ID [39m[49m[22m::MySketch(a: Integer = 1) -> 2D[0m
       Group -> 2D
-        sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 1mm) -> 2D
-          Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 1)⏎ -> 2D
-    sketch [30m[105m[1m NO ID [39m[49m[22m::MySketch(a: 2) -> 2D[0m
+        sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 1mm) -> 2D
+          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 1)⏎ -> 2D
+    sketch [30m[105m[1m NO ID [39m[49m[22m::MySketch(a: Integer = 2) -> 2D[0m
       Group -> 2D
-        sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 4mm) -> 2D
-          Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 4)⏎ -> 2D
+        sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 4mm) -> 2D
+          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 4)⏎ -> 2D
 
 -- Test Result --
 OK

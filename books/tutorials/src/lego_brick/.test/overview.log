@@ -14,14 +14,14 @@
  8:     frame = Frame(width, height, thickness);
  9:     struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
 10:         .translate(x = [0..3] * SPACING)
-11:         .center();
+11:         .align();
 12:     frame | struts;
 13: }
 14: 
 15: use Rect as Cap;
 16: 
 17: sketch Knobs() {
-18:     Circle(d = 4.8mm, center = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
+18:     Circle(d = 4.8mm, c = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
 19: }
 20: 
 21: width = 15.8mm;
@@ -34,28 +34,16 @@
 -- Output --
 -- Errors --
 error: Symbol center not found.
-  ---> <FROM STR>:11:10
+  ---> <FROM STR>:18:73
      |
-  11 |         .center();
-     |          ^^^^^^
-     |
-error: Workbench Circle cannot find initialization for those arguments
-  ---> <FROM STR>:18:12
-     |
-  18 |     Circle(d = 4.8mm, center = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
-     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol center not found.
-  ---> <FROM STR>:18:78
-     |
-  18 |     Circle(d = 4.8mm, center = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
-     |                                                                              ^^^^^^
+  18 |     Circle(d = 4.8mm, c = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
+     |                                                                         ^^^^^^
      |
 warning: This expression statement did not produce any model
   ---> <FROM STR>:18:5
      |
-  18 |     Circle(d = 4.8mm, center = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  18 |     Circle(d = 4.8mm, c = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAIL

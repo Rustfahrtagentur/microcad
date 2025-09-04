@@ -26,22 +26,22 @@
 -- Errors --
 -- Model --
   Group -> 2D (root)
-    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: 0mm, y: 0mm, z: 0mm) -> 2…[0m
+    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: Length = 0mm, y: Length = 0mm, z: Length = 0mm) -> 2D[0m
       #[color = rgba(1, 0, 0, 1)]
-      Transform __builtin::ops::translate(x: 0, y: 0, z: 0)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Rect(height: 3, width: 3, x: 0, y: 0)⏎ -> 2D
-    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: 4mm, y: 0mm, z: 0mm) -> 2…[0m
+      Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D
+        Primitive2D __builtin::geo2d::Rect(height: Integer = 3, width: Integer = 3, x: Integer = 0, y: Integer = 0)⏎ -> 2D
+    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: Length = 4mm, y: Length = 0mm, z: Length = 0mm) -> 2D[0m
       #[color = rgba(0, 0, 1, 1)]
-      Transform __builtin::ops::translate(x: 4, y: 0, z: 0)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Rect(height: 3, width: 3, x: 0, y: 0)⏎ -> 2D
-    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: 0mm, y: 4mm, z: 0mm) -> 2…[0m
+      Transform __builtin::ops::translate(x: Scalar = 4, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D
+        Primitive2D __builtin::geo2d::Rect(height: Integer = 3, width: Integer = 3, x: Integer = 0, y: Integer = 0)⏎ -> 2D
+    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: Length = 0mm, y: Length = 4mm, z: Length = 0mm) -> 2D[0m
       #[color = rgba(0, 1, 0, 1)]
-      Transform __builtin::ops::translate(x: 0, y: 4, z: 0)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Rect(height: 3, width: 3, x: 0, y: 0)⏎ -> 2D
-    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: 4mm, y: 4mm, z: 0mm) -> 2…[0m
+      Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 4, z: Scalar = 0)⏎ -> 2D
+        Primitive2D __builtin::geo2d::Rect(height: Integer = 3, width: Integer = 3, x: Integer = 0, y: Integer = 0)⏎ -> 2D
+    op [30m[105m[1m NO ID [39m[49m[22m::translate(x: Length = 4mm, y: Length = 4mm, z: Length = 0mm) -> 2D[0m
       #[color = rgba(0.5, 0.5, 0.5, 1)]
-      Transform __builtin::ops::translate(x: 4, y: 4, z: 0)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Rect(height: 3, width: 3, x: 0, y: 0)⏎ -> 2D
+      Transform __builtin::ops::translate(x: Scalar = 4, y: Scalar = 4, z: Scalar = 0)⏎ -> 2D
+        Primitive2D __builtin::geo2d::Rect(height: Integer = 3, width: Integer = 3, x: Integer = 0, y: Integer = 0)⏎ -> 2D
 
 -- Test Result --
 OK

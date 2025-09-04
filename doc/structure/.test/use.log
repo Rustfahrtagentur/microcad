@@ -14,10 +14,10 @@
 -- Errors --
 -- Model --
   Group -> 2D (root)
-    sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), r: 4mm) -> 2D
-      Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 4)⏎ -> 2D
-    sketch std::geo2d::Rect(size: 40mm) -> 2D
-      Primitive2D __builtin::geo2d::Rect(height: 40, width: 40, x: -20, y: -20)⏎ -> 2D
+    sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), r: Length = 4mm) -> 2D
+      Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 4)⏎ -> 2D
+    sketch std::geo2d::Rect(size: Length = 40mm) -> 2D
+      Primitive2D __builtin::geo2d::Rect(height: Scalar = 40, width: Scalar = 40, x: Scalar = -20, y: Scalar = -20)⏎ -> 2D
 
 -- Test Result --
 OK

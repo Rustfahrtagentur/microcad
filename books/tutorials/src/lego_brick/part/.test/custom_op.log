@@ -12,7 +12,7 @@
  6: op grid(rows: Integer, columns: Integer) {
  7:     @children
  8:         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
- 9:         .center()
+ 9:         .align()
 10: }
 11: 
 12: sketch Base(

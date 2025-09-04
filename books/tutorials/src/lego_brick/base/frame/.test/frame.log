@@ -18,13 +18,13 @@
 -- Errors --
 -- Model --
   Group -> 2D (root)
-    sketch std::geo2d::Frame(height: 15.8mm, thickness: 1.2mm, width: 31.8mm) -> 2D
+    sketch std::geo2d::Frame(height: Length = 15.8mm, thickness: Length = 1.2mm, width: Length = 31.8mm) -> 2D
       Operation subtract()⏎ -> 2D
         Group -> 2D
-          sketch std::geo2d::Rect(height: 15.8mm, width: 31.8mm) -> 2D
-            Primitive2D __builtin::geo2d::Rect(height: 15.8, width: 31.8, x: -15.9, y: -7.9)…
-          sketch std::geo2d::Rect(height: 13.4mm, width: 29.400000000000002mm) -> 2D
-            Primitive2D __builtin::geo2d::Rect(height: 13.4, width: 29.400000000000002, x: -…
+          sketch std::geo2d::Rect(height: Length = 15.8mm, width: Length = 31.8mm) -> 2D
+            Primitive2D __builtin::geo2d::Rect(height: Scalar = 15.8, width: Scalar = 31.8, x: Scalar = -15.9, y: Scalar = -7.9)⏎ -> 2D
+          sketch std::geo2d::Rect(height: Length = 13.4mm, width: Length = 29.400000000000002mm) -> 2D
+            Primitive2D __builtin::geo2d::Rect(height: Scalar = 13.4, width: Scalar = 29.400000000000002, x: Scalar = -14.700000000000001, y: Scalar = -…
 
 -- Test Result --
 OK
