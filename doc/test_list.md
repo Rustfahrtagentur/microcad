@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**301** tests from markdown.
+**271** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -225,36 +225,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/types/.test/tuple_mul_scale.svg)](../doc/types/.test/tuple_mul_scale.log) | [tuple_mul_scale](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_neg.svg)](../doc/types/.test/tuple_neg.log) | [tuple_neg](../doc/types/tuples.md) |
 | [![test](../doc/types/.test/tuple_sub.svg)](../doc/types/.test/tuple_sub.log) | [tuple_sub](../doc/types/tuples.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_assignment.svg)](../doc/tutorial/.test/tutorial_2d_assignment.log) | [tutorial_2d_assignment](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_difference.svg)](../doc/tutorial/.test/tutorial_2d_difference.log) | [tutorial_2d_difference](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_frame.svg)](../doc/tutorial/.test/tutorial_2d_frame.log) | [tutorial_2d_frame](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_groups.svg)](../doc/tutorial/.test/tutorial_2d_groups.log) | [tutorial_2d_groups](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_inner.svg)](../doc/tutorial/.test/tutorial_2d_inner.log) | [tutorial_2d_inner](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_inner_outer.svg)](../doc/tutorial/.test/tutorial_2d_inner_outer.log) | [tutorial_2d_inner_outer](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_inner_outer_use.svg)](../doc/tutorial/.test/tutorial_2d_inner_outer_use.log) | [tutorial_2d_inner_outer_use](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_operator.svg)](../doc/tutorial/.test/tutorial_2d_operator.log) | [tutorial_2d_operator](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_output.svg)](../doc/tutorial/.test/tutorial_2d_output.log) | [tutorial_2d_output](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_rect.svg)](../doc/tutorial/.test/tutorial_2d_rect.log) | [tutorial_2d_rect](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_translate.svg)](../doc/tutorial/.test/tutorial_2d_translate.log) | [tutorial_2d_translate](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_translate_rotate.svg)](../doc/tutorial/.test/tutorial_2d_translate_rotate.log) | [tutorial_2d_translate_rotate](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_2d_use.svg)](../doc/tutorial/.test/tutorial_2d_use.log) | [tutorial_2d_use](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_part_base.svg)](../doc/tutorial/.test/tutorial_part_base.log) | [tutorial_part_base](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_part_cap.svg)](../doc/tutorial/.test/tutorial_part_cap.log) | [tutorial_part_cap](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_part_circle.svg)](../doc/tutorial/.test/tutorial_part_circle.log) | [tutorial_part_circle](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_part_extrude_cap.svg)](../doc/tutorial/.test/tutorial_part_extrude_cap.log) | [tutorial_part_extrude_cap](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_part_geo3d.svg)](../doc/tutorial/.test/tutorial_part_geo3d.log) | [tutorial_part_geo3d](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_part_knobs.svg)](../doc/tutorial/.test/tutorial_part_knobs.log) | [tutorial_part_knobs](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_part_overview.svg)](../doc/tutorial/.test/tutorial_part_overview.log) | [tutorial_part_overview](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_part_result.svg)](../doc/tutorial/.test/tutorial_part_result.log) | [tutorial_part_result](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_sketch_array_multiplication.svg)](../doc/tutorial/.test/tutorial_sketch_array_multiplication.log) | [tutorial_sketch_array_multiplication](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_sketch_base.svg)](../doc/tutorial/.test/tutorial_sketch_base.log) | [tutorial_sketch_base](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_sketch_begin.svg)](../doc/tutorial/.test/tutorial_sketch_begin.log) | [tutorial_sketch_begin](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_sketch_boolean_operations.svg)](../doc/tutorial/.test/tutorial_sketch_boolean_operations.log) | [tutorial_sketch_boolean_operations](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_sketch_constants.svg)](../doc/tutorial/.test/tutorial_sketch_constants.log) | [tutorial_sketch_constants](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_sketch_creating_arrays.svg)](../doc/tutorial/.test/tutorial_sketch_creating_arrays.log) | [tutorial_sketch_creating_arrays](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_sketch_multiple.svg)](../doc/tutorial/.test/tutorial_sketch_multiple.log) | [tutorial_sketch_multiple](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_sketch_multiplicity.svg)](../doc/tutorial/.test/tutorial_sketch_multiplicity.log) | [tutorial_sketch_multiplicity](../doc/tutorial/tutorial.md) |
-| [![test](../doc/tutorial/.test/tutorial_sketch_range_expressions.svg)](../doc/tutorial/.test/tutorial_sketch_range_expressions.log) | [tutorial_sketch_range_expressions](../doc/tutorial/tutorial.md) |
 | [![test](../doc/types/.test/types_bundles_functions.svg)](../doc/types/.test/types_bundles_functions.log) | [types_bundles_functions](../doc/types/README.md) |
 | [![test](../doc/types/.test/types_def_vs_decl.svg)](../doc/types/.test/types_def_vs_decl.log) | [types_def_vs_decl](../doc/types/README.md) |
 | [![test](../doc/types/.test/types_named_tuple.svg)](../doc/types/.test/types_named_tuple.log) | [types_named_tuple](../doc/types/named_tuple.md) |

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2' width='3mm' height='2mm'>
+<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3.3000000000000003 2.2' width='3.3000000000000003mm' height='2.2mm'>
 
   <defs>
     <!-- A marker to be used as an arrowhead -->
@@ -84,6 +84,6 @@
         
   </style>
   <g class="entity">
-    <path d="M0,2L3,2L3,0L0,0L0,2 Z  "/>
+    <path d="M0.15000000000000013,2.1L3.1500000000000004,2.1L3.1500000000000004,0.10000000000000009L0.15000000000000013,0.10000000000000009L0.15000000000000013,2.1 Z  "/>
   </g>
 </svg>

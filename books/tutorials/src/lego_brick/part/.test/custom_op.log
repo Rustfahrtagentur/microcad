@@ -21,7 +21,7 @@
 15:     width: Length,
 16:     height: Length
 17: ) {
-18:     thickness = 1.2mm,
+18:     thickness = 1.2mm;
 19:     frame = Frame(width, height, thickness);
 20:     struts = (Ring(outer = 6.51mm, inner = 4.8mm)).grid(rows, columns);
 21:     frame | struts;
@@ -31,12 +31,12 @@
 25:     Circle(d = 4.8mm).grid(rows, columns);
 26: }
 
--- Parse Error --
-Parser error:   --> 18:22
-   |
-18 |     thickness = 1.2mm,
-   |                      ^---
-   |
-   = expected single_line_comment, array_element_access, tuple_element_access, attribute_access, add, subtract, multiply, divide, union, intersect, power_xor, greater_than, less_than, greater_equal, less_equal, equal, near, not_equal, and, or, xor, if_binary_op, else_binary_op, or method_call
+-- Output --
+-- Errors --
+-- Model --
+  Group -> Undetermined (root)
+
 -- Test Result --
-FAIL
+OK
+Could not determine output type.
+Nothing will be exported.

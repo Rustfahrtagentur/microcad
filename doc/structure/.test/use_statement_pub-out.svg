@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40mm' height='40mm'>
+<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44' width='44mm' height='44mm'>
 
   <defs>
     <!-- A marker to be used as an arrowhead -->
@@ -84,7 +84,7 @@
         
   </style>
   <g class="entity">
-    <circle cx="20" cy="20" r="4"/>
-    <rect x="0" y="0" width="40" height="40"/>
+    <circle cx="22" cy="22" r="4"/>
+    <rect x="2" y="2" width="40" height="40"/>
   </g>
 </svg>

@@ -13,7 +13,12 @@
  7: // create YourSketch
  8: YourSketch();
 
--- Parse Error --
-Missing type or value for definition parameter: <NO ID>
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch <NO ID>::YourSketch() -> 2D
+
 -- Test Result --
-FAIL
+OK
+Export error: Render error: Nothing to render
