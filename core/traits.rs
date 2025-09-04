@@ -5,12 +5,8 @@
 
 use crate::RenderResolution;
 
-pub trait BooleanOp<T = Self> {}
-
-pub trait Center<T = Self> {
-    fn center(&self, resolution: &RenderResolution) -> T;
-}
-
-pub trait Hull<T = Self> {
-    fn hull(&self, resolution: &RenderResolution) -> T;
+/// Trait to align something to center
+pub trait Align<T = Self> {
+    /// Align geometry.
+    fn align(&self, resolution: &RenderResolution) -> T;
 }
