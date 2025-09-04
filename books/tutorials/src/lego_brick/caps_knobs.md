@@ -42,13 +42,13 @@ so we have to subtract `0.5` from all the array values before multiplying with `
 To avoid this complication we can use the function `center()` which can be applied to any workbench
 and centers the object to origin.
 
-[![test](.test/cap_center.svg)](.test/cap_center.log)
+[![test](.test/cap_align.svg)](.test/cap_align.log)
 
-```µcad,cap_center
+```µcad,cap_align
 std::geo2d::Circle(d = 4.8mm, c = (
         x = [0..3] * 8mm, 
         y = [0..1] * 8mm)
-    ).align();
+    ).std::ops::align();
 ```
 
 ![Picture](.test/cap_center-out.svg)
@@ -67,7 +67,7 @@ If we pass to array of `Length` to the tuple, we can generate a multiplicity, wh
 ```µcad,knobs
 sketch Knobs(diameter = 4.8mm) {
     std::geo2d::Circle(d = 4.8mm, c = (x = [0..3] * 8mm, y = [0..1] * 8mm))
-        .align();
+        .std::ops::align();
 }
 
 Knobs();

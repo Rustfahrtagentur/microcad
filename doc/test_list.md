@@ -59,7 +59,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/call_function.svg)](../doc/structure/.test/call_function.log) | [call_function](../doc/structure/calls.md) |
 | [![test](../doc/structure/.test/call_workbench.svg)](../doc/structure/.test/call_workbench.log) | [call_workbench](../doc/structure/calls.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/cap.svg)](../books/tutorials/src/lego_brick/.test/cap.log) | [cap](../books/tutorials/src/lego_brick/caps_knobs.md) |
-| [![test](../books/tutorials/src/lego_brick/.test/cap_center.svg)](../books/tutorials/src/lego_brick/.test/cap_center.log) | [cap_center](../books/tutorials/src/lego_brick/caps_knobs.md) |
+| [![test](../books/tutorials/src/lego_brick/.test/cap_align.svg)](../books/tutorials/src/lego_brick/.test/cap_align.log) | [cap_align](../books/tutorials/src/lego_brick/caps_knobs.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/cap_multiplicity.svg)](../books/tutorials/src/lego_brick/.test/cap_multiplicity.log) | [cap_multiplicity](../books/tutorials/src/lego_brick/caps_knobs.md) |
 | [![test](../doc/structure/.test/children.svg)](../doc/structure/.test/children.log) | [children](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/code.svg)](../doc/structure/.test/code.log) | [code](../doc/structure/workbench.md) |
