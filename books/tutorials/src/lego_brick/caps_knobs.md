@@ -51,7 +51,7 @@ std::geo2d::Circle(d = 4.8mm, c = (
     ).std::ops::align();
 ```
 
-![Picture](.test/cap_center-out.svg)
+![Picture](.test/cap_align-out.svg)
 
 The code looks clearer now.
 
