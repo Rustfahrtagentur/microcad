@@ -18,6 +18,11 @@ with the parameters `width` and `height` set to our measures.
 Like every statement in µcad, it ends with a semicolon (`;`).
 Executing this statement will eventually construct the actual geometry.
 
+As you can see, arguments in µcad are quite explicit.
+There are **no** positional parameters in µcad!
+Instead arguments must be given together with an identifier or match
+unambiguously by type.
+
 Like the outer frame, the inner frame is a `std::geo2d::Rect` too:
 
 [![test](.test/inner.svg)](.test/inner.log)
@@ -48,6 +53,14 @@ std::geo2d::Rect(width = width - 2 * thickness, height = height - 2 * thickness)
 ```
 
 ![Picture](.test/inner_outer-out.svg)
+
+Because we give arguments which match the parameter names of `std::geo2d::Rect()`
+we do not need to write extra parameter names here.
+This is called *auto-matching* and prevents us from having to write this:
+
+```µcad
+std::geo2d::Rect(width = width, height = height);
+```
 
 Now, we can execute the export command from the command line tool:
 

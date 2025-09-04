@@ -64,5 +64,7 @@ This is because µcad brings some builtin binary *operators* which are hard-link
 
 Those builtin operations are from the *builtin library* which can be found within the global module `__builtin`.
 
-Usually there is no need to use them directly (except with operators), because all builtin
-functionalities are also accessible via the *standard library*.
+Usually there is no need to use the builtin library directly, because all builtin
+functionalities are also accessible via the *standard library* and with a more
+convenient interface.
+
