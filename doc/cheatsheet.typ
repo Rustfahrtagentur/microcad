@@ -113,7 +113,7 @@
 
   .mirror(-std::math::Z)
 
-  .center()
+  .align()
 
   .extrude(height = 3.0mm)
 
