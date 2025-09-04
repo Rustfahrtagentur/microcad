@@ -27,3 +27,9 @@ impl Size2 {
         }
     }
 }
+
+impl std::fmt::Display for Size2 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Size2({} mm x {} mm)", self.width, self.height)
+    }
+}

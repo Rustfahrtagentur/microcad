@@ -16,7 +16,7 @@
 -- Model --
   Group -> 2D (root)
     Transform __builtin::ops::translate(x: Scalar = 15, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D
-      #[svg = CustomCommand { id: svg, arguments: Tuple { named: {fill: String = "", style: String = "fill:red"}, unnamed: {}, src_ref: 3:10 (28..46) in 0x6342015ff637821e } }]
+      #[svg = svg = (fill: String = , style: String = fill:red)]
       Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 15, z: Scalar = 0)⏎ -> 2D
         Primitive2D __builtin::geo2d::Rect(height: Scalar = 10, width: Scalar = 10, x: Scalar = 0, y: Scalar = 0)⏎ -> 2D
 

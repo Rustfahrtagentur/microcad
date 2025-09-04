@@ -56,3 +56,12 @@ impl TryFrom<Value> for ResolutionAttribute {
         }
     }
 }
+
+impl std::fmt::Display for ResolutionAttribute {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ResolutionAttribute::Linear(linear) => write!(f, "Linear({linear} mm)"),
+            ResolutionAttribute::Relative(relative) => write!(f, "Relative({relative}%)"),
+        }
+    }
+}

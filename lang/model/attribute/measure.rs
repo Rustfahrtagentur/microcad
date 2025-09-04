@@ -28,3 +28,13 @@ impl From<MeasureCommand> for Value {
         }
     }
 }
+
+impl std::fmt::Display for MeasureCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MeasureCommand::Size => write!(f, "Size"),
+            MeasureCommand::Width => write!(f, "Width"),
+            MeasureCommand::Height => write!(f, "Height"),
+        }
+    }
+}

@@ -30,6 +30,12 @@ pub struct CustomCommand {
     pub arguments: Box<Tuple>,
 }
 
+impl std::fmt::Display for CustomCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} = {}", self.id, self.arguments)
+    }
+}
+
 /// An attribute for a model.
 #[derive(Clone, Debug)]
 pub enum Attribute {
@@ -84,12 +90,12 @@ impl std::fmt::Display for Attribute {
             value = match &self {
                 // TODO: Do not use debug outputs, implement proper Display traits instead.
                 Attribute::Color(color) => format!("{color}"),
-                Attribute::Resolution(resolution) => format!("{resolution:?}"),
+                Attribute::Resolution(resolution) => format!("{resolution}"),
                 Attribute::Theme(theme) => theme.name.clone(),
-                Attribute::Size(size) => format!("{size:?}"),
-                Attribute::Export(export) => format!("{export:?}"),
-                Attribute::Measure(measure) => format!("{measure:?}"),
-                Attribute::Custom(command) => format!("{command:?}"),
+                Attribute::Size(size) => format!("{size}"),
+                Attribute::Export(export) => format!("{export}"),
+                Attribute::Measure(measure) => format!("{measure}"),
+                Attribute::Custom(command) => format!("{command}"),
             }
         )
     }
