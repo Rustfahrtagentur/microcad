@@ -2,6 +2,7 @@ pub use __builtin::ops::subtract;
 pub use __builtin::ops::intersect;
 pub use __builtin::ops::union;
 pub use __builtin::ops::hull;
+pub use __builtin::ops::align;
 
 
 op revolve(angle = 360°) {

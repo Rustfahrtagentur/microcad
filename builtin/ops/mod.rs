@@ -3,7 +3,7 @@
 
 use microcad_lang::builtin::*;
 
-mod center;
+mod align;
 mod extrude;
 mod hull;
 mod orient;
@@ -17,7 +17,7 @@ pub fn ops() -> Symbol {
         .symbol(operation::Union::symbol())
         .symbol(operation::Subtract::symbol())
         .symbol(operation::Intersect::symbol())
-        .symbol(center::Center::symbol())
+        .symbol(align::Align::symbol())
         .symbol(hull::Hull::symbol())
         .symbol(extrude::Extrude::symbol())
         .symbol(orient::Orient::symbol())

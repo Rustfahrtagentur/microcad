@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::traits::Center;
+use crate::traits::Align;
 
 use super::*;
 
@@ -124,8 +124,8 @@ impl Transformed2D for Geometry2D {
     }
 }
 
-impl Center for Geometry2D {
-    fn center(&self, resolution: &RenderResolution) -> Self {
+impl Align for Geometry2D {
+    fn align(&self, resolution: &RenderResolution) -> Self {
         if let Some(bounds) = self.fetch_bounds_2d().rect() {
             let d: Vec2 = bounds.center().x_y().into();
             self.transformed_2d(resolution, &Mat3::from_translation(-d))

@@ -8,19 +8,19 @@ use std::rc::Rc;
 use microcad_lang::{builtin::*, render::*};
 
 #[derive(Debug)]
-pub struct Center;
+pub struct Align;
 
-impl Operation for Center {
+impl Operation for Align {
     fn process_2d(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         context.update_2d(|context, model, resolution| {
             let model_ = model.borrow();
             let geometry: Geometry2DOutput = model_.children.render(context)?;
-            use microcad_core::traits::Center;
-            Ok(geometry.map(|geometry| Rc::new(geometry.center(&resolution))))
+            use microcad_core::traits::Align;
+            Ok(geometry.map(|geometry| Rc::new(geometry.align(&resolution))))
         })
     }
 
-    fn process_3d(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+    fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
         todo!()
         /*context.update_3d(|context, model, resolution| {
             let geometry: Geometry3DOutput = model.render(context)?;
@@ -29,9 +29,9 @@ impl Operation for Center {
     }
 }
 
-impl BuiltinWorkbenchDefinition for Center {
+impl BuiltinWorkbenchDefinition for Align {
     fn id() -> &'static str {
-        "center"
+        "align"
     }
 
     fn kind() -> BuiltinWorkbenchKind {
@@ -39,6 +39,6 @@ impl BuiltinWorkbenchDefinition for Center {
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
-        &|_| Ok(BuiltinWorkpieceOutput::Operation(Box::new(Center)))
+        &|_| Ok(BuiltinWorkpieceOutput::Operation(Box::new(Align)))
     }
 }
