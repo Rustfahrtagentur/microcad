@@ -14,6 +14,6 @@
  8: YourSketch();
 
 -- Parse Error --
-Missing type or value for definition parameter: <INVALID ID>
+Missing type or value for definition parameter: <NO ID>
 -- Test Result --
 FAIL

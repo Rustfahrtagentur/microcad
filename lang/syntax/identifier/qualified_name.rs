@@ -156,7 +156,7 @@ impl std::fmt::Debug for QualifiedName {
         if self.is_empty() {
             write!(f, crate::invalid!(NAME))
         } else {
-            write!(f, "{}", join_identifiers(&self.0, "::"))
+            write!(f, "{}", join_identifiers_debug(&self.0, "::"))
         }
     }
 }
@@ -268,7 +268,7 @@ impl TreeDisplay for QualifiedName {
             f,
             "{:depth$}QualifiedName: '{}'",
             "",
-            join_identifiers(&self.0, "::")
+            join_identifiers_debug(&self.0, "::")
         )
     }
 }

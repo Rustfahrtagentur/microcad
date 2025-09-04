@@ -20,7 +20,7 @@
 -- Errors --
 -- Model --
   Group -> 3D (root)
-    part [30m[105m[1m NO ID [39m[49m[22m::CsgCube(size: Length = 50mm) -> 3D[0m
+    part <NO ID>::CsgCube(size: Length = 50mm) -> 3D
       Operation subtract()⏎ -> 3D
         Group -> 3D
           Operation intersect()⏎ -> 3D

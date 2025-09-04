@@ -20,7 +20,7 @@
 -- Errors --
 -- Model --
   Group -> 2D (root)
-    sketch [30m[105m[1m NO ID [39m[49m[22m::Base(height: Length = 15.8mm, thickness: Length = 1.2mm, width: Length = 31.8mm) -> 2D[0m
+    sketch <NO ID>::Base(height: Length = 15.8mm, thickness: Length = 1.2mm, width: Length = 31.8mm) -> 2D
       Operation union()⏎ -> 2D
         Group -> 2D
           sketch std::geo2d::Frame(height: Length = 15.8mm, thickness: Length = 1.2mm, width: Length = 31.8mm) -> 2D

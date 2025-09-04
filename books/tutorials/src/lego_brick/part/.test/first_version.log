@@ -51,14 +51,14 @@
 -- Errors --
 -- Model --
   Group -> 3D (root)
-    part [30m[105m[1m NO ID [39m[49m[22m::LegoBrick(base_height: Length = 9.6mm) -> 3D[0m
+    part <NO ID>::LegoBrick(base_height: Length = 9.6mm) -> 3D
       Operation union()⏎ -> 3D
         Group -> 3D
           Operation union()⏎ -> 3D
             Group -> 3D
               op std::ops::extrude(height: Length = 9.6mm) -> 3D
                 Operation __builtin::ops::extrude(height: Scalar = 9.6, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_de…
-                  sketch [30m[105m[1m NO ID [39m[49m[22m::Base(height: Length = 31.8mm, width: Length = 15.8mm) -> 2D[0m
+                  sketch <NO ID>::Base(height: Length = 31.8mm, width: Length = 15.8mm) -> 2D
                     Operation union()⏎ -> 2D
                       Group -> 2D
                         sketch std::geo2d::Frame(height: Length = 31.8mm, thickness: Length = 1.2mm, width: Length = 15.8mm) -> 2D
@@ -95,7 +95,7 @@
             Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 9.6)⏎ -> 3D
               op std::ops::extrude(height: Length = 1.7mm) -> 3D
                 Operation __builtin::ops::extrude(height: Scalar = 1.7, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_de…
-                  sketch [30m[105m[1m NO ID [39m[49m[22m::Knobs() -> 2D[0m
+                  sketch <NO ID>::Knobs() -> 2D
                     Operation __builtin::ops::align()⏎ -> 2D
                       sketch std::geo2d::Circle(center: (x: [Length], y: [Length]) = (x: [Length] = [0mm, 8mm, 16mm], y: [Length] = [0mm]), diameter: Length = 4.8…
                         Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D

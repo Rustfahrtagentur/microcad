@@ -55,14 +55,14 @@
 -- Errors --
 -- Model --
   Group -> 3D (root)
-    part [30m[105m[1m NO ID [39m[49m[22m::LegoBrick(base_height: Length = 9.6mm, columns: Integer = 2, rows: Integer = 4) -> 3D[0m
+    part <NO ID>::LegoBrick(base_height: Length = 9.6mm, columns: Integer = 2, rows: Integer = 4) -> 3D
       Operation union()⏎ -> 3D
         Group -> 3D
           Operation union()⏎ -> 3D
             Group -> 3D
               op std::ops::extrude(height: Length = 8.6mm) -> 3D
                 Operation __builtin::ops::extrude(height: Scalar = 8.6, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_de…
-                  sketch [30m[105m[1m NO ID [39m[49m[22m::Base(columns: Integer = 2, height: Length = 15.8mm, rows: Integer = 4, width: Length = 31.8mm)…[0m
+                  sketch <NO ID>::Base(columns: Integer = 2, height: Length = 15.8mm, rows: Integer = 4, width: Length = 31.8mm) -> 2D
                     Operation union()⏎ -> 2D
                       Group -> 2D
                         sketch std::geo2d::Frame(height: Length = 15.8mm, thickness: Length = 1.2mm, width: Length = 31.8mm) -> 2D
@@ -72,7 +72,7 @@
                                 Primitive2D __builtin::geo2d::Rect(height: Scalar = 15.8, width: Scalar = 31.8, x: Scalar = -15.9, y: Scalar = -7.9)⏎ -> 2D
                               sketch std::geo2d::Rect(height: Length = 13.4mm, width: Length = 29.4mm) -> 2D
                                 Primitive2D __builtin::geo2d::Rect(height: Scalar = 13.4, width: Scalar = 29.4, x: Scalar = -14.7, y: Scalar = -6.7)⏎ -> 2D
-                        op [30m[105m[1m NO ID [39m[49m[22m::grid(columns: Integer = 1, rows: Integer = 3) -> 2D[0m
+                        op <NO ID>::grid(columns: Integer = 1, rows: Integer = 3) -> 2D
                           Operation __builtin::ops::align()⏎ -> 2D
                             op std::ops::translate(x: Length = 0mm, y: Length = 0mm, z: Length = 0mm) -> 2D
                               Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D
@@ -97,8 +97,8 @@
             Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 9.6)⏎ -> 3D
               op std::ops::extrude(height: Length = 1.7mm) -> 3D
                 Operation __builtin::ops::extrude(height: Scalar = 1.7, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_de…
-                  sketch [30m[105m[1m NO ID [39m[49m[22m::Knobs(columns: Integer = 2, rows: Integer = 4) -> 2D[0m
-                    op [30m[105m[1m NO ID [39m[49m[22m::grid(columns: Integer = 2, rows: Integer = 4) -> 2D[0m
+                  sketch <NO ID>::Knobs(columns: Integer = 2, rows: Integer = 4) -> 2D
+                    op <NO ID>::grid(columns: Integer = 2, rows: Integer = 4) -> 2D
                       Operation __builtin::ops::align()⏎ -> 2D
                         op std::ops::translate(x: Length = 0mm, y: Length = 0mm, z: Length = 0mm) -> 2D
                           Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D

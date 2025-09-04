@@ -18,7 +18,7 @@ warning: This expression statement did not produce any model
      |
 -- Model --
   Group -> 2D (root)
-    sketch [30m[105m[1m NO ID [39m[49m[22m::K() -> 2D[0m
+    sketch <NO ID>::K() -> 2D
 
 -- Test Result --
 OK

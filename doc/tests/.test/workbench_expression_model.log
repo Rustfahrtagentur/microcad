@@ -12,7 +12,7 @@
 -- Errors --
 -- Model --
   Group -> 2D (root)
-    sketch [30m[105m[1m NO ID [39m[49m[22m::K() -> 2D[0m
+    sketch <NO ID>::K() -> 2D
       Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Integer = 1)⏎ -> 2D
 
 -- Test Result --

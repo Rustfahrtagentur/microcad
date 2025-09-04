@@ -20,7 +20,7 @@
 -- Errors --
 -- Model --
   Group -> 2D (root)
-    sketch [30m[105m[1m NO ID [39m[49m[22m::PunchedDisk(radius: Length = 10mm) -> 2D[0m
+    sketch <NO ID>::PunchedDisk(radius: Length = 10mm) -> 2D
       Operation subtract()⏎ -> 2D
         Group -> 2D
           sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 10mm) -> 2D
