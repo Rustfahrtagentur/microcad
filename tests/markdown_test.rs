@@ -5,10 +5,7 @@ use std::rc::Rc;
 
 use microcad_core::RenderResolution;
 use microcad_export::{stl::StlExporter, svg::SvgExporter};
-use microcad_lang::{
-    render::{Render, RenderContext},
-    tree_display::FormatTree,
-};
+use microcad_lang::tree_display::FormatTree;
 
 fn lines_with(code: &str, marker: &str) -> std::collections::HashSet<usize> {
     code.lines()

@@ -5,8 +5,6 @@
 
 use strum::IntoStaticStr;
 
-use crate::syntax::QualifiedName;
-
 /// A quantity type with
 #[derive(Clone, Debug, IntoStaticStr, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum QuantityType {
