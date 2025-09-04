@@ -71,7 +71,10 @@ impl Geometry2D {
     pub fn is_areal(&self) -> bool {
         !matches!(
             self,
-            Geometry2D::LineString(_) | Geometry2D::MultiLineString(_) | Geometry2D::Line(_)
+            Geometry2D::LineString(_)
+                | Geometry2D::MultiLineString(_)
+                | Geometry2D::Line(_)
+                | Geometry2D::Collection(_)
         )
     }
 }
@@ -118,6 +121,9 @@ impl Transformed2D for Geometry2D {
                     Self::MultiLineString(multi_line_string.transformed_2d(resolution, mat))
                 }
                 Geometry2D::Line(line) => Self::Line(line.transformed_2d(resolution, mat)),
+                Geometry2D::Collection(geometries) => {
+                    Self::Collection(geometries.transformed_2d(resolution, mat))
+                }
                 _ => unreachable!("Geometry type not supported"),
             }
         }
@@ -152,6 +158,9 @@ impl RenderToMultiPolygon for Geometry2D {
             Geometry2D::Circle(circle) => polygons
                 .0
                 .push(circle.render_to_polygon(resolution).expect("Polygon")),
+            Geometry2D::Collection(geometries) => {
+                geometries.render_to_existing_multi_polygon(resolution, polygons);
+            }
             _ => {}
         }
     }
