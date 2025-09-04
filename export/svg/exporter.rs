@@ -6,8 +6,22 @@
 use microcad_core::{Color, Scalar, theme::Theme};
 use microcad_lang::{Id, builtin::*, model::*, parameter, render::RenderError, value::*};
 
-/// SVG Exporter
+/// SVG Exporter.
 pub struct SvgExporter;
+
+/// Settings for this exporter.
+pub struct SvgExporterSettings {
+    /// Relative padding (e.g. 0.05 = 5% = padding on each side).
+    padding_factor: Scalar,
+}
+
+impl Default for SvgExporterSettings {
+    fn default() -> Self {
+        Self {
+            padding_factor: 0.05, // 5% padding on each side.
+        }
+    }
+}
 
 impl SvgExporter {
     /// Generate SVG style string from theme.
@@ -96,14 +110,20 @@ impl Exporter for SvgExporter {
     fn export(&self, model: &Model, filename: &std::path::Path) -> Result<Value, ExportError> {
         use crate::svg::*;
         use microcad_core::FetchBounds2D;
+        let settings = SvgExporterSettings::default();
+        let bounds = model.fetch_bounds_2d();
 
-        if let Some(content_rect) = model.fetch_bounds_2d().rect() {
+        if bounds.is_valid() {
+            let content_rect = bounds
+                .enlarge(2.0 * settings.padding_factor)
+                .rect()
+                .expect("Rect");
             log::debug!("Exporting into SVG file {filename:?}");
             let f = std::fs::File::create(filename)?;
             let mut writer = SvgWriter::new_canvas(
                 Box::new(std::io::BufWriter::new(f)),
                 model.get_size(),
-                *content_rect,
+                content_rect,
                 None,
             )?;
             writer.style(&SvgExporter::theme_to_svg_style(
