@@ -1,0 +1,49 @@
+-- Test --
+  tutorial_part_geo3d
+  ../doc/tutorial/tutorial.md:655
+
+-- Code --
+
+ 1: use std::math::*;
+ 2: use std::ops::*;
+ 3: use std::geo3d::*;
+ 4: 
+ 5: size = 40mm;
+ 6: body = Sphere(r = size / 1.5) & Cube(size);
+ 7: holes = Cylinder(h = size, d = size / 1.5).orient([X,Y,Z]);
+ 8: body - holes;
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 3D (root)
+    Operation subtract()⏎ -> 3D
+      Group -> 3D
+        Operation intersect()⏎ -> 3D
+          Group -> 3D
+            part std::geo3d::Sphere(r: 26.666666666666668mm) -> 3D
+              Primitive3D __builtin::geo3d::Sphere(radius: 26.666666666666668)⏎ -> 3D
+            part std::geo3d::Cube(size: 40mm) -> 3D
+              Transform __builtin::ops::translate(x: -20, y: -20, z: -20)⏎ -> 3D
+                Primitive3D __builtin::geo3d::Cube(size_x: 40, size_y: 40, size_z: 40)⏎ -> 3D
+        Operation union()⏎ -> 3D
+          Group -> 3D
+            op std::ops::orient(v: (x: 1, y: 0, z: 0)) -> 3D
+              Transform __builtin::ops::orient(x: 1, y: 0, z: 0)⏎ -> 3D
+                part std::geo3d::Cylinder(d: 26.666666666666668mm, h: 40mm) -> 3D
+                  Transform __builtin::ops::translate(x: 0, y: 0, z: -20)⏎ -> 3D
+                    Primitive3D __builtin::geo3d::Cylinder(height: 40, radius_bottom: 13.33333333333…
+            op std::ops::orient(v: (x: 0, y: 1, z: 0)) -> 3D
+              Transform __builtin::ops::orient(x: 0, y: 1, z: 0)⏎ -> 3D
+                part std::geo3d::Cylinder(d: 26.666666666666668mm, h: 40mm) -> 3D
+                  Transform __builtin::ops::translate(x: 0, y: 0, z: -20)⏎ -> 3D
+                    Primitive3D __builtin::geo3d::Cylinder(height: 40, radius_bottom: 13.33333333333…
+            op std::ops::orient(v: (x: 0, y: 0, z: 1)) -> 3D
+              Transform __builtin::ops::orient(x: 0, y: 0, z: 1)⏎ -> 3D
+                part std::geo3d::Cylinder(d: 26.666666666666668mm, h: 40mm) -> 3D
+                  Transform __builtin::ops::translate(x: 0, y: 0, z: -20)⏎ -> 3D
+                    Primitive3D __builtin::geo3d::Cylinder(height: 40, radius_bottom: 13.33333333333…
+
+-- Test Result --
+OK
+Export successful.

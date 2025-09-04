@@ -18,5 +18,47 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Operation union()⏎ -> 2D
+      Group -> 2D
+        sketch std::geo2d::Frame(height: 15.8mm, thickness: 1.2mm, width: 31.8mm) -> 2D
+          Operation subtract()⏎ -> 2D
+            Group -> 2D
+              sketch std::geo2d::Rect(height: 15.8mm, width: 31.8mm) -> 2D
+                Primitive2D __builtin::geo2d::Rect(height: 15.8, width: 31.8, x: -15.9, y: -7.9)…
+              sketch std::geo2d::Rect(height: 13.4mm, width: 29.400000000000002mm) -> 2D
+                Primitive2D __builtin::geo2d::Rect(height: 13.4, width: 29.400000000000002, x: -…
+        Operation union()⏎ -> 2D
+          Group -> 2D
+            op std::ops::translate(x: -8mm, y: 0mm, z: 0mm) -> 2D
+              Transform __builtin::ops::translate(x: -8, y: 0, z: 0)⏎ -> 2D
+                sketch std::geo2d::Ring(inner_d: 4.8mm, outer_d: 6.51mm) -> 2D
+                  Operation subtract()⏎ -> 2D
+                    Group -> 2D
+                      sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 3.255mm) -> 2D
+                        Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 3.255)⏎ -> 2D
+                      sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 2.4mm) -> 2D
+                        Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 2.4)⏎ -> 2D
+            op std::ops::translate(x: 0mm, y: 0mm, z: 0mm) -> 2D
+              Transform __builtin::ops::translate(x: 0, y: 0, z: 0)⏎ -> 2D
+                sketch std::geo2d::Ring(inner_d: 4.8mm, outer_d: 6.51mm) -> 2D
+                  Operation subtract()⏎ -> 2D
+                    Group -> 2D
+                      sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 3.255mm) -> 2D
+                        Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 3.255)⏎ -> 2D
+                      sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 2.4mm) -> 2D
+                        Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 2.4)⏎ -> 2D
+            op std::ops::translate(x: 8mm, y: 0mm, z: 0mm) -> 2D
+              Transform __builtin::ops::translate(x: 8, y: 0, z: 0)⏎ -> 2D
+                sketch std::geo2d::Ring(inner_d: 4.8mm, outer_d: 6.51mm) -> 2D
+                  Operation subtract()⏎ -> 2D
+                    Group -> 2D
+                      sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 3.255mm) -> 2D
+                        Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 3.255)⏎ -> 2D
+                      sketch std::geo2d::Circle(center: (x: 0mm, y: 0mm), radius: 2.4mm) -> 2D
+                        Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 2.4)⏎ -> 2D
+
 -- Test Result --
 OK
+Export successful.

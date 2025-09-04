@@ -1,0 +1,81 @@
+-- Test --
+  tutorial_part_result
+  ../doc/tutorial/tutorial.md:734
+
+-- Code --
+
+ 1: use std::ops::*;
+ 2: use std::geo2d::*;
+ 3: 
+ 4: const SPACING = 8mm;
+ 5: 
+ 6: sketch Base(width: Length, height: Length) {
+ 7:     wall_width = 1.2mm;
+ 8:     frame = Frame(width, height, thickness = wall_width);
+ 9:     struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
+10:         .translate(y = [0..2] * SPACING)
+11:         .center();
+12:     frame | struts;
+13: }
+14: 
+15: use Rect as Cap;
+16: 
+17: sketch Knobs() {
+18:     Circle(diameter = 4.8mm, center = (x = [0..2] * SPACING, y = [0..4] * SPACING)).center();
+19: }
+20: 
+21: part LegoBrick(base_height = 9.6mm) {
+22:     width = 15.8mm;
+23:     height = 31.8mm;
+24:     top_thickness = 1.0mm;
+25: 
+26:     base = Base(width, height)
+27:         .extrude(base_height);
+28: 
+29:     cap = Cap(width, height)
+30:         .extrude(top_thickness)
+31:         .translate(z = base_height - top_thickness);
+32: 
+33:     knobs = Knobs()
+34:         .extrude(1.7mm)
+35:         .translate(z = base_height);
+36: 
+37:     base | cap | knobs; // Combine all components
+38: }
+39: 
+40: LegoBrick();
+
+-- Output --
+-- Errors --
+error: Symbol center not found.
+  ---> <FROM STR>:11:10
+     |
+  11 |         .center();
+     |          ^^^^^^
+     |
+error: Symbol center not found.
+  ---> <FROM STR>:18:85
+     |
+  18 |     Circle(diameter = 4.8mm, center = (x = [0..2] * SPACING, y = [0..4] * SPACING)).center();
+     |                                                                                     ^^^^^^
+     |
+warning: This expression statement did not produce any model
+  ---> <FROM STR>:18:5
+     |
+  18 |     Circle(diameter = 4.8mm, center = (x = [0..2] * SPACING, y = [0..4] * SPACING)).center();
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Calling operation on empty geometry
+  ---> <FROM STR>:34:10
+     |
+  34 |         .extrude(1.7mm)
+     |          ^^^^^^^
+     |
+error: Calling operation on empty geometry
+  ---> <FROM STR>:35:10
+     |
+  35 |         .translate(z = base_height);
+     |          ^^^^^^^^^
+     |
+-- Test Result --
+FAIL

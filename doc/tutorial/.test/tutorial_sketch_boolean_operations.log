@@ -1,0 +1,31 @@
+-- Test --
+  tutorial_sketch_boolean_operations
+  ../doc/tutorial/tutorial.md:488
+
+-- Code --
+
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: const SPACING = 8mm;
+ 5: 
+ 6: wall_width = 1.2mm;
+ 7: width = 15.8mm;
+ 8: height = 31.8mm;
+ 9: frame = Frame(width, height, thickness = wall_width);
+10: struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
+11:     .translate(y = [0..3] * SPACING)
+12:     .center();
+13: 
+14: frame | struts;
+
+-- Output --
+-- Errors --
+error: Symbol center not found.
+  ---> <FROM STR>:12:6
+     |
+  12 |     .center();
+     |      ^^^^^^
+     |
+-- Test Result --
+FAIL

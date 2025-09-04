@@ -57,11 +57,5 @@ warning: This expression statement did not produce any model
   18 |     Circle(d = 4.8mm, center = (x = [0..3] * SPACING, y = [0..1] * SPACING)).center();
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-warning: The sketch workbench will produce no 2D output.
-  ---> <FROM STR>:17:1
-     |
-  17 | sketch Knobs() {
-     | ^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
 FAIL

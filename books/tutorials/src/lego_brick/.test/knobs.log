@@ -25,11 +25,5 @@ warning: This expression statement did not produce any model
    2 |     std::geo2d::Circle(d = 4.8mm, c = (x = [0..3] * 8mm, y = [0..1] * 8mm))
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-warning: The sketch workbench will produce no 2D output.
-  ---> <FROM STR>:1:1
-     |
-   1 | sketch Knobs(diameter = 4.8mm) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
 FAIL

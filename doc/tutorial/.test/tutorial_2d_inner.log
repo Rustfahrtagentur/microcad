@@ -1,0 +1,20 @@
+-- Test --
+  tutorial_2d_inner
+  ../doc/tutorial/tutorial.md:132
+
+-- Code --
+
+ 1: wall_width = 1.2mm;
+ 2: frame_inner = std::geo2d::Rect(width = 15.8mm - 2*wall_width, height = 31.8mm - 2*wall_width);
+ 3: frame_inner;
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch std::geo2d::Rect(height: 29.400000000000002mm, width: 13.4mm) -> 2D
+      Primitive2D __builtin::geo2d::Rect(height: 29.400000000000002, width: 13.4, x: -…
+
+-- Test Result --
+OK
+Export successful.

@@ -1,0 +1,17 @@
+-- Test --
+  tutorial_2d_assignment
+  ../doc/tutorial/tutorial.md:103
+
+-- Code --
+
+ 1: frame_outer = std::geo2d::Rect(width = 15.8mm, height = 31.8mm);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> Undetermined (root)
+
+-- Test Result --
+OK
+Could not determine output type.
+Nothing will be exported.

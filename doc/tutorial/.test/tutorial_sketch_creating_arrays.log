@@ -1,0 +1,45 @@
+-- Test --
+  tutorial_sketch_creating_arrays
+  ../doc/tutorial/tutorial.md:449
+
+-- Code --
+
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: const SPACING = 8mm;
+ 5: 
+ 6: (Circle(d = 6.51mm) - Circle(d = 4.8mm)).translate(y = [0..3] * SPACING);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    op std::ops::translate(x: 0mm, y: 0mm, z: 0mm) -> 2D
+      Transform __builtin::ops::translate(x: 0, y: 0, z: 0)⏎ -> 2D
+        Operation subtract()⏎ -> 2D
+          Group -> 2D
+            sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 6.51mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 3.255)⏎ -> 2D
+            sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 4.8mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 2.4)⏎ -> 2D
+    op std::ops::translate(x: 0mm, y: 8mm, z: 0mm) -> 2D
+      Transform __builtin::ops::translate(x: 0, y: 8, z: 0)⏎ -> 2D
+        Operation subtract()⏎ -> 2D
+          Group -> 2D
+            sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 6.51mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 3.255)⏎ -> 2D
+            sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 4.8mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 2.4)⏎ -> 2D
+    op std::ops::translate(x: 0mm, y: 16mm, z: 0mm) -> 2D
+      Transform __builtin::ops::translate(x: 0, y: 16, z: 0)⏎ -> 2D
+        Operation subtract()⏎ -> 2D
+          Group -> 2D
+            sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 6.51mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 3.255)⏎ -> 2D
+            sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 4.8mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 2.4)⏎ -> 2D
+
+-- Test Result --
+OK
+Export successful.

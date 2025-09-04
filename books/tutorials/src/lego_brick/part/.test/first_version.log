@@ -67,11 +67,17 @@ warning: This expression statement did not produce any model
   19 |     Circle(diameter = 4.8mm, center).center();
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-warning: The sketch workbench will produce no 2D output.
-  ---> <FROM STR>:17:1
+error: Calling operation on empty geometry
+  ---> <FROM STR>:35:10
      |
-  17 | sketch Knobs() {
-     | ^^^^^^^^^^^^^^^^
+  35 |         .extrude(1.7mm)
+     |          ^^^^^^^
+     |
+error: Calling operation on empty geometry
+  ---> <FROM STR>:36:10
+     |
+  36 |         .translate(z = base_height);
+     |          ^^^^^^^^^
      |
 -- Test Result --
 FAIL

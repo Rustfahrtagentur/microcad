@@ -17,23 +17,15 @@
 
 -- Output --
 -- Errors --
-error: Symbol std::ops::subtract not found.
-  ---> <FROM STR>:2:5
-     |
-   2 | use std::ops::subtract;
-     |     ^^^^^^^^^^^^^^^^^^
-     |
-error: Symbol subtract not found.
-  ---> <FROM STR>:10:3
-     |
-  10 | }.subtract();
-     |   ^^^^^^^^
-     |
-warning: This expression statement did not produce any model
-  ---> <FROM STR>:7:1
-     |
-   7 | {
-     | ^
-     |
+-- Model --
+  Group -> 2D (root)
+    Operation __builtin::ops::subtract()⏎ -> 2D
+      Group -> 2D
+        sketch std::geo2d::Rect(height: 15.8mm, width: 31.8mm) -> 2D
+          Primitive2D __builtin::geo2d::Rect(height: 15.8, width: 31.8, x: -15.9, y: -7.9)…
+        sketch std::geo2d::Rect(height: 13.4mm, width: 29.400000000000002mm) -> 2D
+          Primitive2D __builtin::geo2d::Rect(height: 13.4, width: 29.400000000000002, x: -…
+
 -- Test Result --
-FAIL
+OK
+Export successful.

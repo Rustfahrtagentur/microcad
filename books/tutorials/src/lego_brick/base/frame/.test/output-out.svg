@@ -74,20 +74,9 @@
         }
          
         .entity {
-            fill: #191919;
+            fill: rgba(178, 178, 178, 0.70);
             stroke: #191919;
             stroke-width: 0.4;
-        }
-         
-        .entity-stroke {
-            fill: none;
-            stroke: #191919;
-            stroke-width: 0.4;
-        }
-         
-        .entity-fill {
-            fill: #191919;
-            stroke: none;
         }
         
             .active { fill-opacity: 1.0; stroke-opacity: 1.0; }
@@ -95,8 +84,6 @@
         
   </style>
   <g class="entity">
-    <g class="entity">
-      <rect x="0" y="0" width="31.8" height="15.8"/>
-    </g>
+    <rect x="0" y="0" width="31.8" height="15.8"/>
   </g>
 </svg>

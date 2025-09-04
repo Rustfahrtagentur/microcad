@@ -34,7 +34,7 @@ You can generate an array via range expressions: `[1..3]`.
 std::debug::assert_eq([std::count([1,2,3]), 3]);
 ```
 
-## Array operators
+## Array operations
 
 ### Unit bundling
 

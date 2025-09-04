@@ -1,0 +1,27 @@
+-- Test --
+  tutorial_part_extrude_cap
+  ../doc/tutorial/tutorial.md:678
+
+-- Code --
+
+ 1: use std::geo2d::Rect as Cap;
+ 2: use std::ops::extrude;
+ 3: 
+ 4: width = 15.8mm;
+ 5: height = 31.8mm;
+ 6: 
+ 7: Cap(width, height)
+ 8:     .extrude(height = 1.0mm);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 3D (root)
+    op std::ops::extrude(height: 1mm) -> 3D
+      Operation __builtin::ops::extrude(height: 1, n_divisions: 0, scale_top_x: 1, sca…
+        sketch std::geo2d::Rect(height: 31.8mm, width: 15.8mm) -> 2D
+          Primitive2D __builtin::geo2d::Rect(height: 31.8, width: 15.8, x: -7.9, y: -15.9)…
+
+-- Test Result --
+OK
+Export successful.

@@ -67,6 +67,8 @@ To construct a rectangle in µcad, we use a sketch with the name `std::geo2d::Re
 
 In the `lego_brick.µcad` file, delete all contents and replace it with the following statement:
 
+[![test](.test/tutorial_2d_rect.svg)](.test/tutorial_2d_rect.log)
+
 ```µcad,tutorial_2d_rect
 std::geo2d::Rect(width = 15.8mm, height = 31.8mm);
 ```
@@ -96,6 +98,8 @@ During the design process, we will add more geometry to our design.
 Therefore, it is useful to identify each sub-geometry by a name.
 In the next we want to give the rectangle a name `frame_outer`, so we can identify it more easily:
 
+[![test](.test/tutorial_2d_assignment.svg)](.test/tutorial_2d_assignment.log)
+
 ```µcad,tutorial_2d_assignment
 frame_outer = std::geo2d::Rect(width = 15.8mm, height = 31.8mm);
 ```
@@ -107,6 +111,8 @@ you will notice that nothing is exported.
 
 Why? Because in µcad, assignments are not part of the output geometry.
 A second statement `frame_outer;` is needed to output the geometry stored in the `frame_outer` variable.
+
+[![test](.test/tutorial_2d_output.svg)](.test/tutorial_2d_output.log)
 
 ```µcad,tutorial_2d_output
 frame_outer = std::geo2d::Rect(width = 15.8mm, height = 31.8mm);
@@ -120,6 +126,8 @@ Now, let's create the inner frame of the brick base.
 
 Like the outer frame, the inner frame is also expressed with a `std::geo2d::Rect`.
 Let's take a look at the code:
+
+[![test](.test/tutorial_2d_inner.svg)](.test/tutorial_2d_inner.log)
 
 ```µcad,tutorial_2d_inner
 wall_width = 1.2mm;
@@ -136,6 +144,8 @@ Finally, we output the geometry with the `frame_inner;` statement.
 
 Now, we are able to output the inner and outer geometry at the same time.
 Similar to the `wall_width = 1.2mm`, we also assign `width` and `height` their respective values:
+
+[![test](.test/tutorial_2d_inner_outer.svg)](.test/tutorial_2d_inner_outer.log)
 
 ```µcad,tutorial_2d_inner_outer
 wall_width = 1.2mm;
@@ -158,6 +168,8 @@ They process an input geometry and produce an output geometry.
 All operations in the µcad standard library `std` are located in the submodule [`ops`](../libs/std//ops/README.md).
 Consider the following example that translates a `Rect` with a size of `40mm` by `20mm` in `x` direction:
 
+[![test](.test/tutorial_2d_translate.svg)](.test/tutorial_2d_translate.log)
+
 ```µcad,tutorial_2d_translate
 std::geo2d::Rect(40mm).std::ops::translate(x = 20mm);
 ```
@@ -165,6 +177,8 @@ std::geo2d::Rect(40mm).std::ops::translate(x = 20mm);
 Let's examine the syntax of the above example.
 First, we construct a rectangle with `std::geo2d::Rect(40mm)`, and then we translate in `x` direction `x = 20mm` with [`std::ops::translate(x = 20mm)`](../libs/std/ops/translate.md).
 We apply the operation using the `.`. This way we can also apply several operations to a geometry:
+
+[![test](.test/tutorial_2d_translate_rotate.svg)](.test/tutorial_2d_translate_rotate.log)
 
 ```µcad,tutorial_2d_translate_rotate
 std::geo2d::Rect(40mm)
@@ -179,6 +193,8 @@ We construct a rectangle, then we translate it, and finally, we [`rotate`](../li
 You might have noticed that writing `std::ops` and `std::geo2d` in front of each element seems redundant and cumbersome.
 Luckily, µcad has syntax element called [*use statements*](../structure/use.md).
 This means, from the previous example, we can simply write:
+
+[![test](.test/tutorial_2d_use.svg)](.test/tutorial_2d_use.log)
 
 ```µcad,tutorial_2d_use
 use std::geo2d::Rect; // Only include `Rect` from `std::geo2d`.
@@ -196,6 +212,8 @@ As you can see, this makes the code much simpler and clearer.
 Let's get back to our actual task to construct a frame.
 Here is how source code looks with use statements:
 
+[![test](.test/tutorial_2d_inner_outer_use.svg)](.test/tutorial_2d_inner_outer_use.log)
+
 ```µcad,tutorial_2d_inner_outer_use
 use std::geo2d::Rect;
 
@@ -210,6 +228,8 @@ frame_inner;
 
 Another useful syntax feature in µcad is the ability to group several statements into a single output using curly brackets `{}`.
 Let's change the code in `lego_brick.µcad`:
+
+[![test](.test/tutorial_2d_groups.svg)](.test/tutorial_2d_groups.log)
 
 ```µcad,tutorial_2d_groups
 use std::geo2d::Rect;
@@ -240,6 +260,8 @@ We have already seen the operations `translate` and `rotate`.
 In µcad, the operation to subtract a geometry from one another is called [`difference`](../libs/std/ops/difference.md).
 On our case, we want to subtract the outer part by the inner part in our frame group:
 
+[![test](.test/tutorial_2d_difference.svg)](.test/tutorial_2d_difference.log)
+
 ```µcad,tutorial_2d_difference
 use std::geo2d::Rect;
 
@@ -261,6 +283,8 @@ frame;
 
 You might notice that subtracting one geometry from another can be written just like a mathematical subtraction using the `-` operator.
 In addition to *operations*, µcad supports *operators*, which lead to clearer and more concise code:
+
+[![test](.test/tutorial_2d_operator.svg)](.test/tutorial_2d_operator.log)
 
 ```µcad,tutorial_2d_operator
 use std::geo2d::Rect;
@@ -292,6 +316,8 @@ These foundational steps give you a clearer understanding of how µcad works und
 
 Fortunately, µcad’s to construct a frame geometry, the `std` library provides a convenient shortcut: the `Frame` sketch.
 Using it, we can achieve the same result with a much simpler expression:
+
+[![test](.test/tutorial_2d_frame.svg)](.test/tutorial_2d_frame.log)
 
 ```µcad,tutorial_2d_frame
 use std::geo2d::*; // Include all modules from `std::geo2d`
@@ -327,6 +353,8 @@ Along the way, we’ll introduce several new µcad concepts that will help make 
 A single strut has a circular shape with an outer diameter of `d = 6.51mm` and an inner diameter of `d = 4.8mm`.
 We use [`std::geo2d::Circle`](../libs/std/geo2d/README.md#Circle) to construct the circles and similar the frame geometry in the previous chapter, we combine them using the `-` operator:
 
+[![test](.test/tutorial_sketch_begin.svg)](.test/tutorial_sketch_begin.log)
+
 ```µcad,tutorial_sketch_begin
 use std::geo2d::*;
 Circle(d = 6.51mm) - Circle(d = 4.8mm)
@@ -337,6 +365,8 @@ Circle(d = 6.51mm) - Circle(d = 4.8mm)
 Instead of constructing only a single strut, but our Lego brick needs *three* of them.
 The shape of each strut remains the same -- they’re simply offset vertically by `8mm`.
 From the concept we know already, a first solution could be to write the strut three times and translating them using `std::ops::translate`.
+
+[![test](.test/tutorial_sketch_multiple.svg)](.test/tutorial_sketch_multiple.log)
 
 ```µcad,tutorial_sketch_multiple
 use std::geo2d::*;
@@ -368,6 +398,8 @@ An array of values is expressed with `[]` brackets.
 
 This allows us to shorten the previous example significantly:
 
+[![test](.test/tutorial_sketch_multiplicity.svg)](.test/tutorial_sketch_multiplicity.log)
+
 ```µcad,tutorial_sketch_multiplicity
 use std::geo2d::*;
 use std::ops::*;
@@ -384,6 +416,8 @@ especially if you later want to add more positions dynamically.
 Across the Lego universe, the spacing of `8mm` is used everywhere.
 This means we can store it in global constant using the `const` keyword.
 
+[![test](.test/tutorial_sketch_constants.svg)](.test/tutorial_sketch_constants.log)
+
 ```µcad,tutorial_sketch_constants
 use std::geo2d::*;
 use std::ops::*;
@@ -394,6 +428,8 @@ const SPACING = 8mm;
 ```
 
 We still have to write `SPACING` twice, but we can change this be multiplying the array:
+
+[![test](.test/tutorial_sketch_array_multiplication.svg)](.test/tutorial_sketch_array_multiplication.log)
 
 ```µcad,tutorial_sketch_array_multiplication
 use std::geo2d::*;
@@ -408,6 +444,8 @@ const SPACING = 8mm;
 
 The term `[-1, 0, 1]` can be replaced with a range expression `[0..3]`, which yields an array `[0, 1, 2]`:
 
+[![test](.test/tutorial_sketch_creating_arrays.svg)](.test/tutorial_sketch_creating_arrays.log)
+
 ```µcad,tutorial_sketch_creating_arrays
 use std::geo2d::*;
 use std::ops::*;
@@ -421,6 +459,8 @@ A range expression has the syntax `[m..n]` where `m` and `n` have to be of type 
 
 However, after changing the file you can see that the struts are not centered anymore.
 To center the struts, we can apply the `std:ops::center` operation:
+
+[![test](.test/tutorial_sketch_range_expressions.svg)](.test/tutorial_sketch_range_expressions.log)
 
 ```µcad,tutorial_sketch_range_expressions
 use std::geo2d::*;
@@ -442,6 +482,8 @@ Similar to the `difference` operation, that can be expressed using the `-` opera
 The `difference` and `union` are called *boolean operations*. You can read more about boolean operation in the documentation.
 
 The code in the `lego_brick.µcad` with the whole 2D base geometry of the brick will look like this:
+
+[![test](.test/tutorial_sketch_boolean_operations.svg)](.test/tutorial_sketch_boolean_operations.log)
 
 ```µcad,tutorial_sketch_boolean_operations
 use std::geo2d::*;
@@ -475,6 +517,8 @@ There *three* kinds of workbenches:
 ### Definition of our first sketch `Base`
 
 Now, we want to *encapsulate* the construction of the frame into a `sketch` workbench called `Base`.
+
+[![test](.test/tutorial_sketch_base.svg)](.test/tutorial_sketch_base.log)
 
 ```µcad,tutorial_sketch_base
 use std::geo2d::*;
@@ -513,6 +557,8 @@ the remaining sections of the brick -- `Cap` and `Knobs` -- can be constructed s
 
 The `Cap` is nothing more than a rectangle. We do not have to define a specific `sketch Cap`, instead we can use *aliases*:
 
+[![test](.test/tutorial_part_cap.svg)](.test/tutorial_part_cap.log)
+
 ```µcad,tutorial_part_cap
 use std::geo2d::Rect as Cap;
 
@@ -544,6 +590,8 @@ Notice that we have called the `std::geo2d::Circle` with additional argument `c`
 The parameter `c` of a circle is supposed to be a tuple of type `(x: Length,y: Length)`.
 If we pass to array of `Length` to the tuple, we can generate a multiplicity, which eventually creates `2*4` circles.
 
+[![test](.test/tutorial_part_knobs.svg)](.test/tutorial_part_knobs.log)
+
 ```µcad,tutorial_part_knobs
 const SPACING = 8mm;
 
@@ -558,6 +606,8 @@ Knobs();
 ### Overview of the sketches
 
 Below is an intermediate result of the sketches of the three components we now have defined:
+
+[![test](.test/tutorial_part_overview.svg)](.test/tutorial_part_overview.log)
 
 ```µcad,tutorial_part_overview
 use std::geo2d::*;
@@ -600,6 +650,8 @@ Like a sketch, a [*part*](../structure/part.md) is also workbench but calling a 
 There are several standard 3D parts in the standard library in the [`std::geo3d`](../libs/std/geo3d/README.md) submodule.
 The example below constructs a dice with holes in each direction:
 
+[![test](.test/tutorial_part_geo3d.svg)](.test/tutorial_part_geo3d.log)
+
 ```µcad,tutorial_part_geo3d
 use std::math::*;
 use std::ops::*;
@@ -621,6 +673,8 @@ This can be achieved by *extrusion* and the corresponding µcad operation is cal
 
 As a first example, let's take the cap of brick and extrude with a `height = 1.0mm`.
 
+[![test](.test/tutorial_part_extrude_cap.svg)](.test/tutorial_part_extrude_cap.log)
+
 ```µcad,tutorial_part_extrude_cap
 use std::geo2d::Rect as Cap;
 use std::ops::extrude;
@@ -638,6 +692,8 @@ Notice that `height = 1.0` will extrude will in Z axis.
 ### A first dreft for a parametric part
 
 Let's create a first draft for the brick by taking the base sketch and using it in the `LegoBrick` part:
+
+[![test](.test/tutorial_part_base.svg)](.test/tutorial_part_base.log)
 
 ```µcad,tutorial_part_base
 use std::geo2d::*;
@@ -672,6 +728,8 @@ LegoBrick(); // Instantiate a Lego brick
 Now, let's also consider the `Base` and the `Cap` sketch and also integrate it into the part.
 We extrude `Base`, `Knobs` and `Cap` and translate it in Z direction if necessary.
 Afterwards, we combine the three components by the `|` operator.
+
+[![test](.test/tutorial_part_result.svg)](.test/tutorial_part_result.log)
 
 ```µcad,tutorial_part_result
 use std::ops::*;

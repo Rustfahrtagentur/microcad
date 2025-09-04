@@ -1,0 +1,27 @@
+-- Test --
+  tutorial_2d_use
+  ../doc/tutorial/tutorial.md:199
+
+-- Code --
+
+ 1: use std::geo2d::Rect; // Only include `Rect` from `std::geo2d`.
+ 2: use std::ops::*; // Include all operations from `std::ops`.
+ 3: 
+ 4: Rect(40mm)
+ 5:     .translate(x = 20mm)
+ 6:     .rotate(45°);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    op std::ops::rotate(angle: 0.7853981633974483π, axis: (x: 0, y: 0, z: 1)) -> 2D
+      Transform __builtin::ops::rotate(matrix: Matrix3 [[0.7071067811865476, 0.7071067…
+        op std::ops::translate(x: 20mm, y: 0mm, z: 0mm) -> 2D
+          Transform __builtin::ops::translate(x: 20, y: 0, z: 0)⏎ -> 2D
+            sketch std::geo2d::Rect(size: 40mm) -> 2D
+              Primitive2D __builtin::geo2d::Rect(height: 40, width: 40, x: -20, y: -20)⏎ -> 2D
+
+-- Test Result --
+OK
+Export successful.

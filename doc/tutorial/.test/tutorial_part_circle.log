@@ -1,0 +1,27 @@
+-- Test --
+  tutorial_part_circle
+  ../doc/tutorial/tutorial.md:578
+
+-- Code --
+
+ 1: const SPACING = 8mm;
+ 2: 
+ 3: std::geo2d::Circle(d = 4.8mm, c = (x = [0..2] * SPACING, y = [0..4] * SPACING));
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch std::geo2d::Circle(c: (x: [0mm, 8mm], y: [0mm, 8mm, 16mm, 24mm]), d: 4.8m…
+      Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 2.4)⏎ -> 2D
+      Primitive2D __builtin::geo2d::Circle(cx: 8, cy: 0, radius: 2.4)⏎ -> 2D
+      Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 8, radius: 2.4)⏎ -> 2D
+      Primitive2D __builtin::geo2d::Circle(cx: 8, cy: 8, radius: 2.4)⏎ -> 2D
+      Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 16, radius: 2.4)⏎ -> 2D
+      Primitive2D __builtin::geo2d::Circle(cx: 8, cy: 16, radius: 2.4)⏎ -> 2D
+      Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 24, radius: 2.4)⏎ -> 2D
+      Primitive2D __builtin::geo2d::Circle(cx: 8, cy: 24, radius: 2.4)⏎ -> 2D
+
+-- Test Result --
+OK
+Export successful.

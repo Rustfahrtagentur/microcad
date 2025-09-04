@@ -1,0 +1,18 @@
+-- Test --
+  tutorial_2d_rect
+  ../doc/tutorial/tutorial.md:72
+
+-- Code --
+
+ 1: std::geo2d::Rect(width = 15.8mm, height = 31.8mm);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch std::geo2d::Rect(height: 31.8mm, width: 15.8mm) -> 2D
+      Primitive2D __builtin::geo2d::Rect(height: 31.8, width: 15.8, x: -7.9, y: -15.9)…
+
+-- Test Result --
+OK
+Export successful.

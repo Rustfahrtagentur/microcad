@@ -13,5 +13,31 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Operation subtract()⏎ -> 2D
+      Group -> 2D
+        sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 6.51mm) -> 2D
+          Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 3.255)⏎ -> 2D
+        sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 4.8mm) -> 2D
+          Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 2.4)⏎ -> 2D
+    op std::ops::translate(x: 8mm, y: 0mm, z: 0mm) -> 2D
+      Transform __builtin::ops::translate(x: 8, y: 0, z: 0)⏎ -> 2D
+        Operation subtract()⏎ -> 2D
+          Group -> 2D
+            sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 6.51mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 3.255)⏎ -> 2D
+            sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 4.8mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 2.4)⏎ -> 2D
+    op std::ops::translate(x: -8mm, y: 0mm, z: 0mm) -> 2D
+      Transform __builtin::ops::translate(x: -8, y: 0, z: 0)⏎ -> 2D
+        Operation subtract()⏎ -> 2D
+          Group -> 2D
+            sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 6.51mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 3.255)⏎ -> 2D
+            sketch std::geo2d::Circle(c: (x: 0mm, y: 0mm), d: 4.8mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: 0, cy: 0, radius: 2.4)⏎ -> 2D
+
 -- Test Result --
 OK
+Export successful.

@@ -23,17 +23,5 @@ error: Invalid operator: -
    3 |         y = ([0..1] - 0.5) * 8mm)
      |              ^^^^^^^^^^^^
      |
-error: Value Error: Cannot convert value <INVALID VALUE> to f64
-  ---> ../lib/std/geo2d.µcad:21:5
-     |
-  21 |     __builtin::geo2d::Circle(radius = radius / 1mm, cx = center.x / 1mm, cy = center.y / 1mm);
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-warning: The sketch workbench will produce no 2D output.
-  ---> ../lib/std/geo2d.µcad:1:1
-     |
-   1 | /// Circle definition
-     | ^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
 FAIL

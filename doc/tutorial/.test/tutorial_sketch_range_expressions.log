@@ -1,0 +1,31 @@
+-- Test --
+  tutorial_sketch_range_expressions
+  ../doc/tutorial/tutorial.md:465
+
+-- Code --
+
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: const SPACING = 8mm;
+ 5: 
+ 6: (Circle(d = 6.51mm) - Circle(d = 4.8mm))
+ 7:     .translate(y = [0..3] * SPACING)
+ 8:     .center();
+
+-- Output --
+-- Errors --
+error: Symbol center not found.
+  ---> <FROM STR>:8:6
+     |
+   8 |     .center();
+     |      ^^^^^^
+     |
+warning: This expression statement did not produce any model
+  ---> <FROM STR>:6:1
+     |
+   6 | (Circle(d = 6.51mm) - Circle(d = 4.8mm))
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAIL
