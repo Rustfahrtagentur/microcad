@@ -5,6 +5,8 @@
 
 use strum::IntoStaticStr;
 
+use crate::syntax::QualifiedName;
+
 /// A quantity type with
 #[derive(Clone, Debug, IntoStaticStr, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum QuantityType {
@@ -77,6 +79,7 @@ impl std::ops::Div for QuantityType {
 
     fn div(self, rhs: Self) -> Self::Output {
         if rhs == self {
+            log::error!("{rhs} == {self}");
             return QuantityType::Scalar;
         }
         if rhs == QuantityType::Scalar {

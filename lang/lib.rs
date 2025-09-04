@@ -91,7 +91,7 @@ pub fn shorten(what: &str, max_chars: usize) -> String {
 #[macro_export]
 macro_rules! shorten {
     ($what:expr) => {
-        $crate::shorten(&format!("{}", $what), 80)
+        $crate::shorten(&format!("{}", $what), 140)
     };
     ($what:expr,$shorten:expr) => {
         if $shorten {
