@@ -24,10 +24,10 @@ height = 15.8mm;
 
 As you can see, there is no `;` after the braces.
 
-## Manipulate geometry with *Operations*
-
 Nothing has really changed with the braces, but now we can combine both rectangles
-by using an *operation*:
+by using an *operation*.
+
+## Manipulate geometry with *Operations*
 
 In µcad, the operation to subtract a geometry from one another is called [`subtract`](../libs/std/ops/subtract.md).
 In our case, we want to subtract the outer part by the inner part in our frame group:

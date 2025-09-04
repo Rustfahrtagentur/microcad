@@ -54,8 +54,8 @@ std::geo2d::Rect(width = width - 2 * thickness, height = height - 2 * thickness)
 
 ![Picture](.test/inner_outer-out.svg)
 
-Because we give arguments which match the parameter names of `std::geo2d::Rect()`
-we do not need to write extra parameter names here.
+Because the arguments we give to the first `std::geo2d::Rect()` match exactly the parameter
+names of it we do not need to write extra parameter names here.
 This is called *auto-matching* and prevents us from having to write this:
 
 ```µcad

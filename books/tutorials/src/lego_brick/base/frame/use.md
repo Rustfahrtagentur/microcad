@@ -8,7 +8,7 @@ This is because builtin sketches (and parts) in µcad are organized within modul
 is a submodule of `std` and contains all built-in sketches.
 
 Writing `std::ops` and `std::geo2d` in front of each element seems redundant and cumbersome.
-Luckily, µcad has syntax element called [*use statements*](../structure/use.md).
+Luckily, µcad has syntax elements called [*use statements*](../structure/use.md).
 This means, from the previous code, we can simply write:
 
 [![test](.test/use.svg)](.test/use.log)

@@ -26,3 +26,5 @@ Frame(width, height, thickness);
 ```
 
 ![Picture](.test/frame-out.svg)
+
+Looks fine, so let's continue with the struts...
