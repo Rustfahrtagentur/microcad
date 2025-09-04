@@ -1,7 +1,7 @@
 # The final part
 
 Additionally, to the `grid` operation, we have to compute
-the overall and width and height in the `LegoBrick` part:
+the overall width and height in the `LegoBrick` part:
 
 * `width = rows * 8mm - 0.2mm`
 * `height = columns * 8mm - 0.2mm`
