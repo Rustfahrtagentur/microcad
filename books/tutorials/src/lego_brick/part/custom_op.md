@@ -59,6 +59,15 @@ sketch Knobs(rows: Integer, columns: Integer) {
     Circle(d = 4.8mm)
         .grid(rows, columns);
 }
+
+rows = 2;
+columns = 4;
+width = columns * SPACING - 0.2mm;
+height = rows * SPACING - 0.2mm;
+cap_thickness = 1.0mm;
+
+Base(rows, columns, width, height);
+Knobs(rows, columns);
 ```
 
 ![Picture](.test/custom_op-out.svg)
