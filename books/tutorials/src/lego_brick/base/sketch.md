@@ -4,7 +4,7 @@ Now, we want to turn the construction of the Lego brick base into a *reusable, p
 In µcad, a reusable, parametric component that produces or transforms a geometry is called 
 [*workbench*](../structure/workbench.md).
 
-There *three* kinds of workbenches:
+There are *three* kinds of workbenches:
 
 * [**sketches**](../structure/sketch.md): produce 2D geometry (e.g. a `Rect`).
 * [**parts**](../structure/part.md): produce 3D geometry, e.g. `Sphere`. We will create a `part` for our final Lego brick.
