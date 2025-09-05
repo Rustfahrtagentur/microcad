@@ -75,3 +75,6 @@ Knobs();
 ```
 
 ![Picture](.test/knobs-out.svg)
+
+We now have all the sketches we need!
+Let's move on and bring them together...
