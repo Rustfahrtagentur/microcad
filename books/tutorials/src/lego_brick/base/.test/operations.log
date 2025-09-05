@@ -12,7 +12,7 @@
  6: height = 15.8mm;
  7: frame = Frame(width, height, thickness);
  8: struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
- 9:              .translate(x = [-1..2] * 8mm);
+ 9:              .translate(x = [-1..1] * 8mm);
 10: 
 11: frame | struts;
 

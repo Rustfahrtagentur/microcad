@@ -1,6 +1,6 @@
 # Ranges
 
-The term `[-1, 0, 1]` can be replaced with a range expression `[-1..2]`, which yields the array we need:
+The term `[-1, 0, 1]` can be replaced with a range expression `[-1..1]`, which yields the array we need:
 
 [![test](.test/ranges.svg)](.test/ranges.log)
 
@@ -8,7 +8,7 @@ The term `[-1, 0, 1]` can be replaced with a range expression `[-1..2]`, which y
 use std::geo2d::*;
 use std::ops::*;
 
-(Circle(d = 6.51mm) - Circle(d = 4.8mm)).translate(x = [-1..2] * 8mm);
+(Circle(d = 6.51mm) - Circle(d = 4.8mm)).translate(x = [-1..1] * 8mm);
 ```
 
 ![Picture](.test/ranges-out.svg)
@@ -21,7 +21,3 @@ if you write `[-1..1]` in µcad.
 
 At this point, we are almost finished with the base.
 We just have to find a way to combine frame and structs.
-
-## TODO
-
-Ask people which one is better and more readable in this case: `[-1..2]` or `[-1..1]`

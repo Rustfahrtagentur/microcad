@@ -23,7 +23,7 @@ use std::ops::*;
 sketch Base(width: Length, height: Length, thickness = 1.2mm) {
     frame = Frame(width, height, thickness);
     struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
-             .translate(x = [-1..2] * 8mm);
+             .translate(x = [-1..1] * 8mm);
     frame | struts;
 }
 

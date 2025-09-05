@@ -29,7 +29,7 @@ We can easily construct a grid with circles via multiplicity:
 
 ```µcad,cap_multiplicity
 std::geo2d::Circle(d = 4.8mm, c = (
-        x = ([-1..2] - 0.5) * 8mm, 
+        x = ([-1..1] - 0.5) * 8mm, 
         y = ([0..1] - 0.5) * 8mm)
     );
 ```

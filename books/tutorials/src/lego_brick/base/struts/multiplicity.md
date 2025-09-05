@@ -3,8 +3,7 @@
 To avoid having to call `translate` multiple times, µcad provides a powerful feature called *multiplicity*.
 Instead of applying `translate()` separately for each position, you can pass it an [array of values](../types/arrays.md).
 An array of values is expressed with `[]` brackets.
-
-µcad will automatically apply the operation once for each value in the array.
+µcad then will automatically apply the operation once for each value in the array.
 
 This allows us to shorten the previous example significantly:
 

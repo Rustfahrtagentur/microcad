@@ -3,7 +3,7 @@
 
 use crate::{eval::*, model::*};
 
-impl Eval for RangeStart {
+impl Eval for RangeFirst {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let value: Value = self.0.eval(context)?;
         Ok(match value {
@@ -23,7 +23,7 @@ impl Eval for RangeStart {
     }
 }
 
-impl Eval for RangeEnd {
+impl Eval for RangeLast {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         let value: Value = self.0.eval(context)?;
         Ok(match value {
@@ -45,9 +45,9 @@ impl Eval for RangeEnd {
 
 impl Eval for RangeExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        Ok(match (self.start.eval(context)?, self.end.eval(context)?) {
-            (Value::Integer(start), Value::Integer(end)) => Value::Array(Array::new(
-                (start..end).map(Value::Integer).collect(),
+        Ok(match (self.first.eval(context)?, self.last.eval(context)?) {
+            (Value::Integer(first), Value::Integer(last)) => Value::Array(Array::new(
+                (first..last+1).map(Value::Integer).collect(),
                 Type::Integer,
             )),
             (_, _) => Value::None,
