@@ -3,7 +3,7 @@
 Until now we have two rectangles which are generated within
 the same file but to build a frame from this we need to combine them.
 
-## Grouping Statements
+## Grouping statements
 
 The first step is to bundle the rectangles into a group with curly brackets `{}`.
 So let's put some around the frame's rectangles.
@@ -29,7 +29,7 @@ by using an *operation*.
 
 ## Manipulate geometry with *Operations*
 
-In µcad, the operation to subtract a geometry from one another is called [`subtract`](../libs/std/ops/subtract.md).
+In µcad, the operation to subtract a geometry from another one is called [`subtract`](../libs/std/ops/subtract.md).
 In our case, we want to subtract the outer part by the inner part in our frame group:
 
 [![test](.test/subtract.svg)](.test/subtract.log)

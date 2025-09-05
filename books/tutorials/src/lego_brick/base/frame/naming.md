@@ -30,7 +30,7 @@ outer;
 Naming the rectangles leads to some better readability but the code will get quite a bit longer, because
 for each rectangle we now need a second statement to render them.
 
-This makes more sense, if you use an *Operator* (`-`) instead of an *Operation* (`subtract()`).
+This makes more sense, if you use an *Operator* (`-`) instead of an *Operation* (`subtract()`) to combine them.
 
 [![test](.test/operator.svg)](.test/operator.log)
 
