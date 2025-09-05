@@ -35,7 +35,8 @@ sketch Base(rows: Integer, columns: Integer, width: Length, height: Length) {
 use Rect as Cap;
 
 sketch Knobs(rows: Integer, columns: Integer) {
-    Circle(d = 4.8mm).grid(rows, columns);
+    Circle(d = 4.8mm)
+        .grid(rows, columns);
 }
 
 part LegoBrick(rows = 4, columns = 2, base_height = 9.6mm) {
