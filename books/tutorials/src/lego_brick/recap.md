@@ -18,8 +18,8 @@ In this tutorial you should have learned about the following things:
 - Extruding sketches with `std::ops::extrude
 - Creating custom sketches & parts
 - Creating custom operations
-  Separating code into external modules
-  Controlling export with attributes
+- Separating code into external modules
+- Controlling export with attributes
 
 Congratulations, you have successfully finished this tutorial.
 
