@@ -14,7 +14,7 @@ sketch Base(width: Length, height: Length) {
     thickness = 1.2mm;
     frame = Frame(width, height, thickness);
     struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
-        .translate(x = [0..3] * SPACING)
+        .translate(x = [0..2] * SPACING)
         .align();
     frame | struts;
 }
