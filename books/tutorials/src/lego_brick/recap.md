@@ -21,6 +21,6 @@ In this tutorial you should have learned about the following things:
 - Separating code into external modules
 - Controlling export with attributes
 
-Congratulations, you have successfully finished this tutorial.
+Congratulations, you now have successfully finished this tutorial!
 
-If you cannot get enough try to master the [additional exercises](exercises.md).
+If you could not get enough, try to master the further exercises...
