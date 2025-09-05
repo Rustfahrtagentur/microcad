@@ -29,15 +29,16 @@ We can easily construct a grid with circles via multiplicity:
 
 ```µcad,cap_multiplicity
 std::geo2d::Circle(d = 4.8mm, c = (
-        x = ([-1..1] - 0.5) * 8mm, 
+        x = ([-1..2] - 0.5) * 8mm, 
         y = ([0..1] - 0.5) * 8mm)
     );
 ```
 
 ![Picture](.test/cap_multiplicity-out.svg)
 
-Calculating `x` and `y` is a bit tricky here, because we now have no element in the center anymore
-so we have to subtract `0.5` from all the array values before multiplying with `8mm` to get a centered result.
+Calculating `x` and `y` is a bit tricky here, because with `x` getting `[-1..2]` (which is `[-1, 0, 1, 2]`)
+we now have no element in the center anymore so we have to subtract `0.5` from all the array values before
+multiplying with `8mm` to get a centered result.
 
 To avoid this complication we can use the function `align()` which can be applied to any workbench
 and centers the object to origin.
