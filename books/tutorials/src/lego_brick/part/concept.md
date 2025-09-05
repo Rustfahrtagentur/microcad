@@ -1,4 +1,4 @@
-# Making a concept
+# Make a parameterization concept
 
 Now we want to make the Lego brick part fully parametric and reusable.
 We want to:

@@ -25,7 +25,7 @@
   - [Create a part](./lego_brick/part/README.md)
     - [Extrude into 3D](./lego_brick/part/extrude.md)
     - [Create a first version](./lego_brick/part/first.md)
-    - [Making a concept](./lego_brick/part/concept.md)
+    - [Parameterization Concept](./lego_brick/part/concept.md)
     - [Custom operation](./lego_brick/part/custom_op.md)
     - [The final part](./lego_brick/part/final.md)
   - [External module](./lego_brick/external.md)
