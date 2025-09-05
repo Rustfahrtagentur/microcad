@@ -24,4 +24,4 @@ This will create a box with dimensions 15.8 ⨯ 31.8 ⨯ 1.0 mm.
 
 Notice that with `std::ops::extrude()` we always will extrude along Z axis.
 
-![Picture](.test/extrude_cap-out.svg)
+![Picture](.test/extrude_cap-out.stl)
