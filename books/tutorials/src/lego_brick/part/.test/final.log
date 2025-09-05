@@ -26,30 +26,31 @@
 20: use Rect as Cap;
 21: 
 22: sketch Knobs(rows: Integer, columns: Integer) {
-23:     Circle(d = 4.8mm).grid(rows, columns);
-24: }
-25: 
-26: part LegoBrick(rows = 4, columns = 2, base_height = 9.6mm) {
-27:     width = rows * SPACING - 0.2mm;
-28:     height = columns * SPACING - 0.2mm;
-29:     cap_thickness = 1.0mm;
-30: 
-31:     base = Base(rows, columns, width, height)
-32:         .extrude(base_height - cap_thickness);
-33: 
-34:     cap = Cap(width, height)
-35:         .extrude(cap_thickness)
-36:         .translate(z = base_height - cap_thickness);
-37: 
-38:     knobs = Knobs(rows, columns)
-39:         .extrude(1.7mm)
-40:         .translate(z = base_height);
-41: 
-42:     base | cap | knobs;
-43: }
-44: 
-45: // render a brick with default values
-46: LegoBrick();
+23:     Circle(d = 4.8mm)
+24:         .grid(rows, columns);
+25: }
+26: 
+27: part LegoBrick(rows = 4, columns = 2, base_height = 9.6mm) {
+28:     width = rows * SPACING - 0.2mm;
+29:     height = columns * SPACING - 0.2mm;
+30:     cap_thickness = 1.0mm;
+31: 
+32:     base = Base(rows, columns, width, height)
+33:         .extrude(base_height - cap_thickness);
+34: 
+35:     cap = Cap(width, height)
+36:         .extrude(cap_thickness)
+37:         .translate(z = base_height - cap_thickness);
+38: 
+39:     knobs = Knobs(rows, columns)
+40:         .extrude(1.7mm)
+41:         .translate(z = base_height);
+42: 
+43:     base | cap | knobs;
+44: }
+45: 
+46: // render a brick with default values
+47: LegoBrick();
 
 -- Output --
 -- Errors --

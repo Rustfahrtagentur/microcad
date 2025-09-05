@@ -23,13 +23,15 @@
 17: ) {
 18:     thickness = 1.2mm;
 19:     frame = Frame(width, height, thickness);
-20:     struts = (Ring(outer = 6.51mm, inner = 4.8mm)).grid(rows, columns);
-21:     frame | struts;
-22: }
-23: 
-24: sketch Knobs(rows: Integer, columns: Integer) {
-25:     Circle(d = 4.8mm).grid(rows, columns);
-26: }
+20:     struts = Ring(outer = 6.51mm, inner = 4.8mm)
+21:         .grid(rows, columns);
+22:     frame | struts;
+23: }
+24: 
+25: sketch Knobs(rows: Integer, columns: Integer) {
+26:     Circle(d = 4.8mm)
+27:         .grid(rows, columns);
+28: }
 
 -- Output --
 -- Errors --
