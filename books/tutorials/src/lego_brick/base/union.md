@@ -19,7 +19,7 @@ frame = Frame(width, height, thickness);
 struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
              .translate(x = [-1..1] * 8mm);
 
-frame | struts;
+frame | struts; // We could also write `{ frame; struts; }.union()` but the `|` operator is more elegant. 
 ```
 
 If you export the file, you will see a frame and the structs combined into a single object.

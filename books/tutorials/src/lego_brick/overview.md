@@ -1,6 +1,6 @@
 # Putting it together
 
-Below is an intermediate result of the sketches of the three components we now have defined:
+Below is an intermediate result of the sketches of the three components that have now been defined:
 
 [![test](.test/overview.svg)](.test/overview.log)
 
@@ -37,8 +37,8 @@ Knobs();
 ![Picture](.test/overview-out.svg)
 
 Across the Lego universe, the spacing of `8mm` is used everywhere.
-To address this we can store it in global constant named `SPACING` using the `const` keyword.
+To address this we can store it in a *global constant* named `SPACING` using the `const` keyword.
 The name of a constant must be in capital letters.
-It can be used from within the current module/file and from all sketches & parts within that module.
+It can be used from within the current module/file and from all sketches and parts within that module.
 
 In the next steps, we want to create a 3D geometry.

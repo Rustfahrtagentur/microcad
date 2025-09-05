@@ -23,11 +23,11 @@ sketch YourSketch( /* your building plan */ ) {
 YourSketch();
 ```
 
-If we export the file with the command:
+We can export the file using the following command:
 
 ```sh
 microcad export lego_brick
 ```
 
 Nothing will be exported because the sketch does not contain any output geometry.
-Therefore, let's add some geometry!
+Therefore, let's add some!

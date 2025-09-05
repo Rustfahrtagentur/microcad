@@ -2,8 +2,8 @@
 
 Let's make a brick out of our `Base`, the `Knobs` and the `Cap` sketch and integrate everything into a part.
 
-We extrude `Base`, `Knobs` and `Cap` and translate it in Z direction if necessary.
-Afterwards, we combine the three components by the `|` operator.
+We extrude `Base`, `Knobs` and `Cap` and translate them in Z direction if necessary.
+Afterwards, we combine the three components using the `|` operator.
 
 [![test](.test/first_version.svg)](.test/first_version.log)
 
@@ -53,6 +53,6 @@ part LegoBrick(base_height = 9.6mm) {
 LegoBrick();
 ```
 
-When we take the code snippet above and export it, instead of an SVG, an STL file will be exported:
+When we export the code snippet above, an STL file will be exported instead of an SVG file.
 
 ![Picture](.test/first_version-out.svg)

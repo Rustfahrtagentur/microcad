@@ -16,14 +16,14 @@ mod lego_brick;
 
 use lego_brick::*;
 
-#[export = "lego_brick2x2.stl"]
-brick2x2 = LegoBrick(rows = 2, columns = 2, base_height = 9.6mm * 2);
+#[export = "double_2x2.stl"]
+double_2x2 = LegoBrick(rows = 2, columns = 2, base_height = 9.6mm * 2);
 
-#[export = "lego_brick4x2.stl"]
-brick4x2 = LegoBrick(rows = 4, columns = 2);
+#[export = "single_4x2.stl"]
+single_4x2 = LegoBrick(rows = 4, columns = 2);
 
-#[export = "lego-brick5x1.stl"]
-brick3x2 = LegoBrick(rows = 5, columns = 1, base_height = 3.2mm);
+#[export = "third_3x2.stl"]
+third_3x2 = LegoBrick(rows = 5, columns = 1, base_height = 3.2mm);
 ```
 
 When we export the file now, three files with the specified names will be created

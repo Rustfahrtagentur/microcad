@@ -6,7 +6,8 @@ the overall width and height in the `LegoBrick` part:
 * `width = rows * 8mm - 0.2mm`
 * `height = columns * 8mm - 0.2mm`
 
-Now we can write the final part of a `LegoBrick`.
+Now we are ready to write the final part of a `LegoBrick`.
+
 We add some default values for `rows` and `columns` in the building plan and use
 them in the last statement where we call `LegoBrick()`.
 
