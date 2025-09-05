@@ -9,9 +9,9 @@ plugin with syntax coloring which you might want to install from our source code
 ### Install SVG Preview
 
 You might want to install
-[Svg Preview for VSCode](https://github.com/SimonSiefke/vscode-svg-preview).
+[Svg Preview for VSCode](https://marketplace.visualstudio.com/items?itemName=SimonSiefke.svg-preview).
 
 ### Install STL Viewer extension
 
 Another useful extension is the
-[vscode-stl-viewer](https://open-vsx.org/extension/mtsmfm/vscode-stl-viewer).
+[vscode-stl-viewer](https://marketplace.visualstudio.com/items?itemName=mtsmfm.vscode-stl-viewer).
