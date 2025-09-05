@@ -21,7 +21,7 @@
 15: use Rect as Cap;
 16: 
 17: sketch Knobs() {
-18:     center = (x = [0..3] * SPACING, y = [0..1] * SPACING);
+18:     center = (x = [0..1] * SPACING, y = [0..3] * SPACING);
 19:     Circle(diameter = 4.8mm, center)
 20:         .align();
 21: }
@@ -109,15 +109,15 @@
                 Operation __builtin::ops::extrude(height: Scalar = 1.7, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_de…
                   sketch <NO ID>::Knobs() -> 2D
                     Operation __builtin::ops::align()⏎ -> 2D
-                      sketch std::geo2d::Circle(center: (x: [Length], y: [Length]) = (x: [Length] = [0mm, 8mm, 16mm, 24mm], y: [Length] = [0mm, 8mm]), diameter: L…
+                      sketch std::geo2d::Circle(center: (x: [Length], y: [Length]) = (x: [Length] = [0mm, 8mm], y: [Length] = [0mm, 8mm, 16mm, 24mm]), diameter: L…
                         Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
                         Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 16, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 24, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
                         Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
                         Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 16, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 24, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
+                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 16, radius: Scalar = 2.4)⏎ -> 2D
+                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 16, radius: Scalar = 2.4)⏎ -> 2D
+                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 24, radius: Scalar = 2.4)⏎ -> 2D
+                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 24, radius: Scalar = 2.4)⏎ -> 2D
 
 -- Test Result --
 OK
