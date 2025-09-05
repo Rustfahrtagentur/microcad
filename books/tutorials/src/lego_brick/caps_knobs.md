@@ -37,8 +37,8 @@ std::geo2d::Circle(d = 4.8mm, c = (
 ![Picture](.test/cap_multiplicity-out.svg)
 
 Calculating `x` and `y` is a bit tricky here, because with `x` getting `[-1..2]` (which is `[-1, 0, 1, 2]`)
-we now have no element in the center anymore so we have to subtract `0.5` from all the array values before
-multiplying with `8mm` to get a centered result.
+and `y` getting `[0..1]` we now have no element in the center anymore.
+So we have to subtract `0.5` from all the array values before multiplying with `8mm` to get a centered result.
 
 To avoid this complication we can use the function `align()` which can be applied to any workbench
 and centers the object to origin.
@@ -61,7 +61,7 @@ The code looks clearer now.
 Notice that we have called the `std::geo2d::Circle` with additional argument `c`.
 `c` is given as a tuple `(x = ..., y = ...)`. A [tuple](../types/tuples.md) is a collection of (mostly named) values.
 The parameter `c` of a circle is supposed to be a tuple of type `(x: Length,y: Length)`.
-If we pass to array of `Length` to the tuple, we can generate a multiplicity, which eventually creates `2*4` circles.
+If we pass an array of `Length` to the tuple, we can generate a multiplicity, which eventually creates `2*4` circles.
 
 [![test](.test/knobs.svg)](.test/knobs.log)
 
