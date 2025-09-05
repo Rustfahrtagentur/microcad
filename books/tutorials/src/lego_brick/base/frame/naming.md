@@ -11,12 +11,12 @@ outer = std::geo2d::Rect(width = 31.8mm, height = 15.8mm);
 ```
 
 By adding `outer =` to the call `std::geo2d::Rect(..)`, we have created an [*assignment*](../structure/assignments.md).
-Now, the output rectangle will be stored in the variable `outer`.
+Now, the output rectangle will be stored in the value `outer`.
 However, when we export the file again via `microcad export lego_brick.µcad`,
 you will notice that nothing is exported.
 
 Why? Because in µcad, assignments are not part of the output geometry.
-A second statement `outer;` is needed to output the geometry stored in the `outer` variable.
+A second statement `outer;` is needed to output the geometry stored in the `outer` value.
 
 [![test](.test/output.svg)](.test/output.log)
 

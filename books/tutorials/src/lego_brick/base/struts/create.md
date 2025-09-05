@@ -21,7 +21,7 @@ Circle(d = 6.51mm) - Circle(d =  4.8mm);
 ![Picture](.test/multiple-out.svg)
 
 The code above produces the expected result. However, the code is quite repetitive.
-We could improve it slightly by storing the expression `Circle(d = 6.51mm) - Circle(d = 4.8mm)` in a variable, say `strut`.
+We could improve it slightly by storing the expression `Circle(d = 6.51mm) - Circle(d = 4.8mm)` in a value, say `strut`.
 But even then, we’d still need to write out each `translate(...)` call manually.
 
 And more importantly:
