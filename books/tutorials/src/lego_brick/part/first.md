@@ -26,7 +26,8 @@ use Rect as Cap;
 
 sketch Knobs() {
     center = (x = [0..3] * SPACING, y = [0..1] * SPACING);
-    Circle(diameter = 4.8mm, center).align();
+    Circle(diameter = 4.8mm, center)
+        .align();
 }
 
 part LegoBrick(base_height = 9.6mm) {
