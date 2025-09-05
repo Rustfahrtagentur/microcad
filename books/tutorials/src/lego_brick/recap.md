@@ -15,7 +15,7 @@ In this tutorial you should have learned about the following things:
 - Argument multiplicity
 - Ranges
 - Using constants
-- Extruding sketches with `std::ops::extrude
+- Extruding sketches with `std::ops::extrude`
 - Creating custom sketches & parts
 - Creating custom operations
 - Separating code into external modules

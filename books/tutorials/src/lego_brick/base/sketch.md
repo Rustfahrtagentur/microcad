@@ -1,7 +1,7 @@
 # Create a sketch for the base
 
 Now, we want to turn the construction of the Lego brick base into a *reusable, parametric component*.
-In µcad, a reusable, parametric component that produces or transforms a geometry is called 
+In µcad, a reusable, parametric component that produces or transforms a geometry is called
 [*workbench*](../structure/workbench.md).
 
 There are *three* kinds of workbenches:
@@ -42,8 +42,8 @@ If we examine the syntax of the above example, we can see the following things:
 * The sketch `Base` has 3 parameters `width`, `height` and `thickness`. Together they are
   called the *building plan* of `Base`.
 * `width` and `height` have the type `Length` and no default value, they are *required*.
-* `thickness` is also of type value, but implicitly, because we have defined a default value `1.2mm`
-  which is a length of unit `mm`.
+* `thickness` is also of type `Length'`, but implicitly, because we have defined a default value `1.2mm`
+  which is a `Length` of unit `mm`.
 * The body `{ ... }` of `Base` constructs the actual geometry.
 * `Base(width = 15.8mm, height = 31.8mm)` is a call of the sketch.
 
