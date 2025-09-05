@@ -39,6 +39,6 @@ Knobs();
 Across the Lego universe, the spacing of `8mm` is used everywhere.
 To address this we can store it in global constant named `SPACING` using the `const` keyword.
 The name of a constant must be in capital letters.
-It can be used within the current module/file and from all sketches & parts in that module.
+It can be used from within the current module/file and from all sketches & parts within that module.
 
 In the next steps, we want to create a 3D geometry.
