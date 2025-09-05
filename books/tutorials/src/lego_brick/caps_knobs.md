@@ -18,7 +18,7 @@ Cap(width = 31.8mm, height = 15.8mm);
 
 ![Picture](.test/cap-out.svg)
 
-`Cap` will now be known as `Rect`.
+`std::geo2d::Rect` will now also be known as `Cap`.
 
 ## Knobs
 
