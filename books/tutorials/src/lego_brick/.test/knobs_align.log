@@ -1,5 +1,5 @@
 -- Test --
-  cap_align
+  knobs_align
   ../books/tutorials/src/lego_brick/caps_knobs.md:48
 
 -- Code --

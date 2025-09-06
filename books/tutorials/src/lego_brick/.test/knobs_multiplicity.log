@@ -1,5 +1,5 @@
 -- Test --
-  cap_multiplicity
+  knobs_multiplicity
   ../books/tutorials/src/lego_brick/caps_knobs.md:30
 
 -- Code --
