@@ -73,18 +73,16 @@ fn toml_importer() {
     println!("{value}");
 
     if let Value::Tuple(tuple) = value {
-        if let Value::Models(models) = tuple
+        if let Value::Model(model) = tuple
             .by_id(&Identifier::no_ref("package"))
             .expect("Package info")
         {
-            if let Some(model) = models.single_model() {
-                let model_ = model.borrow();
-                let name = model_
-                    .get_property(&Identifier::no_ref("name"))
-                    .expect("property");
-                let name = name.try_string().expect("String value");
-                println!("{name}");
-            }
+            let model_ = model.borrow();
+            let name = model_
+                .get_property(&Identifier::no_ref("name"))
+                .expect("property");
+            let name = name.try_string().expect("String value");
+            println!("{name}");
         }
     } else {
         panic!("Value must be a tuple!")

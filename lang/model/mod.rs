@@ -56,12 +56,6 @@ impl Model {
         self.borrow().element.is_operation()
     }
 
-    /// Check if this model contains geometry.
-    pub fn contains_geometry(&self) -> bool {
-        let self_ = &self.borrow();
-        self_.element.contains_geometry() || self_.children.contains_geometry()
-    }
-
     /// Make a deep copy if this model.
     /// TODO: isn't this a Clone?
     pub fn make_deep_copy(&self) -> Self {
@@ -129,10 +123,17 @@ impl Model {
     }
 
     /// Find children model placeholder in model descendants.
-    pub fn find_children_placeholder(&self) -> Option<Model> {
-        self.descendants().find(|n| {
-            n.borrow().id.is_none() && matches!(n.0.borrow().element.value, Element::ChildrenMarker)
-        })
+    pub fn replace_children_placeholder(&self, model: &Model) -> Self {
+        self.descendants().for_each(|m| {
+            let mut m_ = m.borrow_mut();
+            if m_.id.is_none() && matches!(m_.element.value, Element::ChildrenMarker) {
+                log::error!("Replace: {model}");
+                model.borrow_mut().parent = Some(self.clone());
+                *m_ = model.borrow().clone_content();
+                m_.children = model.borrow().children.clone();
+            }
+        });
+        self.clone()
     }
 
     /// Deduce output type from children and set it and return it.

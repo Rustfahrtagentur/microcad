@@ -91,7 +91,7 @@ impl Eval for Call {
                         context.error(self, EvalError::CannotCallOperationWithoutWorkpiece)?;
                         Ok(Value::None)
                     } else {
-                        Ok(Value::Models(w.call(
+                        Ok(Value::Model(w.call(
                             self.src_ref(),
                             symbol.clone(),
                             &args,

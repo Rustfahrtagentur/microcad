@@ -23,9 +23,10 @@ pub enum Element {
     /// A workpiece is created by workbenches.
     BuiltinWorkpiece(BuiltinWorkpiece),
 
-    /// A special element after which children will be nested as siblings.
-    ///
-    /// This element is removed after the children have been inserted.
+    /// Multiplicity.
+    Multiplicity,
+
+    /// Children marker.
     ChildrenMarker,
 }
 
@@ -45,7 +46,9 @@ impl Element {
                     builtin_workpiece.output_type
                 }
             },
-            Element::Group | Element::ChildrenMarker => OutputType::NotDetermined,
+            Element::Group | Element::Multiplicity | Element::ChildrenMarker => {
+                OutputType::NotDetermined
+            }
         }
     }
 
@@ -56,27 +59,11 @@ impl Element {
                 BuiltinWorkbenchKind::Primitive2D | BuiltinWorkbenchKind::Primitive3D => false,
                 BuiltinWorkbenchKind::Operation | BuiltinWorkbenchKind::Transform => true,
             },
-            Element::ChildrenMarker | Element::Group => false,
+            Element::Multiplicity | Element::Group | Element::ChildrenMarker => false,
             Element::Workpiece(workpiece) => match workpiece.kind {
                 WorkbenchKind::Part | WorkbenchKind::Sketch => false,
                 WorkbenchKind::Operation => true,
             },
-        }
-    }
-
-    /// Contains geometry.
-    pub fn contains_geometry(&self) -> bool {
-        match self {
-            Element::BuiltinWorkpiece(builtin_workpiece) => match builtin_workpiece.kind {
-                BuiltinWorkbenchKind::Primitive2D | BuiltinWorkbenchKind::Primitive3D => true,
-                BuiltinWorkbenchKind::Operation | BuiltinWorkbenchKind::Transform => false,
-            },
-            Element::ChildrenMarker => true,
-            Element::Workpiece(workpiece) => match workpiece.kind {
-                WorkbenchKind::Part | WorkbenchKind::Sketch => false,
-                WorkbenchKind::Operation => false,
-            },
-            Element::Group => false,
         }
     }
 }

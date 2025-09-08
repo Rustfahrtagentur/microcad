@@ -154,14 +154,15 @@ pub trait BuiltinWorkbenchDefinition {
                 call = crate::mark!(CALL),
                 id = Self::id()
             );
-            Ok(Value::Models(
+            Ok(Value::Model(
                 ArgumentMatch::find_multi_match(
                     args,
                     params.expect("A built-in part must have a parameter list"),
                 )?
                 .iter()
                 .map(|tuple| Self::model(Creator::new(context.current_symbol(), tuple.clone())))
-                .collect(),
+                .collect::<Models>()
+                .to_multiplicity(SrcRef(None)),
             ))
         }
     }

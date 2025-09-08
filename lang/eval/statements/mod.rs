@@ -48,39 +48,35 @@ impl Eval for Statement {
     }
 }
 
-impl Eval<Models> for Statement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
-        let models: Models = match self {
+impl Eval<Option<Model>> for Statement {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<Model>> {
+        let model: Option<Model> = match self {
             Self::Workbench(w) => {
                 context.grant(w.as_ref())?;
-                Default::default()
+                None
             }
-            Self::Module(m) => m.as_ref().eval(context)?,
+            Self::Module(m) => None,
             Self::Function(f) => {
                 context.grant(f.as_ref())?;
-                Default::default()
+                None
             }
             Self::Init(i) => {
                 context.grant(i.as_ref())?;
-                Default::default()
+                None
             }
-
             Self::Return(r) => {
                 context.grant(r)?;
-                Default::default()
+                None
             }
             Self::Use(u) => {
                 u.eval(context)?;
-                Default::default()
+                None
             }
             Self::Assignment(a) => {
                 a.eval(context)?;
-                Default::default()
+                None
             }
-            Self::If(i) => {
-                let model: Option<Model> = i.eval(context)?;
-                model.into()
-            }
+            Self::If(i) => i.eval(context)?,
             Self::Expression(e) => e.eval(context)?,
             Self::InnerAttribute(a) => {
                 context.grant(a)?;
@@ -88,10 +84,13 @@ impl Eval<Models> for Statement {
             }
         };
 
-        if models.deduce_output_type() == OutputType::InvalidMixed {
-            context.error(self, EvalError::CannotMixGeometry)?;
+        if let Some(ref model) = model {
+            if model.deduce_output_type() == OutputType::InvalidMixed {
+                context.error(self, EvalError::CannotMixGeometry)?;
+            }
         }
-        Ok(models)
+
+        Ok(model)
     }
 }
 
@@ -126,13 +125,13 @@ impl Eval<Models> for StatementList {
         let mut output_type = OutputType::NotDetermined;
 
         for statement in self.iter() {
-            let mut statement_models: Models = statement.eval(context)?;
-            output_type = output_type.merge(&statement_models.deduce_output_type());
-            if output_type == OutputType::InvalidMixed {
-                context.error(statement, EvalError::CannotMixGeometry)?;
+            if let Some(model) = statement.eval(context)? {
+                output_type = output_type.merge(&model.deduce_output_type());
+                if output_type == OutputType::InvalidMixed {
+                    context.error(statement, EvalError::CannotMixGeometry)?;
+                }
+                models.push(model);
             }
-
-            models.append(&mut statement_models);
         }
         models.deduce_output_type();
         Ok(models)

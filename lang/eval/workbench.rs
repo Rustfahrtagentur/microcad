@@ -117,7 +117,7 @@ impl WorkbenchDefinition {
         symbol: Symbol,
         arguments: &ArgumentValueList,
         context: &mut Context,
-    ) -> EvalResult<Models> {
+    ) -> EvalResult<Model> {
         log::debug!(
             "Workbench {call} {kind} {id:?}({arguments})",
             call = crate::mark!(CALL),
@@ -189,6 +189,6 @@ impl WorkbenchDefinition {
             }
         }
 
-        Ok(models)
+        Ok(models.to_multiplicity(self.src_ref.clone()))
     }
 }
