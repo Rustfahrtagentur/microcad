@@ -40,7 +40,7 @@ pub enum Expression {
     Call(Call),
     /// A qualified name: `foo::bar`.
     QualifiedName(QualifiedName),
-    /// A marker expression: `@children`.
+    /// A marker expression: `@input`.
     Marker(Marker),
     /// A binary operation: `a + b`
     BinaryOp {

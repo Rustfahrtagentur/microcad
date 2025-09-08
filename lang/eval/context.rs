@@ -1,7 +1,15 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{builtin::*, diag::*, eval::*, model::Model, rc::*, resolve::*, syntax::*};
+use crate::{
+    builtin::*,
+    diag::*,
+    eval::*,
+    model::{Model, Models},
+    rc::*,
+    resolve::*,
+    syntax::*,
+};
 
 /// Grant statements depending on context
 pub trait Grant<T> {
@@ -30,6 +38,8 @@ pub struct Context {
     exporters: ExporterRegistry,
     /// Importer registry.
     importers: ImporterRegistry,
+    /// Input models.
+    input: Models,
 }
 
 impl Context {
@@ -52,9 +62,7 @@ impl Context {
         Self {
             symbol_table: SymbolTable::new(root, symbols, sources).expect("unknown root id"),
             output,
-            diag_handler: Default::default(),
-            exporters: ExporterRegistry::default(),
-            importers: ImporterRegistry::default(),
+            ..Default::default()
         }
     }
 
@@ -83,6 +91,15 @@ impl Context {
         let mut symbols = sources.resolve()?;
         symbols.insert(Identifier::no_ref("__builtin"), builtin);
         Ok(Self::new(root_id, symbols, sources, Box::new(Stdout)))
+    }
+
+    /// Return input models
+    pub fn get_input(&self) -> &Models {
+        &self.input
+    }
+
+    pub fn set_input(&mut self, input: Models) {
+        self.input = input;
     }
 
     /// Access captured output.
@@ -189,14 +206,16 @@ impl Locals for Context {
 impl Default for Context {
     fn default() -> Self {
         Self {
+            output: Box::new(Stdout),
             symbol_table: Default::default(),
             diag_handler: Default::default(),
-            output: Box::new(Stdout),
             exporters: Default::default(),
             importers: Default::default(),
+            input: Default::default(),
         }
     }
 }
+
 impl Lookup for Context {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         self.symbol_table.lookup(name)

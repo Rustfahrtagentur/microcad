@@ -11,7 +11,7 @@ which arranges elements in a grid which is centered to origin:
 const SPACING = 8mm;
 
 op grid(rows: Integer, columns: Integer) {
-    @children
+    @input
         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
         .align()
 }
@@ -20,8 +20,8 @@ op grid(rows: Integer, columns: Integer) {
 The `grid` operation takes `rows` and `columns` as parameters.
 
 Operations - as we already know - have not only an output geometry but an input geometry as well.
-To be able to access those input geometry we need to use the keyword `@children`.
-With `@children` we insert the elements that are given by the caller.
+To be able to access those input geometry we need to use the keyword `@input`.
+With `@input` we insert the elements that are given by the caller.
 In our case that will be a knob or a strut sketch.
 
 We now can rewrite `Knobs` and `Frame` sketches by adding `rows` and `columns`
@@ -36,7 +36,7 @@ use std::ops::*;
 const SPACING = 8mm;
 
 op grid(rows: Integer, columns: Integer) {
-    @children
+    @input
         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
         .align()
 }
@@ -73,4 +73,4 @@ Knobs(rows, columns);
 
 ## TODO
 
-Ask people for better alternatives of `@children`.
+Ask people for better alternatives of `@input`.

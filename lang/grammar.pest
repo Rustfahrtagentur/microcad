@@ -365,7 +365,7 @@ assignment = { (qualifier ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ 
 
 assignment_statement = { (attribute_list ~ ws+)? ~ assignment ~ ws* ~ ";" }
 
-// `@children`: ok
+// `@input`: ok
 marker = { "@" ~ identifier }
 
 // Rule for a single parameter of a definition

@@ -20,7 +20,7 @@ use std::geo2d::*;
 const SPACING = 8mm;
 
 op grid(rows: Integer, columns: Integer) {
-    @children
+    @input
         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
         .align()
 }

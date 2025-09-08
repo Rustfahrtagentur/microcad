@@ -3,21 +3,12 @@
 
 use crate::{eval::*, model::*};
 
-impl Eval<Option<Model>> for Marker {
-    fn eval(&self, _: &mut Context) -> EvalResult<Option<Model>> {
-        if self.is_children_marker() {
-            Ok(Some(
-                ModelBuilder::new(Element::ChildrenMarker, self.src_ref()).build(),
-            ))
-        } else {
-            Ok(None)
-        }
-    }
-}
-
 impl Eval<Models> for Marker {
     fn eval(&self, context: &mut Context) -> EvalResult<Models> {
-        let model: Option<Model> = self.eval(context)?;
-        Ok(model.into())
+        if self.is_input_marker() {
+            Ok(context.get_input().clone())
+        } else {
+            Ok(Models::default())
+        }
     }
 }

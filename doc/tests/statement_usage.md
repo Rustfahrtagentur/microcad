@@ -479,7 +479,7 @@ sketch K() {
 
 ```µcad,workbench_marker
 sketch K() {
-  @children
+  @input
 } K();
 ```
 
@@ -593,7 +593,7 @@ sketch K() {
 
 ```µcad,body_marker
 {
-  @children
+  @input
 }
 ```
 

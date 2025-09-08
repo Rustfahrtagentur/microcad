@@ -22,11 +22,6 @@ pub enum Element {
     ///
     /// A workpiece is created by workbenches.
     BuiltinWorkpiece(BuiltinWorkpiece),
-
-    /// A special element after which children will be nested as siblings.
-    ///
-    /// This element is removed after the children have been inserted.
-    ChildrenMarker,
 }
 
 impl Element {
@@ -45,7 +40,7 @@ impl Element {
                     builtin_workpiece.output_type
                 }
             },
-            Element::Group | Element::ChildrenMarker => OutputType::NotDetermined,
+            Element::Group => OutputType::NotDetermined,
         }
     }
 
@@ -56,7 +51,7 @@ impl Element {
                 BuiltinWorkbenchKind::Primitive2D | BuiltinWorkbenchKind::Primitive3D => false,
                 BuiltinWorkbenchKind::Operation | BuiltinWorkbenchKind::Transform => true,
             },
-            Element::ChildrenMarker | Element::Group => false,
+            Element::Group => false,
             Element::Workpiece(workpiece) => match workpiece.kind {
                 WorkbenchKind::Part | WorkbenchKind::Sketch => false,
                 WorkbenchKind::Operation => true,
@@ -71,7 +66,6 @@ impl Element {
                 BuiltinWorkbenchKind::Primitive2D | BuiltinWorkbenchKind::Primitive3D => true,
                 BuiltinWorkbenchKind::Operation | BuiltinWorkbenchKind::Transform => false,
             },
-            Element::ChildrenMarker => true,
             Element::Workpiece(workpiece) => match workpiece.kind {
                 WorkbenchKind::Part | WorkbenchKind::Sketch => false,
                 WorkbenchKind::Operation => false,

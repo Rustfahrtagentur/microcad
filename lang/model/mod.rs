@@ -128,13 +128,6 @@ impl Model {
         Models::from(vec![self.clone(), other]).boolean_op(op)
     }
 
-    /// Find children model placeholder in model descendants.
-    pub fn find_children_placeholder(&self) -> Option<Model> {
-        self.descendants().find(|n| {
-            n.borrow().id.is_none() && matches!(n.0.borrow().element.value, Element::ChildrenMarker)
-        })
-    }
-
     /// Deduce output type from children and set it and return it.
     pub fn deduce_output_type(&self) -> OutputType {
         let self_ = self.borrow();

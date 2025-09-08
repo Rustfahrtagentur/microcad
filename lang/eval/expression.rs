@@ -45,13 +45,15 @@ impl Eval for RangeLast {
 
 impl Eval for RangeExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        Ok(match (self.first.eval(context)?, self.last.eval(context)?) {
-            (Value::Integer(first), Value::Integer(last)) => Value::Array(Array::new(
-                (first..last+1).map(Value::Integer).collect(),
-                Type::Integer,
-            )),
-            (_, _) => Value::None,
-        })
+        Ok(
+            match (self.first.eval(context)?, self.last.eval(context)?) {
+                (Value::Integer(first), Value::Integer(last)) => Value::Array(Array::new(
+                    (first..last + 1).map(Value::Integer).collect(),
+                    Type::Integer,
+                )),
+                (_, _) => Value::None,
+            },
+        )
     }
 }
 
@@ -239,10 +241,7 @@ impl Eval for Expression {
                 Ok(Value::from_single_model(model))
             }
             Self::QualifiedName(qualified_name) => qualified_name.eval(context),
-            Self::Marker(marker) => {
-                let model: Option<Model> = marker.eval(context)?;
-                Ok(Value::Models(model.into_iter().collect()))
-            }
+            Self::Marker(marker) => Ok(Value::Models(marker.eval(context)?)),
             // Access a property `x` of an expression `circle.x`
             Self::PropertyAccess(lhs, id, src_ref) => {
                 let value: Value = lhs.eval(context)?;
