@@ -1,0 +1,51 @@
+
+op a(x: Scalar) { @input }
+op b() { @input }
+
+op c(x: [Scalar]) {
+    @input.a(x).b()
+}
+
+sketch D() { }
+
+// Call D()
+// call a()
+// call b()
+
+
+// a(2.0)
+//   translate(1.0)
+//     Circle
+__builtin::geo2d::Circle(radius = 42.0)
+    .__builtin::ops::translate(x = 1.0, y = 0, z = 0)
+    .a(x = 2.0);
+
+
+// c(4.0)
+//   a(2.0)
+//     translate(1.0)
+//       Circle
+// c(5.0)
+//   a(2.0)
+//     translate(1.0)
+//       Circle
+std::geo2d::Circle(radius = 42.0mm)
+    .__builtin::ops::translate(x = 1.0, y = 0, z = 0)
+    .a(x = 2.0)
+    .c([4.0, 5.0]);
+
+// b
+//   a(2.0)
+//     D
+//   a(3.0)
+//     D
+//__builtin::geo2d::Circle(radius = 42.0).a([2.0, 3.0]).b();
+
+
+
+// c(2.0)
+//    b
+//       a(2.0)
+//          D
+//__builtin::geo2d::Circle(radius = 42.0).c([4.0, 5.0]);
+

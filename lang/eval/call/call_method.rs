@@ -69,7 +69,7 @@ impl CallMethod<Models> for Models {
                 |context| {
                     let models = match &symbol.borrow().def {
                         SymbolDefinition::Workbench(workbench_definition) => workbench_definition
-                            .call_op_method(
+                            .call(
                             SrcRef::merge(name, args),
                             symbol.clone(),
                             args,
@@ -91,9 +91,15 @@ impl CallMethod<Models> for Models {
                         }
                     };
 
-                    log::error!("call_method: \n{models}", models = FormatTree(&models));
-                    log::error!("call_method: \n{}", FormatTree(self));
-                    context.set_input(models.clone());
+                    // for model in models.iter() {
+                    //     model.append_children(self.clone());
+                    //  }
+                    log::error!(
+                        "call_method (models): \n{models}",
+                        models = FormatTree(&models)
+                    );
+                    log::error!("call_method (self): \n{}", FormatTree(self));
+                    //   context.set_input(models.clone());
 
                     Ok(models)
                 },
