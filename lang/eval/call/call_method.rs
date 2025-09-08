@@ -3,7 +3,7 @@
 
 //! Argument value evaluation entity
 
-use crate::{eval::*, model::Models, syntax::*};
+use crate::{eval::*, model::Models, syntax::*, tree_display::FormatTree};
 
 /// Trait for calling methods of values
 pub trait CallMethod<T = Value> {
@@ -60,18 +60,18 @@ impl CallMethod<Models> for Models {
         context: &mut Context,
     ) -> EvalResult<Models> {
         // Try nest models for an operation: models.op()
-        fn try_nest(
+        fn nest(
             name: &QualifiedName,
             context: &mut Context,
-            models: &Models,
-            op: Models,
+            self_: &Models,
+            models: Models,
         ) -> EvalResult<Models> {
-            if op.is_operation() {
+            if models.is_operation() {
                 if !models.contains_geometry() {
                     context.error(name, EvalError::OperationOnEmptyGeometry)?;
                 }
 
-                return Ok(op.nest(models));
+                return Ok(models.nest(self_));
             } else {
                 context.error(name, EvalError::NotAnOperation(name.clone()))?;
             }
@@ -87,19 +87,17 @@ impl CallMethod<Models> for Models {
                     src_ref: SrcRef::merge(name, args),
                 },
                 |context| {
-                    Ok(match &symbol.borrow().def {
-                        SymbolDefinition::Workbench(workbench_definition) => {
-                            let op = workbench_definition.call(
-                                SrcRef::merge(name, args),
-                                symbol.clone(),
-                                args,
-                                context,
-                            )?;
-                            try_nest(name, context, self, op)?
-                        }
+                    let models = match &symbol.borrow().def {
+                        SymbolDefinition::Workbench(workbench_definition) => workbench_definition
+                            .call_op_method(
+                            SrcRef::merge(name, args),
+                            symbol.clone(),
+                            args,
+                            context,
+                        )?,
                         SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
-                            Value::Models(models) => try_nest(name, context, self, models)?,
-                            value => panic!("Builtin call returned {value} but no models."),
+                            Value::Models(models) => models,
+                            _ => Models::default(),
                         },
                         def => {
                             context.error(
@@ -111,7 +109,9 @@ impl CallMethod<Models> for Models {
                             )?;
                             Models::default()
                         }
-                    })
+                    };
+
+                    nest(name, context, self, models)
                 },
             )
         } else {
