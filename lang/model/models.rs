@@ -47,19 +47,6 @@ impl Models {
         }
     }
 
-    /// Nest models in self.
-    pub fn nest(self, op: &Models) -> Self {
-        self.iter().for_each(|new_parent| {
-            op.iter().for_each(|model| {
-                model.detach();
-
-                new_parent.append(model.make_deep_copy());
-            });
-        });
-
-        self
-    }
-
     /// A union operation model for this collection.
     pub fn union(&self) -> Model {
         self.boolean_op(microcad_core::BooleanOp::Union)

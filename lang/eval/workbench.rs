@@ -188,8 +188,15 @@ impl WorkbenchDefinition {
                 }
             }
         }
-        log::debug!("Call result models\n{}", FormatTree(&models));
 
+        context.set_input(models.clone());
+
+        log::error!(
+            "Call workbench: {name} \n{models} \n{input}",
+            name = self.id,
+            models = FormatTree(&models),
+            input = context.get_input(),
+        );
         Ok(models)
     }
 
@@ -206,7 +213,7 @@ impl WorkbenchDefinition {
         arguments: &ArgumentValueList,
         context: &mut Context,
     ) -> EvalResult<Models> {
-        log::debug!(
+        log::error!(
             "Workbench op {call} {kind} {id:?}({arguments})",
             call = crate::mark!(CALL),
             id = self.id,
@@ -276,8 +283,7 @@ impl WorkbenchDefinition {
                 }
             }
         }
-
-        //context.set_input(models.clone());
+        log::error!("call_op_method: \n{models}", models = FormatTree(&models));
 
         Ok(models)
     }

@@ -59,26 +59,6 @@ impl CallMethod<Models> for Models {
         args: &ArgumentValueList,
         context: &mut Context,
     ) -> EvalResult<Models> {
-        // Try nest models for an operation: models.op()
-        fn nest(
-            name: &QualifiedName,
-            context: &mut Context,
-            self_: &Models,
-            models: Models,
-        ) -> EvalResult<Models> {
-            if models.is_operation() {
-                if !models.contains_geometry() {
-                    context.error(name, EvalError::OperationOnEmptyGeometry)?;
-                }
-
-                return Ok(models.nest(self_));
-            } else {
-                context.error(name, EvalError::NotAnOperation(name.clone()))?;
-            }
-
-            Ok(models.clone())
-        }
-
         if let Some(symbol) = name.eval(context)? {
             context.scope(
                 StackFrame::Call {
@@ -111,7 +91,11 @@ impl CallMethod<Models> for Models {
                         }
                     };
 
-                    nest(name, context, self, models)
+                    log::error!("call_method: \n{models}", models = FormatTree(&models));
+                    log::error!("call_method: \n{}", FormatTree(self));
+                    context.set_input(models.clone());
+
+                    Ok(models)
                 },
             )
         } else {
