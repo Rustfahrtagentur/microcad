@@ -3,8 +3,7 @@
 
 //! Element of a [`Model`].
 
-use crate::{model::*, syntax::*, value::*};
-use microcad_core::*;
+use crate::{builtin::*, model::*, syntax::*, value::*};
 use strum::IntoStaticStr;
 
 /// An element defines the entity of a [`Model`].
@@ -19,22 +18,67 @@ pub enum Element {
     /// A workpiece is created by workbenches.
     Workpiece(Workpiece),
 
+    /// A built-in workpiece.
+    ///
+    /// A workpiece is created by workbenches.
+    BuiltinWorkpiece(BuiltinWorkpiece),
+
     /// A special element after which children will be nested as siblings.
     ///
     /// This element is removed after the children have been inserted.
     ChildrenMarker,
+}
 
-    /// An affine transform.
-    Transform(AffineTransform),
+impl Element {
+    /// Get output type of element.
+    pub fn output_type(&self) -> OutputType {
+        match self {
+            Element::Workpiece(workpiece) => match workpiece.kind {
+                WorkbenchKind::Sketch => OutputType::Geometry2D,
+                WorkbenchKind::Part => OutputType::Geometry3D,
+                WorkbenchKind::Operation => OutputType::NotDetermined,
+            },
+            Element::BuiltinWorkpiece(builtin_workpiece) => match builtin_workpiece.kind {
+                BuiltinWorkbenchKind::Primitive2D => OutputType::Geometry2D,
+                BuiltinWorkbenchKind::Primitive3D => OutputType::Geometry3D,
+                BuiltinWorkbenchKind::Transform | BuiltinWorkbenchKind::Operation => {
+                    builtin_workpiece.output_type
+                }
+            },
+            Element::Group | Element::ChildrenMarker => OutputType::NotDetermined,
+        }
+    }
 
-    /// A 2D geometry.
-    Primitive2D(std::rc::Rc<Geometry2D>),
+    /// Check if an element is an operation.
+    pub fn is_operation(&self) -> bool {
+        match self {
+            Element::BuiltinWorkpiece(builtin_workpiece) => match builtin_workpiece.kind {
+                BuiltinWorkbenchKind::Primitive2D | BuiltinWorkbenchKind::Primitive3D => false,
+                BuiltinWorkbenchKind::Operation | BuiltinWorkbenchKind::Transform => true,
+            },
+            Element::ChildrenMarker | Element::Group => false,
+            Element::Workpiece(workpiece) => match workpiece.kind {
+                WorkbenchKind::Part | WorkbenchKind::Sketch => false,
+                WorkbenchKind::Operation => true,
+            },
+        }
+    }
 
-    /// A 3D geometry.
-    Primitive3D(std::rc::Rc<Geometry3D>),
-
-    /// An operation that generates geometries from its children.
-    Operation(std::rc::Rc<dyn Operation>),
+    /// Contains geometry.
+    pub fn contains_geometry(&self) -> bool {
+        match self {
+            Element::BuiltinWorkpiece(builtin_workpiece) => match builtin_workpiece.kind {
+                BuiltinWorkbenchKind::Primitive2D | BuiltinWorkbenchKind::Primitive3D => true,
+                BuiltinWorkbenchKind::Operation | BuiltinWorkbenchKind::Transform => false,
+            },
+            Element::ChildrenMarker => true,
+            Element::Workpiece(workpiece) => match workpiece.kind {
+                WorkbenchKind::Part | WorkbenchKind::Sketch => false,
+                WorkbenchKind::Operation => false,
+            },
+            Element::Group => false,
+        }
+    }
 }
 
 impl std::fmt::Display for Element {
@@ -42,15 +86,7 @@ impl std::fmt::Display for Element {
         let name: &'static str = self.into();
         match &self {
             Element::Workpiece(workpiece) => write!(f, "{workpiece}"),
-            Element::Primitive2D(primitive) => {
-                write!(f, "{name}({primitive:?})")
-            }
-            Element::Primitive3D(primitive) => {
-                write!(f, "{name}({primitive:?})")
-            }
-            Element::Operation(transformation) => {
-                write!(f, "{name}({transformation:?})")
-            }
+            Element::BuiltinWorkpiece(builtin_workpiece) => write!(f, "{builtin_workpiece}"),
             _ => write!(f, "{name}"),
         }
     }

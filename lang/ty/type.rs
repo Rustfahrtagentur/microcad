@@ -48,6 +48,13 @@ impl Type {
             _ => false,
         }
     }
+
+    /// Check if types are add compatible.
+    pub fn is_add_compatible_to(&self, rhs: &Self) -> bool {
+        rhs == self
+            || (*self == Type::Integer && *rhs == Type::scalar())
+            || (*rhs == Type::Integer && *self == Type::scalar())
+    }
 }
 
 impl std::ops::Mul for Type {
@@ -78,7 +85,7 @@ impl std::ops::Div for Type {
         }
 
         match (self, rhs) {
-            (ty, Type::Integer) => ty,
+            (Type::Integer, ty) | (ty, Type::Integer) => ty,
             (Type::Quantity(lhs), Type::Quantity(rhs)) => Type::Quantity(lhs / rhs),
             (Type::Array(array_type), ty) => *array_type / ty,
             (Type::Tuple(_), _) => todo!(),

@@ -8,11 +8,10 @@ impl Eval<Model> for std::rc::Rc<SourceFile> {
         context.scope(
             StackFrame::Source(self.id(), SymbolMap::default()),
             |context| {
-                let model = ModelBuilder::new_group()
+                let model = ModelBuilder::new(Element::Group, self.src_ref())
                     .add_children(self.statements.eval(context)?)?
                     .attributes(self.statements.eval(context)?)
                     .build();
-                model.borrow_mut().origin.source_file = Some(self.clone());
                 Ok(model)
             },
         )

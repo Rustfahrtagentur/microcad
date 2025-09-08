@@ -8,5 +8,10 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Integer = 1)⏎ -> 2D
+
 -- Test Result --
 OK
+Export successful.

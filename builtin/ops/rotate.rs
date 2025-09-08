@@ -1,13 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_lang::{
-    eval::*,
-    model::*,
-    syntax::Identifier,
-    ty::{MatrixType, Type},
-    value::*,
-};
+use microcad_lang::{builtin::*, model::*};
 
 /// Builtin definition for a rotation in 2D and 3D.
 #[derive(Debug)]
@@ -18,11 +12,21 @@ impl BuiltinWorkbenchDefinition for Rotate {
         "rotate"
     }
 
-    fn model(args: &Tuple) -> EvalResult<Model> {
-        Ok(ModelBuilder::new_transform(AffineTransform::Rotation(args.get("matrix")?)).build())
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Transform
+    }
+
+    fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        &|args| {
+            Ok(BuiltinWorkpieceOutput::Transform(
+                AffineTransform::Rotation(args.get("matrix")),
+            ))
+        }
     }
 
     fn parameters() -> ParameterValueList {
+        use microcad_lang::ty::*;
+
         [(
             Identifier::no_ref("matrix"),
             ParameterValue {

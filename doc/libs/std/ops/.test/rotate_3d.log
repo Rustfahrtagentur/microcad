@@ -12,5 +12,24 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 3D (root)
+    op std::ops::rotate(x: Angle = 1.5707963267949rad, y: Angle = 0rad, z: Angle = 0rad) -> 3D
+      Transform __builtin::ops::rotate(matrix: Matrix3x3 = Matrix3 [[1.0, 0.0, 0.0], [0.0, 6.123233995736766e-17, 1.0], [0.0, -1.0, 6.123233995736…
+        part std::geo3d::Cylinder(d: Length = 20mm, h: Length = 50mm) -> 3D
+          Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = -25)⏎ -> 3D
+            Primitive3D __builtin::geo3d::Cylinder(height: Scalar = 50, radius_bottom: Scalar = 10, radius_top: Scalar = 10)⏎ -> 3D
+    op std::ops::rotate(x: Angle = 0rad, y: Angle = 1.5707963267949rad, z: Angle = 0rad) -> 3D
+      Transform __builtin::ops::rotate(matrix: Matrix3x3 = Matrix3 [[6.123233995736766e-17, 0.0, -1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 6.123233995736…
+        part std::geo3d::Cylinder(d: Length = 20mm, h: Length = 50mm) -> 3D
+          Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = -25)⏎ -> 3D
+            Primitive3D __builtin::geo3d::Cylinder(height: Scalar = 50, radius_bottom: Scalar = 10, radius_top: Scalar = 10)⏎ -> 3D
+    op std::ops::rotate(x: Angle = 0rad, y: Angle = 0rad, z: Angle = 1.5707963267949rad) -> 3D
+      Transform __builtin::ops::rotate(matrix: Matrix3x3 = Matrix3 [[6.123233995736766e-17, 1.0, 0.0], [-1.0, 6.123233995736766e-17, 0.0], [0.0, 0…
+        part std::geo3d::Cylinder(d: Length = 20mm, h: Length = 50mm) -> 3D
+          Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = -25)⏎ -> 3D
+            Primitive3D __builtin::geo3d::Cylinder(height: Scalar = 50, radius_bottom: Scalar = 10, radius_top: Scalar = 10)⏎ -> 3D
+
 -- Test Result --
 OK
+Export successful.

@@ -4,8 +4,8 @@
 //! Work piece element
 
 use crate::{
-    eval::{EvalError, EvalResult},
-    model::{OutputType, Properties, PropertiesAccess},
+    eval::*,
+    model::*,
     syntax::{Identifier, WorkbenchKind},
     value::Value,
 };
@@ -17,6 +17,8 @@ pub struct Workpiece {
     pub kind: WorkbenchKind,
     /// Workpiece properties.
     pub properties: Properties,
+    /// Creator symbol.
+    pub creator: Creator,
 }
 
 impl Workpiece {
@@ -50,18 +52,9 @@ impl Workpiece {
 impl std::fmt::Display for Workpiece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.kind {
-            WorkbenchKind::Part => write!(f, "Part"),
-            WorkbenchKind::Sketch => write!(f, "Sketch"),
-            WorkbenchKind::Operation => write!(f, "Operation"),
-        }
-    }
-}
-
-impl From<WorkbenchKind> for Workpiece {
-    fn from(kind: WorkbenchKind) -> Self {
-        Workpiece {
-            kind,
-            properties: Default::default(),
+            WorkbenchKind::Part => write!(f, "part {}", self.creator),
+            WorkbenchKind::Sketch => write!(f, "sketch {}", self.creator),
+            WorkbenchKind::Operation => write!(f, "op {}", self.creator),
         }
     }
 }

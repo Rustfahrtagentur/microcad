@@ -19,15 +19,3 @@ pub fn print() -> Symbol {
         },
     )
 }
-
-#[test]
-fn print_test() {
-    let mut context = Context::from_source(
-        "../tests/test_cases/print.µcad",
-        crate::builtin_module(),
-        &[],
-    )
-    .expect("resolvable file ../tests/test_cases/print.µcad");
-
-    assert!(context.eval().is_ok());
-}

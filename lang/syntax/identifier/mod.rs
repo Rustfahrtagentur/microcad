@@ -9,13 +9,28 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
+use crate::{Id, parse::*, parser::Parser, src_ref::*, syntax::*};
 
 /// µcad identifier
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(pub Refer<Id>);
 
 static UNIQUE_ID_NEXT: std::sync::Mutex<usize> = std::sync::Mutex::new(0);
+
+/// A case for an identifier.
+#[derive(Debug, PartialEq, Eq)]
+pub enum Case {
+    /// PascalCase
+    Pascal,
+    /// lower_snake_case
+    LowerSnake,
+    /// UPPER_SNAKE_CASE
+    UpperSnake,
+    /// A
+    UpperSingleChar,
+    /// Invalid.
+    Invalid,
+}
 
 impl Identifier {
     /// Make empty (invalid) id
@@ -68,6 +83,46 @@ impl Identifier {
     /// Add given `prefix` to identifier to get `qualified name`.
     pub fn with_prefix(&self, prefix: &QualifiedName) -> QualifiedName {
         QualifiedName::from(self).with_prefix(prefix)
+    }
+
+    /// Detect if the identifier matches a certain case.
+    pub fn detect_case(&self) -> Case {
+        let s = &self.0.value;
+
+        if s.is_empty() {
+            return Case::Invalid;
+        }
+
+        if s.len() == 1 {
+            let c = s.chars().next().expect("At least one char");
+            if c.is_ascii_uppercase() {
+                return Case::UpperSingleChar;
+            } else {
+                return Case::Invalid;
+            }
+        }
+
+        let has_underscore = s.contains('_');
+
+        if has_underscore {
+            if s.chars().all(|c| c.is_ascii_uppercase() || c == '_') {
+                return Case::UpperSnake;
+            } else if s.chars().all(|c| c.is_ascii_lowercase() || c == '_') {
+                return Case::LowerSnake;
+            } else {
+                return Case::Invalid;
+            }
+        } else {
+            // Must be PascalCase: starts with uppercase and contains no underscores
+            let mut chars = s.chars();
+            if let Some(first) = chars.next() {
+                if first.is_ascii_uppercase() && chars.all(|c| c.is_ascii_alphanumeric()) {
+                    return Case::Pascal;
+                }
+            }
+        }
+
+        Case::Invalid
     }
 }
 
@@ -149,6 +204,15 @@ impl TreeDisplay for Identifier {
 pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
     identifiers
         .iter()
+        .map(|ident| format!("{ident}"))
+        .collect::<Vec<_>>()
+        .join(separator)
+}
+
+/// join several identifiers with `::` and return as string
+pub fn join_identifiers_debug(identifiers: &[Identifier], separator: &str) -> String {
+    identifiers
+        .iter()
         .map(|ident| format!("{ident:?}"))
         .collect::<Vec<_>>()
         .join(separator)
@@ -185,4 +249,22 @@ fn identifier_hash() {
 
     // shall be equal
     assert_eq!(hash1, hash2);
+}
+
+#[test]
+fn identifier_case() {
+    let detect_case = |s| -> Case { Identifier::no_ref(s).detect_case() };
+
+    assert_eq!(detect_case("PascalCase"), Case::Pascal);
+    assert_eq!(detect_case("lower_snake_case"), Case::LowerSnake);
+    assert_eq!(detect_case("UPPER_SNAKE_CASE"), Case::UpperSnake);
+    assert_eq!(detect_case("notValid123_"), Case::Invalid);
+    assert_eq!(detect_case(""), Case::Invalid);
+    assert_eq!(detect_case("A"), Case::UpperSingleChar); // New case
+    assert_eq!(detect_case("z"), Case::Invalid); // lowercase single letter
+    assert_eq!(detect_case("_"), Case::Invalid); // only underscore
+    assert_eq!(detect_case("a_b"), Case::LowerSnake);
+    assert_eq!(detect_case("A_B"), Case::UpperSnake);
+
+    println!("All tests passed.");
 }

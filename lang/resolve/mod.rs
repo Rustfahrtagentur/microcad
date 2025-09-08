@@ -10,7 +10,7 @@
 //!
 //! let source_file = SourceFile::load("my.µcad").expect("parsing success");
 //!
-//! let source_symbol = source_file.resolve(None);
+//! let source_symbol = source_file.resolve();
 //! ```
 //!
 //! To "run" the source file (and get the expected output) it must now be evaluated (see [`crate::eval`])  .

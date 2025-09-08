@@ -35,7 +35,7 @@ impl QuantityType {
             QuantityType::Area => "mm²",
             QuantityType::Volume => "mm³",
             QuantityType::Density => "g/mm³",
-            QuantityType::Angle => "π",
+            QuantityType::Angle => "rad",
             QuantityType::Weight => "g",
             QuantityType::Invalid => todo!(),
         }

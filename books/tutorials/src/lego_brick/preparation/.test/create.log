@@ -1,0 +1,24 @@
+-- Test --
+  create
+  ../books/tutorials/src/lego_brick/preparation/create.md:15
+
+-- Code --
+
+ 1: // microcad generated file
+ 2: 
+ 3: sketch YourSketch( /* your building plan */ ) {
+ 4:     // your code
+ 5: }
+ 6: 
+ 7: // create YourSketch
+ 8: YourSketch();
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch <NO ID>::YourSketch() -> 2D
+
+-- Test Result --
+OK
+Export error: Render error: Nothing to render

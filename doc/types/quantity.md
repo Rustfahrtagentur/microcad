@@ -162,3 +162,24 @@ pound = 2.204623lb;
 
 std::debug::assert([gram, kilogram].all_equal());
 ```
+
+## Arithmetic
+
+Quantity types can use operators:
+
+[![test](.test/types_quantity_arithmetic.svg)](.test/types_quantity_arithmetic.log)
+
+```µcad,types_quantity_arithmetic
+use std::debug::assert;
+
+a = 2.0mm;
+assert([a, 2mm, 2.0mm].all_equal());
+b = 2 * a;
+assert([b, 4mm, 4.0mm].all_equal());
+c = a / 2;
+assert([c, 1mm, 1.0mm].all_equal());
+d = a + 2.0mm;
+assert([d, 4mm, 4.0mm].all_equal());
+e = a - 2.0mm;
+assert([e, 0mm, 0.0mm].all_equal());
+```

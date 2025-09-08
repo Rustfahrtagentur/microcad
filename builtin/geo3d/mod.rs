@@ -9,7 +9,7 @@ pub use cube::*;
 pub use cylinder::*;
 pub use sphere::*;
 
-use microcad_lang::{eval::*, resolve::*};
+use microcad_lang::builtin::*;
 
 /// geo3d Builtin module
 pub fn geo3d() -> Symbol {

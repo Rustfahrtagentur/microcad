@@ -1,6 +1,0 @@
-use __builtin::*;
-
-{
-    // Multiplicity for a builtin circle
-    geo2d::Circle(radius = [1.0, 2.0]);
-}

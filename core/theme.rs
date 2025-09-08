@@ -22,6 +22,8 @@ pub struct Theme {
     pub highlight: Color,
     /// Default color for entities
     pub entity: Color,
+    /// Default color for entity outlines
+    pub outline: Color,
     /// Color used for active construction lines
     pub active: Color,
     /// Color used for inactive construction lines
@@ -44,7 +46,8 @@ impl Theme {
             grid: Color::rgb(0.2, 0.2, 0.2),
             selection: Color::rgb(1.0, 0.6, 0.0),
             highlight: Color::rgb(1.0, 1.0, 0.0),
-            entity: Color::rgb(0.9, 0.9, 0.9),
+            entity: Color::rgba(0.9, 0.9, 0.9, 0.7),
+            outline: Color::rgb(0.1, 0.1, 0.1),
             active: Color::rgb(0.8, 0.8, 0.8),
             inactive: Color::rgb(0.4, 0.4, 0.4),
             measure: Color::rgb(0.0, 0.8, 0.8),
@@ -62,7 +65,8 @@ impl Theme {
             grid: Color::rgb(0.85, 0.85, 0.85),
             selection: Color::rgb(0.0, 0.4, 0.8),
             highlight: Color::rgb(1.0, 0.6, 0.0),
-            entity: Color::rgb(0.1, 0.1, 0.1),
+            entity: Color::rgba(0.7, 0.7, 0.7, 0.7),
+            outline: Color::rgb(0.1, 0.1, 0.1),
             active: Color::rgb(0.2, 0.2, 0.2),
             inactive: Color::rgb(0.8, 0.8, 0.8),
             measure: Color::rgb(0.0, 0.8, 0.8),

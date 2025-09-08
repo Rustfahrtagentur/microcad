@@ -1,0 +1,19 @@
+-- Test --
+  inner
+  ../books/tutorials/src/lego_brick/base/frame/rect.md:25
+
+-- Code --
+
+ 1: thickness = 1.2mm;
+ 2: std::geo2d::Rect(width = 31.8mm - 2 * thickness, height = 15.8mm - 2 * thickness);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch std::geo2d::Rect(height: Length = 13.4mm, width: Length = 29.4mm) -> 2D
+      Primitive2D __builtin::geo2d::Rect(height: Scalar = 13.4, width: Scalar = 29.4, x: Scalar = -14.7, y: Scalar = -6.7)⏎ -> 2D
+
+-- Test Result --
+OK
+Export successful.

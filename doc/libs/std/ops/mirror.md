@@ -2,7 +2,7 @@
 
 Mirror an object along an axis:
 
-[![test](.test/mirror_3d.png)](.test/mirror_3d.log)
+[![test](.test/mirror_3d.svg)](.test/mirror_3d.log)
 
 ```µcad,mirror_3d
 use std::math::*;

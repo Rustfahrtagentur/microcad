@@ -9,11 +9,11 @@ pub enum BooleanOp {
     /// Computes the union R = P ∪ Q
     Union,
     /// computes the difference R = P ∖ Q
-    Difference,
+    Subtract,
     /// computes the complement R=P̅
     Complement,
     /// computes the intersection R = P ∩ Q
-    Intersection,
+    Intersect,
 }
 
 use geo::OpType;
@@ -27,9 +27,9 @@ impl From<BooleanOp> for OpType {
 impl From<&BooleanOp> for OpType {
     fn from(op: &BooleanOp) -> Self {
         match op {
-            BooleanOp::Difference => OpType::Difference,
+            BooleanOp::Subtract => OpType::Difference,
             BooleanOp::Union => OpType::Union,
-            BooleanOp::Intersection => OpType::Intersection,
+            BooleanOp::Intersect => OpType::Intersection,
             BooleanOp::Complement => OpType::Xor,
         }
     }

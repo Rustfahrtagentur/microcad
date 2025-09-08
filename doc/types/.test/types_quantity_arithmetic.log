@@ -1,0 +1,28 @@
+-- Test --
+  types_quantity_arithmetic
+  ../doc/types/quantity.md:172
+
+-- Code --
+
+ 1: use std::debug::assert;
+ 2: 
+ 3: a = 2.0mm;
+ 4: assert([a, 2mm, 2.0mm].all_equal());
+ 5: b = 2 * a;
+ 6: assert([b, 4mm, 4.0mm].all_equal());
+ 7: c = a / 2;
+ 8: assert([c, 1mm, 1.0mm].all_equal());
+ 9: d = a + 2.0mm;
+10: assert([d, 4mm, 4.0mm].all_equal());
+11: e = a - 2.0mm;
+12: assert([e, 0mm, 0.0mm].all_equal());
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> Undetermined (root)
+
+-- Test Result --
+OK
+Could not determine output type.
+Nothing will be exported.

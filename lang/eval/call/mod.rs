@@ -4,18 +4,14 @@
 //! µcad Call related evaluation entities
 
 #[macro_use]
-mod argument_value;
 mod argument;
-mod argument_value_list;
 mod call_method;
 mod call_trait;
 
-pub use argument_value::*;
-pub use argument_value_list::*;
 pub use call_method::*;
 pub use call_trait::*;
 
-use crate::{eval::*, syntax::*};
+use crate::{eval::*, syntax::*, value::*};
 
 use thiserror::Error;
 
@@ -90,7 +86,19 @@ impl Eval for Call {
             },
             |context| match &symbol.borrow().def {
                 SymbolDefinition::Builtin(f) => f.call(&args, context),
-                SymbolDefinition::Workbench(w) => Ok(Value::Models(w.call(&args, context)?)),
+                SymbolDefinition::Workbench(w) => {
+                    if matches!(w.kind, WorkbenchKind::Operation) {
+                        context.error(self, EvalError::CannotCallOperationWithoutWorkpiece)?;
+                        Ok(Value::None)
+                    } else {
+                        Ok(Value::Models(w.call(
+                            self.src_ref(),
+                            symbol.clone(),
+                            &args,
+                            context,
+                        )?))
+                    }
+                }
                 SymbolDefinition::Function(f) => f.call(&args, context),
                 def => {
                     context.error(
@@ -101,11 +109,6 @@ impl Eval for Call {
                 }
             },
         ) {
-            Ok(Value::Models(models)) => {
-                // Store the information, saying that these models have been created by this symbol.
-                models.set_creator(symbol, self.src_ref());
-                Ok(Value::Models(models))
-            }
             Ok(value) => Ok(value),
             Err(err) => {
                 context.error(self, err)?;

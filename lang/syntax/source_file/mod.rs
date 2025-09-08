@@ -19,7 +19,7 @@ pub struct SourceFile {
 
     /// Hash of the source file
     ///
-    /// This hash is calculated from the the source code itself
+    /// This hash is calculated from the source code itself
     /// This is used to map `SrcRef` -> `SourceFile`
     pub hash: u64,
 }
@@ -93,28 +93,6 @@ impl TreeDisplay for SourceFile {
 impl SrcReferrer for SourceFile {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         SrcRef::new(0..self.num_lines(), 0, 0, self.hash)
-    }
-}
-
-#[test]
-fn load_source_file() {
-    let source_file = SourceFile::load(r#"../tests/test_cases/ops/difference.µcad"#);
-    if let Err(ref err) = source_file {
-        log::error!("{err}");
-    }
-
-    let source_file = source_file.expect("test error");
-
-    let first_statement = source_file.statements.first().expect("test error");
-    match first_statement {
-        Statement::Use(u) => {
-            use crate::src_ref::SrcReferrer;
-            assert_eq!(
-                u.src_ref().source_slice(&source_file.source),
-                "use __builtin::*;"
-            );
-        }
-        _ => panic!(),
     }
 }
 

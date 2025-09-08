@@ -1,6 +1,6 @@
 -- Test --
   array_unit_bundling
-  ../doc/types/arrays.md:47
+  ../doc/types/arrays.md:45
 
 -- Code --
 
@@ -15,5 +15,10 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> Undetermined (root)
+
 -- Test Result --
 OK
+Could not determine output type.
+Nothing will be exported.

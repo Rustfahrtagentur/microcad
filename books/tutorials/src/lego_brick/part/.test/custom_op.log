@@ -1,0 +1,42 @@
+-- Test --
+  custom_op
+  ../books/tutorials/src/lego_brick/part/custom_op.md:33
+
+-- Code --
+
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: const SPACING = 8mm;
+ 5: 
+ 6: op grid(rows: Integer, columns: Integer) {
+ 7:     @children
+ 8:         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
+ 9:         .align()
+10: }
+11: 
+12: sketch Base(
+13:     rows: Integer,
+14:     columns: Integer,
+15:     width: Length,
+16:     height: Length
+17: ) {
+18:     thickness = 1.2mm;
+19:     frame = Frame(width, height, thickness);
+20:     struts = (Ring(outer = 6.51mm, inner = 4.8mm)).grid(rows, columns);
+21:     frame | struts;
+22: }
+23: 
+24: sketch Knobs(rows: Integer, columns: Integer) {
+25:     Circle(d = 4.8mm).grid(rows, columns);
+26: }
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> Undetermined (root)
+
+-- Test Result --
+OK
+Could not determine output type.
+Nothing will be exported.

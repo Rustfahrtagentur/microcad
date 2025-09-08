@@ -1,0 +1,27 @@
+-- Test --
+  tuple_add_different
+  ../doc/types/tuples.md:101
+
+-- Code --
+
+ 1: a = (x = 1.0mm, y = 2.0mm);
+ 2: b = (x = 3.0mm, z = 4.0mm);
+ 3: c = a + b; // error: Tuple type mismatch for +: lhs=(x: Length, y: Length), rhs=(x: Length, z: Length)
+ 4: std::debug::assert_eq([c, (x = 4.0mm, y = 6.0mm)]); // error: Array elements have different types: [<INVALID TYPE>, (x: Length, y: Length)]
+
+-- Output --
+-- Errors --
+error: Tuple type mismatch: lhs=(x: Length, y: Length), rhs=(x: Length, z: Length)
+  ---> <FROM STR>:3:5
+     |
+   3 | c = a + b; // error: Tuple type mismatch for +: lhs=(x: Length, y: Length), rhs=(x: Length, z: Length)
+     |     ^^^^^
+     |
+error: Array elements have different types: [<INVALID TYPE>, (x: Length, y: Length)]
+  ---> <FROM STR>:4:23
+     |
+   4 | std::debug::assert_eq([c, (x = 4.0mm, y = 6.0mm)]); // error: Array elements have different types: [<INVALID TYPE>, (x: Length, y: Length)]
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

@@ -1,0 +1,44 @@
+-- Test --
+  scopes
+  ../doc/tests/locals.md:56
+
+-- Code --
+
+ 1: a = 1;
+ 2: 
+ 3: __builtin::debug::assert_valid(a);
+ 4: __builtin::debug::assert_invalid(b);
+ 5: __builtin::debug::assert_invalid(c);
+ 6: 
+ 7: {
+ 8:     __builtin::debug::assert_valid(a);
+ 9:     __builtin::debug::assert_invalid(b);
+10:     __builtin::debug::assert_invalid(c);
+11: 
+12:     b = 2;
+13: 
+14:     __builtin::debug::assert_valid(a);
+15:     __builtin::debug::assert_valid(b);
+16:     __builtin::debug::assert_invalid(c);
+17: 
+18:     c = 3;
+19: 
+20:     __builtin::debug::assert_valid(a);
+21:     __builtin::debug::assert_valid(b);
+22:     __builtin::debug::assert_valid(c);
+23: };
+24: 
+25: __builtin::debug::assert_valid(a);
+26: __builtin::debug::assert_invalid(b);
+27: __builtin::debug::assert_invalid(c);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> Undetermined (root)
+    Group -> Undetermined
+
+-- Test Result --
+OK
+Could not determine output type.
+Nothing will be exported.

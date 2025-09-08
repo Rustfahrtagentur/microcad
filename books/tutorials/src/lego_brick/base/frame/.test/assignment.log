@@ -1,0 +1,17 @@
+-- Test --
+  assignment
+  ../books/tutorials/src/lego_brick/base/frame/naming.md:9
+
+-- Code --
+
+ 1: outer = std::geo2d::Rect(width = 31.8mm, height = 15.8mm);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> Undetermined (root)
+
+-- Test Result --
+OK
+Could not determine output type.
+Nothing will be exported.

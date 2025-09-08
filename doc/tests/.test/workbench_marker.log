@@ -10,11 +10,11 @@
 
 -- Output --
 -- Errors --
-warning: The sketch workbench will produce no 2D output.
-  ---> <FROM STR>:1:1
-     |
-   1 | sketch K() {
-     | ^^^^^^^^^^^^
-     |
+-- Model --
+  Group -> 2D (root)
+    sketch <NO ID>::K() -> 2D
+      ChildrenMarker -> Undetermined
+
 -- Test Result --
 OK
+Export error: Render error: Invalid output type: Undetermined

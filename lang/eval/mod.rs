@@ -30,7 +30,6 @@
 mod argument_match;
 mod attribute;
 mod body;
-mod builtin;
 mod call;
 mod context;
 mod eval_error;
@@ -51,12 +50,10 @@ mod workbench;
 
 pub use argument_match::*;
 pub use attribute::*;
-pub use builtin::*;
 pub use call::*;
 pub use context::*;
 pub use eval_error::*;
 pub use output::*;
-pub use parameter::*;
 pub use statements::*;
 pub use symbols::*;
 

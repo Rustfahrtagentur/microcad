@@ -55,33 +55,65 @@ impl CallMethod for Array {
 impl CallMethod<Models> for Models {
     fn call_method(
         &self,
-        id: &QualifiedName,
+        name: &QualifiedName,
         args: &ArgumentValueList,
         context: &mut Context,
     ) -> EvalResult<Models> {
-        if let Some(symbol) = id.eval(context)? {
-            Ok(match &symbol.borrow().def {
-                SymbolDefinition::Workbench(workbench_definition) => {
-                    let models = workbench_definition.call(args, context)?.nest(self);
-                    models.set_creator(symbol.clone(), SrcRef::merge(id, args));
-                    models
+        // Try nest models for an operation: models.op()
+        fn try_nest(
+            name: &QualifiedName,
+            context: &mut Context,
+            models: &Models,
+            op: Models,
+        ) -> EvalResult<Models> {
+            if op.is_operation() {
+                if !models.contains_geometry() {
+                    context.error(name, EvalError::OperationOnEmptyGeometry)?;
                 }
-                SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
-                    Value::Models(models) => {
-                        let models = models.nest(self);
-                        models.set_creator(symbol.clone(), SrcRef::merge(id, args));
-                        models
-                    }
-                    value => panic!("Builtin call returned {value} but no models."),
+
+                return Ok(op.nest(models));
+            } else {
+                context.error(name, EvalError::NotAnOperation(name.clone()))?;
+            }
+
+            Ok(models.clone())
+        }
+
+        if let Some(symbol) = name.eval(context)? {
+            context.scope(
+                StackFrame::Call {
+                    symbol: symbol.clone(),
+                    args: args.clone(),
+                    src_ref: SrcRef::merge(name, args),
                 },
-                def => {
-                    context.error(
-                        id,
-                        EvalError::SymbolCannotBeCalled(id.clone(), Box::new(def.clone())),
-                    )?;
-                    Models::default()
-                }
-            })
+                |context| {
+                    Ok(match &symbol.borrow().def {
+                        SymbolDefinition::Workbench(workbench_definition) => {
+                            let op = workbench_definition.call(
+                                SrcRef::merge(name, args),
+                                symbol.clone(),
+                                args,
+                                context,
+                            )?;
+                            try_nest(name, context, self, op)?
+                        }
+                        SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
+                            Value::Models(models) => try_nest(name, context, self, models)?,
+                            value => panic!("Builtin call returned {value} but no models."),
+                        },
+                        def => {
+                            context.error(
+                                name,
+                                EvalError::SymbolCannotBeCalled(
+                                    name.clone(),
+                                    Box::new(def.clone()),
+                                ),
+                            )?;
+                            Models::default()
+                        }
+                    })
+                },
+            )
         } else {
             Ok(Models::default())
         }

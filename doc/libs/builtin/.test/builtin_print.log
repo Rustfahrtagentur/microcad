@@ -1,0 +1,18 @@
+-- Test --
+  builtin_print
+  ../doc/libs/builtin/debug.md:7
+
+-- Code --
+
+ 1: __builtin::print("ok");
+
+-- Output --
+ok
+-- Errors --
+-- Model --
+  Group -> Undetermined (root)
+
+-- Test Result --
+OK
+Could not determine output type.
+Nothing will be exported.

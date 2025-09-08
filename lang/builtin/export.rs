@@ -5,7 +5,7 @@
 
 use std::rc::Rc;
 
-use crate::{builtin::file_io::*, eval::*, model::*, parameter, value::*, Id};
+use crate::{Id, builtin::file_io::*, model::*, parameter, render::RenderError, value::*};
 
 use thiserror::Error;
 
@@ -31,6 +31,10 @@ pub enum ExportError {
     /// No exporter id.
     #[error("Multiple exporters for file extension: {0:?}")]
     MultipleExportersForFileExtension(Vec<Id>),
+
+    /// Render error during export.
+    #[error("Render error: {0}")]
+    RenderError(#[from] RenderError),
 }
 
 /// Exporter trait.

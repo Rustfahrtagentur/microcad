@@ -11,6 +11,8 @@ use microcad_core::*;
 
 pub use error::*;
 
+const OUTPUT_PRECISION: i32 = 14;
+
 /// A numeric value
 #[derive(Clone, PartialEq)]
 pub struct Quantity {
@@ -100,12 +102,12 @@ impl Ty for Quantity {
 
 impl std::fmt::Display for Quantity {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}", self.value, self.quantity_type.base_unit())
+        write!(f, "{}{}", round::round(self.value,OUTPUT_PRECISION), self.quantity_type.base_unit())
     }
 }
 
 impl std::fmt::Debug for Quantity {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} = {}", self.quantity_type, self.value)
+        write!(f, "{} = {}", self.quantity_type, round::round(self.value,OUTPUT_PRECISION))
     }
 }

@@ -16,11 +16,10 @@ warning: This expression statement did not produce any model
    2 |   1 + 2;
      |   ^^^^^^
      |
-warning: The sketch workbench will produce no 2D output.
-  ---> <FROM STR>:1:1
-     |
-   1 | sketch K() {
-     | ^^^^^^^^^^^^
-     |
+-- Model --
+  Group -> 2D (root)
+    sketch <NO ID>::K() -> 2D
+
 -- Test Result --
 OK
+Export error: Render error: Nothing to render

@@ -8,7 +8,7 @@ use std::rc::Rc;
 use derive_more::{Deref, DerefMut};
 
 use crate::{
-    geo3d::{bounds::Bounds3D, FetchBounds3D},
+    geo3d::{FetchBounds3D, bounds::Bounds3D},
     *,
 };
 
@@ -18,8 +18,8 @@ pub struct Geometries3D(Vec<Rc<Geometry3D>>);
 
 impl Geometries3D {
     /// New geometry collection.
-    pub fn new(geometries: Vec<Rc<Geometry3D>>) -> Self {
-        Self(geometries)
+    pub fn new(geometries: Vec<Geometry3D>) -> Self {
+        Self(geometries.into_iter().map(Rc::new).collect())
     }
 
     /// Append another geometry collection.
@@ -27,22 +27,42 @@ impl Geometries3D {
         self.0.append(&mut geometries.0)
     }
 
-    /// Apply boolean operation to geometry collection.
-    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> Geometries3D {
-        if self.0.is_empty() {
-            return Geometries3D::default();
-        }
-
-        self.0[1..]
+    /// Apply boolean operation on collection and render to manifold.
+    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> Rc<Manifold> {
+        let manifold_list: Vec<_> = self
+            .0
             .iter()
-            .fold(self.0[0].clone(), |acc, geo| {
-                if let Some(r) = acc.boolean_op(resolution, geo.as_ref(), op) {
-                    Rc::new(r)
+            // Render each geometry into a multipolygon and filter out empty ones
+            .filter_map(|geo| {
+                let manifold = geo.render_to_manifold(resolution);
+                if manifold.is_empty() {
+                    None
                 } else {
-                    acc
+                    Some(manifold)
                 }
             })
-            .into()
+            .collect();
+
+        if manifold_list.is_empty() {
+            return Rc::new(Manifold::empty());
+        }
+
+        manifold_list[1..]
+            .iter()
+            .fold(manifold_list[0].clone(), |acc, other| {
+                Rc::new(acc.boolean_op(other, op.into()))
+            })
+    }
+
+    /// Convex hull.
+    pub fn hull(&self, resolution: &RenderResolution) -> Manifold {
+        self.render_to_manifold(resolution).hull()
+    }
+}
+
+impl FromIterator<Rc<Geometry3D>> for Geometries3D {
+    fn from_iter<T: IntoIterator<Item = Rc<Geometry3D>>>(iter: T) -> Self {
+        Geometries3D(iter.into_iter().collect())
     }
 }
 
@@ -58,14 +78,14 @@ impl Transformed3D for Geometries3D {
     fn transformed_3d(&self, render_resolution: &RenderResolution, mat: &Mat4) -> Self {
         Self(
             self.iter()
-                .map(|geometry| std::rc::Rc::new(geometry.transformed_3d(render_resolution, mat)))
+                .map(|geometry| Rc::new(geometry.transformed_3d(render_resolution, mat)))
                 .collect::<Vec<_>>(),
         )
     }
 }
 
-impl From<std::rc::Rc<Geometry3D>> for Geometries3D {
-    fn from(geometry: std::rc::Rc<Geometry3D>) -> Self {
-        Self::new(vec![geometry])
+impl RenderToMesh for Geometries3D {
+    fn render_to_manifold(&self, resolution: &RenderResolution) -> std::rc::Rc<Manifold> {
+        self.boolean_op(resolution, &BooleanOp::Union)
     }
 }

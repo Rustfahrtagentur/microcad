@@ -3,7 +3,7 @@
 
 //! Model tree module
 
-use crate::{model::*, resolve::*, src_ref::*, syntax::SourceFile};
+use crate::{model::*, src_ref::*};
 use derive_more::{Deref, DerefMut};
 use microcad_core::BooleanOp;
 
@@ -18,6 +18,16 @@ impl Models {
             1 => self.0.first().cloned(),
             _ => None,
         }
+    }
+
+    /// Check if all models contain an operation element.
+    pub fn is_operation(&self) -> bool {
+        self.iter().all(Model::is_operation)
+    }
+
+    /// Check if any model in the collection contains a geometry.
+    pub fn contains_geometry(&self) -> bool {
+        self.iter().any(Model::contains_geometry)
     }
 
     /// Returns a property of the included models.
@@ -38,9 +48,9 @@ impl Models {
     }
 
     /// Nest models in self.
-    pub fn nest(self, models: &Models) -> Self {
+    pub fn nest(self, op: &Models) -> Self {
         self.iter().for_each(|new_parent| {
-            models.iter().for_each(|model| {
+            op.iter().for_each(|model| {
                 model.detach();
 
                 // Handle children marker.
@@ -75,9 +85,9 @@ impl Models {
     pub fn boolean_op(&self, op: BooleanOp) -> Model {
         match self.single_model() {
             Some(model) => model,
-            None => ModelBuilder::new_operation(op)
+            None => ModelBuilder::new(Element::BuiltinWorkpiece(op.into()), SrcRef(None))
                 .add_children(
-                    [ModelBuilder::new_group()
+                    [ModelBuilder::new(Element::Group, SrcRef(None))
                         .add_children(self.clone())
                         .expect("No error")
                         .build()]
@@ -95,24 +105,10 @@ impl Models {
         lhs.iter().chain(rhs.iter()).cloned().collect()
     }
 
-    /// Set the information about the creator for all models.
-    ///
-    /// See [`ModelInner::set_creator`] for more info.
-    pub(crate) fn set_creator(&self, creator: Symbol, call_src_ref: SrcRef) {
-        self.iter().for_each(|model| {
-            model
-                .borrow_mut()
-                .set_creator(creator.clone(), call_src_ref.clone())
-        })
-    }
-
     /// Filter the models by source file.
-    pub fn filter_by_source_file(&self, source_file: &std::rc::Rc<SourceFile>) -> Models {
+    pub fn filter_by_source_hash(&self, source_hash: u64) -> Models {
         self.iter()
-            .filter(|model| match model.find_source_file() {
-                Some(other) => source_file.hash == other.hash,
-                None => false,
-            })
+            .filter(|model| source_hash == model.source_hash())
             .cloned()
             .collect()
     }

@@ -62,14 +62,14 @@ impl Eval<Option<ExportCommand>> for syntax::AttributeCommand {
                 ) {
                     Ok(arguments) => {
                         let filename: std::path::PathBuf =
-                            arguments.get::<String>("filename")?.into();
-                        let id: Option<Id> = if let Ok(id) = arguments.get::<String>("id") {
+                            arguments.get::<String>("filename").into();
+                        let id: Option<Id> = if let Ok(id) = arguments.by_str::<String>("id") {
                             Some(id.into())
                         } else {
                             None
                         };
                         let resolution = RenderResolution::new(
-                            arguments.get::<&Value>("resolution")?.try_scalar()?,
+                            arguments.get::<&Value>("resolution").try_scalar()?,
                         );
 
                         match context.find_exporter(&filename, &id) {

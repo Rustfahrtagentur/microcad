@@ -1,0 +1,30 @@
+-- Test --
+  builtin_extrude
+  ../doc/libs/builtin/ops.md:40
+
+-- Code --
+
+ 1: use __builtin::*;
+ 2: 
+ 3: a = geo2d::Circle(radius = 8.0) - geo2d::Circle(radius = 4.0, cx = [-3.0, 3.0], cy = [-3.0, 3.0]);
+ 4: 
+ 5: a.ops::extrude(height = 4.0, n_divisions = 0, twist_degrees = 0.0, scale_top_x = 1.0, scale_top_y = 1.0);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 3D (root)
+    Operation __builtin::ops::extrude(height: Scalar = 4, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_degr…
+      Operation subtract()⏎ -> 2D
+        Group -> 2D
+          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 8)⏎ -> 2D
+          Operation union()⏎ -> 2D
+            Group -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: Scalar = -3, cy: Scalar = -3, radius: Scalar = 4)⏎ -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 3, cy: Scalar = -3, radius: Scalar = 4)⏎ -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: Scalar = -3, cy: Scalar = 3, radius: Scalar = 4)⏎ -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 3, cy: Scalar = 3, radius: Scalar = 4)⏎ -> 2D
+
+-- Test Result --
+OK
+Export successful.

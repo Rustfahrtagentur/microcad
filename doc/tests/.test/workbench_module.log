@@ -16,11 +16,5 @@ error: Module statement not available here
    2 |   mod m {} // error
      |   ^^^^^^^^
      |
-warning: The sketch workbench will produce no 2D output.
-  ---> <FROM STR>:1:1
-     |
-   1 | sketch K() {
-     | ^^^^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED

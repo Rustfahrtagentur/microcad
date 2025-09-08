@@ -26,5 +26,23 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch <NO ID>::Wheel(radius: Length = 50mm, thickness: Length = 10mm) -> 2D
+      Operation subtract()⏎ -> 2D
+        Group -> 2D
+          sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 50mm) -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 50)⏎ -> 2D
+          sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 40mm) -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 40)⏎ -> 2D
+    sketch <NO ID>::Wheel(diameter: Length = 100mm, thickness: Length = 10mm) -> 2D
+      Operation subtract()⏎ -> 2D
+        Group -> 2D
+          sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 50mm) -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 50)⏎ -> 2D
+          sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 40mm) -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 40)⏎ -> 2D
+
 -- Test Result --
 OK
+Export successful.

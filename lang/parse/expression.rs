@@ -90,7 +90,7 @@ lazy_static::lazy_static! {
             .op(Op::infix(less_equal, Left) | Op::infix(greater_equal, Left))
             .op(Op::infix(add, Left) | Op::infix(subtract, Left))
             .op(Op::infix(multiply, Left) | Op::infix(divide, Left))
-            .op(Op::infix(r#union, Left) | Op::infix(intersection, Left))
+            .op(Op::infix(r#union, Left) | Op::infix(intersect, Left))
             .op(Op::infix(power_xor, Left))
             .op(Op::infix(near, Left))
             .op(Op::prefix(unary_minus))
@@ -156,7 +156,7 @@ impl Parse for Expression {
                     Rule::multiply => "*",
                     Rule::divide => "/",
                     Rule::r#union => "|",
-                    Rule::intersection => "&",
+                    Rule::intersect => "&",
                     Rule::power_xor => "^",
                     Rule::greater_than => ">",
                     Rule::less_than => "<",

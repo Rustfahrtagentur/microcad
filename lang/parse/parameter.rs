@@ -49,7 +49,7 @@ impl Parse for ParameterList {
         Parser::ensure_rule(&pair, Rule::parameter_list);
         let mut parameters = ParameterList::default();
 
-        for pair in pair.inner() {
+        for pair in pair.inner().filter(|p| p.as_rule() == Rule::parameter) {
             parameters
                 .try_push(Parameter::parse(pair)?)
                 .map_err(ParseError::DuplicateIdentifier)?;

@@ -206,6 +206,18 @@ pub enum EvalError {
     #[error("Resolve error {0}")]
     ResolveError(#[from] ResolveError),
 
+    /// Unexpected source file in expression
+    #[error("{0} is not operation.")]
+    NotAnOperation(QualifiedName),
+
+    /// Calling an operation on an empty geometry, e.g.: `{}.op()`.
+    #[error("Calling operation on empty geometry")]
+    OperationOnEmptyGeometry,
+
+    /// Cannot call operation without workpiece, e.g. `op()`.
+    #[error("Cannot call operation without workpiece.")]
+    CannotCallOperationWithoutWorkpiece,
+
     /// Function missing return statement
     #[error("Missing return statement in {0}")]
     MissingReturn(QualifiedName),

@@ -1,9 +1,9 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Algorithm
+//! Operation trait.
 
-use crate::model::*;
+use crate::{model::*, render::*};
 use microcad_core::*;
 
 /// Operation trait.
@@ -15,20 +15,13 @@ pub trait Operation: std::fmt::Debug {
         OutputType::NotDetermined
     }
 
-    /// The input type of this operation.
-    ///
-    /// By default, the input type is undetermined.
-    fn input_type(&self) -> OutputType {
-        OutputType::NotDetermined
-    }
-
     /// Process the model.
-    fn process_2d(&self, _model: &Model) -> Geometries2D {
+    fn process_2d(&self, _context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         unimplemented!()
     }
 
     /// Process the model.
-    fn process_3d(&self, _model: &Model) -> Geometries3D {
+    fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
         unimplemented!()
     }
 }

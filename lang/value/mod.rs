@@ -6,16 +6,24 @@
 //! Every evaluation of any *symbol* leads to a [`Value`] which then might continued
 //! to process or ends up as the overall evaluation result.
 
+mod argument_value;
+mod argument_value_list;
 mod array;
 mod matrix;
+mod parameter_value;
+mod parameter_value_list;
 mod quantity;
 mod tuple;
 mod value_access;
 mod value_error;
 mod value_list;
 
+pub use argument_value::*;
+pub use argument_value_list::*;
 pub use array::*;
 pub use matrix::*;
+pub use parameter_value::*;
+pub use parameter_value_list::*;
 pub use quantity::*;
 pub use tuple::*;
 pub use value_access::*;
@@ -190,6 +198,8 @@ impl std::ops::Neg for Value {
         match self {
             Value::Integer(n) => Ok(Value::Integer(-n)),
             Value::Quantity(q) => Ok(Value::Quantity(q.neg())),
+            Value::Array(a) => -a,
+            Value::Tuple(t) => -t.as_ref().clone(),
             _ => Err(ValueError::InvalidOperator("-".into())),
         }
     }
@@ -225,7 +235,10 @@ impl std::ops::Add for Value {
                     lhs.ty(),
                 )))
             }
+            // Add a value to an array.
             (Value::Array(lhs), rhs) => Ok((lhs + rhs)?),
+            // Add two tuples of the same type: (x = 1., y = 2.) + (x = 3., y = 4.)
+            (Value::Tuple(lhs), Value::Tuple(rhs)) => Ok((*lhs + *rhs)?.into()),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} + {rhs}"))),
         }
     }
@@ -247,10 +260,13 @@ impl std::ops::Sub for Value {
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs - rhs)?)),
             // Subtract value to an array: `[1,2,3] - 1 = [0,1,2]`.
             (Value::Array(lhs), rhs) => Ok((lhs - rhs)?),
+            // Subtract two tuples of the same type: (x = 1., y = 2.) - (x = 3., y = 4.)
+            (Value::Tuple(lhs), Value::Tuple(rhs)) => Ok((*lhs - *rhs)?.into()),
+
             // Boolean difference operator for models
             (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
                 lhs.union()
-                    .boolean_op(microcad_core::BooleanOp::Difference, rhs.union()),
+                    .boolean_op(microcad_core::BooleanOp::Subtract, rhs.union()),
             )),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} - {rhs}"))),
         }
@@ -272,6 +288,9 @@ impl std::ops::Mul for Value {
             // Multiply two scalars
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs * rhs)?)),
             (Value::Array(array), value) | (value, Value::Array(array)) => Ok((array * value)?),
+            (Value::Tuple(tuple), value) | (value, Value::Tuple(tuple)) => {
+                Ok((tuple.as_ref().clone() * value)?.into())
+            }
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} * {rhs}"))),
         }
     }
@@ -313,7 +332,8 @@ impl std::ops::Div for Value {
             (Value::Quantity(lhs), Value::Integer(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
             (Value::Integer(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
             (Value::Quantity(lhs), Value::Quantity(rhs)) => Ok(Value::Quantity((lhs / rhs)?)),
-            (Value::Array(list), value) => Ok((list / value)?),
+            (Value::Array(array), value) => Ok((array / value)?),
+            (Value::Tuple(tuple), value) => Ok((tuple.as_ref().clone() / value)?.into()),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} / {rhs}"))),
         }
     }
@@ -342,7 +362,7 @@ impl std::ops::BitAnd for Value {
     fn bitand(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Value::Models(lhs), Value::Models(rhs)) => Ok(Value::from_single_model(
-                lhs.union().boolean_op(BooleanOp::Intersection, rhs.union()),
+                lhs.union().boolean_op(BooleanOp::Intersect, rhs.union()),
             )),
             (Value::Bool(lhs), Value::Bool(rhs)) => Ok(Value::Bool(lhs & rhs)),
             (lhs, rhs) => Err(ValueError::InvalidOperator(format!("{lhs} & {rhs}"))),

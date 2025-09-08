@@ -21,6 +21,8 @@ pub enum Geometry3D {
     Sphere(Sphere),
     /// Cylinder.
     Cylinder(Cylinder),
+    /// Collection,
+    Collection(Geometries3D),
 }
 
 impl std::fmt::Debug for Geometry3D {
@@ -31,7 +33,12 @@ impl std::fmt::Debug for Geometry3D {
 }
 
 impl Geometry3D {
-    /// Execute boolean operation
+    /// Return name of geometry.
+    pub fn name(&self) -> &'static str {
+        self.into()
+    }
+
+    /// Execute boolean operation.
     pub fn boolean_op(
         &self,
         resolution: &RenderResolution,
@@ -45,27 +52,9 @@ impl Geometry3D {
         Some(Geometry3D::Manifold(Rc::new(a.boolean_op(&b, op))))
     }
 
-    /// Execute multiple boolean operations
-    pub fn boolean_op_multi(
-        geometries: Vec<Rc<Self>>,
-        resolution: &RenderResolution,
-        op: &BooleanOp,
-    ) -> Option<Rc<Self>> {
-        if geometries.is_empty() {
-            return None;
-        }
-
-        Some(
-            geometries[1..]
-                .iter()
-                .fold(geometries[0].clone(), |acc, geo| {
-                    if let Some(r) = acc.boolean_op(resolution, geo.as_ref(), op) {
-                        Rc::new(r)
-                    } else {
-                        acc
-                    }
-                }),
-        )
+    /// Convex hull for geometry.
+    pub fn hull(&self, resolution: &RenderResolution) -> Manifold {
+        self.render_to_manifold(resolution).hull()
     }
 
     /// Transform mesh geometry
@@ -97,6 +86,7 @@ impl FetchBounds3D for Geometry3D {
             Geometry3D::Cube(cube) => cube.fetch_bounds_3d(),
             Geometry3D::Sphere(sphere) => sphere.fetch_bounds_3d(),
             Geometry3D::Cylinder(cylinder) => cylinder.fetch_bounds_3d(),
+            Geometry3D::Collection(collection) => collection.fetch_bounds_3d(),
         }
     }
 }
@@ -114,13 +104,14 @@ impl Transformed3D for Geometry3D {
 }
 
 impl RenderToMesh for Geometry3D {
-    fn render_to_manifold(self, resolution: &RenderResolution) -> Rc<Manifold> {
+    fn render_to_manifold(&self, resolution: &RenderResolution) -> std::rc::Rc<Manifold> {
         match self {
-            Geometry3D::Mesh(triangle_mesh) => Rc::new(triangle_mesh.to_manifold()),
-            Geometry3D::Manifold(manifold) => manifold,
+            Geometry3D::Mesh(triangle_mesh) => std::rc::Rc::new(triangle_mesh.to_manifold()),
+            Geometry3D::Manifold(manifold) => manifold.clone(),
             Geometry3D::Cube(cube) => cube.render_to_manifold(resolution),
             Geometry3D::Sphere(sphere) => sphere.render_to_manifold(resolution),
             Geometry3D::Cylinder(cylinder) => cylinder.render_to_manifold(resolution),
+            Geometry3D::Collection(collection) => collection.render_to_manifold(resolution),
         }
     }
 }

@@ -9,7 +9,7 @@ pub use circle::*;
 pub use line::*;
 pub use rect::*;
 
-use microcad_lang::{eval::*, resolve::*};
+use microcad_lang::builtin::*;
 
 /// Module for built-in 2D geometries.
 pub fn geo2d() -> Symbol {

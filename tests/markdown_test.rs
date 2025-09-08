@@ -5,6 +5,7 @@ use std::rc::Rc;
 
 use microcad_core::RenderResolution;
 use microcad_export::{stl::StlExporter, svg::SvgExporter};
+use microcad_lang::tree_display::FormatTree;
 
 fn lines_with(code: &str, marker: &str) -> std::collections::HashSet<usize> {
     code.lines()
@@ -17,6 +18,11 @@ fn lines_with(code: &str, marker: &str) -> std::collections::HashSet<usize> {
             }
         })
         .collect()
+}
+
+#[allow(dead_code)]
+pub fn init() {
+    let _ = env_logger::builder().try_init();
 }
 
 #[allow(dead_code)]
@@ -38,6 +44,8 @@ pub fn run_test(
     use microcad_builtin::*;
     use microcad_lang::diag::*;
     use microcad_lang::syntax::*;
+
+    crate::markdown_test::init();
 
     log::info!("Running test '{name}':\n\n{code}");
 
@@ -220,30 +228,40 @@ pub fn run_test(
                     (Ok(model), false, false) => {
                         use microcad_lang::model::{ExportCommand as Export, OutputType};
 
+                        // get print output
+                        write!(log_out, "-- Model --\n{}\n", FormatTree(&model))
+                            .expect("no output error");
+
                         let _ = fs::hard_link("images/ok.svg", banner);
-                        writeln!(log_out, "-- Test Result --\nOK").expect("output error");
-                        match model.final_output_type() {
-                            OutputType::Geometry2D => {
-                                Export {
-                                    filename: format!("{out_filename}.svg").into(),
-                                    resolution: RenderResolution::default(),
-                                    exporter: Rc::new(SvgExporter),
-                                }
-                                .export(&model)
-                                .expect("No error");
+                        writeln!(log_out, "-- Test Result --\nOK").expect("no output error");
+
+                        let export = match model.deduce_output_type() {
+                            OutputType::Geometry2D => Some(Export {
+                                filename: format!("{out_filename}.svg").into(),
+                                resolution: RenderResolution::default(),
+                                exporter: Rc::new(SvgExporter),
+                            }),
+                            OutputType::Geometry3D => Some(Export {
+                                filename: format!("{out_filename}.stl").into(),
+                                resolution: RenderResolution::coarse(),
+                                exporter: Rc::new(StlExporter),
+                            }),
+                            OutputType::NotDetermined => {
+                                writeln!(log_out, "Could not determine output type.")
+                                    .expect("output error");
+                                None
                             }
-                            OutputType::Geometry3D => {
-                                Export {
-                                    filename: format!("{out_filename}.stl").into(),
-                                    resolution: RenderResolution::coarse(),
-                                    exporter: Rc::new(StlExporter),
-                                }
-                                .export(&model)
-                                .expect("No error");
-                            }
-                            OutputType::NotDetermined => {}
                             _ => panic!("Invalid geometry output"),
+                        };
+
+                        match export {
+                            Some(export) => match export.export(&model) {
+                                Ok(_) => writeln!(log_out, "Export successful."),
+                                Err(error) => writeln!(log_out, "Export error: {error}"),
+                            },
+                            None => writeln!(log_out, "Nothing will be exported."),
                         }
+                        .expect("output error")
                     }
                     // test is todo but succeeds with no errors
                     (Ok(_), false, true) => {

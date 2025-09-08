@@ -36,7 +36,7 @@ pub enum Expression {
     TupleExpression(TupleExpression),
     /// A body: `{}`.
     Body(Body),
-    /// A call: `ops::difference()`.
+    /// A call: `ops::subtract()`.
     Call(Call),
     /// A qualified name: `foo::bar`.
     QualifiedName(QualifiedName),

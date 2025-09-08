@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use cgmath::{InnerSpace, SquareMatrix};
-use microcad_core::{Mat3, Vec3};
+use microcad_core::{Mat3, Scalar, Vec3};
 use microcad_lang::{diag::*, eval::*, parameter, resolve::*, syntax::*, ty::*, value::*};
 
 /// Absolute value abs(x)
@@ -18,6 +18,26 @@ fn abs() -> Symbol {
                 ctx.error(
                     arg,
                     EvalError::BuiltinError(format!("Cannot calculate abs({value})")),
+                )?;
+                Value::None
+            }
+        })
+    })
+}
+
+/// Square root sqrt(x).
+fn sqrt() -> Symbol {
+    Symbol::new_builtin(Identifier::no_ref("sqrt"), None, &|_params, args, ctx| {
+        let (_, arg) = args.get_single()?;
+        Ok(match &arg.value {
+            Value::Integer(i) => (*i as Scalar).sqrt().into(),
+            Value::Quantity(q) => {
+                Value::Quantity(Quantity::new(q.value.sqrt(), q.quantity_type.clone()))
+            }
+            value => {
+                ctx.error(
+                    arg,
+                    EvalError::BuiltinError(format!("Cannot calculate sqrt({value})")),
                 )?;
                 Value::None
             }
@@ -137,7 +157,7 @@ fn rotate_around_axis() -> Symbol {
         ) {
             Ok(ref args) => {
                 let angle = get_angle(args, "angle");
-                let axis = Vec3::new(args.get("x")?, args.get("y")?, args.get("z")?);
+                let axis = Vec3::new(args.get("x"), args.get("y"), args.get("z"));
 
                 let matrix = Mat3::from_axis_angle(axis, angle);
                 Ok(Value::Matrix(Box::new(Matrix::Matrix3(matrix))))
@@ -231,6 +251,7 @@ pub fn math() -> Symbol {
             Value::Tuple(Box::new(Vec3::unit_z().into())),
         ))
         .symbol(abs())
+        .symbol(sqrt())
         .symbol(cos())
         .symbol(sin())
         .symbol(tan())

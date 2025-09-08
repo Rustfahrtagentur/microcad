@@ -1,0 +1,21 @@
+-- Test --
+  cap
+  ../books/tutorials/src/lego_brick/caps_knobs.md:12
+
+-- Code --
+
+ 1: // alias Rect as Cap
+ 2: use std::geo2d::Rect as Cap;
+ 3: 
+ 4: Cap(width = 31.8mm, height = 15.8mm);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch std::geo2d::Rect(height: Length = 15.8mm, width: Length = 31.8mm) -> 2D
+      Primitive2D __builtin::geo2d::Rect(height: Scalar = 15.8, width: Scalar = 31.8, x: Scalar = -15.9, y: Scalar = -7.9)⏎ -> 2D
+
+-- Test Result --
+OK
+Export successful.

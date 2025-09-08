@@ -10,7 +10,7 @@
  4:         { 
  5:             @children;
  6:             std::geo2d::Circle(radius);
- 7:         }.difference();
+ 7:         }.subtract();
  8:     } else {
  9:         std::error("punch_disk must get one object");
 10:     }

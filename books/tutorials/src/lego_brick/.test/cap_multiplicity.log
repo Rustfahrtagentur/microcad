@@ -1,0 +1,23 @@
+-- Test --
+  cap_multiplicity
+  ../books/tutorials/src/lego_brick/caps_knobs.md:30
+
+-- Code --
+
+ 1: std::geo2d::Circle(d = 4.8mm, c = (
+ 2:         x = ([-1..2] - 0.5) * 8mm, 
+ 3:         y = ([0..1] - 0.5) * 8mm)
+ 4:     );
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    sketch std::geo2d::Circle(c: (x: [Length], y: [Length]) = (x: [Length] = [-12mm, -4mm, 4mm], y: [Length] = [-4mm]), d: Length = 4.8mm) -> 2D
+      Primitive2D __builtin::geo2d::Circle(cx: Scalar = -12, cy: Scalar = -4, radius: Scalar = 2.4)⏎ -> 2D
+      Primitive2D __builtin::geo2d::Circle(cx: Scalar = -4, cy: Scalar = -4, radius: Scalar = 2.4)⏎ -> 2D
+      Primitive2D __builtin::geo2d::Circle(cx: Scalar = 4, cy: Scalar = -4, radius: Scalar = 2.4)⏎ -> 2D
+
+-- Test Result --
+OK
+Export successful.

@@ -224,13 +224,11 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     )?;
 
     // Draw intersection.
-    let intersection = Geometry2D::Rect(rect)
-        .boolean_op(
-            &RenderResolution::default(),
-            &Geometry2D::Circle(circle.clone()),
-            &BooleanOp::Intersection,
-        )
-        .expect("Some geometry");
+    let intersection = Geometry2D::Rect(rect).boolean_op(
+        &RenderResolution::default(),
+        &Geometry2D::Circle(circle.clone()),
+        &BooleanOp::Intersect,
+    );
 
     intersection.write_svg_mapped(
         &mut svg,

@@ -1,7 +1,8 @@
-pub use __builtin::ops::difference;
-pub use __builtin::ops::intersection;
+pub use __builtin::ops::subtract;
+pub use __builtin::ops::intersect;
 pub use __builtin::ops::union;
 pub use __builtin::ops::hull;
+pub use __builtin::ops::align;
 
 
 op revolve(angle = 360°) {
@@ -12,6 +13,10 @@ op revolve(angle = 360°) {
 }
 
 op extrude(height: Length) {
+	init(z: Length) {
+		height = z;
+	}
+
     @children.__builtin::ops::extrude(height = height / 1mm, n_divisions = 0, twist_degrees = 0.0, scale_top_x = 1.0, scale_top_y = 1.0);
 }
 

@@ -44,11 +44,21 @@ impl IntoIterator for Array {
     }
 }
 
+impl TryFrom<ValueList> for Array {
+    type Error = ValueError;
+    fn try_from(items: ValueList) -> ValueResult<Array> {
+        match items.types().common_type() {
+            Some(ty) => Ok(Array::new(items, ty)),
+            None => Err(ValueError::CommonTypeExpected),
+        }
+    }
+}
+
 impl FromIterator<Value> for Array {
     fn from_iter<T: IntoIterator<Item = Value>>(iter: T) -> Self {
-        let list: ValueList = iter.into_iter().collect();
-        let ty = list.types().common_type().expect("Common type");
-        Self { ty, items: list }
+        let items: ValueList = iter.into_iter().collect();
+        let ty = items.types().common_type().expect("Common type");
+        Self { ty, items }
     }
 }
 
@@ -73,11 +83,12 @@ impl crate::ty::Ty for Array {
     }
 }
 
+/// + operator. Adds a value to an array, e.g.: `[1,2] + 1 == [2,3]`.
 impl std::ops::Add<Value> for Array {
     type Output = ValueResult;
 
     fn add(self, rhs: Value) -> Self::Output {
-        if rhs.ty() == self.ty {
+        if self.ty.is_add_compatible_to(&rhs.ty()) {
             Ok(Value::Array(Self::new(
                 ValueList::new(
                     self.items
@@ -93,11 +104,12 @@ impl std::ops::Add<Value> for Array {
     }
 }
 
+/// - operator. Subtracts a value from an array, e.g.: `[1,2] - 1 == [0,1]`.
 impl std::ops::Sub<Value> for Array {
     type Output = ValueResult;
 
     fn sub(self, rhs: Value) -> Self::Output {
-        if rhs.ty() == self.ty {
+        if self.ty.is_add_compatible_to(&rhs.ty()) {
             Ok(Value::Array(Self::new(
                 ValueList::new(
                     self.items
@@ -113,19 +125,19 @@ impl std::ops::Sub<Value> for Array {
     }
 }
 
+/// * operator. Multiply a value from an array, e.g.: `[1,2] * 2 == [2,4]`.
 impl std::ops::Mul<Value> for Array {
     type Output = ValueResult;
 
     fn mul(self, rhs: Value) -> Self::Output {
-        let mut values = Vec::new();
-        for value in self.iter() {
-            values.push((value.clone() * rhs.clone())?);
-        }
-
         match self.ty {
             // List * Scalar or List * Integer
             Type::Quantity(_) | Type::Integer => Ok(Value::Array(Array::new(
-                ValueList::new(values),
+                ValueList::new({
+                    self.iter()
+                        .map(|value| value.clone() * rhs.clone())
+                        .collect::<Result<Vec<_>, _>>()?
+                }),
                 self.ty * rhs.ty().clone(),
             ))),
             _ => Err(ValueError::InvalidOperator("*".into())),
@@ -133,26 +145,36 @@ impl std::ops::Mul<Value> for Array {
     }
 }
 
+/// / operator. Divide an array by value, e.g.: `[2,4] / 2 == [1,2]`.
 impl std::ops::Div<Value> for Array {
     type Output = ValueResult;
 
     fn div(self, rhs: Value) -> Self::Output {
-        let mut values = Vec::new();
-        for value in self.iter() {
-            values.push((value.clone() / rhs.clone())?);
-        }
+        let values = ValueList::new(
+            self.iter()
+                .map(|value| value.clone() / rhs.clone())
+                .collect::<Result<Vec<_>, _>>()?,
+        );
 
         match (&self.ty, rhs.ty()) {
             // Integer / Integer => Scalar
-            (Type::Integer, Type::Integer) => Ok(Value::Array(Array::new(
-                ValueList::new(values),
-                Type::scalar(),
-            ))),
-            (Type::Quantity(_), rty) => Ok(Value::Array(Array::new(
-                ValueList::new(values),
-                self.ty / rty.clone(),
-            ))),
+            (Type::Integer, Type::Integer) => Ok(Value::Array(values.try_into()?)),
+            (Type::Quantity(_), _) => Ok(Value::Array(values.try_into()?)),
             _ => Err(ValueError::InvalidOperator("/".into())),
         }
+    }
+}
+
+impl std::ops::Neg for Array {
+    type Output = ValueResult;
+
+    fn neg(self) -> Self::Output {
+        let items: ValueList = self
+            .iter()
+            .map(|value| -value.clone())
+            .collect::<Result<Vec<_>, _>>()?
+            .into_iter()
+            .collect();
+        Ok(Value::Array(items.try_into()?))
     }
 }

@@ -20,7 +20,7 @@ op polar(angle: Angle, radius: Length, shift: Length = 0.0mm) {
 
         Circle(d = d_a);
     }
-    .intersection();
+    .intersect();
 
     teeth | Circle(d = d_f);
 }

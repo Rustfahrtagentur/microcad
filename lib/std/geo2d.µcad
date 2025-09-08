@@ -54,6 +54,13 @@ sketch Rect(width: Length, height: Length, x: Length, y: Length) {
     );
 }
 
+
+/// A frame with a thickness.
+sketch Frame(width: Length, height: Length, thickness: Length) {
+    std::debug::assert(thickness > 0.0mm, "Thickness must be a positive number (thickness = {thickness})");
+    Rect(width, height) - Rect(width = width - 2*thickness, height = height - 2*thickness)
+}
+
 sketch Line(p0: Vec2, p1: Vec2) {
     init(width: Length, y = 0.0mm) {
         p0 = (x = -width / 2mm, y = y / 1mm);
@@ -71,4 +78,20 @@ sketch Line(p0: Vec2, p1: Vec2) {
     }
 
     __builtin::geo2d::Line(x0 = p0.x, y0 = p0.y, x1 = p1.x, y1 = p1.y);
+}
+
+sketch Ring( outer: Length, inner: Length ) {
+     init(outer: Length, thickness: Length) {
+         inner = outer - thickness;
+     }
+
+     init( outer_d: Length, inner_d: Length ) {
+         outer = outer_d/2;
+         inner = inner_d/2;
+     }
+     init(outer_d: Length, thickness_d: Length) {
+         inner = outer - thickness;
+     }
+
+     Circle(radius = outer) - Circle(radius = inner) 
 }

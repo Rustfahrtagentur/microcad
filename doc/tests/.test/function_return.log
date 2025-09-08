@@ -16,5 +16,10 @@ warning: This expression statement did not produce any model
    3 | } f();
      |   ^^^^
      |
+-- Model --
+  Group -> Undetermined (root)
+
 -- Test Result --
 OK
+Could not determine output type.
+Nothing will be exported.

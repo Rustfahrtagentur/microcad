@@ -5,26 +5,25 @@
 
 pub mod attribute;
 pub mod builder;
+pub mod creator;
 pub mod element;
 mod inner;
 pub mod iter;
 pub mod models;
 pub mod operation;
-pub mod origin;
-pub mod output;
+pub mod output_type;
 pub mod properties;
-pub mod render;
 pub mod workpiece;
 
 pub use attribute::*;
 pub use builder::*;
+pub use creator::*;
 pub use element::*;
 pub use inner::*;
 pub use iter::*;
 pub use models::*;
 pub use operation::*;
-pub use origin::*;
-pub use output::*;
+pub use output_type::*;
 pub use properties::*;
 pub use workpiece::*;
 
@@ -33,10 +32,7 @@ use derive_more::{Deref, DerefMut};
 use microcad_core::BooleanOp;
 
 use crate::{
-    diag::WriteToFile,
-    rc::RcMut,
-    syntax::{Identifier, SourceFile},
-    tree_display::*,
+    diag::WriteToFile, rc::RcMut, src_ref::SrcReferrer, syntax::Identifier, tree_display::*,
     value::Value,
 };
 
@@ -50,9 +46,20 @@ impl Model {
         Self(inner)
     }
 
-    /// Calculate Depth of the model.
+    /// Calculate depth of the model.
     pub fn depth(&self) -> usize {
         self.parents().count()
+    }
+
+    /// Check if a model contains an operation element.
+    pub fn is_operation(&self) -> bool {
+        self.borrow().element.is_operation()
+    }
+
+    /// Check if this model contains geometry.
+    pub fn contains_geometry(&self) -> bool {
+        let self_ = &self.borrow();
+        self_.element.contains_geometry() || self_.children.contains_geometry()
     }
 
     /// Make a deep copy if this model.
@@ -124,27 +131,25 @@ impl Model {
     /// Find children model placeholder in model descendants.
     pub fn find_children_placeholder(&self) -> Option<Model> {
         self.descendants().find(|n| {
-            n.borrow().id.is_none() && matches!(n.0.borrow().element, Element::ChildrenMarker)
+            n.borrow().id.is_none() && matches!(n.0.borrow().element.value, Element::ChildrenMarker)
         })
     }
 
-    /// Find the original source file of this model
-    pub fn find_source_file(&self) -> Option<std::rc::Rc<SourceFile>> {
-        self.ancestors()
-            .find_map(|model| model.borrow().origin.source_file.clone())
-    }
-
-    /// Test if the model has this specific source file.
-    pub fn has_source_file(&self, source_file: &std::rc::Rc<SourceFile>) -> bool {
-        match (source_file.as_ref(), self.find_source_file()) {
-            (a, Some(b)) => a.hash == b.hash,
-            _ => false,
+    /// Deduce output type from children and set it and return it.
+    pub fn deduce_output_type(&self) -> OutputType {
+        let self_ = self.borrow();
+        let mut output_type = self_.element.output_type();
+        if output_type == OutputType::NotDetermined {
+            let children = &self_.children;
+            output_type = children.deduce_output_type();
         }
+
+        output_type
     }
 
     /// Return inner group if this model only contains a group as single child.
     ///
-    /// This function is used when we evaluate operations like `difference() {}` or `hull() {}`.
+    /// This function is used when we evaluate operations like `subtract() {}` or `hull() {}`.
     /// When evaluating these operations, we want to iterate over the group's children.
     pub fn into_group(&self) -> Option<Model> {
         let children = &self.borrow().children;
@@ -153,7 +158,7 @@ impl Model {
         }
 
         children.first().and_then(|n| {
-            if let Element::Group = n.0.borrow().element {
+            if let Element::Group = *n.0.borrow().element {
                 Some(n.clone())
             } else {
                 None
@@ -163,20 +168,14 @@ impl Model {
 
     /// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
     pub fn signature(&self) -> String {
-        let self_ = self.borrow();
-
         format!(
-            "{id}{element_type}{origin} -> {output_type}{is_root}",
-            id = match &self_.id {
+            "{id}{element} -> {output_type}{is_root}",
+            id = match &self.borrow().id {
                 Some(id) => format!("{id}: "),
                 None => String::new(),
             },
-            element_type = self_.element,
-            origin = match self_.origin.get_creator() {
-                Some(_) => format!(" = {origin}", origin = self_.origin),
-                None => String::new(),
-            },
-            output_type = self.final_output_type(),
+            element = *self.borrow().element,
+            output_type = self.deduce_output_type(),
             is_root = if self.parents().next().is_some() {
                 ""
             } else {
@@ -223,6 +222,12 @@ impl PartialEq for Model {
     }
 }
 
+impl SrcReferrer for Model {
+    fn src_ref(&self) -> crate::src_ref::SrcRef {
+        self.borrow().src_ref()
+    }
+}
+
 /// Prints a [`Model`].
 ///
 /// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
@@ -258,6 +263,9 @@ impl TreeDisplay for Model {
         tree_state.indent();
         let self_ = self.borrow();
         self_.attributes.tree_print(f, tree_state)?;
+        if let Some(output) = &self_.output {
+            output.tree_print(f, tree_state)?;
+        }
         self_.children.tree_print(f, tree_state)
     }
 }

@@ -36,8 +36,6 @@ std::debug::assert_eq([std::count([1,2,3]), 3]);
 
 ## Array operations
 
-[![test](.test/array_operations.svg)](.test/array_operations.log)
-
 ### Unit bundling
 
 Array support unit bundling, which means the you can write the unit after the `[]` brackets.
@@ -55,9 +53,11 @@ l2 = [1, 2, 3]mm;
 std::debug::assert(l1 == l2);
 ```
 
-### Addition `*`
+### Addition `+`
 
 #### Adding a quantity
+
+[![test](.test/array_add.svg)](.test/array_add.log)
 
 ```µcad,array_add
 d = 0.5mm;
@@ -68,6 +68,8 @@ std::debug::assert_eq([[1,2]mm + 2mm, [3,4]mm]);
 
 #### Subtracting a quantity
 
+[![test](.test/array_sub.svg)](.test/array_sub.log)
+
 ```µcad,array_sub
 d = 0.5mm;
 std::debug::assert_eq([[1,2]mm - 2mm, [-1,0]mm]);
@@ -76,6 +78,8 @@ std::debug::assert_eq([[1,2]mm - 2mm, [-1,0]mm]);
 ### Multiplication `*`
 
 #### Scaling an array
+
+[![test](.test/array_mul_scale.svg)](.test/array_mul_scale.log)
 
 ```µcad,array_mul_scale
 d = 0.5mm;
@@ -86,7 +90,18 @@ std::debug::assert_eq([[-d,d]*2, [-1,1]mm]);
 
 #### Dividing an array by a value
 
+[![test](.test/array_div.svg)](.test/array_div.log)
+
 ```µcad,array_div
 d = 1.0mm;
 std::debug::assert_eq([[-d,d]/2, [-0.5, 0.5]mm]);
+```
+
+### Negation `-`
+
+[![test](.test/array_neg.svg)](.test/array_neg.log)
+
+```µcad,array_neg
+d = 1.0mm;
+std::debug::assert_eq([[-d,d], -[d, -d]]);
 ```

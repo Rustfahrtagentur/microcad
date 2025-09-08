@@ -4,22 +4,22 @@
 //! Model attributes.
 
 mod attributes;
-mod export;
+mod export_command;
 mod layer;
-mod measure;
-mod resolution;
+mod measure_command;
+mod resolution_attribute;
 
 use std::rc::Rc;
 
 pub use attributes::Attributes;
-pub use export::ExportCommand;
+pub use export_command::ExportCommand;
 pub use layer::Layer;
-pub use measure::MeasureCommand;
-pub use resolution::ResolutionAttribute;
+pub use measure_command::MeasureCommand;
+pub use resolution_attribute::ResolutionAttribute;
 
 use crate::{create_tuple_value, syntax::*, value::*};
 
-use microcad_core::{theme::Theme, Color, Size2};
+use microcad_core::{Color, Size2, theme::Theme};
 
 /// A custom command attribute from an exporter, e.g.: `svg = (style = "fill:none")`
 #[derive(Clone, Debug)]
@@ -28,6 +28,12 @@ pub struct CustomCommand {
     pub id: Identifier,
     /// Argument tuple.
     pub arguments: Box<Tuple>,
+}
+
+impl std::fmt::Display for CustomCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} = {}", self.id, self.arguments)
+    }
 }
 
 /// An attribute for a model.
@@ -84,12 +90,12 @@ impl std::fmt::Display for Attribute {
             value = match &self {
                 // TODO: Do not use debug outputs, implement proper Display traits instead.
                 Attribute::Color(color) => format!("{color}"),
-                Attribute::Resolution(resolution) => format!("{resolution:?}"),
+                Attribute::Resolution(resolution) => format!("{resolution}"),
                 Attribute::Theme(theme) => theme.name.clone(),
-                Attribute::Size(size) => format!("{size:?}"),
-                Attribute::Export(export) => format!("{export:?}"),
-                Attribute::Measure(measure) => format!("{measure:?}"),
-                Attribute::Custom(command) => format!("{command:?}"),
+                Attribute::Size(size) => format!("{size}"),
+                Attribute::Export(export) => format!("{export}"),
+                Attribute::Measure(measure) => format!("{measure}"),
+                Attribute::Custom(command) => format!("{command}"),
             }
         )
     }
@@ -145,6 +151,17 @@ pub trait AttributesAccess {
         match self.get_single_attribute(id) {
             Some(attribute) => attribute.into(),
             None => Value::None,
+        }
+    }
+
+    /// Get resolution attribute.
+    fn get_resolution(&self) -> Option<ResolutionAttribute> {
+        match self.get_single_attribute(&Identifier::no_ref("resolution")) {
+            Some(value) => match value {
+                Attribute::Resolution(resolution) => Some(resolution),
+                _ => unreachable!(),
+            },
+            None => None,
         }
     }
 

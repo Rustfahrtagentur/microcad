@@ -1,0 +1,23 @@
+-- Test --
+  grid
+  ../books/tutorials/src/lego_brick/part/custom_op.md:11
+
+-- Code --
+
+ 1: const SPACING = 8mm;
+ 2: 
+ 3: op grid(rows: Integer, columns: Integer) {
+ 4:     @children
+ 5:         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
+ 6:         .align()
+ 7: }
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> Undetermined (root)
+
+-- Test Result --
+OK
+Could not determine output type.
+Nothing will be exported.

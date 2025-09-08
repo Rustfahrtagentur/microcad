@@ -1,0 +1,53 @@
+-- Test --
+  use_test
+  ../doc/tests/use.md:5
+
+-- Code --
+
+ 1: // use debug from `std/module.µcad`
+ 2: use std::debug::assert;
+ 3: assert(true);
+ 4: 
+ 5: // use all symbols from std::debug for test checks
+ 6: use std::debug::*;
+ 7: 
+ 8: // use symbol `circle` in file `geo2d.µcad`
+ 9: use std::geo2d::Circle;
+10: assert_valid(Circle);
+11: 
+12: // use all symbols in file `geo3d.µcad`
+13: use std::geo3d::*;
+14: assert_valid(Sphere);
+15: assert_valid(Cube);
+16: 
+17: // alias `bar` in `std/text/foo.µcad` into `baz`
+18: use std::test::foo::Bar as baz;
+19: assert_valid(baz);
+20: 
+21: // use print from `std/module.µcad`
+22: use std::print;
+23: assert_valid(print);
+24: print("Hello");
+25: 
+26: // public use operation from `std/module.µcad`
+27: pub use std::ops;
+28: assert_valid(ops);
+29: assert_invalid(use_test::ops);
+30: 
+31: part MyPart() {
+32:     Circle(radius=1);
+33:     Sphere(radius=1);
+34: }
+35: 
+36: assert_valid(MyPart);
+
+-- Output --
+Hello
+-- Errors --
+-- Model --
+  Group -> Undetermined (root)
+
+-- Test Result --
+OK
+Could not determine output type.
+Nothing will be exported.

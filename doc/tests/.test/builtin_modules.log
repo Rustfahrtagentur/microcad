@@ -1,0 +1,29 @@
+-- Test --
+  builtin_modules
+  ../doc/tests/modules.md:5
+
+-- Code --
+
+ 1: mod a {
+ 2:     mod b {
+ 3:         mod c {
+ 4:             part M1() {}
+ 5:         }
+ 6:     }
+ 7: 
+ 8:     part M2() {}
+ 9: }
+10: 
+11: a::b::c::M1();
+12: a::M2();
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 3D (root)
+    part <NO ID>::a::b::c::M1() -> 3D
+    part <NO ID>::a::M2() -> 3D
+
+-- Test Result --
+OK
+Export successful.

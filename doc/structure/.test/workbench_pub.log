@@ -18,11 +18,5 @@ error: Function statement not available here
    2 |     pub fn inner() { return radius/2; }   // error: cant use pub fn inside workbench
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-warning: The part workbench will produce no 3D output.
-  ---> <FROM STR>:1:1
-     |
-   1 | part PunchedDisk(radius: Length) {
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED

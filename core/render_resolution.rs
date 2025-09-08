@@ -53,3 +53,9 @@ impl Default for RenderResolution {
         RenderResolution { linear: 0.1 }
     }
 }
+
+impl std::fmt::Display for RenderResolution {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "@{}mm", self.linear)
+    }
+}

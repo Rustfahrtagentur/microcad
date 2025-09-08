@@ -3,7 +3,7 @@
 
 //! µcad builtin library
 
-use microcad_lang::{builtin::*, diag::*, eval::*, parameter, syntax::*, value::*};
+use microcad_lang::{builtin::*, diag::*, eval::*, value::*};
 
 use crate::Symbol;
 

@@ -16,11 +16,5 @@ error: Use statement not available here
    2 |   pub use std; // error
      |   ^^^^^^^^^^^^
      |
-warning: The sketch workbench will produce no 2D output.
-  ---> <FROM STR>:1:1
-     |
-   1 | sketch K() { 
-     | ^^^^^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED

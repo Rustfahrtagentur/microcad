@@ -1,0 +1,31 @@
+-- Test --
+  use
+  ../books/tutorials/src/lego_brick/base/frame/use.md:16
+
+-- Code --
+
+ 1: use std::geo2d::Rect;
+ 2: use std::ops::subtract;
+ 3: 
+ 4: thickness = 1.2mm;
+ 5: width = 31.8mm;
+ 6: height = 15.8mm;
+ 7: {
+ 8:     Rect(width, height);
+ 9:     Rect(width = width - 2 * thickness, height = height - 2 * thickness);
+10: }.subtract();
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    Operation __builtin::ops::subtract()⏎ -> 2D
+      Group -> 2D
+        sketch std::geo2d::Rect(height: Length = 15.8mm, width: Length = 31.8mm) -> 2D
+          Primitive2D __builtin::geo2d::Rect(height: Scalar = 15.8, width: Scalar = 31.8, x: Scalar = -15.9, y: Scalar = -7.9)⏎ -> 2D
+        sketch std::geo2d::Rect(height: Length = 13.4mm, width: Length = 29.4mm) -> 2D
+          Primitive2D __builtin::geo2d::Rect(height: Scalar = 13.4, width: Scalar = 29.4, x: Scalar = -14.7, y: Scalar = -6.7)⏎ -> 2D
+
+-- Test Result --
+OK
+Export successful.

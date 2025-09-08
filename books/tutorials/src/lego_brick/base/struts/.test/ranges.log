@@ -1,0 +1,43 @@
+-- Test --
+  ranges
+  ../books/tutorials/src/lego_brick/base/struts/range.md:7
+
+-- Code --
+
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: (Circle(d = 6.51mm) - Circle(d = 4.8mm)).translate(x = [-1..2] * 8mm);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group -> 2D (root)
+    op std::ops::translate(x: Length = -8mm, y: Length = 0mm, z: Length = 0mm) -> 2D
+      Transform __builtin::ops::translate(x: Scalar = -8, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D
+        Operation subtract()⏎ -> 2D
+          Group -> 2D
+            sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 6.51mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
+            sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 4.8mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+    op std::ops::translate(x: Length = 0mm, y: Length = 0mm, z: Length = 0mm) -> 2D
+      Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D
+        Operation subtract()⏎ -> 2D
+          Group -> 2D
+            sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 6.51mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
+            sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 4.8mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+    op std::ops::translate(x: Length = 8mm, y: Length = 0mm, z: Length = 0mm) -> 2D
+      Transform __builtin::ops::translate(x: Scalar = 8, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D
+        Operation subtract()⏎ -> 2D
+          Group -> 2D
+            sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 6.51mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
+            sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 4.8mm) -> 2D
+              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+
+-- Test Result --
+OK
+Export successful.

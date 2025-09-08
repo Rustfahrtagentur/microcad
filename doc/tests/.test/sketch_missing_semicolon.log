@@ -8,10 +8,24 @@
  2: use std::ops::translate;
  3: 
  4: {
- 5:     Circle(radius = 5mm) // error: missing semicolon
+ 5:     Circle(radius = 5mm) // missing semicolon is ok.
  6: }.translate(y=[-34mm/2 , 34mm/2]);
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> 2D (root)
+    op std::ops::translate(x: Length = 0mm, y: Length = -17mm, z: Length = 0mm) -> 2D
+      Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = -17, z: Scalar = 0)⏎ -> 2D
+        Group -> 2D
+          sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 5mm) -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 5)⏎ -> 2D
+    op std::ops::translate(x: Length = 0mm, y: Length = 17mm, z: Length = 0mm) -> 2D
+      Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 17, z: Scalar = 0)⏎ -> 2D
+        Group -> 2D
+          sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 5mm) -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 5)⏎ -> 2D
+
 -- Test Result --
-OK BUT SHOULD FAIL
+OK
+Export successful.

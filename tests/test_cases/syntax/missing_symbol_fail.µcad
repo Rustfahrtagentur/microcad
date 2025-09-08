@@ -1,6 +1,0 @@
-sketch double_box(size: Length) {
-    init(half_the_size: Length) { size = half_the_size * 2.0; }
-    rectangle(size);
-}
-
-double_box(10.0mm);

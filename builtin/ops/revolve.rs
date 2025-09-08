@@ -1,10 +1,13 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use std::rc::Rc;
+
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{builtin::*, model::*, render::*};
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct Revolve {
     circular_segments: Integer,
     revolve_degrees: Scalar,
@@ -15,24 +18,26 @@ impl Operation for Revolve {
         OutputType::Geometry3D
     }
 
-    fn process_3d(&self, model: &Model) -> Geometries3D {
-        use std::rc::Rc;
-        let geometries = model.render_geometries_2d();
+    fn process_3d(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        context.update_3d(|context, model, resolution| {
+            let model_ = model.borrow();
+            let geometries: Geometries2D = model_.children.render(context)?;
 
-        let multi_polygon_data = geo2d::multi_polygon_to_vec(
-            &geometries.render_to_multi_polygon(&model.borrow().output.resolution),
-        );
-        let multi_polygon_data: Vec<_> = multi_polygon_data
-            .iter()
-            .map(|ring| ring.as_slice())
-            .collect();
+            let multi_polygon_data =
+                geo2d::multi_polygon_to_vec(&geometries.render_to_multi_polygon(&resolution));
+            let multi_polygon_data: Vec<_> = multi_polygon_data
+                .iter()
+                .map(|ring| ring.as_slice())
+                .collect();
 
-        Rc::new(Geometry3D::Manifold(Rc::new(Manifold::revolve(
-            &multi_polygon_data,
-            self.circular_segments as u32,
-            self.revolve_degrees,
-        ))))
-        .into()
+            Ok(Some(Rc::new(Geometry3D::Manifold(Rc::new(
+                Manifold::revolve(
+                    &multi_polygon_data,
+                    self.circular_segments as u32,
+                    self.revolve_degrees,
+                ),
+            )))))
+        })
     }
 }
 
@@ -41,12 +46,21 @@ impl BuiltinWorkbenchDefinition for Revolve {
         "revolve"
     }
 
-    fn model(args: &Tuple) -> EvalResult<Model> {
-        Ok(ModelBuilder::new_operation(Revolve {
-            circular_segments: args.get("circular_segments")?,
-            revolve_degrees: args.get("revolve_degrees")?,
-        })
-        .build())
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Operation
+    }
+
+    fn output_type() -> OutputType {
+        OutputType::Geometry3D
+    }
+
+    fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        &|args| {
+            Ok(BuiltinWorkpieceOutput::Operation(Box::new(Revolve {
+                circular_segments: args.get("circular_segments"),
+                revolve_degrees: args.get("revolve_degrees"),
+            })))
+        }
     }
 
     fn parameters() -> ParameterValueList {

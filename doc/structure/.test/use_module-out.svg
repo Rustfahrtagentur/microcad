@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80' width='80mm' height='80mm'>
+<svg version='1.1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 88 88' width='88mm' height='88mm'>
 
   <defs>
     <!-- A marker to be used as an arrowhead -->
@@ -74,20 +74,9 @@
         }
          
         .entity {
-            fill: #191919;
+            fill: rgba(178, 178, 178, 0.70);
             stroke: #191919;
             stroke-width: 0.4;
-        }
-         
-        .entity-stroke {
-            fill: none;
-            stroke: #191919;
-            stroke-width: 0.4;
-        }
-         
-        .entity-fill {
-            fill: #191919;
-            stroke: none;
         }
         
             .active { fill-opacity: 1.0; stroke-opacity: 1.0; }
@@ -95,8 +84,6 @@
         
   </style>
   <g class="entity">
-    <g class="entity">
-      <circle cx="40" cy="40" r="40"/>
-    </g>
+    <circle cx="44" cy="44" r="40"/>
   </g>
 </svg>

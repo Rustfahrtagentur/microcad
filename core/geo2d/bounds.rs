@@ -25,6 +25,11 @@ impl Bounds2D {
         )))
     }
 
+    /// Check if bounds are valid.
+    pub fn is_valid(&self) -> bool {
+        self.0.is_some()
+    }
+
     /// Minimum corner.
     pub fn min(&self) -> Option<Vec2> {
         self.0.as_ref().map(|s| Vec2::new(s.min().x, s.min().y))
@@ -48,6 +53,16 @@ impl Bounds2D {
     /// Return rect.
     pub fn rect(&self) -> &Option<Rect> {
         &self.0
+    }
+
+    /// Enlarge bounds by a factor and return new bounds
+    pub fn enlarge(&self, factor: Scalar) -> Self {
+        Self(self.0.map(|rect| {
+            let c = rect.center();
+            let s: geo::Coord = (rect.width(), rect.height()).into();
+            let s = s * 0.5 * (1.0 + factor);
+            Rect::new(c - s, c + s)
+        }))
     }
 
     /// Calculate extended bounds.
@@ -127,6 +142,20 @@ impl From<Option<Rect>> for Bounds2D {
 impl From<Size2> for Bounds2D {
     fn from(value: Size2) -> Self {
         Self::new(Vec2::new(0.0, 0.0), Vec2::new(value.width, value.height))
+    }
+}
+
+impl std::fmt::Display for Bounds2D {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.0 {
+            Some(rect) => write!(
+                f,
+                "[{min:?}, {max:?}]",
+                min = rect.min().x_y(),
+                max = rect.max().x_y()
+            ),
+            None => write!(f, "[no bounds]"),
+        }
     }
 }
 

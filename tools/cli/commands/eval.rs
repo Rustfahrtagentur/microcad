@@ -3,7 +3,10 @@
 
 //! µcad CLI eval commands
 
-use microcad_lang::diag::{Diag, WriteToFile};
+use microcad_lang::{
+    diag::{Diag, WriteToFile},
+    tree_display::FormatTree,
+};
 
 use crate::commands::RunCommand;
 
@@ -31,7 +34,7 @@ impl RunCommand for Eval {
 
         match &self.output {
             Some(filename) => model.write_to_file(&filename)?,
-            None => println!("{model}"),
+            None => println!("{}", FormatTree(&model)),
         }
 
         Ok(())

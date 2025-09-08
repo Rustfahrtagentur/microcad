@@ -3,8 +3,19 @@
 
 //! Model
 
-use crate::{model::*, rc::*, resolve::*, src_ref::*, syntax::*};
-use microcad_core::{Geometry2D, Geometry3D};
+use crate::{model::*, render::*, src_ref::*, syntax::*};
+
+/// Render state of the model.
+pub enum ModelRenderState {
+    /// The model has not been rendered.
+    /// Model output is [`None`].
+    Pending,
+    /// The model has been pre-rendered via [`Model::pre-render`]
+    /// Model output is [`Some`], but there is no geometry.
+    Preparing,
+    /// Rendering is completed.
+    Complete,
+}
 
 /// The actual model contents
 #[derive(custom_debug::Debug, Default)]
@@ -19,21 +30,34 @@ pub struct ModelInner {
     /// Children of the model.
     pub children: Models,
     /// Element of the model with [SrcRef].
-    pub element: Element,
+    pub element: Refer<Element>,
     /// Attributes used for export.
     pub attributes: Attributes,
-    /// The symbol (e.g. [`WorkbenchDefinition`]) that created this [`Model`].
-    pub origin: Origin,
     /// The output type of the this model.
-    pub output: ModelOutput,
+    pub output: Option<RenderOutput>,
 }
 
 impl ModelInner {
     /// Create a new [`ModelInner`] with a specific element.
-    pub fn new(element: Element) -> Self {
+    pub fn new(element: Element, src_ref: SrcRef) -> Self {
         Self {
-            element,
+            element: Refer::new(element, src_ref),
             ..Default::default()
+        }
+    }
+
+    /// Return render state of the model.
+    pub fn render_state(&self) -> ModelRenderState {
+        match &self.output {
+            Some(RenderOutput::Geometry2D { geometry, .. }) => match geometry {
+                Some(_) => ModelRenderState::Complete,
+                None => ModelRenderState::Preparing,
+            },
+            Some(RenderOutput::Geometry3D { geometry, .. }) => match geometry {
+                Some(_) => ModelRenderState::Complete,
+                None => ModelRenderState::Preparing,
+            },
+            None => ModelRenderState::Pending,
         }
     }
 
@@ -44,7 +68,6 @@ impl ModelInner {
             parent: None,
             element: self.element.clone(),
             attributes: self.attributes.clone(),
-            origin: self.origin.clone(),
             output: self.output.clone(),
             ..Default::default()
         }
@@ -60,13 +83,23 @@ impl ModelInner {
         self.children.is_empty()
     }
 
-    /// Set the information about the creator of this model.
-    ///
-    /// This function is called after the resulting models of a call of a part
-    /// have been retrieved.   
-    pub(crate) fn set_creator(&mut self, creator: Symbol, call_src_ref: SrcRef) {
-        self.origin.set_creator(creator);
-        self.origin.call_src_ref = call_src_ref;
+    /// Return element of this model.
+    pub fn element(&self) -> &Element {
+        &self.element
+    }
+
+    /// Returns the render output, panics if there is no render output.
+    pub fn output(&self) -> &RenderOutput {
+        self.output
+            .as_ref()
+            .expect("Render output. You have to pre-render() and render() the model first.")
+    }
+
+    /// Returns the mutable render output, panics if there is no render output.
+    pub fn output_mut(&mut self) -> &mut RenderOutput {
+        self.output
+            .as_mut()
+            .expect("Render output. You have to pre-render() and render() the model first.")
     }
 }
 
@@ -80,20 +113,8 @@ impl PropertiesAccess for ModelInner {
     }
 }
 
-impl From<Rc<Geometry2D>> for ModelInner {
-    fn from(geometry: Rc<Geometry2D>) -> Self {
-        Self::new(Element::Primitive2D(geometry))
-    }
-}
-
-impl From<Rc<Geometry3D>> for ModelInner {
-    fn from(geometry: Rc<Geometry3D>) -> Self {
-        Self::new(Element::Primitive3D(geometry))
-    }
-}
-
-impl From<AffineTransform> for ModelInner {
-    fn from(transform: AffineTransform) -> Self {
-        ModelInner::new(Element::Transform(transform))
+impl SrcReferrer for ModelInner {
+    fn src_ref(&self) -> SrcRef {
+        self.element.src_ref.clone()
     }
 }

@@ -1,6 +1,6 @@
 -- Test --
   array_mul_scale
-  ../doc/types/arrays.md:80
+  ../doc/types/arrays.md:84
 
 -- Code --
 
@@ -9,5 +9,10 @@
 
 -- Output --
 -- Errors --
+-- Model --
+  Group -> Undetermined (root)
+
 -- Test Result --
 OK
+Could not determine output type.
+Nothing will be exported.

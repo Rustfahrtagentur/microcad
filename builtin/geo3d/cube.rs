@@ -1,8 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, rc::*, value::*};
+use microcad_lang::builtin::*;
 
 pub struct Cube;
 
@@ -11,17 +10,19 @@ impl BuiltinWorkbenchDefinition for Cube {
         "Cube"
     }
 
-    fn model(args: &Tuple) -> EvalResult<Model> {
-        Ok(
-            ModelBuilder::new_3d_primitive(Rc::new(Geometry3D::Cube(geo3d::Cube {
-                size: Vec3::new(
-                    args.get("size_x")?,
-                    args.get("size_y")?,
-                    args.get("size_z")?,
-                ),
-            })))
-            .build(),
-        )
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Primitive3D
+    }
+
+    fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        use microcad_core::*;
+        &|args| {
+            Ok(BuiltinWorkpieceOutput::Primitive3D(Geometry3D::Cube(
+                geo3d::Cube {
+                    size: Vec3::new(args.get("size_x"), args.get("size_y"), args.get("size_z")),
+                },
+            )))
+        }
     }
 
     fn parameters() -> ParameterValueList {

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::{eval::*, model::*, parameter, value::*};
+use microcad_lang::{builtin::*, model::*};
 
 /// Builtin definition for a translation.
 #[derive(Debug)]
@@ -13,15 +13,22 @@ impl BuiltinWorkbenchDefinition for Translate {
         "translate"
     }
 
-    fn model(args: &Tuple) -> EvalResult<Model> {
-        Ok(
-            ModelBuilder::new_transform(AffineTransform::Translation(Vec3::new(
-                args.get("x")?,
-                args.get("y")?,
-                args.get("z")?,
-            )))
-            .build(),
-        )
+    fn kind() -> BuiltinWorkbenchKind {
+        BuiltinWorkbenchKind::Transform
+    }
+
+    fn workpiece_function() -> &'static BuiltinWorkpieceFn {
+        use microcad_lang::value::*;
+
+        &|args| {
+            Ok(BuiltinWorkpieceOutput::Transform(
+                AffineTransform::Translation(Vec3::new(
+                    args.get("x"),
+                    args.get("y"),
+                    args.get("z"),
+                )),
+            ))
+        }
     }
 
     fn parameters() -> ParameterValueList {

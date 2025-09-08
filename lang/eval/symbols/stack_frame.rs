@@ -48,6 +48,14 @@ impl StackFrame {
         }
     }
 
+    /// Return symbol of the stack frame, if there is any.
+    pub fn symbol(&self) -> Option<Symbol> {
+        match &self {
+            StackFrame::Call { symbol, .. } => Some(symbol.clone()),
+            _ => None,
+        }
+    }
+
     /// Return stack frame kind as str
     pub fn kind_str(&self) -> &'static str {
         match self {
