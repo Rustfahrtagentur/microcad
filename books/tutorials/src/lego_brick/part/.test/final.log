@@ -4,61 +4,157 @@
 
 -- Code --
 
- 1: use std::ops::*;
- 2: use std::geo2d::*;
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
  3: 
  4: const SPACING = 8mm;
  5: 
- 6: op grid(rows: Integer, columns: Integer) {
+ 6: op grid(columns: Integer, rows: Integer) {
  7:     @input
- 8:         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
+ 8:         .translate(x = [1..columns] * SPACING, y = [1..rows] * SPACING)
  9:         .align()
 10: }
 11: 
-12: sketch Base(rows: Integer, columns: Integer, width: Length, height: Length) {
-13:     thickness = 1.2mm;
-14:     frame = Frame(width, height, thickness);
-15:     struts = Ring(outer = 6.51mm, inner = 4.8mm)
-16:         .grid(rows = rows - 1, columns = columns - 1);
-17:     frame | struts;
-18: }
-19: 
-20: use Rect as Cap;
-21: 
-22: sketch Knobs(rows: Integer, columns: Integer) {
-23:     Circle(d = 4.8mm)
-24:         .grid(rows, columns);
-25: }
+12: sketch Base(
+13:     columns: Integer,
+14:     rows: Integer,
+15:     width: Length,
+16:     height: Length
+17: ) {
+18:     thickness = 1.2mm;
+19:     frame = Frame(width, height, thickness);
+20:     struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
+21:         .grid(columns = columns-1, rows = rows-1);
+22:     frame | struts;
+23: }
+24: 
+25: use Rect as Cap;
 26: 
-27: part LegoBrick(rows = 4, columns = 2, base_height = 9.6mm) {
-28:     width = rows * SPACING - 0.2mm;
-29:     height = columns * SPACING - 0.2mm;
-30:     cap_thickness = 1.0mm;
+27: sketch Knobs(columns: Integer, rows: Integer) {
+28:     Circle(d = 4.8mm)
+29:         .grid(columns, rows);
+30: }
 31: 
-32:     base = Base(rows, columns, width, height)
-33:         .extrude(base_height - cap_thickness);
-34: 
-35:     cap = Cap(width, height)
-36:         .extrude(cap_thickness)
-37:         .translate(z = base_height - cap_thickness);
-38: 
-39:     knobs = Knobs(rows, columns)
-40:         .extrude(1.7mm)
-41:         .translate(z = base_height);
-42: 
-43:     base | cap | knobs;
-44: }
-45: 
-46: // render a brick with default values
-47: LegoBrick();
+32: part LegoBrick(rows = 2, columns = 4, base_height = 9.6mm) {
+33:     width = columns * SPACING - 0.2mm;
+34:     height =rows * SPACING - 0.2mm;
+35:     cap_thickness = 1.0mm;
+36: 
+37:     base = Base(rows, columns, width, height)
+38:         .extrude(base_height - cap_thickness);
+39: 
+40:     cap = Cap(width, height)
+41:         .extrude(cap_thickness)
+42:         .translate(z = base_height - cap_thickness);
+43: 
+44:     knobs = Knobs(rows, columns)
+45:         .extrude(1.7mm)
+46:         .translate(z = base_height);
+47: 
+48:     base | cap | knobs;
+49: }
+50: 
+51: // render a brick with default values
+52: LegoBrick();
 
 -- Output --
 -- Errors --
-error: Workbench Ring cannot find initialization for those arguments
-  ---> <FROM STR>:15:19
-     |
-  15 |     struts = Ring(outer = 6.51mm, inner = 4.8mm)
-     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+-- Model --
+  Group -> 3D (root)
+    part <NO ID>::LegoBrick(base_height: Length = 9.6mm, columns: Integer = 4, rows: Integer = 2) -> 3D
+      Operation union()⏎ -> 3D
+        Group -> 3D
+          Operation union()⏎ -> 3D
+            Group -> 3D
+              op std::ops::extrude(height: Length = 8.6mm) -> 3D
+                Operation __builtin::ops::extrude(height: Scalar = 8.6, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_de…
+                  sketch <NO ID>::Base(columns: Integer = 4, height: Length = 15.8mm, rows: Integer = 2, width: Length = 31.8mm) -> 2D (root)
+                    Operation union()⏎ -> 2D
+                      Group -> 2D
+                        sketch std::geo2d::Frame(height: Length = 15.8mm, thickness: Length = 1.2mm, width: Length = 31.8mm) -> 2D
+                          Operation subtract()⏎ -> 2D
+                            Group -> 2D
+                              sketch std::geo2d::Rect(height: Length = 15.8mm, width: Length = 31.8mm) -> 2D
+                                Primitive2D __builtin::geo2d::Rect(height: Scalar = 15.8, width: Scalar = 31.8, x: Scalar = -15.9, y: Scalar = -7.9)⏎ -> 2D
+                              sketch std::geo2d::Rect(height: Length = 13.4mm, width: Length = 29.4mm) -> 2D
+                                Primitive2D __builtin::geo2d::Rect(height: Scalar = 13.4, width: Scalar = 29.4, x: Scalar = -14.7, y: Scalar = -6.7)⏎ -> 2D
+                        op <NO ID>::grid(columns: Integer = 3, rows: Integer = 1) -> 2D
+                          Operation __builtin::ops::align()⏎ -> 2D
+                            Multiplicity -> 2D
+                              op std::ops::translate(x: Length = 8mm, y: Length = 8mm, z: Length = 0mm) -> 2D
+                                Transform __builtin::ops::translate(x: Scalar = 8, y: Scalar = 8, z: Scalar = 0)⏎ -> 2D
+                                  sketch std::geo2d::Ring(inner_d: Length = 4.8mm, outer_d: Length = 6.51mm) -> 2D (root)
+                                    Operation subtract()⏎ -> 2D
+                                      Group -> 2D
+                                        sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 3.255mm) -> 2D
+                                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
+                                        sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 2.4mm) -> 2D
+                                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                              op std::ops::translate(x: Length = 16mm, y: Length = 8mm, z: Length = 0mm) -> 2D
+                                Transform __builtin::ops::translate(x: Scalar = 16, y: Scalar = 8, z: Scalar = 0)⏎ -> 2D
+                                  sketch std::geo2d::Ring(inner_d: Length = 4.8mm, outer_d: Length = 6.51mm) -> 2D (root)
+                                    Operation subtract()⏎ -> 2D
+                                      Group -> 2D
+                                        sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 3.255mm) -> 2D
+                                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
+                                        sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 2.4mm) -> 2D
+                                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                              op std::ops::translate(x: Length = 24mm, y: Length = 8mm, z: Length = 0mm) -> 2D
+                                Transform __builtin::ops::translate(x: Scalar = 24, y: Scalar = 8, z: Scalar = 0)⏎ -> 2D
+                                  sketch std::geo2d::Ring(inner_d: Length = 4.8mm, outer_d: Length = 6.51mm) -> 2D (root)
+                                    Operation subtract()⏎ -> 2D
+                                      Group -> 2D
+                                        sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 3.255mm) -> 2D
+                                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
+                                        sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 2.4mm) -> 2D
+                                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+              op std::ops::translate(x: Length = 0mm, y: Length = 0mm, z: Length = 8.6mm) -> 3D
+                Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 8.6)⏎ -> 3D
+                  op std::ops::extrude(height: Length = 1mm) -> 3D (root)
+                    Operation __builtin::ops::extrude(height: Scalar = 1, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_degr…
+                      sketch std::geo2d::Rect(height: Length = 15.8mm, width: Length = 31.8mm) -> 2D (root)
+                        Primitive2D __builtin::geo2d::Rect(height: Scalar = 15.8, width: Scalar = 31.8, x: Scalar = -15.9, y: Scalar = -7.9)⏎ -> 2D
+          op std::ops::translate(x: Length = 0mm, y: Length = 0mm, z: Length = 9.6mm) -> 3D
+            Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 9.6)⏎ -> 3D
+              op std::ops::extrude(height: Length = 1.7mm) -> 3D (root)
+                Operation __builtin::ops::extrude(height: Scalar = 1.7, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_de…
+                  sketch <NO ID>::Knobs(columns: Integer = 4, rows: Integer = 2) -> 2D (root)
+                    op <NO ID>::grid(columns: Integer = 4, rows: Integer = 2) -> 2D
+                      Operation __builtin::ops::align()⏎ -> 2D
+                        Multiplicity -> 2D
+                          op std::ops::translate(x: Length = 8mm, y: Length = 8mm, z: Length = 0mm) -> 2D
+                            Transform __builtin::ops::translate(x: Scalar = 8, y: Scalar = 8, z: Scalar = 0)⏎ -> 2D
+                              sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 4.8mm) -> 2D (root)
+                                Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                          op std::ops::translate(x: Length = 16mm, y: Length = 8mm, z: Length = 0mm) -> 2D
+                            Transform __builtin::ops::translate(x: Scalar = 16, y: Scalar = 8, z: Scalar = 0)⏎ -> 2D
+                              sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 4.8mm) -> 2D (root)
+                                Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                          op std::ops::translate(x: Length = 24mm, y: Length = 8mm, z: Length = 0mm) -> 2D
+                            Transform __builtin::ops::translate(x: Scalar = 24, y: Scalar = 8, z: Scalar = 0)⏎ -> 2D
+                              sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 4.8mm) -> 2D (root)
+                                Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                          op std::ops::translate(x: Length = 32mm, y: Length = 8mm, z: Length = 0mm) -> 2D
+                            Transform __builtin::ops::translate(x: Scalar = 32, y: Scalar = 8, z: Scalar = 0)⏎ -> 2D
+                              sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 4.8mm) -> 2D (root)
+                                Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                          op std::ops::translate(x: Length = 8mm, y: Length = 16mm, z: Length = 0mm) -> 2D
+                            Transform __builtin::ops::translate(x: Scalar = 8, y: Scalar = 16, z: Scalar = 0)⏎ -> 2D
+                              sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 4.8mm) -> 2D (root)
+                                Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                          op std::ops::translate(x: Length = 16mm, y: Length = 16mm, z: Length = 0mm) -> 2D
+                            Transform __builtin::ops::translate(x: Scalar = 16, y: Scalar = 16, z: Scalar = 0)⏎ -> 2D
+                              sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 4.8mm) -> 2D (root)
+                                Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                          op std::ops::translate(x: Length = 24mm, y: Length = 16mm, z: Length = 0mm) -> 2D
+                            Transform __builtin::ops::translate(x: Scalar = 24, y: Scalar = 16, z: Scalar = 0)⏎ -> 2D
+                              sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 4.8mm) -> 2D (root)
+                                Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                          op std::ops::translate(x: Length = 32mm, y: Length = 16mm, z: Length = 0mm) -> 2D
+                            Transform __builtin::ops::translate(x: Scalar = 32, y: Scalar = 16, z: Scalar = 0)⏎ -> 2D
+                              sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), d: Length = 4.8mm) -> 2D (root)
+                                Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+
 -- Test Result --
-FAIL
+OK
+Export successful.
