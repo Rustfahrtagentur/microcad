@@ -37,7 +37,7 @@ const SPACING = 8mm;
 
 op grid(rows: Integer, columns: Integer) {
     @input
-        .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
+        .translate(x = [1..rows] * SPACING, y = [1..columns] * SPACING)
         .align()
 }
 
@@ -49,7 +49,7 @@ sketch Base(
 ) {
     thickness = 1.2mm;
     frame = Frame(width, height, thickness);
-    struts = Ring(outer = 6.51mm, inner = 4.8mm)
+    struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
         .grid(rows, columns);
     frame | struts;
 }
