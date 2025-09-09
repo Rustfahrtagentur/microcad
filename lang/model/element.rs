@@ -27,7 +27,7 @@ pub enum Element {
     Multiplicity,
 
     /// Children marker.
-    ChildrenMarker,
+    InputPlaceholder,
 }
 
 impl Element {
@@ -46,7 +46,7 @@ impl Element {
                     builtin_workpiece.output_type
                 }
             },
-            Element::Group | Element::Multiplicity | Element::ChildrenMarker => {
+            Element::Group | Element::Multiplicity | Element::InputPlaceholder => {
                 OutputType::NotDetermined
             }
         }
@@ -59,7 +59,7 @@ impl Element {
                 BuiltinWorkbenchKind::Primitive2D | BuiltinWorkbenchKind::Primitive3D => false,
                 BuiltinWorkbenchKind::Operation | BuiltinWorkbenchKind::Transform => true,
             },
-            Element::Multiplicity | Element::Group | Element::ChildrenMarker => false,
+            Element::Multiplicity | Element::Group | Element::InputPlaceholder => false,
             Element::Workpiece(workpiece) => match workpiece.kind {
                 WorkbenchKind::Part | WorkbenchKind::Sketch => false,
                 WorkbenchKind::Operation => true,

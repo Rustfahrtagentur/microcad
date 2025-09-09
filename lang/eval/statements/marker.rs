@@ -5,9 +5,9 @@ use crate::{eval::*, model::*};
 
 impl Eval<Option<Model>> for Marker {
     fn eval(&self, _: &mut Context) -> EvalResult<Option<Model>> {
-        if self.is_children_marker() {
+        if self.is_input_placeholder() {
             Ok(Some(
-                ModelBuilder::new(Element::ChildrenMarker, self.src_ref()).build(),
+                ModelBuilder::new(Element::InputPlaceholder, self.src_ref()).build(),
             ))
         } else {
             Ok(None)

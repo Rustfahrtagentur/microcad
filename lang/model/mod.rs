@@ -122,15 +122,15 @@ impl Model {
         Models::from(vec![self.clone(), other]).boolean_op(op)
     }
 
-    /// Find children model placeholder in model descendants.
-    pub fn replace_children_placeholder(&self, model: &Model) -> Self {
-        self.descendants().for_each(|m| {
-            let mut m_ = m.borrow_mut();
-            if m_.id.is_none() && matches!(m_.element.value, Element::ChildrenMarker) {
-                log::error!("Replace: {model}");
-                model.borrow_mut().parent = Some(self.clone());
-                *m_ = model.borrow().clone_content();
-                m_.children = model.borrow().children.clone();
+    /// Replace each input placeholder with copies of `input_model`.
+    pub fn replace_input_placeholders(&self, input_model: &Model) -> Self {
+        self.descendants().for_each(|model| {
+            let mut model_ = model.borrow_mut();
+            if model_.id.is_none() && matches!(model_.element.value, Element::InputPlaceholder) {
+                let mut input_model_ = input_model.borrow_mut();
+                input_model_.parent = Some(self.clone());
+                *model_ = input_model_.clone_content();
+                model_.children = input_model_.children.clone();
             }
         });
         self.clone()

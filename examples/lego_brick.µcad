@@ -5,7 +5,7 @@ use std::ops::*;
 const SPACING = 8mm;
 
 op grid(rows: Integer, columns: Integer) {
-    @children
+    @input
         .translate(x = [1..rows] * SPACING, y = [1..columns] * SPACING)
         .align()
 }

@@ -76,8 +76,7 @@ impl CallMethod<Option<Model>> for Model {
                                 context,
                             )?;
 
-                            //  model.append(self.make_deep_copy());
-                            Some(model.replace_children_placeholder(self))
+                            Some(model.replace_input_placeholders(self))
                         }
                         SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
                             Value::Model(model) => {

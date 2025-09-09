@@ -11,29 +11,29 @@ So this would be a neutral operation:
 
 ```µcad,op_example
 // define operation nop without parameters
-op nop() { @children }
+op nop() { @input }
 
 // use operation nop on a circle
 std::geo2d::Circle(radius = 1cm).nop();
 ```
 
-## `@children`
+## `@input`
 
-`@children` is a placeholder to tell where child nodes are nested.
+`@input` is a placeholder to tell where child nodes are nested.
 It can also be used to retrieve information about the tree structure
-In the above example `@children` will result in a `std::geo2d::Circle(radius = 1cm)`.
+In the above example `@input` will result in a `std::geo2d::Circle(radius = 1cm)`.
 
 An operation can have multiple children like in this example:
 
-[![test](.test/children.svg)](.test/children.log)
+[![test](.test/input.svg)](.test/input.log)
 
-```µcad,children#todo
+```µcad,input#todo
 // define operation which takes multiple items
 op punched_disk() { 
     // check number of children
-    if @children.count() == 2 {
+    if @input.count() == 2 {
         // make hole
-        @children.subtract(); 
+        @input.subtract(); 
     } else {
         std::error("punched_disk must get two objects");
     }
@@ -53,9 +53,9 @@ Like other workbenches operations can have parameters too:
 ```µcad,parameters#todo
 // define operation which takes multiple items
 op punch_disk(radius: Length) {
-    if @children.count() == 1 {
+    if @input.count() == 1 {
         { 
-            @children;
+            @input;
             std::geo2d::Circle(radius);
         }.subtract();
     } else {

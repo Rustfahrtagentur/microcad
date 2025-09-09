@@ -5,19 +5,19 @@
 
 use crate::{src_ref::*, syntax::*};
 
-/// Node marker, e.g. `@children`.
+/// Node marker, e.g. `@input`.
 #[derive(Clone, Debug)]
 pub struct Marker {
-    /// Marker name, e.g. `children`
+    /// Marker name, e.g. `input`
     pub id: Identifier,
     /// Source code reference
     pub src_ref: SrcRef,
 }
 
 impl Marker {
-    /// Returns true if the marker is a children marker
-    pub fn is_children_marker(&self) -> bool {
-        &self.id == "children"
+    /// Returns true if the marker is an input placeholder
+    pub fn is_input_placeholder(&self) -> bool {
+        &self.id == "input"
     }
 }
 
