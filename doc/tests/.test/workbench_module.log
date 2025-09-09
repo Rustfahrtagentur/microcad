@@ -10,11 +10,5 @@
 
 -- Output --
 -- Errors --
-error: Module statement not available here
-  ---> <FROM STR>:2:3
-     |
-   2 |   mod m {} // error
-     |   ^^^^^^^^
-     |
 -- Test Result --
-FAILED AS EXPECTED
+OK BUT SHOULD FAIL

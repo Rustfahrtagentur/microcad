@@ -29,11 +29,11 @@ error: Symbol count not found.
    3 |     if @children.count() == 1 {
      |                  ^^^^^
      |
-error: Symbol std::error not found.
-  ---> <FROM STR>:9:9
+error: If condition is not a boolean: <INVALID VALUE>
+  ---> <FROM STR>:3:5
      |
-   9 |         std::error("punch_disk must get one object");
-     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   3 |     if @children.count() == 1 {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 TODO

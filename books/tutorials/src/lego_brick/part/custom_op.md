@@ -35,32 +35,32 @@ use std::ops::*;
 
 const SPACING = 8mm;
 
-op grid(rows: Integer, columns: Integer) {
+op grid(columns: Integer, rows: Integer) {
     @input
-        .translate(x = [1..rows] * SPACING, y = [1..columns] * SPACING)
+        .translate(x = [1..columns] * SPACING, y = [1..rows] * SPACING)
         .align()
 }
 
 sketch Base(
-    rows: Integer,
     columns: Integer,
+    rows: Integer,
     width: Length,
     height: Length
 ) {
     thickness = 1.2mm;
     frame = Frame(width, height, thickness);
     struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
-        .grid(rows, columns);
+        .grid(columns = columns-1, rows = rows-1);
     frame | struts;
 }
 
-sketch Knobs(rows: Integer, columns: Integer) {
+sketch Knobs(columns: Integer, rows: Integer) {
     Circle(d = 4.8mm)
-        .grid(rows, columns);
+        .grid(columns, rows);
 }
 
-rows = 2;
 columns = 4;
+rows = 2;
 width = columns * SPACING - 0.2mm;
 height = rows * SPACING - 0.2mm;
 cap_thickness = 1.0mm;

@@ -10,11 +10,5 @@
 
 -- Output --
 -- Errors --
-error: Return statement not available here
-  ---> <FROM STR>:2:3
-     |
-   2 |   return 1;  // error
-     |   ^^^^^^^^^
-     |
 -- Test Result --
-FAILED AS EXPECTED
+OK BUT SHOULD FAIL

@@ -14,12 +14,6 @@
 
 -- Output --
 -- Errors --
-warning: This expression statement did not produce any model
-  ---> <FROM STR>:1:1
-     |
-   1 | [
-     | ^
-     |
 -- Model --
   Group -> Undetermined (root)
 

@@ -15,11 +15,5 @@ error: Cannot call operation without workpiece.
    1 | std::ops::translate(x = 3.0mm); // error: Cannot call operation without workpiece. 
      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Calling operation on empty geometry
-  ---> <FROM STR>:2:4
-     |
-   2 | {}.std::ops::translate(x = 3.0mm);  // error: Calling operation on empty geometry
-     |    ^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
-FAILED AS EXPECTED
+FAILED BUT WITH WRONG ERRORS
