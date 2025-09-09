@@ -64,8 +64,8 @@ impl PropertiesAccess for Workpiece {
         self.properties.get(id)
     }
 
-    fn get_properties(&self) -> &Properties {
-        &self.properties
+    fn get_properties(&self) -> Option<&Properties> {
+        Some(&self.properties)
     }
 
     fn add_properties(&mut self, props: Properties) {

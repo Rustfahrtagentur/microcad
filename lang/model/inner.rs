@@ -108,7 +108,7 @@ impl PropertiesAccess for ModelInner {
         self.element.get_property(id)
     }
 
-    fn get_properties(&self) -> &Properties {
+    fn get_properties(&self) -> Option<&Properties> {
         self.element.get_properties()
     }
 

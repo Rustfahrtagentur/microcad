@@ -40,7 +40,7 @@ impl std::fmt::Display for Properties {
 impl TreeDisplay for Properties {
     fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         self.iter()
-            .try_for_each(|(id, value)| writeln!(f, "{:depth$}{id:?} : {value:?}", ""))
+            .try_for_each(|(id, value)| writeln!(f, "{:depth$}prop {id:?} = {value:?}", ""))
     }
 }
 
@@ -49,7 +49,7 @@ pub trait PropertiesAccess {
     /// Get a value of property, or [`Value::None`] if the property does not exist.
     fn get_property(&self, id: &Identifier) -> Option<&Value>;
     /// Get all properties
-    fn get_properties(&self) -> &Properties;
+    fn get_properties(&self) -> Option<&Properties>;
     /// Set or create properties with the given ids and values.
     fn add_properties(&mut self, props: Properties);
 }

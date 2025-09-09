@@ -87,10 +87,10 @@ impl PropertiesAccess for Element {
         }
     }
 
-    fn get_properties(&self) -> &Properties {
+    fn get_properties(&self) -> Option<&Properties> {
         match self {
             Self::Workpiece(workpiece) => workpiece.get_properties(),
-            _ => unreachable!("not a workpiece element"),
+            element => None,
         }
     }
 
