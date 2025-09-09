@@ -59,7 +59,7 @@
             Group -> 3D
               op std::ops::extrude(height: Length = 9.6mm) -> 3D
                 Operation __builtin::ops::extrude(height: Scalar = 9.6, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_de…
-                  sketch <NO ID>::Base(height: Length = 31.8mm, width: Length = 15.8mm) -> 2D
+                  sketch <NO ID>::Base(height: Length = 31.8mm, width: Length = 15.8mm) -> 2D (root)
                     Operation union()⏎ -> 2D
                       Group -> 2D
                         sketch std::geo2d::Frame(height: Length = 31.8mm, thickness: Length = 1.2mm, width: Length = 15.8mm) -> 2D
@@ -70,54 +70,56 @@
                               sketch std::geo2d::Rect(height: Length = 29.4mm, width: Length = 13.4mm) -> 2D
                                 Primitive2D __builtin::geo2d::Rect(height: Scalar = 29.4, width: Scalar = 13.4, x: Scalar = -6.7, y: Scalar = -14.7)⏎ -> 2D
                         Operation __builtin::ops::align()⏎ -> 2D
-                          op std::ops::translate(x: Length = 0mm, y: Length = 0mm, z: Length = 0mm) -> 2D
-                            Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D
-                              sketch std::geo2d::Ring(inner_d: Length = 4.8mm, outer_d: Length = 6.51mm) -> 2D
-                                Operation subtract()⏎ -> 2D
-                                  Group -> 2D
-                                    sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 3.255mm) -> 2D
-                                      Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
-                                    sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 2.4mm) -> 2D
-                                      Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
-                          op std::ops::translate(x: Length = 0mm, y: Length = 8mm, z: Length = 0mm) -> 2D
-                            Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 8, z: Scalar = 0)⏎ -> 2D
-                              sketch std::geo2d::Ring(inner_d: Length = 4.8mm, outer_d: Length = 6.51mm) -> 2D
-                                Operation subtract()⏎ -> 2D
-                                  Group -> 2D
-                                    sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 3.255mm) -> 2D
-                                      Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
-                                    sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 2.4mm) -> 2D
-                                      Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
-                          op std::ops::translate(x: Length = 0mm, y: Length = 16mm, z: Length = 0mm) -> 2D
-                            Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 16, z: Scalar = 0)⏎ -> 2D
-                              sketch std::geo2d::Ring(inner_d: Length = 4.8mm, outer_d: Length = 6.51mm) -> 2D
-                                Operation subtract()⏎ -> 2D
-                                  Group -> 2D
-                                    sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 3.255mm) -> 2D
-                                      Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
-                                    sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 2.4mm) -> 2D
-                                      Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                          Multiplicity -> 2D
+                            op std::ops::translate(x: Length = 0mm, y: Length = 0mm, z: Length = 0mm) -> 2D
+                              Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D
+                                sketch std::geo2d::Ring(inner_d: Length = 4.8mm, outer_d: Length = 6.51mm) -> 2D
+                                  Operation subtract()⏎ -> 2D
+                                    Group -> 2D
+                                      sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 3.255mm) -> 2D
+                                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
+                                      sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 2.4mm) -> 2D
+                                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                            op std::ops::translate(x: Length = 0mm, y: Length = 8mm, z: Length = 0mm) -> 2D
+                              Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 8, z: Scalar = 0)⏎ -> 2D
+                                sketch std::geo2d::Ring(inner_d: Length = 4.8mm, outer_d: Length = 6.51mm) -> 2D
+                                  Operation subtract()⏎ -> 2D
+                                    Group -> 2D
+                                      sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 3.255mm) -> 2D
+                                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
+                                      sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 2.4mm) -> 2D
+                                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                            op std::ops::translate(x: Length = 0mm, y: Length = 16mm, z: Length = 0mm) -> 2D
+                              Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 16, z: Scalar = 0)⏎ -> 2D
+                                sketch std::geo2d::Ring(inner_d: Length = 4.8mm, outer_d: Length = 6.51mm) -> 2D
+                                  Operation subtract()⏎ -> 2D
+                                    Group -> 2D
+                                      sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 3.255mm) -> 2D
+                                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
+                                      sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 2.4mm) -> 2D
+                                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
               op std::ops::translate(x: Length = 0mm, y: Length = 0mm, z: Length = 8.6mm) -> 3D
                 Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 8.6)⏎ -> 3D
-                  op std::ops::extrude(height: Length = 1mm) -> 3D
+                  op std::ops::extrude(height: Length = 1mm) -> 3D (root)
                     Operation __builtin::ops::extrude(height: Scalar = 1, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_degr…
-                      sketch std::geo2d::Rect(height: Length = 31.8mm, width: Length = 15.8mm) -> 2D
+                      sketch std::geo2d::Rect(height: Length = 31.8mm, width: Length = 15.8mm) -> 2D (root)
                         Primitive2D __builtin::geo2d::Rect(height: Scalar = 31.8, width: Scalar = 15.8, x: Scalar = -7.9, y: Scalar = -15.9)⏎ -> 2D
           op std::ops::translate(x: Length = 0mm, y: Length = 0mm, z: Length = 9.6mm) -> 3D
             Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = 9.6)⏎ -> 3D
-              op std::ops::extrude(height: Length = 1.7mm) -> 3D
+              op std::ops::extrude(height: Length = 1.7mm) -> 3D (root)
                 Operation __builtin::ops::extrude(height: Scalar = 1.7, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_de…
-                  sketch <NO ID>::Knobs() -> 2D
+                  sketch <NO ID>::Knobs() -> 2D (root)
                     Operation __builtin::ops::align()⏎ -> 2D
                       sketch std::geo2d::Circle(center: (x: [Length], y: [Length]) = (x: [Length] = [0mm, 8mm], y: [Length] = [0mm, 8mm, 16mm, 24mm]), diameter: L…
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 16, radius: Scalar = 2.4)⏎ -> 2D
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 16, radius: Scalar = 2.4)⏎ -> 2D
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 24, radius: Scalar = 2.4)⏎ -> 2D
-                        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 24, radius: Scalar = 2.4)⏎ -> 2D
+                        Multiplicity -> 2D
+                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
+                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
+                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 16, radius: Scalar = 2.4)⏎ -> 2D
+                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 16, radius: Scalar = 2.4)⏎ -> 2D
+                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 24, radius: Scalar = 2.4)⏎ -> 2D
+                          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 24, radius: Scalar = 2.4)⏎ -> 2D
 
 -- Test Result --
 OK

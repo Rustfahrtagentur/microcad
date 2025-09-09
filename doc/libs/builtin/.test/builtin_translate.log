@@ -5,7 +5,7 @@
 -- Code --
 
  1: op translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
- 2:     @children.__builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm);
+ 2:     @input.__builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm);
  3: }
  4: 
  5: r = __builtin::geo2d::Rect(x = 0, y = 0, width = 3, height = 3);

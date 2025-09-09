@@ -18,14 +18,15 @@
     sketch <NO ID>::Knobs(diameter: Length = 4.8mm) -> 2D
       Operation __builtin::ops::align()⏎ -> 2D
         sketch std::geo2d::Circle(c: (x: [Length], y: [Length]) = (x: [Length] = [0mm, 8mm, 16mm, 24mm], y: [Length] = [0mm, 8mm]), d: Length = 4.8m…
-          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
-          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
-          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 16, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
-          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 24, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
-          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
-          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
-          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 16, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
-          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 24, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
+          Multiplicity -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 16, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 24, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 8, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 16, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
+            Primitive2D __builtin::geo2d::Circle(cx: Scalar = 24, cy: Scalar = 8, radius: Scalar = 2.4)⏎ -> 2D
 
 -- Test Result --
 OK

@@ -1,5 +1,5 @@
 -- Test --
-  children
+  input
   ../doc/structure/op.md:30
 
 -- Code --
@@ -7,9 +7,9 @@
  1: // define operation which takes multiple items
  2: op punched_disk() { 
  3:     // check number of children
- 4:     if @children.count() == 2 {
+ 4:     if @input.count() == 2 {
  5:         // make hole
- 6:         @children.subtract(); 
+ 6:         @input.subtract(); 
  7:     } else {
  8:         std::error("punched_disk must get two objects");
  9:     }
@@ -24,16 +24,16 @@
 -- Output --
 -- Errors --
 error: Symbol count not found.
-  ---> <FROM STR>:4:18
+  ---> <FROM STR>:4:15
      |
-   4 |     if @children.count() == 2 {
-     |                  ^^^^^
+   4 |     if @input.count() == 2 {
+     |               ^^^^^
      |
 error: If condition is not a boolean: <INVALID VALUE>
   ---> <FROM STR>:4:5
      |
-   4 |     if @children.count() == 2 {
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 |     if @input.count() == 2 {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 TODO
