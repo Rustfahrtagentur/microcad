@@ -22,11 +22,5 @@ error: Assignment statement not available here
    3 |         prop hole = radius/2;  // eval error: prop not allowed in function
      |         ^^^^^^^^^^^^^^^^^^^^^
      |
-warning: This expression statement did not produce any model
-  ---> <FROM STR>:6:5
-     |
-   6 |     inner();
-     |     ^^^^^^^^
-     |
 -- Test Result --
 FAILED BUT WITH WRONG ERRORS

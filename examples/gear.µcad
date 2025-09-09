@@ -3,7 +3,7 @@ use std::geo2d::*;
 use std::math::*;
 
 op polar(angle: Angle, radius: Length, shift: Length = 0.0mm) {
-    @children.translate(x = radius, y = shift).rotate(z = angle);
+    @input.translate(x = radius, y = shift).rotate(z = angle);
 }
 
 /*sketch Gear(

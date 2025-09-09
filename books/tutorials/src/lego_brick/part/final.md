@@ -13,36 +13,41 @@ them in the last statement where we call `LegoBrick()`.
 
 [![test](.test/final.svg)](.test/final.log)
 
-```µcad,final
-use std::ops::*;
+```µcad,final(hires)
 use std::geo2d::*;
+use std::ops::*;
 
 const SPACING = 8mm;
 
-op grid(rows: Integer, columns: Integer) {
-    @children
-        .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
+op grid(columns: Integer, rows: Integer) {
+    @input
+        .translate(x = [1..columns] * SPACING, y = [1..rows] * SPACING)
         .align()
 }
 
-sketch Base(rows: Integer, columns: Integer, width: Length, height: Length) {
+sketch Base(
+    columns: Integer,
+    rows: Integer,
+    width: Length,
+    height: Length
+) {
     thickness = 1.2mm;
     frame = Frame(width, height, thickness);
-    struts = Ring(outer = 6.51mm, inner = 4.8mm)
-        .grid(rows = rows - 1, columns = columns - 1);
+    struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
+        .grid(columns = columns-1, rows = rows-1);
     frame | struts;
 }
 
 use Rect as Cap;
 
-sketch Knobs(rows: Integer, columns: Integer) {
+sketch Knobs(columns: Integer, rows: Integer) {
     Circle(d = 4.8mm)
-        .grid(rows, columns);
+        .grid(columns, rows);
 }
 
-part LegoBrick(rows = 4, columns = 2, base_height = 9.6mm) {
-    width = rows * SPACING - 0.2mm;
-    height = columns * SPACING - 0.2mm;
+part LegoBrick(rows = 2, columns = 4, base_height = 9.6mm) {
+    width = columns * SPACING - 0.2mm;
+    height =rows * SPACING - 0.2mm;
     cap_thickness = 1.0mm;
 
     base = Base(rows, columns, width, height)

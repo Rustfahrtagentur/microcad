@@ -1,6 +1,6 @@
 -- Test --
   group
-  ../doc/tests/semicolon.md:59
+  ../doc/tests/semicolon.md:60
 
 -- Code --
 

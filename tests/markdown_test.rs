@@ -28,6 +28,7 @@ pub fn init() {
 #[allow(dead_code)]
 pub fn run_test(
     name: &str,
+    params: &str,
     mode: &str,
     code: &str,
     banner: &str,
@@ -36,6 +37,7 @@ pub fn run_test(
     reference: &str,
 ) {
     let todo = mode == "todo" || mode == "todo_fail";
+    let hires = params == "hires";
 
     use std::fs;
     use std::io;
@@ -243,7 +245,11 @@ pub fn run_test(
                             }),
                             OutputType::Geometry3D => Some(Export {
                                 filename: format!("{out_filename}.stl").into(),
-                                resolution: RenderResolution::coarse(),
+                                resolution: if hires {
+                                    RenderResolution::default()
+                                } else {
+                                    RenderResolution::coarse()
+                                },
                                 exporter: Rc::new(StlExporter),
                             }),
                             OutputType::NotDetermined => {

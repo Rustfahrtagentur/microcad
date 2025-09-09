@@ -45,13 +45,15 @@ impl Eval for RangeLast {
 
 impl Eval for RangeExpression {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        Ok(match (self.first.eval(context)?, self.last.eval(context)?) {
-            (Value::Integer(first), Value::Integer(last)) => Value::Array(Array::new(
-                (first..last+1).map(Value::Integer).collect(),
-                Type::Integer,
-            )),
-            (_, _) => Value::None,
-        })
+        Ok(
+            match (self.first.eval(context)?, self.last.eval(context)?) {
+                (Value::Integer(first), Value::Integer(last)) => Value::Array(Array::new(
+                    (first..last + 1).map(Value::Integer).collect(),
+                    Type::Integer,
+                )),
+                (_, _) => Value::None,
+            },
+        )
     }
 }
 
@@ -146,12 +148,10 @@ impl Expression {
     ) -> EvalResult<Value> {
         let value = self.eval(context)?;
         match value {
-            Value::Models(mut models) => {
+            Value::Model(model) => {
                 let attributes = attribute_list.eval(context)?;
-                models.iter_mut().for_each(|model| {
-                    model.borrow_mut().attributes = attributes.clone();
-                });
-                Ok(Value::Models(models))
+                model.borrow_mut().attributes = attributes.clone();
+                Ok(Value::Model(model))
             }
             Value::None => Ok(Value::None),
             _ => {
@@ -236,12 +236,12 @@ impl Eval for Expression {
             Self::Call(call) => call.eval(context),
             Self::Body(body) => {
                 let model: Model = body.eval(context)?;
-                Ok(Value::from_single_model(model))
+                Ok(model.into())
             }
             Self::QualifiedName(qualified_name) => qualified_name.eval(context),
             Self::Marker(marker) => {
                 let model: Option<Model> = marker.eval(context)?;
-                Ok(Value::Models(model.into_iter().collect()))
+                Ok(model.map(Value::Model).unwrap_or_default())
             }
             // Access a property `x` of an expression `circle.x`
             Self::PropertyAccess(lhs, id, src_ref) => {
@@ -251,8 +251,8 @@ impl Eval for Expression {
                         Some(value) => return Ok(value.clone()),
                         None => context.error(src_ref, EvalError::PropertyNotFound(id.clone()))?,
                     },
-                    Value::Models(models) => match models.fetch_property(id) {
-                        Some(prop) => return Ok(prop),
+                    Value::Model(model) => match model.borrow().get_property(id) {
+                        Some(prop) => return Ok(prop.clone()),
                         None => context.error(src_ref, EvalError::PropertyNotFound(id.clone()))?,
                     },
                     _ => {}
@@ -278,9 +278,11 @@ impl Eval for Expression {
     }
 }
 
-impl Eval<Models> for Expression {
-    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
-        let value: Value = self.eval(context)?;
-        Ok(value.fetch_models())
+impl Eval<Option<Model>> for Expression {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<Model>> {
+        Ok(match self.eval(context)? {
+            Value::Model(model) => Some(model),
+            _ => None,
+        })
     }
 }

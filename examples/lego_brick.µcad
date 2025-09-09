@@ -2,6 +2,14 @@ use std::*;
 use std::geo2d::*;
 use std::ops::*;
 
+const SPACING = 8mm;
+
+op grid(rows: Integer, columns: Integer) {
+    @input
+        .translate(x = [1..rows] * SPACING, y = [1..columns] * SPACING)
+        .align()
+}
+
 part LegoBrick(rows: Integer, columns: Integer, a = 8mm, base_height = 9.6mm) {
     wall = 1.2mm;
     width = rows * a - 0.2mm;
@@ -11,7 +19,7 @@ part LegoBrick(rows: Integer, columns: Integer, a = 8mm, base_height = 9.6mm) {
     base = {
         frame = Rect(width, height) - Rect(width = width - wall * 2, height = height - wall * 2);
         struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
-            .translate(x = [1..rows-1] * a , y = [1..columns-1] * a).align();
+            .grid(rows = rows - 1, columns = columns - 1);
         frame | struts;
     }
     .extrude(height = base_height - top_thickness);
@@ -20,8 +28,8 @@ part LegoBrick(rows: Integer, columns: Integer, a = 8mm, base_height = 9.6mm) {
         .extrude(height = top_thickness)
         .translate(z = base_height - top_thickness);
     
-    knobs = Circle(d = 4.8mm, c = (x = [1..rows] * a, y = [1..columns] * a))
-        .align()
+    knobs = Circle(d = 4.8mm)
+        .grid(rows, columns)
         .extrude(height = 1.7mm)
         .translate(z = base_height);
 

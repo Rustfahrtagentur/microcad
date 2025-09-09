@@ -10,12 +10,6 @@
 
 -- Output --
 -- Errors --
-warning: This expression statement did not produce any model
-  ---> <FROM STR>:3:3
-     |
-   3 | } f();
-     |   ^^^^
-     |
 -- Model --
   Group -> Undetermined (root)
 

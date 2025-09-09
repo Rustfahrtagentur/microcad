@@ -23,14 +23,14 @@
     Group -> 3D
       op std::ops::translate(x: Length = 30mm, y: Length = 30mm, z: Length = 30mm) -> 3D
         Transform __builtin::ops::translate(x: Scalar = 30, y: Scalar = 30, z: Scalar = 30)⏎ -> 3D
-          Operation subtract()⏎ -> 3D
+          Operation subtract()⏎ -> 3D (root)
             Group -> 3D
               part std::geo3d::Cube(size: Length = 50mm) -> 3D
                 Transform __builtin::ops::translate(x: Scalar = -25, y: Scalar = -25, z: Scalar = -25)⏎ -> 3D
                   Primitive3D __builtin::geo3d::Cube(size_x: Scalar = 50, size_y: Scalar = 50, size_z: Scalar = 50)⏎ -> 3D
               op std::ops::translate(x: Length = 12.5mm, y: Length = 12.5mm, z: Length = 12.5mm) -> 3D
                 Transform __builtin::ops::translate(x: Scalar = 12.5, y: Scalar = 12.5, z: Scalar = 12.5)⏎ -> 3D
-                  part std::geo3d::Cube(size: Length = 25mm) -> 3D
+                  part std::geo3d::Cube(size: Length = 25mm) -> 3D (root)
                     Transform __builtin::ops::translate(x: Scalar = -12.5, y: Scalar = -12.5, z: Scalar = -12.5)⏎ -> 3D
                       Primitive3D __builtin::geo3d::Cube(size_x: Scalar = 25, size_y: Scalar = 25, size_z: Scalar = 25)⏎ -> 3D
 

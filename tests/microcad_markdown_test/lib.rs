@@ -247,7 +247,7 @@ fn scan_for_tests(
     let mut test_name = String::new();
     let mut test_code = String::new();
 
-    let start = Regex::new(r#"```[mµ][Cc][Aa][Dd](,(?<name>[\.#_\w]+))?"#).expect("bad regex");
+    let start = Regex::new(r#"```[mµ][Cc][Aa][Dd](,(?<name>[\.\(\)#_\w]+))?"#).expect("bad regex");
     let end = Regex::new(r#"```"#).expect("bad regex");
 
     let mut ignore = false;
@@ -314,13 +314,20 @@ fn create_test<'a>(
         (name, None)
     };
 
-    warning!(
-        "create test: {name}\t{}\t{file_path:?}",
-        if let Some(mode) = mode {
-            format!("{mode} ")
+    let (name, params) = if let Some((name, params)) = name.split_once('(') {
+        if params.ends_with(")") {
+            (name, Some(&params[0..params.len() - 1]))
         } else {
-            "".to_string()
+            (name, None)
         }
+    } else {
+        (name, None)
+    };
+
+    warning!(
+        "create test: {name}\t{params}{mode}\t{file_path:?}",
+        params = params.unwrap_or_default(),
+        mode = mode.unwrap_or_default()
     );
 
     // where to store generated output
@@ -343,7 +350,7 @@ fn create_test<'a>(
     }
 
     f.push_str(&create_test_code(
-        name, mode, code, &banner, &log, &out, reference,
+        name, params, mode, code, &banner, &log, &out, reference,
     ));
 
     Some(Output::new(
@@ -365,6 +372,7 @@ fn create_test<'a>(
 /// - `todo`:
 fn create_test_code(
     name: &str,
+    params: Option<&str>,
     mode: Option<&str>,
     code: &str,
     banner: &std::path::Path,
@@ -376,13 +384,14 @@ fn create_test_code(
     let log_out = &log_out.to_string_lossy().escape_default().to_string();
     let out = &out.to_string_lossy().escape_default().to_string();
     let mode = mode.unwrap_or("ok");
+    let params = params.unwrap_or_default();
 
     format!(
         r###"
         #[test]
         #[allow(non_snake_case)]
         fn r#{name}() {{
-            crate::markdown_test::run_test("{name}", "{mode}", r##"{code}"##, "{banner}", "{log_out}", "{out}", "{reference}");
+            crate::markdown_test::run_test("{name}", "{params}", "{mode}", r##"{code}"##, "{banner}", "{log_out}", "{out}", "{reference}");
         }}"###
     )
 }

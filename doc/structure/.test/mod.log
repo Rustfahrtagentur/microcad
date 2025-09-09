@@ -28,17 +28,11 @@
 
 -- Output --
 -- Errors --
-error: Symbol pow not found.
-  ---> <FROM STR>:15:9
+error: Missing return statement in <NO ID>::math::pow
+  ---> <FROM STR>:4:37
      |
-  15 |         pow(x, 2.0)
-     |         ^^^^^^^^^^^
-     |
-error: Symbol pow not found.
-  ---> <FROM STR>:8:17
-     |
-   8 |             x * pow(x, n-1) // return recursive product
-     |                 ^^^^^^^^^^^
+   4 |     fn pow( x: Scalar, n: Integer ) {
+     |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAIL(TODO)

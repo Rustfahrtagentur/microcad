@@ -60,7 +60,7 @@
 
   #box() *op* operation(a: Length) {
 
-  #box(width: 12pt) \@children.translate(x = a)
+  #box(width: 12pt) \@input.translate(x = a)
 
   #box() }
 

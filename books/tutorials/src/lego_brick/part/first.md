@@ -7,7 +7,7 @@ Afterwards, we combine the three components using the `|` operator.
 
 [![test](.test/first_version.svg)](.test/first_version.log)
 
-```µcad,first_version
+```µcad,first_version(hires)
 use std::ops::*;
 use std::geo2d::*;
 
@@ -55,4 +55,4 @@ LegoBrick();
 
 When we export the code snippet above, an STL file will be exported instead of an SVG file.
 
-![Picture](.test/first_version-out.svg)
+![Picture](.test/first_version-out.stl)

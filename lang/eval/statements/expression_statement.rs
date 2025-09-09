@@ -9,15 +9,13 @@ impl Eval for ExpressionStatement {
         context.grant(self)?;
         let value: Value = self.expression.eval(context)?;
         match value {
-            Value::Models(mut models) => {
+            Value::Model(model) => {
                 let attributes = self.attribute_list.eval(context)?;
-                models.iter_mut().for_each(|model| {
-                    model
-                        .borrow_mut()
-                        .attributes
-                        .append(&mut attributes.clone());
-                });
-                Ok(Value::Models(models))
+                model
+                    .borrow_mut()
+                    .attributes
+                    .append(&mut attributes.clone());
+                Ok(Value::Model(model))
             }
             Value::None => Ok(Value::None),
             _ => {
@@ -33,15 +31,12 @@ impl Eval for ExpressionStatement {
     }
 }
 
-impl Eval<Models> for ExpressionStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
+impl Eval<Option<Model>> for ExpressionStatement {
+    fn eval(&self, context: &mut Context) -> EvalResult<Option<Model>> {
         log::debug!("Evaluating expression statement to models:\n{self}");
-        let value: Value = self.eval(context)?;
-        let models = value.fetch_models();
-        if models.is_empty() && value != Value::None {
-            context.warning(self, EvalError::EmptyModelExpression)?;
-        }
-
-        Ok(value.fetch_models())
+        Ok(match self.eval(context)? {
+            Value::Model(model) => Some(model),
+            _ => None,
+        })
     }
 }

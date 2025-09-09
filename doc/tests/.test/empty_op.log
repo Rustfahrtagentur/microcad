@@ -5,21 +5,15 @@
 -- Code --
 
  1: std::ops::translate(x = 3.0mm); // error: Cannot call operation without workpiece. 
- 2: {}.std::ops::translate(x = 3.0mm);  // error: Calling operation on empty geometry
+ 2: {}.std::ops::translate(x = 3.0mm);  // warning: Empty geometry.
+ 3: : Calling operation on empty geometry
 
--- Output --
--- Errors --
-error: Cannot call operation without workpiece.
-  ---> <FROM STR>:1:1
-     |
-   1 | std::ops::translate(x = 3.0mm); // error: Cannot call operation without workpiece. 
-     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Calling operation on empty geometry
-  ---> <FROM STR>:2:4
-     |
-   2 | {}.std::ops::translate(x = 3.0mm);  // error: Calling operation on empty geometry
-     |    ^^^^^^^^^^^^^^^^^^^
-     |
+-- Parse Error --
+Parser error:  --> 3:1
+  |
+3 | : Calling operation on empty geometry
+  | ^---
+  |
+  = expected EOI, single_line_comment, final_expression_statement, or statement
 -- Test Result --
-FAILED AS EXPECTED
+FAILED AS EXPECTED (PARSE: Cannot check error line)

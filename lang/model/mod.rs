@@ -56,12 +56,6 @@ impl Model {
         self.borrow().element.is_operation()
     }
 
-    /// Check if this model contains geometry.
-    pub fn contains_geometry(&self) -> bool {
-        let self_ = &self.borrow();
-        self_.element.contains_geometry() || self_.children.contains_geometry()
-    }
-
     /// Make a deep copy if this model.
     /// TODO: isn't this a Clone?
     pub fn make_deep_copy(&self) -> Self {
@@ -128,11 +122,18 @@ impl Model {
         Models::from(vec![self.clone(), other]).boolean_op(op)
     }
 
-    /// Find children model placeholder in model descendants.
-    pub fn find_children_placeholder(&self) -> Option<Model> {
-        self.descendants().find(|n| {
-            n.borrow().id.is_none() && matches!(n.0.borrow().element.value, Element::ChildrenMarker)
-        })
+    /// Replace each input placeholder with copies of `input_model`.
+    pub fn replace_input_placeholders(&self, input_model: &Model) -> Self {
+        self.descendants().for_each(|model| {
+            let mut model_ = model.borrow_mut();
+            if model_.id.is_none() && matches!(model_.element.value, Element::InputPlaceholder) {
+                let mut input_model_ = input_model.borrow_mut();
+                input_model_.parent = Some(self.clone());
+                *model_ = input_model_.clone_content();
+                model_.children = input_model_.children.clone();
+            }
+        });
+        self.clone()
     }
 
     /// Deduce output type from children and set it and return it.

@@ -20,60 +20,20 @@ impl Models {
         }
     }
 
-    /// Check if all models contain an operation element.
-    pub fn is_operation(&self) -> bool {
-        self.iter().all(Model::is_operation)
-    }
-
-    /// Check if any model in the collection contains a geometry.
-    pub fn contains_geometry(&self) -> bool {
-        self.iter().any(Model::contains_geometry)
-    }
-
-    /// Returns a property of the included models.
-    pub fn fetch_property(&self, id: &Identifier) -> Option<Value> {
-        if let Some(model) = self.single_model() {
-            model.borrow().get_property(id).cloned()
-        } else {
-            Some(
-                self.0
-                    .iter()
-                    .filter_map(|model| {
-                        let model_ = model.borrow();
-                        model_.get_property(id).cloned()
-                    })
-                    .collect(),
-            )
+    /// Convert the models into a multiplicity node.
+    pub fn to_multiplicity(&self, src_ref: SrcRef) -> Model {
+        match self.single_model() {
+            Some(model) => model,
+            None => ModelBuilder::new(Element::Multiplicity, src_ref)
+                .add_children(self.clone())
+                .expect("No error")
+                .build(),
         }
     }
 
-    /// Nest models in self.
-    pub fn nest(self, op: &Models) -> Self {
-        self.iter().for_each(|new_parent| {
-            op.iter().for_each(|model| {
-                model.detach();
-
-                // Handle children marker.
-                // If we have found a children marker model, use it's parent as
-                // new parent model.
-                let new_parent = match &new_parent.find_children_placeholder() {
-                    Some(children_marker) => {
-                        let parent = &children_marker
-                            .borrow()
-                            .parent
-                            .clone()
-                            .expect("Must have a parent");
-                        children_marker.detach(); // Remove children marker from tree
-                        parent.clone()
-                    }
-                    None => new_parent.clone(),
-                };
-
-                new_parent.append(model.make_deep_copy());
-            });
-        });
-
-        self
+    /// Check if all models contain an operation element.
+    pub fn is_operation(&self) -> bool {
+        self.iter().all(Model::is_operation)
     }
 
     /// A union operation model for this collection.

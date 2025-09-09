@@ -59,7 +59,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/call_function.svg)](../doc/structure/.test/call_function.log) | [call_function](../doc/structure/calls.md) |
 | [![test](../doc/structure/.test/call_workbench.svg)](../doc/structure/.test/call_workbench.log) | [call_workbench](../doc/structure/calls.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/cap.svg)](../books/tutorials/src/lego_brick/.test/cap.log) | [cap](../books/tutorials/src/lego_brick/caps_knobs.md) |
-| [![test](../doc/structure/.test/children.svg)](../doc/structure/.test/children.log) | [children](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/code.svg)](../doc/structure/.test/code.log) | [code](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/code_between_initializers.svg)](../doc/structure/.test/code_between_initializers.log) | [code_between_initializers](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/code_post_init.svg)](../doc/structure/.test/code_post_init.log) | [code_post_init](../doc/structure/workbench.md) |
@@ -120,6 +119,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/inline_identifiers.svg)](../doc/structure/.test/inline_identifiers.log) | [inline_identifiers](../doc/structure/arguments.md) |
 | [![test](../books/tutorials/src/lego_brick/base/frame/.test/inner.svg)](../books/tutorials/src/lego_brick/base/frame/.test/inner.log) | [inner](../books/tutorials/src/lego_brick/base/frame/rect.md) |
 | [![test](../books/tutorials/src/lego_brick/base/frame/.test/inner_outer.svg)](../books/tutorials/src/lego_brick/base/frame/.test/inner_outer.log) | [inner_outer](../books/tutorials/src/lego_brick/base/frame/rect.md) |
+| [![test](../doc/structure/.test/input.svg)](../doc/structure/.test/input.log) | [input](../doc/structure/op.md) |
 | [![test](../doc/libs/std/ops/.test/intersection_alt_operator.svg)](../doc/libs/std/ops/.test/intersection_alt_operator.log) | [intersection_alt_operator](../doc/libs/std/ops/intersect.md) |
 | [![test](../doc/libs/std/ops/.test/intersection_operator.svg)](../doc/libs/std/ops/.test/intersection_operator.log) | [intersection_operator](../doc/libs/std/ops/intersect.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/knobs.svg)](../books/tutorials/src/lego_brick/.test/knobs.log) | [knobs](../books/tutorials/src/lego_brick/caps_knobs.md) |

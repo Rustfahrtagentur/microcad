@@ -69,7 +69,7 @@ use __builtin::*;
 
 ```µcad,builtin_translate
 op translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
-    @children.__builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm);
+    @input.__builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm);
 }
 
 r = __builtin::geo2d::Rect(x = 0, y = 0, width = 3, height = 3);

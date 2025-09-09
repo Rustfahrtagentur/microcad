@@ -10,12 +10,6 @@
 
 -- Output --
 -- Errors --
-warning: This expression statement did not produce any model
-  ---> <FROM STR>:2:3
-     |
-   2 |   1 + 2;
-     |   ^^^^^^
-     |
 -- Model --
   Group -> 2D (root)
     sketch <NO ID>::K() -> 2D

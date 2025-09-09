@@ -5,7 +5,7 @@
 -- Code --
 
  1: {
- 2:   @children
+ 2:   @input
  3: }
 
 -- Output --
@@ -13,7 +13,7 @@
 -- Model --
   Group -> Undetermined (root)
     Group -> Undetermined
-      ChildrenMarker -> Undetermined
+      InputPlaceholder -> Undetermined
 
 -- Test Result --
 OK

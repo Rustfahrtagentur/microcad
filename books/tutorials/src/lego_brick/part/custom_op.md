@@ -11,7 +11,7 @@ which arranges elements in a grid which is centered to origin:
 const SPACING = 8mm;
 
 op grid(rows: Integer, columns: Integer) {
-    @children
+    @input
         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
         .align()
 }
@@ -20,8 +20,8 @@ op grid(rows: Integer, columns: Integer) {
 The `grid` operation takes `rows` and `columns` as parameters.
 
 Operations - as we already know - have not only an output geometry but an input geometry as well.
-To be able to access those input geometry we need to use the keyword `@children`.
-With `@children` we insert the elements that are given by the caller.
+To be able to access those input geometry we need to use the keyword `@input`.
+With `@input` we insert the elements that are given by the caller.
 In our case that will be a knob or a strut sketch.
 
 We now can rewrite `Knobs` and `Frame` sketches by adding `rows` and `columns`
@@ -35,42 +35,40 @@ use std::ops::*;
 
 const SPACING = 8mm;
 
-op grid(rows: Integer, columns: Integer) {
-    @children
-        .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
+op grid(columns: Integer, rows: Integer) {
+    @input
+        .translate(x = [1..columns] * SPACING, y = [1..rows] * SPACING)
         .align()
 }
 
 sketch Base(
-    rows: Integer,
     columns: Integer,
+    rows: Integer,
     width: Length,
     height: Length
 ) {
     thickness = 1.2mm;
     frame = Frame(width, height, thickness);
-    struts = Ring(outer = 6.51mm, inner = 4.8mm)
-        .grid(rows, columns);
+    struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
+        .grid(columns = columns-1, rows = rows-1);
     frame | struts;
 }
 
-sketch Knobs(rows: Integer, columns: Integer) {
+sketch Knobs(columns: Integer, rows: Integer) {
     Circle(d = 4.8mm)
-        .grid(rows, columns);
+        .grid(columns, rows);
 }
 
-rows = 2;
+use Rect as Cap;
+
 columns = 4;
+rows = 2;
 width = columns * SPACING - 0.2mm;
 height = rows * SPACING - 0.2mm;
-cap_thickness = 1.0mm;
 
 Base(rows, columns, width, height);
+Cap(width, height);
 Knobs(rows, columns);
 ```
 
 ![Picture](.test/custom_op-out.svg)
-
-## TODO
-
-Ask people for better alternatives of `@children`.

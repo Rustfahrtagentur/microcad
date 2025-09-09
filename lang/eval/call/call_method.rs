@@ -3,7 +3,7 @@
 
 //! Argument value evaluation entity
 
-use crate::{eval::*, model::Models, syntax::*};
+use crate::{eval::*, model::Model, syntax::*};
 
 /// Trait for calling methods of values
 pub trait CallMethod<T = Value> {
@@ -52,33 +52,13 @@ impl CallMethod for Array {
     }
 }
 
-impl CallMethod<Models> for Models {
+impl CallMethod<Option<Model>> for Model {
     fn call_method(
         &self,
         name: &QualifiedName,
         args: &ArgumentValueList,
         context: &mut Context,
-    ) -> EvalResult<Models> {
-        // Try nest models for an operation: models.op()
-        fn try_nest(
-            name: &QualifiedName,
-            context: &mut Context,
-            models: &Models,
-            op: Models,
-        ) -> EvalResult<Models> {
-            if op.is_operation() {
-                if !models.contains_geometry() {
-                    context.error(name, EvalError::OperationOnEmptyGeometry)?;
-                }
-
-                return Ok(op.nest(models));
-            } else {
-                context.error(name, EvalError::NotAnOperation(name.clone()))?;
-            }
-
-            Ok(models.clone())
-        }
-
+    ) -> EvalResult<Option<Model>> {
         if let Some(symbol) = name.eval(context)? {
             context.scope(
                 StackFrame::Call {
@@ -89,16 +69,20 @@ impl CallMethod<Models> for Models {
                 |context| {
                     Ok(match &symbol.borrow().def {
                         SymbolDefinition::Workbench(workbench_definition) => {
-                            let op = workbench_definition.call(
+                            let model = workbench_definition.call(
                                 SrcRef::merge(name, args),
                                 symbol.clone(),
                                 args,
                                 context,
                             )?;
-                            try_nest(name, context, self, op)?
+
+                            Some(model.replace_input_placeholders(self))
                         }
                         SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
-                            Value::Models(models) => try_nest(name, context, self, models)?,
+                            Value::Model(model) => {
+                                model.append(self.make_deep_copy());
+                                Some(model.clone())
+                            }
                             value => panic!("Builtin call returned {value} but no models."),
                         },
                         def => {
@@ -109,13 +93,13 @@ impl CallMethod<Models> for Models {
                                     Box::new(def.clone()),
                                 ),
                             )?;
-                            Models::default()
+                            None
                         }
                     })
                 },
             )
         } else {
-            Ok(Models::default())
+            Ok(None)
         }
     }
 }
@@ -135,7 +119,10 @@ impl CallMethod for Value {
             Value::Tuple(_) => eval_todo!(context, id, "call_method for Tuple"),
             Value::Matrix(_) => eval_todo!(context, id, "call_method for Matrix"),
             Value::Array(list) => list.call_method(id, args, context),
-            Value::Models(models) => Ok(Value::Models(models.call_method(id, args, context)?)),
+            Value::Model(model) => Ok(model
+                .call_method(id, args, context)?
+                .map(Value::Model)
+                .unwrap_or_default()),
             _ => {
                 context.error(id, EvalError::UnknownMethod(id.clone()))?;
                 Ok(Value::None)

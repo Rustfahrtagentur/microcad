@@ -4,15 +4,9 @@
 
 -- Code --
 
- 1: {}.std::ops::translate(x = 5mm) // error: Calling operation on empty geometry
+ 1: {}.std::ops::translate(x = 5mm) // warning: Calling operation on empty geometry
 
 -- Output --
 -- Errors --
-error: Calling operation on empty geometry
-  ---> <FROM STR>:1:4
-     |
-   1 | {}.std::ops::translate(x = 5mm) // error: Calling operation on empty geometry
-     |    ^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
-FAILED AS EXPECTED
+OK BUT SHOULD FAIL

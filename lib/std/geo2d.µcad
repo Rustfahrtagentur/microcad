@@ -80,18 +80,19 @@ sketch Line(p0: Vec2, p1: Vec2) {
     __builtin::geo2d::Line(x0 = p0.x, y0 = p0.y, x1 = p1.x, y1 = p1.y);
 }
 
-sketch Ring( outer: Length, inner: Length ) {
-     init(outer: Length, thickness: Length) {
-         inner = outer - thickness;
+sketch Ring(outer_r: Length, inner_r: Length ) {
+     init(outer_r: Length, thickness: Length) {
+         inner_r = outer_r - thickness;
      }
 
-     init( outer_d: Length, inner_d: Length ) {
-         outer = outer_d/2;
-         inner = inner_d/2;
+     init(outer_d: Length, inner_d: Length ) {
+         outer_r = outer_d/2;
+         inner_r = inner_d/2;
      }
-     init(outer_d: Length, thickness_d: Length) {
-         inner = outer - thickness;
+     init(outer_d: Length, thickness: Length) {
+         inner_r = outer_d/2 - thickness;
+         outer_r = outer_d/2;
      }
 
-     Circle(radius = outer) - Circle(radius = inner) 
+     Circle(radius = outer_r) - Circle(radius = inner_r) 
 }
