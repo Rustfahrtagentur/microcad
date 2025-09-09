@@ -10,5 +10,11 @@
 
 -- Output --
 -- Errors --
+error: Expression statement not available here
+  ---> <FROM STR>:2:3
+     |
+   2 |   1 + 2; // error
+     |   ^^^^^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

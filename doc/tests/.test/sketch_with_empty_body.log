@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: {}.std::ops::translate(x = 5mm) // error: Calling operation on empty geometry
+ 1: {}.std::ops::translate(x = 5mm) // warning: Calling operation on empty geometry
 
 -- Output --
 -- Errors --
