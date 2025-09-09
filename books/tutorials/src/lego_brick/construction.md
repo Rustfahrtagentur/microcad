@@ -13,6 +13,6 @@ We will design three components by *extrusion* of the following 2D sketches:
 
 ![Picture of all three](knobs_and_struts.png)
 
-After that, we will use the sketches to construct a 3D part of a lego brick.
+Next, we will use the sketches to create a 3D model of a Lego brick.
 
-At last we will put everything together into a proper library.
+Finally, we will compile everything into a proper library.

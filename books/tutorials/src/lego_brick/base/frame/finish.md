@@ -27,10 +27,4 @@ Frame(width, height, thickness);
 
 ![Picture](.test/frame-out.svg)
 
-Because `Frame` has three parameters called exactly like our value names,
-we do not need to write parameter names at all here.
-This is called *auto-matching* and prevents us from having to write this:
-
-```µcad
-Frame(width = width, height = height, thickness = thickness);
-```
+It looks fine, so let's continue with the struts...

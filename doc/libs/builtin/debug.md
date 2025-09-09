@@ -12,13 +12,13 @@ __builtin::print("ok");
 
 ### `assert`
 
-[![test](.test/builtin_debug_assert.svg)](.test/builtin_debug_assert.log)
+[![test](.test/builtin_debug_assert_true.svg)](.test/builtin_debug_assert_true.log)
 
 ```µcad,builtin_debug_assert_true
 __builtin::debug::assert(true);
 ```
 
-[![test](.test/builtin_debug_assert.svg)](.test/builtin_debug_assert.log)
+[![test](.test/builtin_debug_assert_false.svg)](.test/builtin_debug_assert_false.log)
 
 ```µcad,builtin_debug_assert_false#fail
 __builtin::debug::assert(false); // error: Assertion failed: false

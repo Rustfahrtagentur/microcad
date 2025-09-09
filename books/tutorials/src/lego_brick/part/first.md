@@ -2,8 +2,8 @@
 
 Let's make a brick out of our `Base`, the `Knobs` and the `Cap` sketch and integrate everything into a part.
 
-We extrude `Base`, `Knobs` and `Cap` and translate it in Z direction if necessary.
-Afterwards, we combine the three components by the `|` operator.
+We extrude `Base`, `Knobs` and `Cap` and translate them in Z direction if necessary.
+Afterwards, we combine the three components using the `|` operator.
 
 [![test](.test/first_version.svg)](.test/first_version.log)
 
@@ -16,8 +16,8 @@ const SPACING = 8mm;
 sketch Base(width: Length, height: Length) {
     thickness = 1.2mm;
     frame = Frame(width, height, thickness);
-    struts = (Circle(d = 6.51mm) - Circle(d = 4.8mm))
-        .translate(y = [-1..1] * SPACING)
+    struts = Ring(outer_d = 6.51mm, inner_d = 4.8mm)
+        .translate(y = [0..2] * SPACING)
         .align();
     frame | struts;
 }
@@ -25,8 +25,9 @@ sketch Base(width: Length, height: Length) {
 use Rect as Cap;
 
 sketch Knobs() {
-    center = (x = [0..3] * SPACING, y = [0..1] * SPACING);
-    Circle(diameter = 4.8mm, center).align();
+    center = (x = [0..1] * SPACING, y = [0..3] * SPACING);
+    Circle(diameter = 4.8mm, center)
+        .align();
 }
 
 part LegoBrick(base_height = 9.6mm) {
@@ -52,6 +53,6 @@ part LegoBrick(base_height = 9.6mm) {
 LegoBrick();
 ```
 
-When we take the code snippet above and export it, instead of an SVG, an STL file will be exported:
+When we export the code snippet above, an STL file will be exported instead of an SVG file.
 
 ![Picture](.test/first_version-out.svg)

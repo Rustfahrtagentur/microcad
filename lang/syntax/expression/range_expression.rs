@@ -7,21 +7,21 @@ use crate::{src_ref::*, syntax::*};
 
 /// Range start.
 #[derive(Clone, Debug, Default)]
-pub struct RangeStart(pub Box<Expression>);
+pub struct RangeFirst(pub Box<Expression>);
 
-impl SrcReferrer for RangeStart {
+impl SrcReferrer for RangeFirst {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         self.0.src_ref()
     }
 }
 
-impl std::fmt::Display for RangeStart {
+impl std::fmt::Display for RangeFirst {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }
 
-impl TreeDisplay for RangeStart {
+impl TreeDisplay for RangeFirst {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}RangeStart:", "")?;
         depth.indent();
@@ -31,20 +31,20 @@ impl TreeDisplay for RangeStart {
 
 /// Range end.
 #[derive(Clone, Debug, Default)]
-pub struct RangeEnd(pub Box<Expression>);
+pub struct RangeLast(pub Box<Expression>);
 
-impl SrcReferrer for RangeEnd {
+impl SrcReferrer for RangeLast {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         self.0.src_ref()
     }
 }
 
-impl std::fmt::Display for RangeEnd {
+impl std::fmt::Display for RangeLast {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }
-impl TreeDisplay for RangeEnd {
+impl TreeDisplay for RangeLast {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}RangeEnd:", "")?;
         depth.indent();
@@ -55,10 +55,10 @@ impl TreeDisplay for RangeEnd {
 /// Range expression, e.g. `a..b`.
 #[derive(Clone, Debug, Default)]
 pub struct RangeExpression {
-    /// Start of the range.
-    pub start: RangeStart,
-    /// End of the range.
-    pub end: RangeEnd,
+    /// First value in the range.
+    pub first: RangeFirst,
+    /// Last value in the range.
+    pub last: RangeLast,
     /// Source code reference.
     pub src_ref: SrcRef,
 }
@@ -71,14 +71,14 @@ impl SrcReferrer for RangeExpression {
 
 impl std::fmt::Display for RangeExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}..{}", self.start, self.end)
+        write!(f, "{}..{}", self.first, self.last)
     }
 }
 impl TreeDisplay for RangeExpression {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}RangeExpression:", "")?;
         depth.indent();
-        self.start.tree_print(f, depth)?;
-        self.end.tree_print(f, depth)
+        self.first.tree_print(f, depth)?;
+        self.last.tree_print(f, depth)
     }
 }

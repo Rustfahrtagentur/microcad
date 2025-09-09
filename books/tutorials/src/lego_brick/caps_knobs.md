@@ -18,49 +18,52 @@ Cap(width = 31.8mm, height = 15.8mm);
 
 ![Picture](.test/cap-out.svg)
 
-`Cap` will now be known as `Rect`.
+`std::geo2d::Rect` will now also be known as `Cap`.
 
 ## Knobs
 
 The knobs of the brick are simple circles with a diameter of `4.8mm`.
 We can easily construct a grid with circles via multiplicity:
 
-[![test](.test/cap_multiplicity.svg)](.test/cap_multiplicity.log)
+[![test](.test/knobs_multiplicity.svg)](.test/knobs_multiplicity.log)
 
-```µcad,cap_multiplicity
+```µcad,knobs_multiplicity
 std::geo2d::Circle(d = 4.8mm, c = (
         x = ([-1..2] - 0.5) * 8mm, 
         y = ([0..1] - 0.5) * 8mm)
     );
 ```
 
-![Picture](.test/cap_multiplicity-out.svg)
+![Picture](.test/knobs_multiplicity-out.svg)
 
-Calculating `x` and `y` is a bit tricky here, because we now have no element in the center anymore
-so we have to subtract `0.5` from all the array values before multiplying with `8mm` to get a centered result.
+Calculating `x` and `y` is a bit tricky here, because with `x` getting `[-1..2]` (which is `[-1, 0, 1, 2]`)
+and `y` getting `[0..1]` we now have no element in the center anymore.
+So we have to subtract `0.5` from all the array values before multiplying with `8mm` to get a centered result.
 
-To avoid this complication we can use the function `center()` which can be applied to any workbench
-and centers the object to origin.
+To avoid this complication we can use the operation `align()`.
+By default, if we do not pass any arguments to operation, it will center the object to origin.
 
-[![test](.test/cap_align.svg)](.test/cap_align.log)
+[![test](.test/knobs_align.svg)](.test/knobs_align.log)
 
-```µcad,cap_align
+```µcad,knobs_align
 std::geo2d::Circle(d = 4.8mm, c = (
         x = [0..3] * 8mm, 
         y = [0..1] * 8mm)
     ).std::ops::align();
 ```
 
-![Picture](.test/cap_align-out.svg)
+![Picture](.test/knobs_align-out.svg)
 
 The code looks clearer now.
 
 ### Tuples
 
-Notice that we have called the `std::geo2d::Circle` with additional argument `c`.
-`c` is given as a tuple `(x = ..., y = ...)`. A [tuple](../types/tuples.md) is a collection of (mostly named) values.
-The parameter `c` of a circle is supposed to be a tuple of type `(x: Length,y: Length)`.
-If we pass to array of `Length` to the tuple, we can generate a multiplicity, which eventually creates `2*4` circles.
+Notice that we have called the `std::geo2d::Circle` with an additional argument `c`.
+`c` is given as a *tuple* `(x = ..., y = ...)`.
+A [tuple](../types/tuples.md) is a collection of (mostly named) values.
+
+The parameter `c` of a circle is supposed to be a tuple of type `(x: Length, y: Length)`.
+If we pass an array of `Length` to the tuple, we can generate a *multiplicity*, which eventually creates `2*4` circles.
 
 [![test](.test/knobs.svg)](.test/knobs.log)
 
@@ -74,3 +77,6 @@ Knobs();
 ```
 
 ![Picture](.test/knobs-out.svg)
+
+We now have all the sketches we need!
+Let's move on and bring them together...

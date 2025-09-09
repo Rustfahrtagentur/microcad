@@ -5,22 +5,20 @@ In this tutorial you should have learned about the following things:
 - Installing microcad
 - Creating a new µcad file
 - Using basic 2D primitives in `std::geo2d`: `Rect`, `Circle`, `Frame`
-- Define and use named values
+- Define and use named values and models
 - Combining geometries with `std::ops::subtract` and `std::ops::union`
+- Geometrical operators: `|`, `-`
 - Using the `use` statement
-- Naming models
-- Geometrical operators
 - Move geometries with `std::ops::translate`
-- Arrays
+- [Arrays](../../../../doc/types/arrays.md)
 - Argument multiplicity
 - Ranges
-- Using constants
-- Extruding sketches with `std::ops::extrude
-- Creating custom sketches & parts
-- Creating custom operations
-  Separating code into external modules
-  Controlling export with attributes
+- Constants
+- Extruding sketches with `std::ops::extrude`
+- Creating custom sketches, parts and operations
+- Separating code into external modules
+- Controlling export with attributes
 
-Congratulations, you have successfully finished this tutorial.
+Congratulations, you now have successfully finished this tutorial!
 
-If you cannot get enough try to master the [additional exercises](exercises.md).
+If you could not get enough, try to master the additional exercises...

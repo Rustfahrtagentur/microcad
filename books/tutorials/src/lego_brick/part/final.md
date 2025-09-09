@@ -1,12 +1,13 @@
 # The final part
 
 Additionally, to the `grid` operation, we have to compute
-the overall and width and height in the `LegoBrick` part:
+the overall width and height in the `LegoBrick` part:
 
 * `width = rows * 8mm - 0.2mm`
 * `height = columns * 8mm - 0.2mm`
 
-Now we can write the final part of a `LegoBrick`.
+Now we are ready to write the final part of a `LegoBrick`.
+
 We add some default values for `rows` and `columns` in the building plan and use
 them in the last statement where we call `LegoBrick()`.
 
@@ -35,7 +36,8 @@ sketch Base(rows: Integer, columns: Integer, width: Length, height: Length) {
 use Rect as Cap;
 
 sketch Knobs(rows: Integer, columns: Integer) {
-    Circle(d = 4.8mm).grid(rows, columns);
+    Circle(d = 4.8mm)
+        .grid(rows, columns);
 }
 
 part LegoBrick(rows = 4, columns = 2, base_height = 9.6mm) {

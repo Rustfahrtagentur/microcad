@@ -1,7 +1,6 @@
 # Custom operation
 
-The knobs and struts are created using multiplicity and the knobs already use the `center()`
-operation and the struts might use this too.
+The knobs and struts are created using multiplicity by `translate` operation and the `align()` operation.
 
 To make placing the elements more generic we will create an operation called `grid`
 which arranges elements in a grid which is centered to origin:
@@ -50,13 +49,28 @@ sketch Base(
 ) {
     thickness = 1.2mm;
     frame = Frame(width, height, thickness);
-    struts = (Ring(outer = 6.51mm, inner = 4.8mm)).grid(rows, columns);
+    struts = Ring(outer = 6.51mm, inner = 4.8mm)
+        .grid(rows, columns);
     frame | struts;
 }
 
 sketch Knobs(rows: Integer, columns: Integer) {
-    Circle(d = 4.8mm).grid(rows, columns);
+    Circle(d = 4.8mm)
+        .grid(rows, columns);
 }
+
+rows = 2;
+columns = 4;
+width = columns * SPACING - 0.2mm;
+height = rows * SPACING - 0.2mm;
+cap_thickness = 1.0mm;
+
+Base(rows, columns, width, height);
+Knobs(rows, columns);
 ```
 
 ![Picture](.test/custom_op-out.svg)
+
+## TODO
+
+Ask people for better alternatives of `@children`.

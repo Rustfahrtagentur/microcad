@@ -3,3 +3,7 @@ authors = ["Patrick Hoffmann"]
 language = "en"
 src = "src"
 title = "Microcad Tutorials"
+
+[output.html]
+default-theme = "rust"
+preferred-dark-theme = "navy"

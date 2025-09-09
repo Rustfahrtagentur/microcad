@@ -3,7 +3,7 @@
 
 use crate::{parse::*, parser::*, syntax::*};
 
-impl Parse for RangeStart {
+impl Parse for RangeFirst {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(Self(Box::new(
             pair.find(Rule::expression)
@@ -15,7 +15,7 @@ impl Parse for RangeStart {
     }
 }
 
-impl Parse for RangeEnd {
+impl Parse for RangeLast {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(Self(Box::new(
             pair.find(Rule::expression)
@@ -30,8 +30,8 @@ impl Parse for RangeEnd {
 impl Parse for RangeExpression {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(Self {
-            start: pair.find(Rule::range_start).expect("Range start"),
-            end: pair.find(Rule::range_end).expect("Range end"),
+            first: pair.find(Rule::range_start).expect("Range start"),
+            last: pair.find(Rule::range_end).expect("Range end"),
             src_ref: pair.src_ref(),
         })
     }

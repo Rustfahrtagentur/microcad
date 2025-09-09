@@ -7,7 +7,7 @@
  1: use std::geo2d::*;
  2: use std::ops::*;
  3: 
- 4: Ring(outer_d = 6.51mm, inner_d = 4.8mm).translate(x = [-1..2] * 8mm);
+ 4: Ring(outer_d = 6.51mm, inner_d = 4.8mm).translate(x = [-1..1] * 8mm);
 
 -- Output --
 -- Errors --
