@@ -14,10 +14,3 @@ impl Eval<Option<Model>> for Marker {
         }
     }
 }
-
-impl Eval<Models> for Marker {
-    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
-        let model: Option<Model> = self.eval(context)?;
-        Ok(model.into())
-    }
-}

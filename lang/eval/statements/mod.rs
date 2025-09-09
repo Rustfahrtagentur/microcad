@@ -55,7 +55,7 @@ impl Eval<Option<Model>> for Statement {
                 context.grant(w.as_ref())?;
                 None
             }
-            Self::Module(m) => None,
+            Self::Module(_) => None,
             Self::Function(f) => {
                 context.grant(f.as_ref())?;
                 None

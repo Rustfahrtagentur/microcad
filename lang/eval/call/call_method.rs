@@ -3,7 +3,7 @@
 
 //! Argument value evaluation entity
 
-use crate::{eval::*, model::Model, syntax::*, tree_display::FormatTree};
+use crate::{eval::*, model::Model, syntax::*};
 
 /// Trait for calling methods of values
 pub trait CallMethod<T = Value> {
