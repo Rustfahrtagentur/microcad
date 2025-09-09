@@ -33,14 +33,16 @@
 27:         .grid(columns, rows);
 28: }
 29: 
-30: columns = 4;
-31: rows = 2;
-32: width = columns * SPACING - 0.2mm;
-33: height = rows * SPACING - 0.2mm;
-34: cap_thickness = 1.0mm;
-35: 
-36: Base(rows, columns, width, height);
-37: Knobs(rows, columns);
+30: use Rect as Cap;
+31: 
+32: columns = 4;
+33: rows = 2;
+34: width = columns * SPACING - 0.2mm;
+35: height = rows * SPACING - 0.2mm;
+36: 
+37: Base(rows, columns, width, height);
+38: Cap(width, height);
+39: Knobs(rows, columns);
 
 -- Output --
 -- Errors --
@@ -86,6 +88,8 @@
                             Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3.255)⏎ -> 2D
                           sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 2.4mm) -> 2D
                             Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 2.4)⏎ -> 2D
+    sketch std::geo2d::Rect(height: Length = 15.8mm, width: Length = 31.8mm) -> 2D
+      Primitive2D __builtin::geo2d::Rect(height: Scalar = 15.8, width: Scalar = 31.8, x: Scalar = -15.9, y: Scalar = -7.9)⏎ -> 2D
     sketch <NO ID>::Knobs(columns: Integer = 4, rows: Integer = 2) -> 2D
       op <NO ID>::grid(columns: Integer = 4, rows: Integer = 2) -> 2D
         Operation __builtin::ops::align()⏎ -> 2D

@@ -59,18 +59,16 @@ sketch Knobs(columns: Integer, rows: Integer) {
         .grid(columns, rows);
 }
 
+use Rect as Cap;
+
 columns = 4;
 rows = 2;
 width = columns * SPACING - 0.2mm;
 height = rows * SPACING - 0.2mm;
-cap_thickness = 1.0mm;
 
 Base(rows, columns, width, height);
+Cap(width, height);
 Knobs(rows, columns);
 ```
 
 ![Picture](.test/custom_op-out.svg)
-
-## TODO
-
-Ask people for better alternatives of `@input`.
