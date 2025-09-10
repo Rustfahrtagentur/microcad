@@ -1,13 +1,29 @@
 import { ListView, VerticalBox } from "std-widgets.slint";
 
-export struct ViewModelItem {
-    name: string,
+
+
+
+export struct VM_Argument {
+    id: string,
+    value: string,
+}
+
+export struct VM_Creator {
+    symbol_name: string,
+    arguments: [VM_Argument]
+}
+
+export struct VM_Item {
+    depth: int,
+    element: string,
+    src_ref: string,
+    creator: VM_Creator,
 }
 
 
 
 component ListItem inherits Rectangle {
-    in property <string> text: "";
+    in property <VM_Item> item;
     in property <int> index: 0;
 
     height: 40px;
@@ -16,29 +32,46 @@ component ListItem inherits Rectangle {
     Rectangle {
         // Hover effect
         background: touch-area.has-hover ? #cce5ff : transparent;
+        width: root.width;
+        height: root.height;
     }
 
-    Text {
-        text: root.text;
-        vertical-alignment: center;
-        horizontal-alignment: left;
-        padding-left: 10px;
-        font-size: 16px;
+    HorizontalLayout {
+        width: root.width;
+        height: root.height;
+
+        Rectangle {
+            width: item.depth * 32px;
+        }
+
+        Text {
+            text: item.element;
+            vertical-alignment: center;
+            horizontal-alignment: left;
+            padding-left: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
     }
 
-    touch-area := TouchArea { }
+    touch-area := TouchArea {
+        width: root.width;
+        height: root.height;
+    }
 }
 
 export component MainWindow inherits Window {
     default-font-family: "Jetbrains Mono";
 
-    in property <[ViewModelItem]> view-model;
+    in property <[VM_Item]> view-model;
 
-    ListView {
+    list-view := ListView {
         width: parent.width;
         height: parent.height;
+        mouse-drag-pan-enabled: true;
         for item[index] in root.view-model: ListItem {
-            text: item.name;
+            width: list-view.width;
+            item: item;
             index: index;
         }
     }

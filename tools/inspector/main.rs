@@ -7,6 +7,7 @@ extern crate microcad_lang;
 
 use clap::Parser;
 
+use microcad_lang::resolve::FullyQualify;
 use microcad_lang::syntax::*;
 use microcad_lang::{eval::Context, tree_display::FormatTree};
 
@@ -27,13 +28,25 @@ struct Inspector {
     pub search_paths: Vec<std::path::PathBuf>,
 }
 
-impl ViewModelItem {
+impl VM_Item {
     fn _from_model(model: &Model, items: &mut Vec<Self>, depth: usize) {
-        items.push(ViewModelItem {
-            name: format!("{:depth$}{}", "", model.signature()).into(),
+        let model_ = model.borrow();
+
+        let creator = match model_.element.creator() {
+            Some(creator) => VM_Creator {
+                symbol_name: creator.symbol.full_name().to_string().into(),
+                arguments: slint::ModelRc::new(VecModel::from(vec![])),
+            },
+            None => VM_Creator::default(),
+        };
+
+        items.push(VM_Item {
+            depth: depth as i32,
+            element: model_.element.value.to_string().into(),
+            src_ref: model_.element.src_ref.to_string().into(),
+            creator,
         });
-        model
-            .borrow()
+        model_
             .children()
             .for_each(|model| Self::_from_model(model, items, depth + 1))
     }
@@ -70,7 +83,7 @@ impl Inspector {
                     Ok(model) => {
                         // Model
                         println!("{}", FormatTree(&model));
-                        ViewModelItem::from_model(&model)
+                        VM_Item::from_model(&model)
                     }
                     Err(err) => {
                         log::error!("{err}");
