@@ -31,6 +31,15 @@ pub enum Element {
 }
 
 impl Element {
+    /// Creator.
+    pub fn creator(&self) -> Option<&Creator> {
+        match self {
+            Element::Workpiece(workpiece) => Some(&workpiece.creator),
+            Element::BuiltinWorkpiece(builtin_workpiece) => Some(&builtin_workpiece.creator),
+            _ => None,
+        }
+    }
+
     /// Get output type of element.
     pub fn output_type(&self) -> OutputType {
         match self {
