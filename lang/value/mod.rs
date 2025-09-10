@@ -376,15 +376,15 @@ impl std::fmt::Debug for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Value::None => write!(f, crate::invalid!(VALUE)),
-            Value::Integer(n) => write!(f, "Integer = {n}"),
+            Value::Integer(n) => write!(f, "{n}"),
             Value::Quantity(q) => write!(f, "{q}"),
-            Value::Bool(b) => write!(f, "Bool = {b}"),
-            Value::String(s) => write!(f, "String = \"{s}\""),
-            Value::Array(l) => write!(f, "Array = {l}"),
-            Value::Tuple(t) => write!(f, "Tuple = {t}"),
-            Value::Matrix(m) => write!(f, "Matrix = {m}"),
+            Value::Bool(b) => write!(f, "{b}"),
+            Value::String(s) => write!(f, "\"{s}\""),
+            Value::Array(l) => write!(f, "{l}"),
+            Value::Tuple(t) => write!(f, "{t}"),
+            Value::Matrix(m) => write!(f, "{m}"),
             Value::Model(n) => write!(f, "Models:\n {n}"),
-            Value::Return(r) => write!(f, "Return = {r}"),
+            Value::Return(r) => write!(f, "Return: {r}"),
         }
     }
 }
