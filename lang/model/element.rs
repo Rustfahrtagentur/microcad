@@ -90,7 +90,7 @@ impl PropertiesAccess for Element {
     fn get_properties(&self) -> Option<&Properties> {
         match self {
             Self::Workpiece(workpiece) => workpiece.get_properties(),
-            element => None,
+            _ => None,
         }
     }
 

@@ -170,13 +170,12 @@ impl Model {
     /// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
     pub fn signature(&self) -> String {
         format!(
-            "{id}{element} -> {output_type}{is_root}",
+            "{id}{element}{is_root} ->",
             id = match &self.borrow().id {
                 Some(id) => format!("{id}: "),
                 None => String::new(),
             },
             element = *self.borrow().element,
-            output_type = self.deduce_output_type(),
             is_root = if self.parents().next().is_some() {
                 ""
             } else {
@@ -265,21 +264,18 @@ impl TreeDisplay for Model {
         f: &mut std::fmt::Formatter,
         mut tree_state: TreeState,
     ) -> std::fmt::Result {
-        writeln!(
-            f,
-            "{:tree_state$}{signature}",
-            "",
-            signature = crate::shorten!(self.signature(), tree_state.shorten)
-        )?;
-        tree_state.indent();
+        let signature = crate::shorten!(self.signature(), tree_state.shorten);
         let self_ = self.borrow();
+        if let Some(output) = &self_.output {
+            writeln!(f, "{:tree_state$}{signature} {output}", "",)?;
+        } else {
+            writeln!(f, "{:tree_state$}{signature}", "",)?;
+        }
+        tree_state.indent();
         if let Some(props) = self_.get_properties() {
             props.tree_print(f, tree_state)?;
         }
         self_.attributes.tree_print(f, tree_state)?;
-        if let Some(output) = &self_.output {
-            output.tree_print(f, tree_state)?;
-        }
         self_.children.tree_print(f, tree_state)
     }
 }

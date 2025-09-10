@@ -164,16 +164,15 @@ fn mat3_to_mat4(m: &Mat3) -> Mat4 {
 
 impl std::fmt::Display for RenderOutput {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "--> out ")?;
         match &self {
             RenderOutput::Geometry2D {
                 local_matrix,
                 geometry,
                 ..
             } => {
-                write!(f, "2D -> ")?;
+                write!(f, "2D: ")?;
                 if local_matrix.is_none() && geometry.is_none() {
-                    write!(f, "nothing to render")?;
+                    write!(f, "(nothing to render)")?;
                 }
                 if local_matrix.is_some() {
                     write!(f, "transform ")?;
@@ -196,9 +195,9 @@ impl std::fmt::Display for RenderOutput {
                 geometry,
                 ..
             } => {
-                write!(f, "3D -> ")?;
+                write!(f, "3D: ")?;
                 match (geometry, local_matrix) {
-                    (None, None) => write!(f, "nothing to render"),
+                    (None, None) => write!(f, "(nothing to render)"),
                     (None, Some(_)) => {
                         write!(f, "transform")
                     }
@@ -212,11 +211,5 @@ impl std::fmt::Display for RenderOutput {
             write!(f, " {resolution}")?
         }
         Ok(())
-    }
-}
-
-impl TreeDisplay for RenderOutput {
-    fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
-        writeln!(f, "{:depth$}{self}", "")
     }
 }

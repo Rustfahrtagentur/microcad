@@ -40,7 +40,7 @@ impl std::fmt::Display for Properties {
 impl TreeDisplay for Properties {
     fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         self.iter()
-            .try_for_each(|(id, value)| writeln!(f, "{:depth$}prop {id:?} = {value:?}", ""))
+            .try_for_each(|(id, value)| writeln!(f, "{:depth$}- {id:?} = {value:?}", ""))
     }
 }
 
