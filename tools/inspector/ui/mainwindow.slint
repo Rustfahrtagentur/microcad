@@ -10,7 +10,6 @@ export struct VM_Argument {
 
 export struct VM_Creator {
     symbol_name: string,
-    arguments: [VM_Argument]
 }
 
 export struct VM_Item {
@@ -62,6 +61,8 @@ component ListItem inherits Rectangle {
 
 export component MainWindow inherits Window {
     default-font-family: "Jetbrains Mono";
+    width: 1024px;
+    height: 1024px;
 
     in property <[VM_Item]> view-model;
 

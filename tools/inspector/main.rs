@@ -12,20 +12,30 @@ use microcad_lang::syntax::*;
 use microcad_lang::{eval::Context, tree_display::FormatTree};
 
 use std::rc::Rc;
+use std::sync::{Arc, mpsc};
+mod watcher;
 
 use microcad_lang::model::Model;
 
 use slint::VecModel;
+
+use crate::watcher::Watcher;
 slint::include_modules!();
 
 #[derive(Parser)]
-struct Inspector {
+struct Args {
     /// Input µcad file.
     pub input: std::path::PathBuf,
 
     /// Paths to search for files.
     #[arg(short = 'P', long = "search-path", action = clap::ArgAction::Append, default_value = "./lib", global = true)]
     pub search_paths: Vec<std::path::PathBuf>,
+}
+
+struct Inspector {
+    args: Args,
+
+    pub watcher: Watcher,
 }
 
 impl VM_Item {
@@ -35,7 +45,7 @@ impl VM_Item {
         let creator = match model_.element.creator() {
             Some(creator) => VM_Creator {
                 symbol_name: creator.symbol.full_name().to_string().into(),
-                arguments: slint::ModelRc::new(VecModel::from(vec![])),
+                //   arguments: slint::ModelRc::new(VecModel::from(vec![])),
             },
             None => VM_Creator::default(),
         };
@@ -60,8 +70,15 @@ impl VM_Item {
 }
 
 impl Inspector {
+    pub fn new() -> anyhow::Result<Self> {
+        Ok(Self {
+            args: Args::parse(),
+            watcher: Watcher::new()?,
+        })
+    }
+
     fn load(&self) -> anyhow::Result<Rc<SourceFile>> {
-        let source = SourceFile::load(self.input.clone())?;
+        let source = SourceFile::load(self.args.input.clone())?;
         log::info!("Resolved successfully!");
         Ok(source)
     }
@@ -70,37 +87,60 @@ impl Inspector {
     fn make_context(&self) -> anyhow::Result<Context> {
         Ok(microcad_builtin::builtin_context(
             self.load()?,
-            &self.search_paths,
+            &self.args.search_paths,
         )?)
     }
 
-    pub fn run(&self) -> anyhow::Result<()> {
-        // Create a vector of model items
-        let view_model: VecModel<_> = match self.make_context() {
-            Ok(mut context) => {
-                // Re-evaluate context.
-                match context.eval() {
-                    Ok(model) => {
-                        // Model
-                        println!("{}", FormatTree(&model));
-                        VM_Item::from_model(&model)
+    pub fn run(mut self) -> anyhow::Result<()> {
+        // Create the Slint UI component
+        let main_window = MainWindow::new()?;
+
+        let weak = main_window.as_weak();
+
+        std::thread::spawn(move || {
+            loop {
+                let (tx, rx): (mpsc::Sender<Vec<VM_Item>>, _) = mpsc::channel();
+                // Watch all dependencies of the most recent compilation.
+                self.watcher.update(vec![self.args.input.clone()]);
+
+                // Create a vector of model items
+                let items = match self.make_context() {
+                    Ok(mut context) => {
+                        // Re-evaluate context.
+                        match context.eval() {
+                            Ok(model) => {
+                                // Model
+                                // println!("{}", FormatTree(&model));
+                                VM_Item::from_model(&model)
+                            }
+                            Err(err) => {
+                                log::error!("{err}");
+                                vec![]
+                            }
+                        }
                     }
                     Err(err) => {
                         log::error!("{err}");
                         vec![]
                     }
-                }
-            }
-            Err(err) => {
-                log::error!("{err}");
-                vec![]
-            }
-        }
-        .into();
+                };
 
-        // Create the Slint UI component
-        let main_window = MainWindow::new()?;
-        main_window.set_view_model(slint::ModelRc::new(view_model));
+                // Wait until anything relevant happens.
+                tx.send(items);
+
+                weak.upgrade_in_event_loop(move |main_window| {
+                    let items = rx.recv().unwrap();
+                    let view_model = VecModel::from(items);
+                    main_window.set_view_model(slint::ModelRc::new(view_model))
+                })
+                .unwrap();
+
+                log::info!("File changed 1");
+                self.watcher.wait().unwrap();
+                log::info!("File changed 2");
+            }
+        });
+
         main_window.run()?;
 
         Ok(())
@@ -110,7 +150,5 @@ impl Inspector {
 fn main() -> anyhow::Result<()> {
     env_logger::init();
 
-    let inspector = Inspector::parse();
-
-    inspector.run()
+    Inspector::new()?.run()
 }
