@@ -66,12 +66,16 @@ export component MainWindow inherits Window {
 
     in property <[VM_Item]> view-model;
 
+    default-font-family: "Jetbrains Mono";
+    preferred-width: 1024px;
+    preferred-height: 1024px;
+
     list-view := ListView {
         width: parent.width;
         height: parent.height;
         mouse-drag-pan-enabled: true;
         for item[index] in root.view-model: ListItem {
-            width: list-view.width;
+            width: list-view.viewport-width;
             item: item;
             index: index;
         }
