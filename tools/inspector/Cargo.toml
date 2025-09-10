@@ -29,13 +29,13 @@ toml = "0.9"
 notify = "8"
 slint = "1.13"
 
-[build-dependencies]
-slint-build = "1.13"
-
 microcad-lang = { workspace = true }
 microcad-core = { workspace = true }
 microcad-builtin = { workspace = true }
 microcad-export = { workspace = true }
+
+[build-dependencies]
+slint-build = "1.13"
 
 [lints.rust]
 missing_docs = "warn"

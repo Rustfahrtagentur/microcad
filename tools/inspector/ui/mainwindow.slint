@@ -1,22 +1,45 @@
 import { ListView, VerticalBox } from "std-widgets.slint";
 
-export struct ModelItem {
+export struct ViewModelItem {
     name: string,
 }
 
-export component MainWindow inherits Window {
-    width: 400px;
-    height: 300px;
 
-    in property <[ModelItem]> model;
+
+component ListItem inherits Rectangle {
+    in property <string> text: "";
+    in property <int> index: 0;
+
+    height: 40px;
+    border-radius: 4px;
+    background: Math.mod(self.index, 2) == 0 ? #f0f0f0 : #e0e0e0;
+    Rectangle {
+        // Hover effect
+        background: touch-area.has-hover ? #cce5ff : transparent;
+    }
+
+    Text {
+        text: root.text;
+        vertical-alignment: center;
+        horizontal-alignment: left;
+        padding-left: 10px;
+        font-size: 16px;
+    }
+
+    touch-area := TouchArea { }
+}
+
+export component MainWindow inherits Window {
+    default-font-family: "Jetbrains Mono";
+
+    in property <[ViewModelItem]> view-model;
 
     ListView {
         width: parent.width;
         height: parent.height;
-        for model in root.model: Text {
-            text: model.name;
-            font-size: 18px;
-            padding: 5px;
+        for item[index] in root.view-model: ListItem {
+            text: item.name;
+            index: index;
         }
     }
 }
