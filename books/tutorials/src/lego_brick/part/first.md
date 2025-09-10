@@ -1,4 +1,4 @@
-# Create a first version of the LogoBrick
+# Create a first version of the LegoBrick
 
 Let's make a brick out of our `Base`, the `Knobs` and the `Cap` sketch and integrate everything into a part.
 
