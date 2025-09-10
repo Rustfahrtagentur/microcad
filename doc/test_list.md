@@ -117,8 +117,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/initial_source_file_mixed.svg)](../doc/structure/.test/initial_source_file_mixed.log) | [initial_source_file_mixed](../doc/structure/source_files.md) |
 | [![test](../doc/structure/.test/initializers.svg)](../doc/structure/.test/initializers.log) | [initializers](../doc/structure/workbench.md) |
 | [![test](../doc/structure/.test/inline_identifiers.svg)](../doc/structure/.test/inline_identifiers.log) | [inline_identifiers](../doc/structure/arguments.md) |
-| [![test](../books/tutorials/src/lego_brick/base/frame/.test/inner.svg)](../books/tutorials/src/lego_brick/base/frame/.test/inner.log) | [inner](../books/tutorials/src/lego_brick/base/frame/rect.md) |
-| [![test](../books/tutorials/src/lego_brick/base/frame/.test/inner_outer.svg)](../books/tutorials/src/lego_brick/base/frame/.test/inner_outer.log) | [inner_outer](../books/tutorials/src/lego_brick/base/frame/rect.md) |
+| [![test](../books/tutorials/src/lego_brick/base/frame/.test/inner.svg)](../books/tutorials/src/lego_brick/base/frame/.test/inner.log) | [inner](../books/tutorials/src/lego_brick/base/frame/another_rect.md) |
+| [![test](../books/tutorials/src/lego_brick/base/frame/.test/inner_outer.svg)](../books/tutorials/src/lego_brick/base/frame/.test/inner_outer.log) | [inner_outer](../books/tutorials/src/lego_brick/base/frame/another_rect.md) |
 | [![test](../doc/structure/.test/input.svg)](../doc/structure/.test/input.log) | [input](../doc/structure/op.md) |
 | [![test](../doc/libs/std/ops/.test/intersection_alt_operator.svg)](../doc/libs/std/ops/.test/intersection_alt_operator.log) | [intersection_alt_operator](../doc/libs/std/ops/intersect.md) |
 | [![test](../doc/libs/std/ops/.test/intersection_operator.svg)](../doc/libs/std/ops/.test/intersection_operator.log) | [intersection_operator](../doc/libs/std/ops/intersect.md) |
