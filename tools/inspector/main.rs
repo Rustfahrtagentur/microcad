@@ -7,12 +7,12 @@ extern crate microcad_lang;
 
 use clap::Parser;
 
+use microcad_lang::eval::Context;
 use microcad_lang::resolve::FullyQualify;
 use microcad_lang::syntax::*;
-use microcad_lang::{eval::Context, tree_display::FormatTree};
 
 use std::rc::Rc;
-use std::sync::{Arc, mpsc};
+use std::sync::mpsc;
 mod watcher;
 
 use microcad_lang::model::Model;
@@ -97,11 +97,11 @@ impl Inspector {
 
         let weak = main_window.as_weak();
 
-        std::thread::spawn(move || {
+        std::thread::spawn(move || -> anyhow::Result<()> {
             loop {
                 let (tx, rx): (mpsc::Sender<Vec<VM_Item>>, _) = mpsc::channel();
                 // Watch all dependencies of the most recent compilation.
-                self.watcher.update(vec![self.args.input.clone()]);
+                self.watcher.update(vec![self.args.input.clone()])?;
 
                 // Create a vector of model items
                 let items = match self.make_context() {
@@ -126,18 +126,15 @@ impl Inspector {
                 };
 
                 // Wait until anything relevant happens.
-                tx.send(items);
+                tx.send(items)?;
 
                 weak.upgrade_in_event_loop(move |main_window| {
-                    let items = rx.recv().unwrap();
+                    let items = rx.recv().expect("No error");
                     let view_model = VecModel::from(items);
                     main_window.set_view_model(slint::ModelRc::new(view_model))
-                })
-                .unwrap();
+                })?;
 
-                log::info!("File changed 1");
-                self.watcher.wait().unwrap();
-                log::info!("File changed 2");
+                self.watcher.wait()?;
             }
         });
 
