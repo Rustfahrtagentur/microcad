@@ -1,0 +1,44 @@
+# Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+[package]
+name = "microcad-inspector"
+description = "µcad Inspector"
+documentation = "https://docs.rs/microcad-inspector"
+authors.workspace = true
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+default-run = "microcad-inspector"
+
+[[bin]]
+name = "microcad-inspector"
+path = "main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+anyhow = "1.0"
+env_logger = "0.11"
+log = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = "1.0"
+toml = "0.9"
+notify = "8"
+slint = "1.13"
+
+[build-dependencies]
+slint-build = "1.13"
+
+microcad-lang = { workspace = true }
+microcad-core = { workspace = true }
+microcad-builtin = { workspace = true }
+microcad-export = { workspace = true }
+
+[lints.rust]
+missing_docs = "warn"
+
+[lints.clippy]
+unwrap_used = "warn"

@@ -1,0 +1,22 @@
+import { ListView, VerticalBox } from "std-widgets.slint";
+
+export struct ModelItem {
+    name: string,
+}
+
+export component MainWindow inherits Window {
+    width: 400px;
+    height: 300px;
+
+    in property <[ModelItem]> model;
+
+    ListView {
+        width: parent.width;
+        height: parent.height;
+        for model in root.model: Text {
+            text: model.name;
+            font-size: 18px;
+            padding: 5px;
+        }
+    }
+}
