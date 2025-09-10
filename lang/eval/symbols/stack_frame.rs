@@ -130,18 +130,12 @@ impl StackFrame {
                 String::new()
             };
             match &symbol.borrow().def {
-                SymbolDefinition::Constant(id, value) => writeln!(
-                    f,
-                    "{:depth$}- {id:?}: {ty} = {value}{full_name} (constant)",
-                    "",
-                    ty = value.ty()
-                )?,
-                SymbolDefinition::Argument(id, value) => writeln!(
-                    f,
-                    "{:depth$}- {id:?}: {ty} = {value}{full_name} (argument)",
-                    "",
-                    ty = value.ty()
-                )?,
+                SymbolDefinition::Constant(id, value) => {
+                    writeln!(f, "{:depth$}- {id:?} = {value}{full_name} (constant)", "")?
+                }
+                SymbolDefinition::Argument(id, value) => {
+                    writeln!(f, "{:depth$}- {id:?} = {value}{full_name} (argument)", "")?
+                }
                 SymbolDefinition::SourceFile(source) => {
                     writeln!(f, "{:depth$}- {:?} (source)", "", source.filename())?
                 }
