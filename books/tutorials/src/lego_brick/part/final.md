@@ -68,6 +68,6 @@ part LegoBrick(rows = 2, columns = 4, base_height = 9.6mm) {
 LegoBrick();
 ```
 
-![Picture](.test/final-out.png)
+![Picture](final-out.png)
 
 Let's make a library out of it and use it from another file in the next section.

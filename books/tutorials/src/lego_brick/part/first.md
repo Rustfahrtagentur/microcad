@@ -55,4 +55,4 @@ LegoBrick();
 
 When we export the code snippet above, an STL file will be exported instead of an SVG file.
 
-![Picture](.test/first_version-out.stl)
+![Picture](first_version-out.png)
