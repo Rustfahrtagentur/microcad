@@ -8,6 +8,8 @@ use derive_more::{Deref, DerefMut};
 /// Symbol content
 #[derive(Debug, Clone)]
 pub struct SymbolInner {
+    /// Symbol's visibility
+    pub visibility: Visibility,
     /// Symbol definition
     pub def: SymbolDefinition,
     /// Symbol's parent
@@ -17,6 +19,18 @@ pub struct SymbolInner {
     pub children: SymbolMap,
     /// Flag if this symbol was in use
     pub used: bool,
+}
+
+impl Default for SymbolInner {
+    fn default() -> Self {
+        Self {
+            visibility: Default::default(),
+            def: SymbolDefinition::SourceFile(SourceFile::default().into()),
+            parent: Default::default(),
+            children: Default::default(),
+            used: false,
+        }
+    }
 }
 
 /// Symbol
@@ -35,12 +49,7 @@ pub struct Symbols(Vec<Symbol>);
 
 impl Default for Symbol {
     fn default() -> Self {
-        Self(RcMut::new(SymbolInner {
-            def: SymbolDefinition::SourceFile(SourceFile::default().into()),
-            parent: Default::default(),
-            children: Default::default(),
-            used: false,
-        }))
+        Self(RcMut::new(Default::default()))
     }
 }
 
@@ -79,8 +88,7 @@ impl Symbol {
         Symbol(RcMut::new(SymbolInner {
             def,
             parent,
-            children: Default::default(),
-            used: false,
+            ..Default::default()
         }))
     }
     /// Create a symbol of a source file ([`SymbolDefinition::SourceFile`]).
