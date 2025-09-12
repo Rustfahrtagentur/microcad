@@ -48,25 +48,31 @@ fn check_statements(body: &Body) -> ParseResult<()> {
 
                 // RULE: Illegal statements in workbenches
                 Statement::Module(_) | Statement::Workbench(_) | Statement::Return(_) => {
-                    return Err(ParseError::IllegalWorkbenchStatement);
+                    return Err(ParseError::IllegalWorkbenchStatement(stmt.src_ref()));
                 }
 
                 // RULE: Ony use or assignments before initializers
                 Statement::Use(_) => {
                     if n > first_init && n < last_init {
-                        return Err(ParseError::CodeBetweenInitializers);
+                        return Err(ParseError::CodeBetweenInitializers(stmt.src_ref()));
                     }
                 }
 
                 // Some assignments are post init statements
                 Statement::Assignment(assignment) => match assignment.assignment.qualifier {
-                    Qualifier::Value => (),
+                    Qualifier::Value => {
+                        if n > first_init {
+                            return Err(ParseError::CodeBetweenInitializers(stmt.src_ref()));
+                        }
+                    }
                     Qualifier::Prop => {
                         if n < last_init {
                             if n > first_init {
-                                return Err(ParseError::CodeBetweenInitializers);
+                                return Err(ParseError::CodeBetweenInitializers(stmt.src_ref()));
                             }
-                            return Err(ParseError::StatementNotAllowedPriorInitializers);
+                            return Err(ParseError::StatementNotAllowedPriorInitializers(
+                                stmt.src_ref(),
+                            ));
                         }
                     }
                 },
@@ -79,9 +85,11 @@ fn check_statements(body: &Body) -> ParseResult<()> {
                     // RULE: No code between initializers
                     if n < last_init {
                         if n > first_init {
-                            return Err(ParseError::CodeBetweenInitializers);
+                            return Err(ParseError::CodeBetweenInitializers(stmt.src_ref()));
                         }
-                        return Err(ParseError::StatementNotAllowedPriorInitializers);
+                        return Err(ParseError::StatementNotAllowedPriorInitializers(
+                            stmt.src_ref(),
+                        ));
                     }
                 }
             }

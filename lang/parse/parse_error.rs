@@ -126,16 +126,16 @@ pub enum ParseError {
     QualifiedNameIsNoId(QualifiedName),
 
     /// Statement not allowed within workbenches
-    #[error("Statement not allowed within workbenches")]
-    IllegalWorkbenchStatement,
+    #[error("Statement not allowed within workbenches ({0})")]
+    IllegalWorkbenchStatement(SrcRef),
 
     /// Code Between initializers
-    #[error("Code between initializers is not allowed")]
-    CodeBetweenInitializers,
+    #[error("Code between initializers is not allowed ({0})")]
+    CodeBetweenInitializers(SrcRef),
 
     /// Statement not allowed prior initializers
-    #[error("Statement not allowed prior initializers")]
-    StatementNotAllowedPriorInitializers,
+    #[error("Statement not allowed prior initializers ({0})")]
+    StatementNotAllowedPriorInitializers(SrcRef),
 
     /// Element is not available
     #[error("Element is not available")]

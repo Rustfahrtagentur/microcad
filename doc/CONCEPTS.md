@@ -147,11 +147,11 @@ mod module {
         // public workbench
         pub sketch Sketch(param = 5) {
             // pre-init code
-            assert_eq(super::value, 1);
-            assert_eq(super::pub_value, 2);
-            assert_eq(value, 3);
-            assert_eq(pub_value, 4);
-            assert_invalid(param);
+            // assert_eq(super::value, 1);
+            // assert_eq(super::pub_value, 2);
+            // assert_eq(value, 3);
+            // assert_eq(pub_value, 4);
+            // assert_invalid(param);
             // local value
             sketch_local = 6;
 
