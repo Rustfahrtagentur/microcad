@@ -25,7 +25,7 @@ alpha       = _{ alpha_lower | alpha_upper }
 digit       = _{ '0'..'9' }
 
 COMMENT = {
-  single_line_comment
+    single_line_comment
   | multi_line_comment
 }
 
@@ -352,7 +352,7 @@ attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
 // `const`: ok
 // `prop`: ok
-qualifier = { "const" | "prop" }
+qualifier = { "prop" }
 
 // `r: Length = 5.0mm`: ok
 // `r = 5.0mm`: ok # Type specifier with type inference
@@ -361,7 +361,7 @@ qualifier = { "const" | "prop" }
 // `r`: error # neither type specifier or default value
 // `const r = 5.0mm`: Make value of assignment a public constant
 // `prop r = 5.0mm`: Make value of assignment a public property
-assignment = { (qualifier ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
+assignment = { (visibility ~ ws+)? ~ (qualifier ~ ws+)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
 
 assignment_statement = { (attribute_list ~ ws+)? ~ assignment ~ ws* ~ ";" }
 

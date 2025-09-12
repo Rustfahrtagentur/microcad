@@ -54,17 +54,12 @@ impl Eval<()> for AssignmentStatement {
         };
 
         match assignment.qualifier {
-            Qualifier::Var => {
+            Qualifier::Value => {
                 if context.is_init() {
                     context
                         .get_model()?
                         .add_property(assignment.id.clone(), value)
                 } else if let Err(err) = context.set_local_value(assignment.id.clone(), value) {
-                    context.error(self, err)?;
-                }
-            }
-            Qualifier::Const => {
-                if let Err(err) = context.set_local_value(assignment.id.clone(), value) {
                     context.error(self, err)?;
                 }
             }

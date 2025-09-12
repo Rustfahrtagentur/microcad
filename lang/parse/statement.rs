@@ -144,9 +144,8 @@ impl Parse for Qualifier {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::qualifier);
         match pair.as_str() {
-            "const" => Ok(Self::Const),
             "prop" => Ok(Self::Prop),
-            _ => Ok(Self::Var),
+            _ => Ok(Self::Value),
         }
     }
 }

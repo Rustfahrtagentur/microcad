@@ -60,12 +60,8 @@ fn check_statements(body: &Body) -> ParseResult<()> {
 
                 // Some assignments are post init statements
                 Statement::Assignment(assignment) => match assignment.assignment.qualifier {
-                    Qualifier::Const => {
-                        if n > first_init && n < last_init {
-                            return Err(ParseError::CodeBetweenInitializers);
-                        }
-                    }
-                    Qualifier::Var | Qualifier::Prop => {
+                    Qualifier::Value => (),
+                    Qualifier::Prop => {
                         if n < last_init {
                             if n > first_init {
                                 return Err(ParseError::CodeBetweenInitializers);

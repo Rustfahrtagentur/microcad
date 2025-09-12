@@ -490,7 +490,7 @@ impl Grant<AssignmentStatement> for Context {
     fn grant(&mut self, statement: &AssignmentStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             match statement.assignment.qualifier {
-                Qualifier::Var => {
+                Qualifier::Value => {
                     matches!(
                         stack_frame,
                         StackFrame::Source(_, _)
@@ -500,13 +500,6 @@ impl Grant<AssignmentStatement> for Context {
                             | StackFrame::Function(_)
                     )
                 }
-                Qualifier::Const => matches!(
-                    stack_frame,
-                    StackFrame::Source(_, _)
-                        | StackFrame::Module(_, _)
-                        | StackFrame::Workbench(_, _, _)
-                        | StackFrame::Function(_)
-                ),
                 Qualifier::Prop => matches!(stack_frame, StackFrame::Workbench(_, _, _)),
             }
         } else {

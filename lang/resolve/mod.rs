@@ -40,6 +40,8 @@ pub trait FullyQualify {
 trait Resolve<T = Option<Symbol>> {
     /// Resolve into Symbol
     fn resolve(&self, parent: &Symbol) -> ResolveResult<T>;
+
+    //    fn resolve2(&self, parent: &Symbol
 }
 
 #[test]
@@ -172,8 +174,8 @@ impl Resolve for Attribute {
 impl Resolve for AssignmentStatement {
     fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
         match self.assignment.qualifier {
-            Qualifier::Prop | Qualifier::Var => Ok(None),
-            Qualifier::Const => {
+            Qualifier::Prop => Ok(None),
+            Qualifier::Value => {
                 log::trace!("Declare constant {}", self.assignment.id);
                 Ok(Some(Symbol::new_constant(
                     self.assignment.id.clone(),
