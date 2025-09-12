@@ -221,8 +221,6 @@ use_all = { qualified_name ~ ws* ~ "::" ~ ws* ~ "*" }
 // `std::math as my_math`: ok # Import math from std as my_math
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
 
-nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ body }
-
 // `-5.0mm`: ok # Negate
 // `(a+b)*(c-a)`: ok
 // `a + b + c`: ok
