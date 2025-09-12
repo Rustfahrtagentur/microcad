@@ -43,8 +43,9 @@ If we examine the syntax of the above example, we can see the following things:
 * The body `{ ... }` of `Base` constructs the actual geometry.
 * `Base(width = 15.8mm, height = 31.8mm)` is a call of the sketch.
 
-The best part: We don't even need additional value stores for our measures like `thickness`, `inner_d` etc.
-Every measure has a meaningful name. This makes the code clearer and changes easier.
+The best part: We don't even need additional value stores for our measures like `thickness`, `width` etc.
+Every measure has a meaningful name in the parameters.
+This makes the code clearer and changes easier.
 
 ### An analogy to natural language
 

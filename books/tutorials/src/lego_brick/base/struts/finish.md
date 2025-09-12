@@ -15,3 +15,6 @@ Ring(outer_d = 6.51mm, inner_d = 4.8mm).translate(x = [-1..1] * 8mm);
 ```
 
 ![Picture](.test/ring-out.svg)
+
+At this point, we are almost finished with the base.
+We just have to find a way to combine frame and structs.

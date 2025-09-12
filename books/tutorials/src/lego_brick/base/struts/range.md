@@ -18,6 +18,3 @@ A range expression has the syntax `[m..n]` where `m` and `n` have to be of type 
 As you might have mentioned µcad ranges differ from ranges in other languages (like Rust):
 They include the end value - in Rust you would have to write `[-1..=1]` to achieve the same
 if you write `[-1..1]` in µcad.
-
-At this point, we are almost finished with the base.
-We just have to find a way to combine frame and structs.

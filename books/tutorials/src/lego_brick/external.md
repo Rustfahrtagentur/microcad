@@ -1,6 +1,6 @@
 # External module
 
-Let's assume we want to use the Lego_brick from an external module - like a library.
+Let's assume we want to use the `LegoBrick` from an external module - like a library.
 
 Fortunately, this is simple!
 We just have to create a second file `my_brick.µcad`:
@@ -43,4 +43,4 @@ third_3x2.translate(y = 40mm);
 
 ![Picture](.test/library-out.svg)
 
-We use `mod` to load our external module
+As you can see in the first line we use a `mod` statement to load our external module `lego_brick`.

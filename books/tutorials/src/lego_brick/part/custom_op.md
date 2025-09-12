@@ -72,3 +72,11 @@ Knobs(rows, columns);
 ```
 
 ![Picture](.test/custom_op-out.svg)
+
+Additionally, to the `grid` operation, we compute the overall width and
+height in the `LegoBrick` part, which are:
+
+* `width = rows * 8mm - 0.2mm`
+* `height = columns * 8mm - 0.2mm`
+
+Now we are ready to write the final part of a `LegoBrick`.

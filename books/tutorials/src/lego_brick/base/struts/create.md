@@ -1,6 +1,6 @@
 # Creating circles
 
-We now can easily construct a single strut by using `std::geo2d::circle()` and repeat the lesson we had before,
+We now can easily construct a single strut by using `std::geo2d::Circle()` and repeat the lesson we had before,
 but our Lego brick needs *three* of them.
 
 The shape of each strut remains the same - they’re simply offset horizontally by `8mm` to left and right.
