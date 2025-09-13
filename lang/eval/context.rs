@@ -157,6 +157,7 @@ impl Context {
         self.symbol_table.search_paths()
     }
 
+    /// Get property from current model.
     pub fn get_property(&self, id: &Identifier) -> EvalResult<Value> {
         match self.get_model() {
             Ok(model) => {
@@ -170,6 +171,7 @@ impl Context {
         }
     }
 
+    /// Return if the current frame is an init frame.
     pub fn is_init(&mut self) -> bool {
         if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             matches!(stack_frame, StackFrame::Init(_))
@@ -178,6 +180,7 @@ impl Context {
         }
     }
 
+    /// Lookup a property by qualified name.
     pub fn lookup_property(&self, name: &QualifiedName) -> EvalResult<Symbol> {
         match name.single_identifier() {
             Some(id) => match self.get_property(id) {

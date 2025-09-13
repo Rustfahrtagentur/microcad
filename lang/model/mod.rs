@@ -209,10 +209,12 @@ impl Model {
         Ancestors::new(self.clone())
     }
 
+    /// Get a property from this model.
     pub fn get_property(&self, id: &Identifier) -> Option<Value> {
         self.borrow().element.get_property(id).cloned()
     }
 
+    /// Add a new property to the model.
     pub fn add_property(&mut self, id: Identifier, value: Value) {
         self.borrow_mut()
             .element

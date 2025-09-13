@@ -25,7 +25,7 @@ pub fn init() {
     let _ = env_logger::builder().try_init();
 }
 
-#[allow(dead_code)]
+#[allow(dead_code, clippy::too_many_arguments)]
 pub fn run_test(
     name: &str,
     params: &str,

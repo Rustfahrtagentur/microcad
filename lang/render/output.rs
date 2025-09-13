@@ -7,11 +7,7 @@ use std::rc::Rc;
 
 use microcad_core::{FetchBounds2D, Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
 
-use crate::{
-    model::{Model, OutputType},
-    render::{RenderError, RenderResult},
-    tree_display::{TreeDisplay, TreeState},
-};
+use crate::{model::*, render::*};
 
 /// Geometry 2D type alias.
 pub type Geometry2DOutput = Option<Rc<Geometry2D>>;
