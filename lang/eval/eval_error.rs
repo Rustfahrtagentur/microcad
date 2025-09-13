@@ -229,6 +229,14 @@ pub enum EvalError {
     /// Found a symbol and a property with that name
     #[error("Found a symbol and a property with names {0} and {1}")]
     AmbiguousProperty(QualifiedName, Identifier),
+
+    /// Assignment failed because value already has been initialized
+    #[error("Assignment failed because value {0} already has been initialized")]
+    ValueAlreadyInitialized(Identifier),
+
+    /// Assignment failed because left side is not an l-value
+    #[error("Assignment failed because {0} is not an l-value")]
+    NotAnLValue(Identifier),
 }
 
 /// Result type of any evaluation.

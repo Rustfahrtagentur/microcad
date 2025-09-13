@@ -87,6 +87,13 @@ impl PropertiesAccess for Element {
         }
     }
 
+    fn set_property(&mut self, id: Identifier, value: Value) -> Option<Value> {
+        match self {
+            Self::Workpiece(workpiece) => workpiece.set_property(id, value),
+            _ => unreachable!("not a workpiece element"),
+        }
+    }
+
     fn get_properties(&self) -> Option<&Properties> {
         match self {
             Self::Workpiece(workpiece) => workpiece.get_properties(),

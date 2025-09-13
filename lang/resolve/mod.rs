@@ -176,7 +176,7 @@ impl Resolve for AssignmentStatement {
         match self.assignment.qualifier {
             Qualifier::Prop => Ok(None),
             Qualifier::Value => {
-                log::trace!("Declare constant {}", self.assignment.id);
+                log::trace!("Declare value {}", self.assignment.id);
                 Ok(Some(Symbol::new_constant(
                     self.assignment.id.clone(),
                     Value::None,

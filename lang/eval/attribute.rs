@@ -4,15 +4,15 @@
 use std::str::FromStr;
 
 use crate::{
-    Id,
     builtin::ExporterAccess,
     eval::{self, *},
     model::{Attributes, CustomCommand, ExportCommand, MeasureCommand, ResolutionAttribute},
     parameter,
     syntax::{self, *},
+    Id,
 };
 
-use microcad_core::{Color, RenderResolution, Size2, theme::Theme};
+use microcad_core::{theme::Theme, Color, RenderResolution, Size2};
 use thiserror::Error;
 
 /// Error type for attributes.
@@ -24,7 +24,7 @@ pub enum AttributeError {
 
     /// Attribute cannot be assigned to an expression.
     #[error("Cannot assign attribute to expression `{0}`")]
-    CannotAssignToExpression(Box<Expression>),
+    CannotAssignAttribute(Box<Expression>),
 
     /// Warning when an attribute has already been set.
     #[error("The attribute is already set: {0} = {1}")]

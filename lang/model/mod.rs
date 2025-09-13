@@ -214,8 +214,13 @@ impl Model {
         self.borrow().element.get_property(id).cloned()
     }
 
+    /// Set a property in this model.
+    pub fn set_property(&mut self, id: Identifier, value: Value) -> Option<Value> {
+        self.borrow_mut().element.set_property(id, value)
+    }
+
     /// Add a new property to the model.
-    pub fn add_property(&mut self, id: Identifier, value: Value) {
+    pub fn add_property(&self, id: Identifier, value: Value) {
         self.borrow_mut()
             .element
             .add_properties([(id, value)].into_iter().collect())

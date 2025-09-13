@@ -48,6 +48,8 @@ impl TreeDisplay for Properties {
 pub trait PropertiesAccess {
     /// Get a value of property, or [`Value::None`] if the property does not exist.
     fn get_property(&self, id: &Identifier) -> Option<&Value>;
+    /// Set value of an existing property or add a new property
+    fn set_property(&mut self, id: Identifier, value: Value) -> Option<Value>;
     /// Get all properties
     fn get_properties(&self) -> Option<&Properties>;
     /// Set or create properties with the given ids and values.

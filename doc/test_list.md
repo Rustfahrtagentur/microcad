@@ -257,7 +257,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/use_statement_pub.svg)](../doc/structure/.test/use_statement_pub.log) | [use_statement_pub](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_statement_pub_in_module.svg)](../doc/structure/.test/use_statement_pub_in_module.log) | [use_statement_pub_in_module](../doc/structure/use.md) |
 | [![test](../doc/tests/.test/use_test.svg)](../doc/tests/.test/use_test.log) | [use_test](../doc/tests/use.md) |
-| [![test](../doc/.test/value_declarations.svg)](../doc/.test/value_declarations.log) | [value_declarations](../doc/CONCEPTS.md) |
+| [![test](../doc/tests/.test/value_declarations.svg)](../doc/tests/.test/value_declarations.log) | [value_declarations](../doc/tests/value_declarations.md) |
 | [![test](../doc/debug/.test/verify_assert.svg)](../doc/debug/.test/verify_assert.log) | [verify_assert](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_assert_fail.svg)](../doc/debug/.test/verify_assert_fail.log) | [verify_assert_fail](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_error.svg)](../doc/debug/.test/verify_error.log) | [verify_error](../doc/debug/README.md) |

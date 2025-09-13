@@ -158,7 +158,7 @@ impl Expression {
                 if !attribute_list.is_empty() {
                     context.error(
                         attribute_list,
-                        AttributeError::CannotAssignToExpression(self.clone().into()),
+                        AttributeError::CannotAssignAttribute(self.clone().into()),
                     )?;
                 }
                 Ok(value)

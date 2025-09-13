@@ -22,7 +22,7 @@ impl Eval for ExpressionStatement {
                 if !self.attribute_list.is_empty() {
                     context.error(
                         &self.attribute_list,
-                        AttributeError::CannotAssignToExpression(self.expression.clone().into()),
+                        AttributeError::CannotAssignAttribute(self.expression.clone().into()),
                     )?;
                 }
                 Ok(value)
