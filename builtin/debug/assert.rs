@@ -117,7 +117,7 @@ pub fn assert_invalid() -> Symbol {
         if let Ok((_, arg)) = args.get_single() {
             if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
                 if let Ok(symbol) = context.lookup(&name) {
-                    context.error(name, EvalError::SymbolFound(symbol.full_name()))?;
+                    context.error(&name, EvalError::SymbolFound(symbol.full_name()))?;
                 }
             }
         }

@@ -78,7 +78,7 @@ impl PushDiag for DiagHandler {
         if let Some(error_limit) = self.error_limit {
             if self.error_count >= error_limit && !self.error_limit_reached {
                 self.error(
-                    SrcRef(None),
+                    &SrcRef(None),
                     Box::new(EvalError::ErrorLimitReached(error_limit)),
                 )?;
                 self.error_limit_reached = true;

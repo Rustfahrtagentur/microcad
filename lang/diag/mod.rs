@@ -28,19 +28,19 @@ pub trait PushDiag {
     fn push_diag(&mut self, diag: Diagnostic) -> EvalResult<()>;
 
     /// Push new trace message.
-    fn trace(&mut self, src: impl SrcReferrer, message: String) {
+    fn trace(&mut self, src: &impl SrcReferrer, message: String) {
         self.push_diag(Diagnostic::Trace(Refer::new(message, src.src_ref())))
             .expect("could not push diagnostic trace message");
     }
     /// Push new informative message.
-    fn info(&mut self, src: impl SrcReferrer, message: String) {
+    fn info(&mut self, src: &impl SrcReferrer, message: String) {
         self.push_diag(Diagnostic::Info(Refer::new(message, src.src_ref())))
             .expect("could not push diagnostic info message");
     }
     /// Push new warning.
     fn warning(
         &mut self,
-        src: impl SrcReferrer,
+        src: &impl SrcReferrer,
         error: impl std::error::Error + 'static,
     ) -> EvalResult<()> {
         self.push_diag(Diagnostic::Warning(Refer::new(error.into(), src.src_ref())))
@@ -48,7 +48,7 @@ pub trait PushDiag {
     /// Push new error.
     fn error(
         &mut self,
-        src: impl SrcReferrer,
+        src: &impl SrcReferrer,
         error: impl std::error::Error + 'static,
     ) -> EvalResult<()> {
         let err = Diagnostic::Error(Refer::new(error.into(), src.src_ref()));
