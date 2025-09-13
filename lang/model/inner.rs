@@ -108,6 +108,10 @@ impl PropertiesAccess for ModelInner {
         self.element.get_property(id)
     }
 
+    fn set_property(&mut self, id: Identifier, value: Value) -> Option<Value> {
+        self.element.set_property(id, value)
+    }
+
     fn get_properties(&self) -> Option<&Properties> {
         self.element.get_properties()
     }

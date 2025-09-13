@@ -59,19 +59,22 @@ fn check_statements(body: &Body) -> ParseResult<()> {
                 }
 
                 // Some assignments are post init statements
-                Statement::Assignment(assignment) => match assignment.assignment.qualifier {
+                Statement::Assignment(a_stmt) => match a_stmt.assignment.qualifier {
+                    Qualifier::Const => {
+                        return Err(ParseError::IllegalWorkbenchStatement(stmt.src_ref()))
+                    }
                     Qualifier::Value => {
                         if n > first_init {
-                            return Err(ParseError::CodeBetweenInitializers(stmt.src_ref()));
+                            return Err(ParseError::CodeBetweenInitializers(a_stmt.src_ref()));
                         }
                     }
                     Qualifier::Prop => {
                         if n < last_init {
                             if n > first_init {
-                                return Err(ParseError::CodeBetweenInitializers(stmt.src_ref()));
+                                return Err(ParseError::CodeBetweenInitializers(a_stmt.src_ref()));
                             }
                             return Err(ParseError::StatementNotAllowedPriorInitializers(
-                                stmt.src_ref(),
+                                a_stmt.src_ref(),
                             ));
                         }
                     }

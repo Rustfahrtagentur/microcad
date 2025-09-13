@@ -59,6 +59,9 @@ impl PropertiesAccess for Workpiece {
         self.properties.get(id)
     }
 
+    fn set_property(&mut self, id: Identifier, value: Value) -> Option<Value> {
+        self.properties.insert(id, value)
+    }
     fn get_properties(&self) -> Option<&Properties> {
         Some(&self.properties)
     }

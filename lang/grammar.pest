@@ -350,7 +350,7 @@ attribute_list = { attribute ~ (ws+ ~ attribute)* }
 
 // `const`: ok
 // `prop`: ok
-qualifier = { "prop" }
+qualifier = { "const" | "prop" }
 
 // `r: Length = 5.0mm`: ok
 // `r = 5.0mm`: ok # Type specifier with type inference

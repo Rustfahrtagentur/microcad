@@ -12,6 +12,8 @@ pub enum Qualifier {
     /// local variable
     #[default]
     Value,
+    /// private symbol
+    Const,
     /// workbench property
     Prop,
 }

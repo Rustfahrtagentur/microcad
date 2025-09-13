@@ -175,8 +175,9 @@ impl Resolve for AssignmentStatement {
     fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
         match self.assignment.qualifier {
             Qualifier::Prop => Ok(None),
+            Qualifier::Const => todo!("create symbol"),
             Qualifier::Value => {
-                log::trace!("Declare constant {}", self.assignment.id);
+                log::trace!("Declare value {}", self.assignment.id);
                 Ok(Some(Symbol::new_constant(
                     self.assignment.id.clone(),
                     Value::None,

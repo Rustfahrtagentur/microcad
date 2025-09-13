@@ -8,6 +8,8 @@ use crate::{src_ref::*, syntax::*, ty::*};
 /// Assignment specifying an identifier, type and value
 #[derive(Clone, Debug)]
 pub struct Assignment {
+    /// Value's visibility
+    pub visibility: Visibility,
     /// Assignee qualifier
     pub qualifier: Qualifier,
     /// Assignee
@@ -29,7 +31,22 @@ impl SrcReferrer for Assignment {
 impl std::fmt::Display for Assignment {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.specified_type {
-            Some(t) => write!(f, "{}: {} = {}", self.id, t.ty(), self.expression),
+            Some(t) => write!(
+                f,
+                "{vis}{qual}{id}: {ty} = {expr}",
+                vis = match self.visibility {
+                    Visibility::Private => "",
+                    Visibility::Public => "pub ",
+                },
+                qual = match self.qualifier {
+                    Qualifier::Value => "",
+                    Qualifier::Const => "const ",
+                    Qualifier::Prop => "prop ",
+                },
+                id = self.id,
+                ty = t.ty(),
+                expr = self.expression
+            ),
             None => write!(f, "{} = {}", self.id, self.expression),
         }
     }

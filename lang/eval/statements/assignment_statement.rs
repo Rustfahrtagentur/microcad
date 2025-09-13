@@ -28,12 +28,14 @@ impl Eval<()> for AssignmentStatement {
 
         let assignment = &self.assignment;
 
+        // evaluate assignment expression
         let value: Value = assignment.expression.eval(context)?;
         if let Err(err) = assignment.type_check(value.ty()) {
             context.error(self, err)?;
             return Ok(());
         }
 
+        // apply any attributes to model value
         let value = match value {
             Value::Model(model) => {
                 let attributes = self.attribute_list.eval(context)?;
@@ -41,10 +43,11 @@ impl Eval<()> for AssignmentStatement {
                 Value::Model(model)
             }
             value => {
+                // all other values can't have attributes
                 if !self.attribute_list.is_empty() {
                     context.error(
                         &self.attribute_list,
-                        AttributeError::CannotAssignToExpression(
+                        AttributeError::CannotAssignAttribute(
                             self.assignment.expression.clone().into(),
                         ),
                     )?;
@@ -53,17 +56,44 @@ impl Eval<()> for AssignmentStatement {
             }
         };
 
+        // lookup if we find any existing symbol
+        if let Ok(symbol) = context.lookup(&QualifiedName::from_id(assignment.id.clone())) {
+            match &symbol.borrow().def {
+                SymbolDefinition::Constant(identifier, value) => {
+                    if !value.is_invalid() {
+                        context.error(
+                            identifier,
+                            EvalError::ValueAlreadyInitialized(identifier.clone()),
+                        )?;
+                    }
+                }
+                _ => context.error(
+                    &assignment.id,
+                    EvalError::NotAnLValue(assignment.id.clone()),
+                )?,
+            }
+        }
+
+        // now check what to do with the value
         match assignment.qualifier {
+            Qualifier::Const => todo!("store symbol in module or source file"),
             Qualifier::Value => {
-                if context.is_init() {
-                    context
-                        .get_model()?
-                        .add_property(assignment.id.clone(), value)
-                } else if let Err(err) = context.set_local_value(assignment.id.clone(), value) {
+                if context.get_property(&assignment.id).is_ok() {
+                    todo!("property with that name exists")
+                }
+
+                if let Err(err) = context.set_local_value(assignment.id.clone(), value) {
                     context.error(self, err)?;
                 }
             }
-            Qualifier::Prop => (),
+            Qualifier::Prop => {
+                if context.get_local_value(&assignment.id).is_ok() {
+                    todo!("local value with that name exists")
+                }
+                if let Err(err) = context.init_property(assignment.id.clone(), value) {
+                    context.error(self, err)?;
+                }
+            }
         };
 
         Ok(())

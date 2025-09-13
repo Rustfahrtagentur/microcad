@@ -162,10 +162,27 @@ impl Context {
         match self.get_model() {
             Ok(model) => {
                 if let Some(value) = model.get_property(id) {
-                    Ok(value)
+                    Ok(value.clone())
                 } else {
                     Err(EvalError::PropertyNotFound(id.clone()))
                 }
+            }
+            Err(err) => Err(err),
+        }
+    }
+
+    /// Initialize a property.
+    ///
+    /// Returns error if there is no model or the property has been initialized before.
+    pub fn init_property(&self, id: Identifier, value: Value) -> EvalResult<()> {
+        match self.get_model() {
+            Ok(model) => {
+                if let Some(previous_value) = model.borrow_mut().set_property(id.clone(), value) {
+                    if !previous_value.is_invalid() {
+                        return Err(EvalError::ValueAlreadyInitialized(id.clone()));
+                    }
+                }
+                Ok(())
             }
             Err(err) => Err(err),
         }
@@ -181,7 +198,7 @@ impl Context {
     }
 
     /// Lookup a property by qualified name.
-    pub fn lookup_property(&self, name: &QualifiedName) -> EvalResult<Symbol> {
+    fn lookup_property(&self, name: &QualifiedName) -> EvalResult<Symbol> {
         match name.single_identifier() {
             Some(id) => match self.get_property(id) {
                 Ok(value) => {
@@ -493,17 +510,21 @@ impl Grant<AssignmentStatement> for Context {
     fn grant(&mut self, statement: &AssignmentStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             match statement.assignment.qualifier {
+                Qualifier::Const => {
+                    matches!(stack_frame, StackFrame::Source(..) | StackFrame::Module(..))
+                }
                 Qualifier::Value => {
                     matches!(
                         stack_frame,
-                        StackFrame::Source(_, _)
+                        StackFrame::Source(..)
+                            | StackFrame::Module(..)
                             | StackFrame::Body(_)
-                            | StackFrame::Workbench(_, _, _)
+                            | StackFrame::Workbench(..)
                             | StackFrame::Init(_)
                             | StackFrame::Function(_)
                     )
                 }
-                Qualifier::Prop => matches!(stack_frame, StackFrame::Workbench(_, _, _)),
+                Qualifier::Prop => matches!(stack_frame, StackFrame::Workbench(..)),
             }
         } else {
             false
