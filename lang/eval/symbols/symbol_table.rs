@@ -93,7 +93,7 @@ impl SymbolTable {
         }
     }
 
-    fn lookup_current(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+    fn lookup_module(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         let module = &self.stack.current_module_name();
         log::trace!("Looking for symbol '{name:?}' in current module '{module:?}'");
         let name = &name.with_prefix(module);
@@ -194,7 +194,7 @@ impl Lookup for SymbolTable {
         // collect all symbols that can be found and remember origin
         let result = [
             ("local", self.lookup_local(name)),
-            ("current", self.lookup_current(name)),
+            ("module", self.lookup_module(name)),
             ("workbench", self.lookup_workbench(name)),
             ("global", self.lookup_global(name).map_err(|e| e.into())),
             ("relative", self.lookup_relatively(name)),

@@ -29,14 +29,14 @@ impl Eval<()> for AssignmentStatement {
         let assignment = &self.assignment;
 
         // evaluate assignment expression
-        let value: Value = assignment.expression.eval(context)?;
-        if let Err(err) = assignment.type_check(value.ty()) {
+        let new_value: Value = assignment.expression.eval(context)?;
+        if let Err(err) = assignment.type_check(new_value.ty()) {
             context.error(self, err)?;
             return Ok(());
         }
 
         // apply any attributes to model value
-        let value = match value {
+        let new_value = match new_value {
             Value::Model(model) => {
                 let attributes = self.attribute_list.eval(context)?;
                 model.borrow_mut().attributes = attributes.clone();
@@ -58,9 +58,11 @@ impl Eval<()> for AssignmentStatement {
 
         // lookup if we find any existing symbol
         if let Ok(symbol) = context.lookup(&QualifiedName::from_id(assignment.id.clone())) {
-            match &symbol.borrow().def {
+            match &mut symbol.borrow_mut().def {
                 SymbolDefinition::Constant(identifier, value) => {
-                    if !value.is_invalid() {
+                    if value.is_invalid() {
+                        *value = new_value.clone();
+                    } else {
                         context.error(
                             identifier,
                             EvalError::ValueAlreadyInitialized(identifier.clone()),
@@ -82,7 +84,7 @@ impl Eval<()> for AssignmentStatement {
                     todo!("property with that name exists")
                 }
 
-                if let Err(err) = context.set_local_value(assignment.id.clone(), value) {
+                if let Err(err) = context.set_local_value(assignment.id.clone(), new_value) {
                     context.error(self, err)?;
                 }
             }
@@ -90,7 +92,7 @@ impl Eval<()> for AssignmentStatement {
                 if context.get_local_value(&assignment.id).is_ok() {
                     todo!("local value with that name exists")
                 }
-                if let Err(err) = context.init_property(assignment.id.clone(), value) {
+                if let Err(err) = context.init_property(assignment.id.clone(), new_value) {
                     context.error(self, err)?;
                 }
             }
