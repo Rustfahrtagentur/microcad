@@ -4,6 +4,8 @@
 use std::debug::*;
 
 mod module {
+    
+    use std::debug::*;
 
     // private module variable
     value = 1;
@@ -20,16 +22,10 @@ mod module {
         pub pub_value = 4;
 
         // private workbench
-        sketch PrivateSketch() {}
+        sketch PrivateWorkbench() {}
 
         // public workbench
-        pub sketch Sketch(param = 5) {
-            // assert_eq(super::value, 1);
-            // assert_eq(super::pub_value, 2);
-            // assert_eq(value, 3);
-            // assert_eq(pub_value, 4);
-            // assert_invalid(param);
-            // local value
+        pub sketch Workbench(param = 5) {
             sketch_local = 6;
 
             init(alt_param = 7) {
@@ -68,7 +64,7 @@ mod module {
             assert_eq([value, 3]);
             assert_eq([pub_value, 4]);
             assert_invalid(param);
-            assert_invalid(Sketch);
+            // assert_invalid(Workbench);
             assert_eq([fn_param, 10]);
 
             return 0;
@@ -76,12 +72,12 @@ mod module {
     }
 
     fn function(fn_param = 11) {
-        assert_eq([sub_module::value, 1]);
-        assert_eq([sub_module::pub_value, 2]);
         assert_eq([value, 1]);
         assert_eq([pub_value, 2]);
-        assert_invalid(Sketch);
-        assert_invalid(PrivateSketch);
+        assert_eq([sub_module::value, 3]);
+        assert_eq([sub_module::pub_value, 4]);
+        assert_invalid(Workbench);
+        assert_invalid(PrivateWorkbench);
         assert_eq([fn_param, 11]);
         
         return 0;
@@ -91,9 +87,9 @@ mod module {
 // source file code 
 assert_eq([module::value, 1]);
 assert_eq([module::pub_value, 2]);
-assert_eq([module::sub_module::value, 2]);
-assert_eq([module::sub_module::pub_value, 3]);
-assert_eq([module::sub_module::Sketch().property, 9]);
-assert_invalid(module::sub_module::Sketch().sketch_local);
-assert_invalid(module::sub_module::PrivateSketch);
+assert_eq([module::sub_module::value, 3]);
+assert_eq([module::sub_module::pub_value, 4]);
+assert_eq([module::sub_module::Workbench().property, 9]);
+assert_invalid(module::sub_module::Workbench().sketch_local);
+assert_invalid(module::sub_module::PrivateWorkbench);
 ```
