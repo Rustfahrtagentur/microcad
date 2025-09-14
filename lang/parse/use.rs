@@ -7,20 +7,21 @@ impl Parse for UseDeclaration {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Parser::ensure_rule(&pair, Rule::use_declaration);
 
+        let visibility = crate::find_rule!(pair, visibility)?;
         let mut inner = pair.inner();
         let first = inner.next().expect("Expected use declaration element");
 
         match first.as_rule() {
-            Rule::qualified_name => Ok(Self::Use(QualifiedName::parse(first)?)),
+            Rule::qualified_name => Ok(Self::Use(visibility, QualifiedName::parse(first)?)),
             Rule::use_all => {
                 let inner = first.inner().next().expect("Expected qualified name");
-                Ok(Self::UseAll(QualifiedName::parse(inner)?))
+                Ok(Self::UseAll(visibility, QualifiedName::parse(inner)?))
             }
             Rule::use_alias => {
                 let mut inner = first.inner();
                 let name = QualifiedName::parse(inner.next().expect("Expected qualified name"))?;
                 let alias = Identifier::parse(inner.next().expect("Expected identifier"))?;
-                Ok(Self::UseAlias(name, alias))
+                Ok(Self::UseAlias(visibility, name, alias))
             }
             _ => unreachable!("Invalid use declaration"),
         }
@@ -61,7 +62,7 @@ impl Parse for Visibility {
         let s = pair.as_str();
         match s {
             "pub" => Ok(Self::Public),
-            "private" => Ok(Self::Private),
+            "" => Ok(Self::Private),
             _ => unreachable!("Invalid visibility"),
         }
     }

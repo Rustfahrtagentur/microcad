@@ -1,2 +1,2 @@
-part Bar() {
+pub part Bar() {
 }

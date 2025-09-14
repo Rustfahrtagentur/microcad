@@ -87,7 +87,10 @@ impl Sources {
             let (id, name) = basename.split_first();
             let module = match map.get(&id) {
                 Some(symbol) => symbol.clone(),
-                _ => Symbol::new_module(id.clone()),
+                _ => Symbol::new(
+                    SymbolDefinition::Module(ModuleDefinition::new(Visibility::Public, id.clone())),
+                    None,
+                ),
             };
             Self::recursive_create_modules(&module, &name);
             map.insert(id.clone(), module);
@@ -105,7 +108,10 @@ impl Sources {
             return Some(child.clone());
         }
 
-        let child = Symbol::new_module(node_id.clone());
+        let child = Symbol::new(
+            SymbolDefinition::Module(ModuleDefinition::new(Visibility::Public, node_id.clone())),
+            None,
+        );
         Symbol::add_child(parent, child.clone());
 
         Self::recursive_create_modules(&child, &name.remove_first());
@@ -115,7 +121,10 @@ impl Sources {
     /// Create initial symbol map from externals.
     pub fn resolve(&self) -> ResolveResult<SymbolMap> {
         let mut symbols = Self::create_modules(&self.externals);
-        symbols.insert(self.root().id(), Symbol::new_source(self.root()));
+        symbols.insert(
+            self.root().id(),
+            Symbol::new(SymbolDefinition::SourceFile(self.root()), None),
+        );
 
         self.source_files
             .iter()

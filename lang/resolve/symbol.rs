@@ -8,8 +8,6 @@ use derive_more::{Deref, DerefMut};
 /// Symbol content
 #[derive(Debug, Clone)]
 pub struct SymbolInner {
-    /// Symbol's visibility
-    pub visibility: Visibility,
     /// Symbol definition
     pub def: SymbolDefinition,
     /// Symbol's parent
@@ -24,7 +22,6 @@ pub struct SymbolInner {
 impl Default for SymbolInner {
     fn default() -> Self {
         Self {
-            visibility: Default::default(),
             def: SymbolDefinition::SourceFile(SourceFile::default().into()),
             parent: Default::default(),
             children: Default::default(),
@@ -82,6 +79,7 @@ impl FromIterator<Symbol> for Symbols {
 impl Symbol {
     /// Create new symbol without children.
     /// # Arguments
+    /// - `visibility`: Visibility of the symbol
     /// - `def`: Symbol definition
     /// - `parent`: Symbol's parent symbol or none for root
     pub fn new(def: SymbolDefinition, parent: Option<Symbol>) -> Self {
@@ -90,12 +88,6 @@ impl Symbol {
             parent,
             ..Default::default()
         }))
-    }
-    /// Create a symbol of a source file ([`SymbolDefinition::SourceFile`]).
-    /// # Arguments
-    /// - `source_file`: Resolved source file.
-    pub fn new_source(source_file: Rc<SourceFile>) -> Symbol {
-        Symbol::new(SymbolDefinition::SourceFile(source_file), None)
     }
 
     /// Create a symbol node for a built-in.
@@ -112,21 +104,6 @@ impl Symbol {
             SymbolDefinition::Builtin(Rc::new(Builtin { id, parameters, f })),
             None,
         )
-    }
-
-    /// Create a symbol for module.
-    /// # Arguments
-    /// - `id`: Name of the symbol
-    pub fn new_module(id: Identifier) -> Symbol {
-        Symbol::new(SymbolDefinition::Module(ModuleDefinition::new(id)), None)
-    }
-
-    /// Create a new constant ([`SymbolDefinition::Constant`]).
-    /// # Arguments
-    /// - `id`: Name of the symbol
-    /// - `value`: The value to store
-    pub fn new_constant(id: Identifier, value: Value) -> Symbol {
-        Symbol::new(SymbolDefinition::Constant(id, value), None)
     }
 
     /// Create a new argument ([`SymbolDefinition::Argument`]).
@@ -214,6 +191,26 @@ impl Symbol {
         self.borrow().children.is_empty()
     }
 
+    /// Return `true` if symbol's visibility is private
+    pub fn visibility(&self) -> Visibility {
+        match &self.borrow().def {
+            SymbolDefinition::SourceFile(..) => Visibility::Public,
+            SymbolDefinition::Module(md) => md.visibility,
+            SymbolDefinition::Workbench(wd) => wd.visibility,
+            SymbolDefinition::Function(fd) => fd.visibility,
+            SymbolDefinition::Builtin(..) => Visibility::Public,
+            SymbolDefinition::Constant(visibility, ..) => *visibility,
+            SymbolDefinition::Argument(..) => Visibility::Private,
+            SymbolDefinition::Alias(visibility, ..) => *visibility,
+            SymbolDefinition::UseAll(visibility, ..) => *visibility,
+        }
+    }
+
+    /// Return `true` if symbol's visibility is private
+    pub fn is_private(&self) -> bool {
+        matches!(self.visibility(), Visibility::Private)
+    }
+
     /// Search down the symbol tree for a qualified name.
     /// # Arguments
     /// - `name`: Name to search for.
@@ -282,10 +279,10 @@ impl SrcReferrer for SymbolInner {
             SymbolDefinition::Builtin(_) => {
                 unreachable!("builtin has no source code reference")
             }
-            SymbolDefinition::Constant(identifier, _)
+            SymbolDefinition::Constant(_, identifier, _)
             | SymbolDefinition::Argument(identifier, _) => identifier.src_ref(),
-            SymbolDefinition::Alias(identifier, _) => identifier.src_ref(),
-            SymbolDefinition::UseAll(name) => name.src_ref(),
+            SymbolDefinition::Alias(_, identifier, _) => identifier.src_ref(),
+            SymbolDefinition::UseAll(_, name) => name.src_ref(),
         }
     }
 }

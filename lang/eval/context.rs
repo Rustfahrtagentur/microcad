@@ -207,7 +207,7 @@ impl Context {
                         found = crate::mark!(FOUND_INTERIM)
                     );
                     Ok(Symbol::new(
-                        SymbolDefinition::Constant(id.clone(), value),
+                        SymbolDefinition::Constant(Visibility::Public, id.clone(), value),
                         None,
                     ))
                 }

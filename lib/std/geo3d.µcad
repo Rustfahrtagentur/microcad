@@ -2,7 +2,7 @@
 ///
 /// Examples:
 /// * with radius `r`: `Sphere(r = 10.0mm);`
-part Sphere(radius: Length) {
+pub part Sphere(radius: Length) {
     init(r: Length) {
         radius = r;
     }
@@ -15,7 +15,7 @@ part Sphere(radius: Length) {
 /// Examples:
 /// * with size `s`: `Cube(s = 10.0mm);`
 /// * with size `x`, `y`, and `z`: `Cube(size_x = 10.0mm, size_y = 5.0mm, size_z = 3.0mm);`
-part Cube(size_x: Length, size_y: Length, size_z: Length) {
+pub part Cube(size_x: Length, size_y: Length, size_z: Length) {
     init(size: Length) {
         size_x = size;
         size_y = size;
@@ -38,7 +38,7 @@ part Cube(size_x: Length, size_y: Length, size_z: Length) {
 ///
 /// Examples:
 /// * with radius `r` and height `h`: `Cylinder(r = 10.0mm, h = 5.0mm);`
-part Cylinder(radius_bottom: Length, radius_top: Length, height: Length, offset: Length = 0.0mm) {
+pub part Cylinder(radius_bottom: Length, radius_top: Length, height: Length, offset: Length = 0.0mm) {
     /// Initialize by `radius` and `height`. Cylinder will be centered.
     init(radius: Length, height: Length) {
         radius_bottom = radius;

@@ -99,6 +99,9 @@ impl SymbolTable {
         let name = &name.with_prefix(module);
         match self.lookup_global(name) {
             Ok(symbol) => {
+                if symbol.is_private() {
+                    return Err(EvalError::SymbolIsPrivate(name.clone()));
+                }
                 log::trace!(
                     "{found} symbol in current module: '{name:?}' = '{full_name:?}'",
                     found = crate::mark!(FOUND),
@@ -157,7 +160,7 @@ impl SymbolTable {
     fn de_alias(&mut self, name: &QualifiedName) -> QualifiedName {
         for p in (1..name.len()).rev() {
             if let Ok(symbol) = self.lookup_global(&QualifiedName::no_ref(name[0..p].to_vec())) {
-                if let SymbolDefinition::Alias(_, alias) = &symbol.borrow().def {
+                if let SymbolDefinition::Alias(.., alias) = &symbol.borrow().def {
                     let suffix: QualifiedName = name[p..].iter().cloned().collect();
                     let new_name = suffix.with_prefix(alias);
                     log::trace!("De-aliased name: {name:?} into {new_name:?}");
@@ -171,7 +174,7 @@ impl SymbolTable {
     fn follow_alias(&mut self, symbol: &Symbol) -> EvalResult<Symbol> {
         // execute alias from any use statement
         let def = &symbol.borrow().def;
-        if let SymbolDefinition::Alias(_, name) = def {
+        if let SymbolDefinition::Alias(.., name) = def {
             log::trace!("{found} alias => {name:?}", found = crate::mark!(FOUND));
             Ok(self.lookup(name)?)
         } else {

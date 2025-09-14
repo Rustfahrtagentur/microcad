@@ -5,14 +5,14 @@ pub use __builtin::ops::hull;
 pub use __builtin::ops::align;
 
 
-op revolve(angle = 360°) {
+pub op revolve(angle = 360°) {
     @input.__builtin::ops::revolve(
         circular_segments = 64, // TODO: Make this adaptive to resolution 
         revolve_degrees = angle / 1°
     );
 }
 
-op extrude(height: Length) {
+pub op extrude(height: Length) {
 	init(z: Length) {
 		height = z;
 	}
@@ -20,14 +20,14 @@ op extrude(height: Length) {
     @input.__builtin::ops::extrude(height = height / 1mm, n_divisions = 0, twist_degrees = 0.0, scale_top_x = 1.0, scale_top_y = 1.0);
 }
 
-op translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
+pub op translate(x = 0.0mm, y = 0.0mm, z = 0.0mm) {
 	@input.__builtin::ops::translate(x = x / 1mm, y = y / 1mm, z = z / 1mm);
 }
 
 /// A transformer that rotates a part.
 ///
 /// See the `init`s for examples on how to use this transformer. 
-op rotate(matrix: Matrix3) {
+pub op rotate(matrix: Matrix3) {
 	/// Rotate around an axis by an angle using a 3D vector.
 	/// 
 	/// The `axis` vector will be normalized. 
@@ -86,6 +86,6 @@ op rotate(matrix: Matrix3) {
 
 
 /// Orient an object towards a vector.
-op orient(v: Vec3) {
+pub op orient(v: Vec3) {
     @input.__builtin::ops::orient(x = v.x, y = v.y, z = v.z);
 }

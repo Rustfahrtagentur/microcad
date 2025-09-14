@@ -4,7 +4,7 @@
 /// Examples:
 /// * with radius `r`: `Circle(r = 10.0mm);`
 /// * with diameter `d`: `Circle(d = 5.0mm);`
-sketch Circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
+pub sketch Circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
     init(r: Length, c = (x = 0.0mm, y = 0.0mm)) {
         radius = r;
         center = c;
@@ -26,7 +26,7 @@ sketch Circle(radius: Length, center = (x = 0.0mm, y = 0.0mm)) {
 ///
 /// Examples:
 /// * centered rect with width `w` and height `h`: `rect(width = 10.0mm, height = 5.0mm);`
-sketch Rect(width: Length, height: Length, x: Length, y: Length) {
+pub sketch Rect(width: Length, height: Length, x: Length, y: Length) {
     init(width: Length, height: Length) {
         x = -width / 2.0; // center x
         y = -height / 2.0; // center y
@@ -56,12 +56,12 @@ sketch Rect(width: Length, height: Length, x: Length, y: Length) {
 
 
 /// A frame with a thickness.
-sketch Frame(width: Length, height: Length, thickness: Length) {
+pub sketch Frame(width: Length, height: Length, thickness: Length) {
     std::debug::assert(thickness > 0.0mm, "Thickness must be a positive number (thickness = {thickness})");
     Rect(width, height) - Rect(width = width - 2*thickness, height = height - 2*thickness)
 }
 
-sketch Line(p0: Vec2, p1: Vec2) {
+pub sketch Line(p0: Vec2, p1: Vec2) {
     init(width: Length, y = 0.0mm) {
         p0 = (x = -width / 2mm, y = y / 1mm);
         p1 = (x =  width / 2mm , y = y / 1mm);
@@ -80,7 +80,7 @@ sketch Line(p0: Vec2, p1: Vec2) {
     __builtin::geo2d::Line(x0 = p0.x, y0 = p0.y, x1 = p1.x, y1 = p1.y);
 }
 
-sketch Ring(outer_r: Length, inner_r: Length ) {
+pub sketch Ring(outer_r: Length, inner_r: Length ) {
      init(outer_r: Length, thickness: Length) {
          inner_r = outer_r - thickness;
      }

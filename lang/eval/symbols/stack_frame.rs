@@ -130,9 +130,11 @@ impl StackFrame {
                 String::new()
             };
             match &symbol.borrow().def {
-                SymbolDefinition::Constant(id, value) => {
-                    writeln!(f, "{:depth$}- {id:?} = {value}{full_name} (constant)", "")?
-                }
+                SymbolDefinition::Constant(visibility, id, value) => writeln!(
+                    f,
+                    "{:depth$}- {visibility} {id:?} = {value}{full_name} (constant)",
+                    ""
+                )?,
                 SymbolDefinition::Argument(id, value) => {
                     writeln!(f, "{:depth$}- {id:?} = {value}{full_name} (argument)", "")?
                 }
@@ -151,11 +153,13 @@ impl StackFrame {
                 SymbolDefinition::Builtin(builtin) => {
                     writeln!(f, "{:depth$}- {:?}{full_name} (builtin)", "", builtin.id)?
                 }
-                SymbolDefinition::Alias(id, name) => {
-                    writeln!(f, "{:depth$}- {id:?}{full_name} -> {name} (alias)", "")?
-                }
-                SymbolDefinition::UseAll(name) => {
-                    writeln!(f, "{:depth$}- {name}{full_name} (use all)", "")?
+                SymbolDefinition::Alias(visibility, id, name) => writeln!(
+                    f,
+                    "{:depth$}- {visibility} {id:?}{full_name} -> {name} (alias)",
+                    ""
+                )?,
+                SymbolDefinition::UseAll(visibility, name) => {
+                    writeln!(f, "{:depth$}- {visibility} {name}{full_name} (use all)", "")?
                 }
             }
         }

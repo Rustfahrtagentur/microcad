@@ -72,7 +72,18 @@ impl Stack {
         if self.0.is_empty() {
             QualifiedName::default()
         } else {
-            QualifiedName::no_ref(self.0.iter().filter_map(|locals| locals.id()).collect())
+            QualifiedName::no_ref(
+                self.0
+                    .iter()
+                    .filter_map(|frame| {
+                        if matches!(frame, StackFrame::Module(..) | StackFrame::Source(..)) {
+                            frame.id()
+                        } else {
+                            None
+                        }
+                    })
+                    .collect(),
+            )
         }
     }
 
@@ -144,13 +155,19 @@ impl Locals for Stack {
     }
 
     fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
-        self.put_local(Some(id.clone()), Symbol::new_constant(id, value))
+        self.put_local(
+            Some(id.clone()),
+            Symbol::new(
+                SymbolDefinition::Constant(Visibility::Private, id, value),
+                None,
+            ),
+        )
     }
 
     fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {
         match self.fetch(id) {
             Ok(symbol) => match &symbol.borrow().def {
-                SymbolDefinition::Constant(_, value) | SymbolDefinition::Argument(_, value) => {
+                SymbolDefinition::Constant(.., value) | SymbolDefinition::Argument(.., value) => {
                     Ok(value.clone())
                 }
                 _ => Err(EvalError::LocalNotFound(id.clone())),
@@ -230,12 +247,17 @@ impl std::fmt::Display for Stack {
 fn local_stack() {
     let mut stack = Stack::default();
 
-    let make_int = |id, value| Symbol::new_constant(id, Value::Integer(value));
+    let make_int = |id, value| {
+        Symbol::new(
+            SymbolDefinition::Constant(Visibility::Private, id, Value::Integer(value)),
+            None,
+        )
+    };
 
     let fetch_int = |stack: &Stack, id: &str| -> Option<i64> {
         match stack.fetch(&id.into()) {
             Ok(node) => match &node.borrow().def {
-                SymbolDefinition::Constant(_, Value::Integer(value)) => Some(*value),
+                SymbolDefinition::Constant(.., Value::Integer(value)) => Some(*value),
                 _ => todo!("error"),
             },
             _ => None,
@@ -269,11 +291,9 @@ fn local_stack() {
     assert!(fetch_int(&stack, "c").is_none());
 
     // test alias
-    assert!(
-        stack
-            .put_local(Some("x".into()), make_int("x".into(), 3))
-            .is_ok()
-    );
+    assert!(stack
+        .put_local(Some("x".into()), make_int("x".into(), 3))
+        .is_ok());
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").unwrap() == 2);

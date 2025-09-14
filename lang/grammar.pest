@@ -204,7 +204,7 @@ attribute_access = { "#" ~ identifier }
 element_access = _{ method_call | array_element_access | tuple_element_access | attribute_access }
 
 // `pub`: ok
-visibility = { "pub" }
+visibility = { "pub" | "" }
 
 // `use a;`: ok # Import a single module
 // `use ;`: error # Must import at least one module
@@ -433,7 +433,7 @@ init_definition = { doc_block? ~ "init" ~ ws* ~ parameter_list ~ ws* ~ body }
 
 // `mod math { }`: ok # module
 // `mod math { fn pi() -> Scalar { return 3.14159; } }`: ok # module with function
-module_definition = { "mod" ~ ws+ ~ identifier ~ ws* ~ body }
+module_definition = { visibility ~ "mod" ~ ws+ ~ identifier ~ ws* ~ body }
 
 statement = {
     workbench_definition

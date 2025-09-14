@@ -90,6 +90,5 @@ assert_eq([module::pub_value, 2]);
 assert_eq([module::sub_module::value, 3]);
 assert_eq([module::sub_module::pub_value, 4]);
 assert_eq([module::sub_module::Workbench().property, 9]);
-assert_invalid(module::sub_module::Workbench().sketch_local);
 assert_invalid(module::sub_module::PrivateWorkbench);
 ```

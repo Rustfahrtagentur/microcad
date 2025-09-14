@@ -237,6 +237,10 @@ pub enum EvalError {
     /// Assignment failed because left side is not an l-value
     #[error("Assignment failed because {0} is not an l-value")]
     NotAnLValue(Identifier),
+
+    /// Found symbol but it's not visible to user
+    #[error("Symbol {0} is private")]
+    SymbolIsPrivate(QualifiedName),
 }
 
 /// Result type of any evaluation.

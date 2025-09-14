@@ -59,7 +59,7 @@ impl Eval<()> for AssignmentStatement {
         // lookup if we find any existing symbol
         if let Ok(symbol) = context.lookup(&QualifiedName::from_id(assignment.id.clone())) {
             match &mut symbol.borrow_mut().def {
-                SymbolDefinition::Constant(identifier, value) => {
+                SymbolDefinition::Constant(_, identifier, value) => {
                     if value.is_invalid() {
                         *value = new_value.clone();
                     } else {

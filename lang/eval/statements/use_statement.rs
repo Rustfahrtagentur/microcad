@@ -33,7 +33,7 @@ impl Eval<()> for UseStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<()> {
         context.grant(self)?;
         log::debug!("Evaluating use statement: {self}");
-        if matches!(self.decl, UseDeclaration::UseAll(_)) || self.visibility == Visibility::Private
+        if matches!(self.decl, UseDeclaration::UseAll(..)) || self.visibility == Visibility::Private
         {
             self.decl.eval(context)
         } else {
@@ -45,17 +45,17 @@ impl Eval<()> for UseStatement {
 impl Eval<()> for UseDeclaration {
     fn eval(&self, context: &mut Context) -> EvalResult<()> {
         match &self {
-            UseDeclaration::Use(name) => {
+            UseDeclaration::Use(visibility, name) => {
                 if let Err(err) = context.use_symbol(name, None) {
                     context.error(name, err)?;
                 }
             }
-            UseDeclaration::UseAll(name) => {
+            UseDeclaration::UseAll(visibility, name) => {
                 if let Err(err) = context.use_symbols_of(name, &context.current_name()) {
                     context.error(name, err)?
                 }
             }
-            UseDeclaration::UseAlias(name, alias) => {
+            UseDeclaration::UseAlias(visibility, name, alias) => {
                 if let Err(err) = context.use_symbol(name, Some(alias.clone())) {
                     context.error(name, err)?;
                 }

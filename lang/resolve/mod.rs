@@ -172,15 +172,19 @@ impl Resolve for Attribute {
 }
 
 impl Resolve for AssignmentStatement {
-    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+    fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<Symbol>> {
         match self.assignment.qualifier {
             Qualifier::Prop => Ok(None),
             Qualifier::Const => todo!("create symbol"),
             Qualifier::Value => {
                 log::trace!("Declare value {}", self.assignment.id);
-                Ok(Some(Symbol::new_constant(
-                    self.assignment.id.clone(),
-                    Value::None,
+                Ok(Some(Symbol::new(
+                    SymbolDefinition::Constant(
+                        self.assignment.visibility,
+                        self.assignment.id.clone(),
+                        Value::None,
+                    ),
+                    Some(parent.clone()),
                 )))
             }
         }
@@ -202,21 +206,21 @@ impl Resolve<SymbolMap> for Body {
 impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
     fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
-            UseDeclaration::Use(name) => {
+            UseDeclaration::Use(visibility, name) => {
                 let identifier = name.last().expect("Identifier");
                 Ok(Some((
                     identifier.clone(),
                     Symbol::new(
-                        SymbolDefinition::Alias(identifier.clone(), name.clone()),
+                        SymbolDefinition::Alias(*visibility, identifier.clone(), name.clone()),
                         Some(parent.clone()),
                     ),
                 )))
             }
-            UseDeclaration::UseAll(_) => Ok(None),
-            UseDeclaration::UseAlias(name, alias) => Ok(Some((
+            UseDeclaration::UseAll(visibility, _) => Ok(None),
+            UseDeclaration::UseAlias(visibility, name, alias) => Ok(Some((
                 alias.clone(),
                 Symbol::new(
-                    SymbolDefinition::Alias(alias.clone(), name.clone()),
+                    SymbolDefinition::Alias(*visibility, alias.clone(), name.clone()),
                     Some(parent.clone()),
                 ),
             ))),

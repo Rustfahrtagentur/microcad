@@ -8,6 +8,8 @@ use crate::{rc::*, src_ref::*, syntax::*};
 /// Module definition.
 #[derive(Debug, Clone)]
 pub struct ModuleDefinition {
+    /// Visibility of the module.
+    pub visibility: Visibility,
     /// Name of the module.
     pub id: Identifier,
     /// Module body.
@@ -18,8 +20,9 @@ pub struct ModuleDefinition {
 
 impl ModuleDefinition {
     /// Create a new module definition.
-    pub fn new(id: Identifier) -> Rc<Self> {
+    pub fn new(visibility: Visibility, id: Identifier) -> Rc<Self> {
         Rc::new(Self {
+            visibility,
             id,
             body: Body::default(),
             src_ref: SrcRef(None),
