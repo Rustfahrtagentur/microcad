@@ -127,10 +127,11 @@ impl Symbol {
         if cfg!(feature = "ansi-color") && !self.borrow().used {
             color_print::cwriteln!(
                 f,
-                "{:depth$}<#606060>{id:?} {} [{}]</>",
+                "{:depth$}<#606060>{visibility}{id:?} {def} [{full_name}]</>",
                 "",
-                self.0.borrow().def,
-                self.full_name(),
+                visibility = if self.is_public() { "pub " } else { "" },
+                def = self.0.borrow().def,
+                full_name = self.full_name(),
             )?;
         } else {
             writeln!(
@@ -195,20 +196,67 @@ impl Symbol {
     pub fn visibility(&self) -> Visibility {
         match &self.borrow().def {
             SymbolDefinition::SourceFile(..) => Visibility::Public,
+            SymbolDefinition::Builtin(..) => Visibility::Public,
+            SymbolDefinition::Argument(..) => Visibility::Private,
+
             SymbolDefinition::Module(md) => md.visibility,
             SymbolDefinition::Workbench(wd) => wd.visibility,
             SymbolDefinition::Function(fd) => fd.visibility,
-            SymbolDefinition::Builtin(..) => Visibility::Public,
-            SymbolDefinition::Constant(visibility, ..) => *visibility,
-            SymbolDefinition::Argument(..) => Visibility::Private,
-            SymbolDefinition::Alias(visibility, ..) => *visibility,
-            SymbolDefinition::UseAll(visibility, ..) => *visibility,
+
+            SymbolDefinition::Constant(visibility, ..)
+            | SymbolDefinition::Alias(visibility, ..)
+            | SymbolDefinition::UseAll(visibility, ..) => *visibility,
         }
     }
 
-    /// Return `true` if symbol's visibility is private
+    /// Return `true` if symbol's visibility set to is public.
+    pub fn is_public(&self) -> bool {
+        matches!(self.visibility(), Visibility::Public)
+    }
+
+    /// Return `true` if symbol's visibility set to is non-public.
     pub fn is_private(&self) -> bool {
-        matches!(self.visibility(), Visibility::Private)
+        !self.is_public()
+    }
+
+    fn parents(&self, max: usize) -> Vec<Self> {
+        let mut parents = Vec::new();
+        if max > 0 {
+            if let Some(parent) = &self.borrow().parent {
+                parents.push(parent.clone());
+                parents.append(&mut parent.parents(max - 1));
+            }
+        }
+        parents
+    }
+
+    /// Return `true` if symbol's visibility is private.
+    pub fn is_visible_within(&self, within: &QualifiedName) -> bool {
+        let full_name = self.full_name();
+        // check parents' visibility (below any common parent)
+        let visible = if full_name.is_within(within)
+            && self
+                .parents(full_name.len() - within.len() - 1)
+                .iter()
+                .inspect(|p| log::trace!("{}", p.id()))
+                .any(|parent| parent.is_private())
+        {
+            false
+        }
+        // check own visibility
+        else if self.is_private() {
+            self.full_name().starts_with(within)
+        } else {
+            true
+        };
+
+        log::trace!(
+            "{} is {} from within {within}",
+            self.full_name(),
+            if visible { "visible" } else { "invisible" }
+        );
+
+        visible
     }
 
     /// Search down the symbol tree for a qualified name.

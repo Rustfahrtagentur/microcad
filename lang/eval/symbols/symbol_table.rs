@@ -94,13 +94,13 @@ impl SymbolTable {
     }
 
     fn lookup_module(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        let module = &self.stack.current_module_name();
+        let module = self.stack.current_module_name();
         log::trace!("Looking for symbol '{name:?}' in current module '{module:?}'");
-        let name = &name.with_prefix(module);
+        let name = &name.with_prefix(&module).dissolve_super();
         match self.lookup_global(name) {
             Ok(symbol) => {
-                if symbol.is_private() {
-                    return Err(EvalError::SymbolIsPrivate(name.clone()));
+                if !symbol.is_visible_within(&module) {
+                    return Err(EvalError::SymbolIsPrivate(name.clone(), module));
                 }
                 log::trace!(
                     "{found} symbol in current module: '{name:?}' = '{full_name:?}'",

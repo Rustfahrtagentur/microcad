@@ -239,8 +239,8 @@ pub enum EvalError {
     NotAnLValue(Identifier),
 
     /// Found symbol but it's not visible to user
-    #[error("Symbol {0} is private")]
-    SymbolIsPrivate(QualifiedName),
+    #[error("Symbol {0} is private from within {1}")]
+    SymbolIsPrivate(QualifiedName, QualifiedName),
 }
 
 /// Result type of any evaluation.

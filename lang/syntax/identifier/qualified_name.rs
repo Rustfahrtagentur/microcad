@@ -75,7 +75,7 @@ impl QualifiedName {
     }
 
     /// Tells if self is in a specified module
-    pub fn is_sub_of(&self, module: &QualifiedName) -> bool {
+    pub fn is_within(&self, module: &QualifiedName) -> bool {
         self.starts_with(module)
     }
 
@@ -137,6 +137,24 @@ impl QualifiedName {
     pub fn with_suffix(&self, suffix: Identifier) -> Self {
         let mut name = self.clone();
         name.push(suffix.clone());
+        name
+    }
+
+    /// If name includes any "super" ids those will be dissolved.
+    pub fn dissolve_super(&self) -> Self {
+        let mut name = QualifiedName::default();
+        let mut changed = false;
+        self.iter().for_each(|id| {
+            if *id.0 == "super" {
+                changed = true;
+                name.pop();
+            } else {
+                name.push(id.clone());
+            }
+        });
+        if changed {
+            log::trace!("dissolved super: {self} -> {name}");
+        }
         name
     }
 }
