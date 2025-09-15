@@ -83,6 +83,16 @@ pub fn assert_eq() -> Symbol {
                                     }),
                                 )?;
                             }
+                        } else {
+                            let message: String = a.get("message");
+                            context.error(
+                                args,
+                                EvalError::AssertionFailed(if message.is_empty() {
+                                    format!("Invalid: {a_value}")
+                                } else {
+                                    "{message}".to_string()
+                                }),
+                            )?;
                         }
                     }
                 }
