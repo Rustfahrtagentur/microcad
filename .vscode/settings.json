@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
+        "ansi",
         "ascii",
         "CBIND",
         "cgmath",
@@ -8,6 +9,7 @@
         "coeff",
         "consts",
         "Cura",
+        "cwriteln",
         "cxxflag",
         "cxxflags",
         "elalish",
