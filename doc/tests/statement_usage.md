@@ -705,9 +705,9 @@ fn f() {
 
 [![test](.test/function_assignment_const.svg)](.test/function_assignment_const.log)
 
-```µcad,function_assignment_const
+```µcad,function_assignment_const#fail
 fn f() {
-  const B = 1;
+  const B = 1; // error
 } f();
 ```
 
