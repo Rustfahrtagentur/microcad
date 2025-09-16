@@ -198,6 +198,19 @@ impl SymbolTable {
     pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
         self.sources.search_paths()
     }
+
+    /// Check if current stack frame is code
+    pub fn is_code(&self) -> bool {
+        !matches!(self.stack.current_frame(), Some(StackFrame::Module(..)))
+    }
+
+    /// Check if current stack frame is a module
+    pub fn is_module(&self) -> bool {
+        matches!(
+            self.stack.current_frame(),
+            Some(StackFrame::Module(..) | StackFrame::Source(..))
+        )
+    }
 }
 
 impl Lookup for SymbolTable {
@@ -347,12 +360,33 @@ impl Locals for SymbolTable {
 }
 
 impl UseSymbol for SymbolTable {
-    fn use_symbol(&mut self, name: &QualifiedName, id: Option<Identifier>) -> EvalResult<Symbol> {
+    fn use_symbol(
+        &mut self,
+        name: &QualifiedName,
+        id: Option<Identifier>,
+        within: &QualifiedName,
+    ) -> EvalResult<Symbol> {
         log::debug!("Using symbol {name:?}");
 
         let symbol = self.lookup(name)?;
-        self.stack.put_local(id, symbol.clone())?;
-        log::trace!("Local Stack:\n{}", self.stack);
+        if self.is_module() {
+            let id = id.clone().unwrap_or(symbol.id());
+            if within.is_empty() {
+                self.symbols.insert(id, symbol.clone());
+            } else {
+                self.symbols
+                    .search(within)?
+                    .borrow_mut()
+                    .children
+                    .insert(id, symbol.clone());
+            }
+            log::trace!("Symbol Table:\n{}", self.symbols);
+        }
+
+        if self.is_code() {
+            self.stack.put_local(id, symbol.clone())?;
+            log::trace!("Local Stack:\n{}", self.stack);
+        }
 
         Ok(symbol)
     }
@@ -368,19 +402,27 @@ impl UseSymbol for SymbolTable {
         if symbol.is_empty() {
             Err(EvalError::NoSymbolsToUse(symbol.full_name()))
         } else {
-            for (id, symbol) in symbol.borrow().children.iter() {
-                self.stack.put_local(Some(id.clone()), symbol.clone())?;
-                if within.is_empty() {
-                    self.symbols.insert(id.clone(), symbol.clone());
-                } else {
-                    self.symbols
-                        .search(within)?
-                        .borrow_mut()
-                        .children
-                        .insert(id.clone(), symbol.clone());
+            if self.is_module() {
+                for (id, symbol) in symbol.borrow().children.iter() {
+                    if within.is_empty() {
+                        self.symbols.insert(id.clone(), symbol.clone());
+                    } else {
+                        self.symbols
+                            .search(within)?
+                            .borrow_mut()
+                            .children
+                            .insert(id.clone(), symbol.clone());
+                    }
                 }
+                log::trace!("Symbol Table:\n{}", self.symbols);
             }
-            log::trace!("Local Stack:\n{}", self.stack);
+
+            if self.is_code() {
+                for (id, symbol) in symbol.borrow().children.iter() {
+                    self.stack.put_local(Some(id.clone()), symbol.clone())?;
+                }
+                log::trace!("Local Stack:\n{}", self.stack);
+            }
             Ok(symbol)
         }
     }

@@ -274,6 +274,7 @@ impl Symbol {
         }
     }
 
+    /// check if a private symbol may be declared within this symbol
     pub fn can_const(&self) -> bool {
         matches!(
             self.borrow().def,
@@ -281,6 +282,7 @@ impl Symbol {
         )
     }
 
+    /// check if a value on the stack may be declared within this symbol
     pub fn can_value(&self) -> bool {
         matches!(
             self.borrow().def,
@@ -290,14 +292,17 @@ impl Symbol {
         )
     }
 
+    /// check if a property may be declared within this symbol
     pub fn can_prop(&self) -> bool {
         matches!(self.borrow().def, SymbolDefinition::Workbench(..))
     }
 
+    /// check if a public symbol may be declared within this symbol
     pub fn can_pub(&self) -> bool {
         self.can_const()
     }
 
+    /// Overwrite any value in this symbol
     pub fn set_value(&self, new_value: Value) -> ResolveResult<()> {
         match &mut self.borrow_mut().def {
             SymbolDefinition::Constant(_, _, value) => *value = new_value,

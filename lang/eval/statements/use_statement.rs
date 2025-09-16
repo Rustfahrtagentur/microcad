@@ -13,7 +13,13 @@ pub trait UseSymbol {
     /// # Arguments
     /// - `name`: Name of the symbol to search for
     /// - `id`: if given overwrites the ID from qualified name (use as)
-    fn use_symbol(&mut self, name: &QualifiedName, id: Option<Identifier>) -> EvalResult<Symbol>;
+    /// - `within`: Target symbol
+    fn use_symbol(
+        &mut self,
+        name: &QualifiedName,
+        id: Option<Identifier>,
+        within: &QualifiedName,
+    ) -> EvalResult<Symbol>;
 
     /// Find a symbol in the symbol table and copy all it's children to the locals and the target.
     ///
@@ -51,7 +57,7 @@ impl Eval<()> for UseDeclaration {
                 }
             }
             UseDeclaration::UseAll(visibility, name) => {
-                if let Err(err) = context.use_symbols_of(name, &context.current_name()) {
+                if let Err(err) = context.use_symbols_of(name) {
                     context.error(name, err)?
                 }
             }

@@ -193,11 +193,10 @@ impl Context {
 
     /// Return if the current frame is an init frame.
     pub fn is_init(&mut self) -> bool {
-        if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
-            matches!(stack_frame, StackFrame::Init(_))
-        } else {
-            false
-        }
+        matches!(
+            self.symbol_table.stack.current_frame(),
+            Some(StackFrame::Init(_))
+        )
     }
 
     /// Lookup a property by qualified name.
@@ -318,17 +317,19 @@ impl Diag for Context {
     }
 }
 
-impl UseSymbol for Context {
-    fn use_symbol(&mut self, name: &QualifiedName, id: Option<Identifier>) -> EvalResult<Symbol> {
-        self.symbol_table.use_symbol(name, id)
-    }
-
-    fn use_symbols_of(
+impl Context {
+    /// use symbol in context
+    pub fn use_symbol(
         &mut self,
         name: &QualifiedName,
-        within: &QualifiedName,
+        id: Option<Identifier>,
     ) -> EvalResult<Symbol> {
-        self.symbol_table.use_symbols_of(name, within)
+        self.symbol_table.use_symbol(name, id, &self.current_name())
+    }
+
+    /// use all symbols of given module in context
+    pub fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+        self.symbol_table.use_symbols_of(name, &self.current_name())
     }
 }
 

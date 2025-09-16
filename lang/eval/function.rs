@@ -8,7 +8,13 @@ use crate::{eval::*, syntax::*, value::*};
 impl Eval for FunctionDefinition {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         context.grant(self)?;
-        context.scope(StackFrame::Function(Default::default()), |context| {
+        context.scope(StackFrame::Function(Default::default()), |_context| {
+            /*
+
+            TODO: This whole thing is not working proper because statements can
+                  have other statements inside. Thinking about if clauses every path
+                  must be checked instead of just the top statements.
+
             // check if there is any return statement
             if !self
                 .body
@@ -21,6 +27,7 @@ impl Eval for FunctionDefinition {
                     EvalError::MissingReturn(context.current_name().with_suffix(self.id.clone())),
                 )?
             }
+            */
             // avoid body frame
             Ok(Value::None)
         })

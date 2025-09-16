@@ -46,9 +46,9 @@ pub enum ResolveError {
     #[error("Symbol {0} must be loaded from {1}")]
     SymbolMustBeLoaded(QualifiedName, std::path::PathBuf),
 
-    /// Expression is neither a valid name for a symbol nor local variable.
-    #[error("'{0}' is neither a valid name for a symbol nor local variable")]
-    NotAName(SrcRef),
+    /// Property is not allowed at this place
+    #[error("Defining a property is not allowed here ({0})")]
+    PropertyNotAllowed(SrcRef),
 }
 
 /// Result type of any resolve.
