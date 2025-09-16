@@ -198,7 +198,7 @@ impl Locals for Stack {
 
     fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
         // search from inner scope to root scope to shadow outside locals
-        for frame in self.0.iter().rev() {
+        for (n, frame) in self.0.iter().rev().enumerate() {
             match frame {
                 StackFrame::Source(_, locals)
                 | StackFrame::Body(locals)
@@ -220,7 +220,11 @@ impl Locals for Stack {
                     symbol: _,
                     args: _,
                     src_ref: _,
-                } => (),
+                } => {
+                    if n > 0 {
+                        break;
+                    }
+                }
             }
         }
         Err(EvalError::LocalNotFound(id.clone()))
