@@ -284,7 +284,7 @@ impl Lookup for SymbolTable {
                 // check if all findings point to the same symbol
                 if !found.iter().all(|(_, x)| Rc::ptr_eq(x, first)) {
                     log::debug!(
-                        "{ambiguous} symbol '{name:?}' in {origin}",
+                        "{ambiguous} symbol '{name:?}' in {origin}:\n{self}",
                         ambiguous = crate::mark!(AMBIGUOUS),
                         origin = found
                             .iter()

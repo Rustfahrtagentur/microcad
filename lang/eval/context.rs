@@ -284,10 +284,16 @@ impl Lookup for Context {
                 );
                 property
             }
-            (Ok(symbol), Ok(property)) => Err(EvalError::AmbiguousProperty(
-                symbol.full_name(),
-                property.id(),
-            )),
+            (Ok(symbol), Ok(property)) => {
+                log::debug!(
+                    "{ambiguous} symbol '{name:?}' in {symbol} and {property}:\n{self}",
+                    ambiguous = crate::mark!(AMBIGUOUS),
+                );
+                Err(EvalError::AmbiguousProperty(
+                    symbol.full_name(),
+                    property.id(),
+                ))
+            }
             // throw error from lookup on any error
             (Err(_), Err(_)) => symbol,
         }

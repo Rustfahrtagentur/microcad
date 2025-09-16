@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*, ty::*, value::*};
 
 /// Argument value.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct ArgumentValue {
     /// *value* of the argument.
     pub value: Value,
@@ -24,12 +24,13 @@ impl SrcReferrer for ArgumentValue {
 
 impl std::fmt::Display for ArgumentValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{ty:?} = {val:?}",
-            val = self.value,
-            ty = self.value.ty()
-        )
+        write!(f, "{val}", val = self.value,)
+    }
+}
+
+impl std::fmt::Debug for ArgumentValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{val:?}", val = self.value)
     }
 }
 
