@@ -11,9 +11,9 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> Undetermined (root)
-    Group -> Undetermined
-      InputPlaceholder -> Undetermined
+  Group (root) ->
+    Group ->
+      InputPlaceholder ->
 
 -- Test Result --
 OK

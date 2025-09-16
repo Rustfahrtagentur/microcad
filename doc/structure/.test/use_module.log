@@ -13,9 +13,11 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), r: Length = 40mm) -> 2D
-      Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 40)⏎ -> 2D
+  Group (root) ->
+    Workpiece(sketch) std::geo2d::Circle(c=(x=0mm, y=0mm), r=40mm) ->
+      - center = (x=0mm, y=0mm)
+      - radius = 40mm
+      Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=40)⏎ ->
 
 -- Test Result --
 OK

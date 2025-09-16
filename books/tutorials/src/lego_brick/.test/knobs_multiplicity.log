@@ -12,17 +12,19 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    sketch std::geo2d::Circle(c: (x: [Length], y: [Length]) = (x: [Length] = [-12mm, -4mm, 4mm, 12mm], y: [Length] = [-4mm, 4mm]), d: Length = 4…
-      Multiplicity -> 2D
-        Primitive2D __builtin::geo2d::Circle(cx: Scalar = -12, cy: Scalar = -4, radius: Scalar = 2.4)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Circle(cx: Scalar = -4, cy: Scalar = -4, radius: Scalar = 2.4)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 4, cy: Scalar = -4, radius: Scalar = 2.4)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 12, cy: Scalar = -4, radius: Scalar = 2.4)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Circle(cx: Scalar = -12, cy: Scalar = 4, radius: Scalar = 2.4)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Circle(cx: Scalar = -4, cy: Scalar = 4, radius: Scalar = 2.4)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 4, cy: Scalar = 4, radius: Scalar = 2.4)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Circle(cx: Scalar = 12, cy: Scalar = 4, radius: Scalar = 2.4)⏎ -> 2D
+  Group (root) ->
+    Workpiece(sketch) std::geo2d::Circle(c=(x=[-12mm, -4mm, 4mm, 12mm], y=[-4mm, 4mm]), d=4.8mm) ->
+      - center = (x=[-12mm, -4mm, 4mm, 12mm], y=[-4mm, 4mm])
+      - radius = 2.4mm
+      Multiplicity ->
+        Primitive2D __builtin::geo2d::Circle(cx=-12, cy=-4, radius=2.4)⏎ ->
+        Primitive2D __builtin::geo2d::Circle(cx=-4, cy=-4, radius=2.4)⏎ ->
+        Primitive2D __builtin::geo2d::Circle(cx=4, cy=-4, radius=2.4)⏎ ->
+        Primitive2D __builtin::geo2d::Circle(cx=12, cy=-4, radius=2.4)⏎ ->
+        Primitive2D __builtin::geo2d::Circle(cx=-12, cy=4, radius=2.4)⏎ ->
+        Primitive2D __builtin::geo2d::Circle(cx=-4, cy=4, radius=2.4)⏎ ->
+        Primitive2D __builtin::geo2d::Circle(cx=4, cy=4, radius=2.4)⏎ ->
+        Primitive2D __builtin::geo2d::Circle(cx=12, cy=4, radius=2.4)⏎ ->
 
 -- Test Result --
 OK

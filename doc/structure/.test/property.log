@@ -26,13 +26,7 @@
 
 -- Output --
 outer: 10mm
-inner: <INVALID VALUE>
+inner: 5mm
 -- Errors --
-error: Property not found: inner
-  ---> <FROM STR>:19:21
-     |
-  19 | std::print("inner: {t.inner}");
-     |                     ^^^^^^^
-     |
 -- Test Result --
-TODO
+OK BUT IS TODO

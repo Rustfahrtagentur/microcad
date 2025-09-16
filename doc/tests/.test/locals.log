@@ -49,14 +49,17 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group -> Undetermined (root)
-    Group -> Undetermined
-    Group -> Undetermined
-      Group -> Undetermined
-        Group -> Undetermined
-
+error: Assignment failed because value i already has been initialized with 1
+  ---> <FROM STR>:6:1
+     |
+   6 | i = 1;
+     | ^
+     |
+error: Assignment failed because value i already has been initialized with 1
+  ---> <FROM STR>:6:1
+     |
+   6 | i = 1;
+     | ^
+     |
 -- Test Result --
-OK
-Could not determine output type.
-Nothing will be exported.
+FAIL

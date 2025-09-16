@@ -10,11 +10,14 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 3D (root)
-    op std::ops::extrude(height: Length = 20mm) -> 3D
-      Operation __builtin::ops::extrude(height: Scalar = 20, n_divisions: Integer = 0, scale_top_x: Scalar = 1, scale_top_y: Scalar = 1, twist_deg…
-        sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 20mm) -> 2D (root)
-          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 20)⏎ -> 2D
+  Group (root) ->
+    Workpiece(op) std::ops::extrude(height=20mm) ->
+      - height = 20mm
+      Operation __builtin::ops::extrude(height=20, n_divisions=0, scale_top_x=1, scale_top_y=1, twist_degrees=0)⏎ ->
+        Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=20mm) (root) ->
+          - center = (x=0mm, y=0mm)
+          - radius = 20mm
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=20)⏎ ->
 
 -- Test Result --
 OK

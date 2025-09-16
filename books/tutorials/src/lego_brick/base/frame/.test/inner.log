@@ -10,9 +10,13 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    sketch std::geo2d::Rect(height: Length = 13.4mm, width: Length = 29.4mm) -> 2D
-      Primitive2D __builtin::geo2d::Rect(height: Scalar = 13.4, width: Scalar = 29.4, x: Scalar = -14.7, y: Scalar = -6.7)⏎ -> 2D
+  Group (root) ->
+    Workpiece(sketch) std::geo2d::Rect(height=13.4mm, width=29.4mm) ->
+      - height = 13.4mm
+      - width = 29.4mm
+      - x = -14.7mm
+      - y = -6.7mm
+      Primitive2D __builtin::geo2d::Rect(height=13.4, width=29.4, x=-14.7, y=-6.7)⏎ ->
 
 -- Test Result --
 OK

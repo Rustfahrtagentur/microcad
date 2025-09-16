@@ -8,12 +8,3 @@
  2:   const B = 1;
  3: } K();
 
--- Output --
--- Errors --
--- Model --
-  Group -> 2D (root)
-    sketch <NO ID>::K() -> 2D
-
--- Test Result --
-OK
-Export error: Render error: Nothing to render

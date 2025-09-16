@@ -9,8 +9,8 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    sketch <NO ID>::F() -> 2D
+  Group (root) ->
+    Workpiece(sketch) <NO ID>::F() ->
 
 -- Test Result --
 OK

@@ -11,9 +11,9 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    Group -> 2D
-      Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Integer = 1)⏎ -> 2D
+  Group (root) ->
+    Group ->
+      Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=1)⏎ ->
 
 -- Test Result --
 OK

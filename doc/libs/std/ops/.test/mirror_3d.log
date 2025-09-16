@@ -19,20 +19,32 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 3D (root)
-    Group -> 3D
-      op std::ops::translate(x: Length = 30mm, y: Length = 30mm, z: Length = 30mm) -> 3D
-        Transform __builtin::ops::translate(x: Scalar = 30, y: Scalar = 30, z: Scalar = 30)⏎ -> 3D
-          Operation subtract()⏎ -> 3D (root)
-            Group -> 3D
-              part std::geo3d::Cube(size: Length = 50mm) -> 3D
-                Transform __builtin::ops::translate(x: Scalar = -25, y: Scalar = -25, z: Scalar = -25)⏎ -> 3D
-                  Primitive3D __builtin::geo3d::Cube(size_x: Scalar = 50, size_y: Scalar = 50, size_z: Scalar = 50)⏎ -> 3D
-              op std::ops::translate(x: Length = 12.5mm, y: Length = 12.5mm, z: Length = 12.5mm) -> 3D
-                Transform __builtin::ops::translate(x: Scalar = 12.5, y: Scalar = 12.5, z: Scalar = 12.5)⏎ -> 3D
-                  part std::geo3d::Cube(size: Length = 25mm) -> 3D (root)
-                    Transform __builtin::ops::translate(x: Scalar = -12.5, y: Scalar = -12.5, z: Scalar = -12.5)⏎ -> 3D
-                      Primitive3D __builtin::geo3d::Cube(size_x: Scalar = 25, size_y: Scalar = 25, size_z: Scalar = 25)⏎ -> 3D
+  Group (root) ->
+    Group ->
+      Workpiece(op) std::ops::translate(x=30mm, y=30mm, z=30mm) ->
+        - x = 30mm
+        - y = 30mm
+        - z = 30mm
+        Transform __builtin::ops::translate(x=30, y=30, z=30)⏎ ->
+          Operation subtract()⏎ (root) ->
+            Group ->
+              Workpiece(part) std::geo3d::Cube(size=50mm) ->
+                - size_x = 50mm
+                - size_y = 50mm
+                - size_z = 50mm
+                Transform __builtin::ops::translate(x=-25, y=-25, z=-25)⏎ ->
+                  Primitive3D __builtin::geo3d::Cube(size_x=50, size_y=50, size_z=50)⏎ ->
+              Workpiece(op) std::ops::translate(x=12.5mm, y=12.5mm, z=12.5mm) ->
+                - x = 12.5mm
+                - y = 12.5mm
+                - z = 12.5mm
+                Transform __builtin::ops::translate(x=12.5, y=12.5, z=12.5)⏎ ->
+                  Workpiece(part) std::geo3d::Cube(size=25mm) (root) ->
+                    - size_x = 25mm
+                    - size_y = 25mm
+                    - size_z = 25mm
+                    Transform __builtin::ops::translate(x=-12.5, y=-12.5, z=-12.5)⏎ ->
+                      Primitive3D __builtin::geo3d::Cube(size_x=25, size_y=25, size_z=25)⏎ ->
 
 -- Test Result --
 OK

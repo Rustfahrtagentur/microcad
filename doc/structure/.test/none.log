@@ -10,12 +10,16 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 3D (root)
-    part std::geo3d::Sphere(radius: Length = 40mm) -> 3D
-      Primitive3D __builtin::geo3d::Sphere(radius: Scalar = 40)⏎ -> 3D
-    part std::geo3d::Cube(size: Length = 40mm) -> 3D
-      Transform __builtin::ops::translate(x: Scalar = -20, y: Scalar = -20, z: Scalar = -20)⏎ -> 3D
-        Primitive3D __builtin::geo3d::Cube(size_x: Scalar = 40, size_y: Scalar = 40, size_z: Scalar = 40)⏎ -> 3D
+  Group (root) ->
+    Workpiece(part) std::geo3d::Sphere(radius=40mm) ->
+      - radius = 40mm
+      Primitive3D __builtin::geo3d::Sphere(radius=40)⏎ ->
+    Workpiece(part) std::geo3d::Cube(size=40mm) ->
+      - size_x = 40mm
+      - size_y = 40mm
+      - size_z = 40mm
+      Transform __builtin::ops::translate(x=-20, y=-20, z=-20)⏎ ->
+        Primitive3D __builtin::geo3d::Cube(size_x=40, size_y=40, size_z=40)⏎ ->
 
 -- Test Result --
 OK

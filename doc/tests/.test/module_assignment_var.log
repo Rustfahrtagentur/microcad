@@ -8,13 +8,3 @@
  2:   a = 1; // error
  3: }
 
--- Output --
--- Errors --
-error: Assignment statement not available here
-  ---> <FROM STR>:2:3
-     |
-   2 |   a = 1; // error
-     |   ^^^^^^
-     |
--- Test Result --
-FAILED AS EXPECTED

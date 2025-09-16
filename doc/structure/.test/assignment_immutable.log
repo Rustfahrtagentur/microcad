@@ -9,5 +9,13 @@
 
 -- Output --
 -- Errors --
+error: Assignment failed because value a already has been initialized with 5
+  ---> <FROM STR>:1:1
+     |
+   1 | a = 5;
+     | ^
+     |
 -- Test Result --
 FAIL(TODO)
+-- Test Result --
+FAILED AS EXPECTED BUT IS TODO

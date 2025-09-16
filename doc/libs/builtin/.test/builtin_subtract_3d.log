@@ -11,15 +11,3 @@
  5:     geo3d::Cube(size_x = 3.0, size_y = 3.0, size_z = 3.0);
  6: }.ops::subtract();
 
--- Output --
--- Errors --
--- Model --
-  Group -> 3D (root)
-    Operation __builtin::ops::subtract()⏎ -> 3D
-      Group -> 3D
-        Primitive3D __builtin::geo3d::Sphere(radius: Scalar = 3)⏎ -> 3D
-        Primitive3D __builtin::geo3d::Cube(size_x: Scalar = 3, size_y: Scalar = 3, size_z: Scalar = 3)⏎ -> 3D
-
--- Test Result --
-OK
-Export successful.

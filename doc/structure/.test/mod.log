@@ -34,6 +34,18 @@ error: Missing return statement in <NO ID>::math::pow
    4 |     fn pow( x: Scalar, n: Integer ) {
      |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
+error: Missing return statement in <NO ID>::math::square
+  ---> <FROM STR>:13:30
+     |
+  13 |     pub fn square(x: Scalar) {
+     |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Missing arguments: n
+  ---> <FROM STR>:15:13
+     |
+  15 |         pow(x, 2.0)
+     |             ^^^^^^
+     |
 -- Test Result --
 FAIL(TODO)
 -- Test Result --

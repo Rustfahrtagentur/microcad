@@ -21,8 +21,8 @@ info: a is zero
      |                    ^^^^^^^^^^^
      |
 -- Model --
-  Group -> Undetermined (root)
-    Group -> Undetermined
+  Group (root) ->
+    Group ->
 
 -- Test Result --
 OK

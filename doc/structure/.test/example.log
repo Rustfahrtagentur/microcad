@@ -18,7 +18,7 @@ ERROR: first
 ERROR: second
 -- Errors --
 -- Model --
-  Group -> Undetermined (root)
+  Group (root) ->
 
 -- Test Result --
 OK

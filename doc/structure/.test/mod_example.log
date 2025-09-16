@@ -27,5 +27,5 @@ error: Missing return statement in <NO ID>::std::math::abs
    7 |         fn abs(x: Scalar) -> Scalar {
      |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-Symbol x not found.-- Test Result --
+-- Test Result --
 FAIL

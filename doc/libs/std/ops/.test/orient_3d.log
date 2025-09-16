@@ -13,23 +13,38 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 3D (root)
-    Multiplicity -> 3D
-      op std::ops::orient(v: Vec2 = (x: Scalar = 1, y: Scalar = 0, z: Scalar = 0)) -> 3D
-        Transform __builtin::ops::orient(x: Scalar = 1, y: Scalar = 0, z: Scalar = 0)⏎ -> 3D
-          part std::geo3d::Cylinder(d: Length = 35mm, h: Length = 50mm) -> 3D (root)
-            Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = -25)⏎ -> 3D
-              Primitive3D __builtin::geo3d::Cylinder(height: Scalar = 50, radius_bottom: Scalar = 17.5, radius_top: Scalar = 17.5)⏎ -> 3D
-      op std::ops::orient(v: Vec2 = (x: Scalar = 0, y: Scalar = 1, z: Scalar = 0)) -> 3D
-        Transform __builtin::ops::orient(x: Scalar = 0, y: Scalar = 1, z: Scalar = 0)⏎ -> 3D
-          part std::geo3d::Cylinder(d: Length = 35mm, h: Length = 50mm) -> 3D (root)
-            Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = -25)⏎ -> 3D
-              Primitive3D __builtin::geo3d::Cylinder(height: Scalar = 50, radius_bottom: Scalar = 17.5, radius_top: Scalar = 17.5)⏎ -> 3D
-      op std::ops::orient(v: Vec2 = (x: Scalar = 0, y: Scalar = 0, z: Scalar = 1)) -> 3D
-        Transform __builtin::ops::orient(x: Scalar = 0, y: Scalar = 0, z: Scalar = 1)⏎ -> 3D
-          part std::geo3d::Cylinder(d: Length = 35mm, h: Length = 50mm) -> 3D (root)
-            Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 0, z: Scalar = -25)⏎ -> 3D
-              Primitive3D __builtin::geo3d::Cylinder(height: Scalar = 50, radius_bottom: Scalar = 17.5, radius_top: Scalar = 17.5)⏎ -> 3D
+  Group (root) ->
+    Multiplicity ->
+      Workpiece(op) std::ops::orient(v=(x=1, y=0, z=0)) ->
+        - v = (x=1, y=0, z=0)
+        Transform __builtin::ops::orient(x=1, y=0, z=0)⏎ ->
+          Workpiece(part) std::geo3d::Cylinder(d=35mm, h=50mm) (root) ->
+            - height = 50mm
+            - offset = -25mm
+            - radius_bottom = 17.5mm
+            - radius_top = 17.5mm
+            Transform __builtin::ops::translate(x=0, y=0, z=-25)⏎ ->
+              Primitive3D __builtin::geo3d::Cylinder(height=50, radius_bottom=17.5, radius_top=17.5)⏎ ->
+      Workpiece(op) std::ops::orient(v=(x=0, y=1, z=0)) ->
+        - v = (x=0, y=1, z=0)
+        Transform __builtin::ops::orient(x=0, y=1, z=0)⏎ ->
+          Workpiece(part) std::geo3d::Cylinder(d=35mm, h=50mm) (root) ->
+            - height = 50mm
+            - offset = -25mm
+            - radius_bottom = 17.5mm
+            - radius_top = 17.5mm
+            Transform __builtin::ops::translate(x=0, y=0, z=-25)⏎ ->
+              Primitive3D __builtin::geo3d::Cylinder(height=50, radius_bottom=17.5, radius_top=17.5)⏎ ->
+      Workpiece(op) std::ops::orient(v=(x=0, y=0, z=1)) ->
+        - v = (x=0, y=0, z=1)
+        Transform __builtin::ops::orient(x=0, y=0, z=1)⏎ ->
+          Workpiece(part) std::geo3d::Cylinder(d=35mm, h=50mm) (root) ->
+            - height = 50mm
+            - offset = -25mm
+            - radius_bottom = 17.5mm
+            - radius_top = 17.5mm
+            Transform __builtin::ops::translate(x=0, y=0, z=-25)⏎ ->
+              Primitive3D __builtin::geo3d::Cylinder(height=50, radius_bottom=17.5, radius_top=17.5)⏎ ->
 
 -- Test Result --
 OK

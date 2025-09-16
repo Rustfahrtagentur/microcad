@@ -9,10 +9,11 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group -> Undetermined (root)
-
+error: Assignment failed because value x already has been initialized with 4mm
+  ---> <FROM STR>:1:1
+     |
+   1 | x: Length = 4mm;   // explicit type declaration
+     | ^
+     |
 -- Test Result --
-OK
-Could not determine output type.
-Nothing will be exported.
+FAIL
