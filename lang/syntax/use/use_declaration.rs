@@ -40,10 +40,10 @@ impl SrcReferrer for UseDeclaration {
 impl std::fmt::Display for UseDeclaration {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            UseDeclaration::Use(visibility, name) => write!(f, "{visibility} {name}"),
-            UseDeclaration::UseAll(visibility, name) => write!(f, "{visibility} {name}::*"),
+            UseDeclaration::Use(visibility, name) => write!(f, "{visibility}{name}"),
+            UseDeclaration::UseAll(visibility, name) => write!(f, "{visibility}{name}::*"),
             UseDeclaration::UseAlias(visibility, name, alias) => {
-                write!(f, "{visibility} {name} as {alias}")
+                write!(f, "{visibility}{name} as {alias}")
             }
         }
     }
@@ -54,13 +54,17 @@ impl TreeDisplay for UseDeclaration {
         // use declaration is transparent
         match self {
             UseDeclaration::Use(visibility, name) => {
-                writeln!(f, "{:depth$}Use {name} ({visibility})", "")
+                writeln!(f, "{:depth$}{visibility}use {name}", "")
             }
             UseDeclaration::UseAll(visibility, name) => {
-                writeln!(f, "{:depth$}Use {name}::* ({visibility})", "")
+                writeln!(f, "{:depth$}{visibility}use {name}::* ({visibility})", "")
             }
             UseDeclaration::UseAlias(visibility, name, alias) => {
-                writeln!(f, "{:depth$}Use {name} as {alias} ({visibility})", "")
+                writeln!(
+                    f,
+                    "{:depth$}{visibility}use {name} as {alias} ({visibility})",
+                    ""
+                )
             }
         }
     }

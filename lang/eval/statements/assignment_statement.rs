@@ -99,11 +99,16 @@ impl Eval<()> for AssignmentStatement {
                 }
             }
             Qualifier::Value => {
-                if context.get_property(&assignment.id).is_ok() {
-                    todo!("property with that name exists")
-                }
-
-                if let Err(err) = context.set_local_value(assignment.id.clone(), new_value) {
+                let result = if context.get_property(&assignment.id).is_ok() {
+                    if context.is_init() {
+                        context.init_property(assignment.id.clone(), new_value)
+                    } else {
+                        todo!("property with that name exists")
+                    }
+                } else {
+                    context.set_local_value(assignment.id.clone(), new_value)
+                };
+                if let Err(err) = result {
                     context.error(self, err)?;
                 }
             }

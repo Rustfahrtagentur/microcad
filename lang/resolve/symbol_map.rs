@@ -82,7 +82,7 @@ impl SymbolMap {
     /// Print contained symbols with indention.
     pub fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
         for (id, symbol) in self.0.iter() {
-            symbol.print_symbol(f, Some(id), depth)?;
+            symbol.print_symbol(f, Some(id), depth, true)?;
         }
 
         Ok(())
@@ -117,7 +117,7 @@ impl SymbolMap {
 impl std::fmt::Display for SymbolMap {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (id, symbol) in self.0.iter() {
-            symbol.print_symbol(f, Some(id), 0)?;
+            symbol.print_symbol(f, Some(id), 0, true)?;
         }
 
         Ok(())

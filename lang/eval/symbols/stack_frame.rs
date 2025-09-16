@@ -132,7 +132,7 @@ impl StackFrame {
             match &symbol.borrow().def {
                 SymbolDefinition::Constant(visibility, id, value) => writeln!(
                     f,
-                    "{:depth$}- {visibility} {id:?} = {value}{full_name} (constant)",
+                    "{:depth$}- {visibility}{id:?} = {value}{full_name} (constant)",
                     ""
                 )?,
                 SymbolDefinition::Argument(id, value) => {
@@ -155,11 +155,11 @@ impl StackFrame {
                 }
                 SymbolDefinition::Alias(visibility, id, name) => writeln!(
                     f,
-                    "{:depth$}- {visibility} {id:?}{full_name} -> {name} (alias)",
+                    "{:depth$}- {visibility}{id:?}{full_name} -> {name} (alias)",
                     ""
                 )?,
                 SymbolDefinition::UseAll(visibility, name) => {
-                    writeln!(f, "{:depth$}- {visibility} {name}{full_name} (use all)", "")?
+                    writeln!(f, "{:depth$}- {visibility}{name}{full_name} (use all)", "")?
                 }
                 #[cfg(test)]
                 SymbolDefinition::Tester(id) => writeln!(f, "{:depth$}- {id} (tester)", "")?,

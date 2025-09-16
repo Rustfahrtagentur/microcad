@@ -134,20 +134,21 @@ impl Symbol {
         f: &mut impl std::fmt::Write,
         id: Option<&Identifier>,
         depth: usize,
+        children: bool,
     ) -> std::fmt::Result {
         let self_id = &self.id();
         let id = id.unwrap_or(self_id);
         if cfg!(feature = "ansi-color") && !self.borrow().used {
-            color_print::cwriteln!(
+            color_print::cwrite!(
                 f,
                 "{:depth$}<#606060>{visibility}{id:?} {def} [{full_name}]</>",
                 "",
-                visibility = if self.is_public() { "pub " } else { "" },
+                visibility = self.visibility(),
                 def = self.0.borrow().def,
                 full_name = self.full_name(),
             )?;
         } else {
-            writeln!(
+            write!(
                 f,
                 "{:depth$}{id:?} {} [{}]",
                 "",
@@ -155,12 +156,15 @@ impl Symbol {
                 self.full_name(),
             )?;
         }
-        let indent = 4; //format!("{id}").len();
+        if children {
+            writeln!(f)?;
+            let indent = 4;
 
-        self.borrow()
-            .children
-            .iter()
-            .try_for_each(|(id, child)| child.print_symbol(f, Some(id), depth + indent))
+            self.borrow().children.iter().try_for_each(|(id, child)| {
+                child.print_symbol(f, Some(id), depth + indent, true)
+            })?;
+        }
+        Ok(())
     }
 
     /// Insert child and change parent of child to new parent.
@@ -280,7 +284,9 @@ impl Symbol {
     pub fn can_value(&self) -> bool {
         matches!(
             self.borrow().def,
-            SymbolDefinition::Function(..) | SymbolDefinition::Workbench(..)
+            SymbolDefinition::Function(..)
+                | SymbolDefinition::Workbench(..)
+                | SymbolDefinition::SourceFile(..)
         )
     }
 
@@ -322,16 +328,7 @@ impl FullyQualify for Symbol {
 
 impl std::fmt::Display for Symbol {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.print_symbol(f, None, 0)
-    }
-}
-
-/// Print symbols via [std::fmt::Display]
-pub struct FormatSymbol<'a>(pub &'a Symbol);
-
-impl std::fmt::Display for FormatSymbol<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.print_symbol(f, Some(&self.0.id()), 0)
+        self.print_symbol(f, None, 0, false)
     }
 }
 

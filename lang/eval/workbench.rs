@@ -26,15 +26,25 @@ impl WorkbenchDefinition {
 
         let arguments = creator.arguments.clone();
 
-        let (properties,non_properties) :(Vec<_>,Vec<_>) =                 // copy all arguments which are part of the building plan into properties
-        arguments
-            .named_iter().map(|(id, value)|(id.clone(),value.clone()))
-            .partition(|(id, _)| {
-                self.plan.contains_key(id)
-            });
+        // copy all arguments which are part of the building plan into properties
+        let (mut properties, non_properties): (Vec<_>, Vec<_>) = arguments
+            .named_iter()
+            .map(|(id, value)| (id.clone(), value.clone()))
+            .partition(|(id, _)| self.plan.contains_key(id));
 
-        log::trace!("Properties:\n{:?}", properties);
-        log::trace!("Non-Properties:\n{:?}", non_properties);
+        // create uninitialized values for all missing building plan properties
+        let missing: Vec<_> = self
+            .plan
+            .iter()
+            .filter(|param| !properties.iter().any(|(id, _)| param.id == *id))
+            .map(|param| param.id.clone())
+            .collect();
+        missing
+            .into_iter()
+            .for_each(|id| properties.push((id, Value::None)));
+
+        log::trace!("Properties: {properties:?}");
+        log::trace!("Non-Properties: {non_properties:?}");
 
         // Create model
         let model = ModelBuilder::new(
@@ -65,9 +75,7 @@ impl WorkbenchDefinition {
                         id = self.id,
                         kind = self.kind
                     );
-                    if let Err(err) =
-                        init.eval(&self.plan, non_properties.into_iter().collect(), context)
-                    {
+                    if let Err(err) = init.eval(non_properties.into_iter().collect(), context) {
                         context.error(&self.src_ref_head(), err)?;
                     }
                 }

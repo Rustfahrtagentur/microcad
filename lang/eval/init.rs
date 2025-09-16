@@ -5,37 +5,25 @@ use crate::{eval::*, model::*, syntax::*};
 
 impl InitDefinition {
     /// Evaluate a call to the init definition
-    pub fn eval(&self, plan: &ParameterList, args: Tuple, context: &mut Context) -> EvalResult<()> {
+    pub fn eval(&self, args: Tuple, context: &mut Context) -> EvalResult<()> {
         context.grant(self)?;
         let model = context.get_model()?;
         context.scope(StackFrame::Init(args.into()), |context| {
-            // avoid body stack frame
             let _: Value = self.body.statements.eval(context)?;
 
-            let (found, not_found): (Vec<_>, Vec<_>) = plan
-                .iter()
-                .map(|param| (&param.id, context.get_property(&param.id)))
-                .partition(|(_, v)| {
-                    if let Ok(v) = v {
-                        !v.is_invalid()
-                    } else {
-                        false
-                    }
-                });
-
-            if not_found.is_empty() {
-                let props: Properties = found
-                    .into_iter()
-                    .map(|(id, value)| ((*id).clone(), value.expect("ok")))
+            if let Some(properties) = model.borrow().get_properties() {
+                let missing: IdentifierList = properties
+                    .iter()
+                    .filter(|(_, value)| value.is_invalid())
+                    .map(|(id, _)| id.clone())
                     .collect();
 
-                model.borrow_mut().add_properties(props.clone());
-                Ok(())
-            } else {
-                Err(EvalError::BuildingPlanIncomplete(
-                    not_found.iter().map(|(id, _)| (*id).clone()).collect(),
-                ))
+                if !missing.is_empty() {
+                    context.error(self, EvalError::BuildingPlanIncomplete(missing))?;
+                }
             }
+
+            Ok(())
         })
     }
 }
