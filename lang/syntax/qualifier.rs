@@ -7,7 +7,7 @@
 ///
 /// This is used to determine if an entity is public or private.
 /// By default, entities are private.
-#[derive(Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default)]
 pub enum Qualifier {
     /// local variable
     #[default]

@@ -146,6 +146,7 @@ impl Parse for Qualifier {
         Parser::ensure_rule(&pair, Rule::qualifier);
         match pair.as_str() {
             "prop" => Ok(Self::Prop),
+            "const" => Ok(Self::Const),
             _ => Ok(Self::Value),
         }
     }

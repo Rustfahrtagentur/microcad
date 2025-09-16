@@ -58,27 +58,46 @@ impl Eval<()> for AssignmentStatement {
 
         // lookup if we find any existing symbol
         if let Ok(symbol) = context.lookup(&QualifiedName::from_id(assignment.id.clone())) {
-            match &mut symbol.borrow_mut().def {
+            let err = match &mut symbol.borrow_mut().def {
                 SymbolDefinition::Constant(_, identifier, value) => {
                     if value.is_invalid() {
                         *value = new_value.clone();
+                        None
                     } else {
-                        context.error(
-                            identifier,
-                            EvalError::ValueAlreadyInitialized(identifier.clone()),
-                        )?;
+                        Some((
+                            identifier.clone(),
+                            EvalError::ValueAlreadyInitialized(identifier.clone(), value.clone()),
+                        ))
                     }
                 }
-                _ => context.error(
-                    &assignment.id,
+                _ => Some((
+                    assignment.id.clone(),
                     EvalError::NotAnLValue(assignment.id.clone()),
-                )?,
+                )),
+            };
+            // because logging is blocked while `symbol.borrow_mut()` it must run outside the borrow
+            if let Some((id, err)) = err {
+                context.error(&id, err)?;
             }
         }
 
         // now check what to do with the value
         match assignment.qualifier {
-            Qualifier::Const => todo!("store symbol in module or source file"),
+            Qualifier::Const => {
+                if context.get_property(&assignment.id).is_ok() {
+                    todo!("property with that name exists")
+                }
+
+                let symbol = context.lookup(&assignment.id.clone().into());
+                match symbol {
+                    Ok(symbol) => {
+                        if let Err(err) = symbol.set_value(new_value) {
+                            context.error(self, err)?
+                        }
+                    }
+                    Err(err) => context.error(self, err)?,
+                }
+            }
             Qualifier::Value => {
                 if context.get_property(&assignment.id).is_ok() {
                     todo!("property with that name exists")

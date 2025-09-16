@@ -132,6 +132,10 @@ impl Eval for QualifiedName {
             SymbolDefinition::UseAll(_, name) => {
                 unreachable!("Unexpected use {name} in expression")
             }
+            #[cfg(test)]
+            SymbolDefinition::Tester(..) => {
+                unreachable!()
+            }
         }
     }
 }

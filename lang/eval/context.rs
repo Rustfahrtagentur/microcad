@@ -179,7 +179,10 @@ impl Context {
             Ok(model) => {
                 if let Some(previous_value) = model.borrow_mut().set_property(id.clone(), value) {
                     if !previous_value.is_invalid() {
-                        return Err(EvalError::ValueAlreadyInitialized(id.clone()));
+                        return Err(EvalError::ValueAlreadyInitialized(
+                            id.clone(),
+                            previous_value,
+                        ));
                     }
                 }
                 Ok(())

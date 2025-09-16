@@ -173,11 +173,20 @@ impl Resolve for Attribute {
 
 impl Resolve for AssignmentStatement {
     fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<Symbol>> {
-        match self.assignment.qualifier {
-            Qualifier::Prop => Ok(None),
-            Qualifier::Const => todo!("create symbol"),
-            Qualifier::Value => {
-                log::trace!("Declare value {}", self.assignment.id);
+        match (self.assignment.visibility, self.assignment.qualifier) {
+            // properties do not have a visibility
+            (_, Qualifier::Prop) => {
+                if !parent.can_prop() {
+                    todo!("error: const not allowed");
+                }
+                Ok(None)
+            }
+            // constants will be symbols (`pub` shall equal `pub const`)
+            (_, Qualifier::Const) | (Visibility::Public, Qualifier::Value) => {
+                if !parent.can_const() {
+                    todo!("error: const not allowed");
+                }
+                log::trace!("Declare private value {}", self.assignment.id);
                 Ok(Some(Symbol::new(
                     SymbolDefinition::Constant(
                         self.assignment.visibility,
@@ -186,6 +195,16 @@ impl Resolve for AssignmentStatement {
                     ),
                     Some(parent.clone()),
                 )))
+            }
+            // value go on stack
+            (Visibility::Private, Qualifier::Value) => {
+                if self.assignment.visibility == Visibility::Private && !parent.can_value() {
+                    todo!(
+                        "error: private value not allowed in {parent} at line {:?}",
+                        self.src_ref
+                    );
+                }
+                Ok(None)
             }
         }
     }

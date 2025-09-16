@@ -8,7 +8,7 @@ mod module {
     use std::debug::*;
 
     // private module variable
-    value = 1;
+    const value = 1;
     // public module variable
     pub pub_value = 2;
 
@@ -17,7 +17,7 @@ mod module {
         use std::debug::*;
 
         // private module variable
-        value = 3;
+        const value = 3;
         // public module variable
         pub pub_value = 4;
 
@@ -56,6 +56,8 @@ mod module {
             assert_invalid(alt_param);
             assert_invalid(init_local);
             assert_eq([property, 9]);
+
+            function();
         }
 
         fn function(fn_param = 10) {
@@ -71,10 +73,10 @@ mod module {
         }
     }
 
-    fn function(fn_param = 11) {
-        assert_eq([value, 1]);
+    pub fn function(fn_param = 11) {
+        assert_invalid(value);
         assert_eq([pub_value, 2]);
-        assert_eq([sub_module::value, 3]);
+        assert_invalid(sub_module::value);
         assert_eq([sub_module::pub_value, 4]);
         assert_invalid(Workbench);
         assert_invalid(PrivateWorkbench);
@@ -85,10 +87,11 @@ mod module {
 }
 
 // source file code 
-assert_eq([module::value, 1]);
+assert_invalid(module::value);
 assert_eq([module::pub_value, 2]);
-assert_eq([module::sub_module::value, 3]);
+assert_invalid(module::sub_module::value);
 assert_eq([module::sub_module::pub_value, 4]);
 assert_eq([module::sub_module::Workbench().property, 9]);
 assert_invalid(module::sub_module::PrivateWorkbench);
+assert_eq([module::function(), 0]);
 ```

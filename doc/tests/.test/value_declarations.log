@@ -1,0 +1,110 @@
+-- Test --
+  value_declarations
+  ../doc/tests/value_declarations.md:3
+
+-- Code --
+
+ 1: use std::debug::*;
+ 2: 
+ 3: mod module {
+ 4:     
+ 5:     use std::debug::*;
+ 6: 
+ 7:     // private module variable
+ 8:     const value = 1;
+ 9:     // public module variable
+10:     pub pub_value = 2;
+11: 
+12:     mod sub_module {
+13:         // pre-init code
+14:         use std::debug::*;
+15: 
+16:         // private module variable
+17:         const value = 3;
+18:         // public module variable
+19:         pub pub_value = 4;
+20: 
+21:         // private workbench
+22:         sketch PrivateWorkbench() {}
+23: 
+24:         // public workbench
+25:         pub sketch Workbench(param = 5) {
+26:             sketch_local = 6;
+27: 
+28:             init(alt_param = 7) {
+29:                 init_local = 8;
+30: 
+31:                 assert_eq([super::value, 1]);
+32:                 assert_eq([super::pub_value, 2]);
+33:                 assert_eq([value, 3]);
+34:                 assert_eq([pub_value, 4]);
+35:                 assert_invalid(param);
+36:                 assert_eq([sketch_local, 6]);
+37:                 assert_eq([alt_param, 7]);
+38:                 assert_eq([init_local, 8]);
+39: 
+40:                 prop param = 5; // needed to compile
+41:             }
+42: 
+43:             // property of sketch
+44:             prop property = 9;
+45: 
+46:             // post init code
+47:             assert_invalid(super::value);
+48:             assert_eq([super::pub_value, 2]);
+49:             assert_eq([value, 3]);
+50:             assert_eq([pub_value, 4]);
+51:             assert_eq([param, 5]);
+52:             assert_eq([sketch_local, 6]);
+53:             assert_invalid(alt_param);
+54:             assert_invalid(init_local);
+55:             assert_eq([property, 9]);
+56: 
+57:             function();
+58:         }
+59: 
+60:         fn function(fn_param = 10) {
+61:             assert_invalid(super::value);
+62:             assert_eq([super::pub_value, 2]);
+63:             assert_eq([value, 3]);
+64:             assert_eq([pub_value, 4]);
+65:             assert_invalid(param);
+66:             // assert_invalid(Workbench);
+67:             assert_eq([fn_param, 10]);
+68: 
+69:             return 0;
+70:         }
+71:     }
+72: 
+73:     pub fn function(fn_param = 11) {
+74:         assert_invalid(value);
+75:         assert_eq([pub_value, 2]);
+76:         assert_invalid(sub_module::value);
+77:         assert_eq([sub_module::pub_value, 4]);
+78:         assert_invalid(Workbench);
+79:         assert_invalid(PrivateWorkbench);
+80:         assert_eq([fn_param, 11]);
+81:         
+82:         return 0;
+83:     }
+84: }
+85: 
+86: // source file code 
+87: assert_invalid(module::value);
+88: assert_eq([module::pub_value, 2]);
+89: assert_invalid(module::sub_module::value);
+90: assert_eq([module::sub_module::pub_value, 4]);
+91: assert_eq([module::sub_module::Workbench().property, 9]);
+92: assert_invalid(module::sub_module::PrivateWorkbench);
+93: assert_eq([module::function(), 0]);
+
+-- Output --
+-- Errors --
+error: Unexpectedly found symbol <NO ID>::module::sub_module::PrivateWorkbench
+  ---> <FROM STR>:92:16
+     |
+  92 | assert_invalid(module::sub_module::PrivateWorkbench);
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAIL

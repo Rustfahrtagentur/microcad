@@ -161,6 +161,8 @@ impl StackFrame {
                 SymbolDefinition::UseAll(visibility, name) => {
                     writeln!(f, "{:depth$}- {visibility} {name}{full_name} (use all)", "")?
                 }
+                #[cfg(test)]
+                SymbolDefinition::Tester(id) => writeln!(f, "{:depth$}- {id} (tester)", "")?,
             }
         }
 

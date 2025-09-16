@@ -72,18 +72,26 @@ impl Stack {
         if self.0.is_empty() {
             QualifiedName::default()
         } else {
-            QualifiedName::no_ref(
-                self.0
-                    .iter()
-                    .filter_map(|frame| {
-                        if matches!(frame, StackFrame::Module(..) | StackFrame::Source(..)) {
-                            frame.id()
-                        } else {
-                            None
+            let mut module_name = QualifiedName::default();
+            for (n, frame) in self.0.iter().rev().enumerate() {
+                match frame {
+                    StackFrame::Source(id, ..) | StackFrame::Module(id, ..) => {
+                        module_name.insert(0, id.clone());
+                    }
+                    StackFrame::Call { symbol, .. } => {
+                        if n > 0 {
+                            // log::trace!("CALL: {}, {}", symbol.full_name(), module_name);
+                            module_name =
+                                symbol.full_name().remove_last().with_prefix(&module_name);
+                            break;
                         }
-                    })
-                    .collect(),
-            )
+                    }
+                    _ => (),
+                }
+            }
+
+            // log::trace!("current_module_name: {module_name:?}");
+            module_name
         }
     }
 

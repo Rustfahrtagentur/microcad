@@ -24,6 +24,9 @@ pub enum SymbolDefinition {
     Alias(Visibility, Identifier, QualifiedName),
     /// Use all available symbols in the module with the given name.
     UseAll(Visibility, QualifiedName),
+    /// Just a dummy for testing
+    #[cfg(test)]
+    Tester(Identifier),
 }
 
 impl SymbolDefinition {
@@ -37,6 +40,8 @@ impl SymbolDefinition {
             Self::Builtin(m) => m.id(),
             Self::Constant(_, id, _) | Self::Argument(id, _) | Self::Alias(_, id, _) => id.clone(),
             Self::UseAll(..) => Identifier::none(),
+            #[cfg(test)]
+            Self::Tester(id) => id.clone(),
         }
     }
 }
@@ -53,6 +58,8 @@ impl std::fmt::Display for SymbolDefinition {
             Self::Argument(.., value) => write!(f, "(call_argument) = {value}"),
             Self::Alias(.., name) => write!(f, "(alias) => {name}"),
             Self::UseAll(.., name) => write!(f, "(use all) => {name}"),
+            #[cfg(test)]
+            Self::Tester(id) => write!(f, "(tester) => {id}"),
         }
     }
 }

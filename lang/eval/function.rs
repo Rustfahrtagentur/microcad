@@ -22,7 +22,7 @@ impl Eval for FunctionDefinition {
                 )?
             }
             // avoid body frame
-            self.body.statements.eval(context)
+            Ok(Value::None)
         })
     }
 }

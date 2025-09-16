@@ -231,16 +231,32 @@ pub enum EvalError {
     AmbiguousProperty(QualifiedName, Identifier),
 
     /// Assignment failed because value already has been initialized
-    #[error("Assignment failed because value {0} already has been initialized")]
-    ValueAlreadyInitialized(Identifier),
+    #[error("Assignment failed because value {0} already has been initialized with {1}")]
+    ValueAlreadyInitialized(Identifier, Value),
 
     /// Assignment failed because left side is not an l-value
     #[error("Assignment failed because {0} is not an l-value")]
     NotAnLValue(Identifier),
 
     /// Found symbol but it's not visible to user
-    #[error("Symbol {0} is private from within {1}")]
-    SymbolIsPrivate(QualifiedName, QualifiedName),
+    #[error("Symbol {what} is private from within {within}")]
+    SymbolIsPrivate {
+        /// what was searched
+        what: QualifiedName,
+        /// where it was searched
+        within: QualifiedName,
+    },
+
+    /// Found symbol but it's not visible to user
+    #[error("Symbol {what} (aliased from {alias}) is private from within {within}")]
+    SymbolBehindAliasIsPrivate {
+        /// what was searched
+        what: QualifiedName,
+        /// the alias in between
+        alias: QualifiedName,
+        /// where it was searched
+        within: QualifiedName,
+    },
 }
 
 /// Result type of any evaluation.

@@ -44,9 +44,22 @@ pub struct Symbol(RcMut<SymbolInner>);
 #[derive(Debug, Deref)]
 pub struct Symbols(Vec<Symbol>);
 
+impl Symbols {
+    pub fn full_names(&self) -> QualifiedNames {
+        self.iter().map(|symbol| symbol.full_name()).collect()
+    }
+}
+
 impl Default for Symbol {
     fn default() -> Self {
         Self(RcMut::new(Default::default()))
+    }
+}
+
+impl PartialEq for Symbol {
+    fn eq(&self, other: &Self) -> bool {
+        // just compare the pointers - not the content
+        self.0.as_ptr() == other.0.as_ptr()
     }
 }
 
@@ -206,6 +219,9 @@ impl Symbol {
             SymbolDefinition::Constant(visibility, ..)
             | SymbolDefinition::Alias(visibility, ..)
             | SymbolDefinition::UseAll(visibility, ..) => *visibility,
+
+            #[cfg(test)]
+            SymbolDefinition::Tester(..) => Visibility::Public,
         }
     }
 
@@ -230,44 +246,16 @@ impl Symbol {
         parents
     }
 
-    /// Return `true` if symbol's visibility is private.
-    pub fn is_visible_within(&self, within: &QualifiedName) -> bool {
-        let full_name = self.full_name();
-        // check parents' visibility (below any common parent)
-        let visible = if full_name.is_within(within)
-            && self
-                .parents(full_name.len() - within.len() - 1)
-                .iter()
-                .inspect(|p| log::trace!("{}", p.id()))
-                .any(|parent| parent.is_private())
-        {
-            false
-        }
-        // check own visibility
-        else if self.is_private() {
-            self.full_name().starts_with(within)
-        } else {
-            true
-        };
-
-        log::trace!(
-            "{} is {} from within {within}",
-            self.full_name(),
-            if visible { "visible" } else { "invisible" }
-        );
-
-        visible
-    }
-
     /// Search down the symbol tree for a qualified name.
     /// # Arguments
     /// - `name`: Name to search for.
     pub fn search(&self, name: &QualifiedName) -> Option<Symbol> {
-        log::trace!("Searching {name} in {:?}", self.id());
+        log::trace!("Searching {name} in {:?}", self.full_name());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first) {
                 let name = &name.remove_first();
                 if name.is_empty() {
+                    log::trace!("Found {name} in {:?}", self.full_name());
                     Some(child.clone())
                 } else {
                     child.search(name)
@@ -280,6 +268,36 @@ impl Symbol {
             log::warn!("Cannot search for an anonymous name");
             None
         }
+    }
+
+    pub fn can_const(&self) -> bool {
+        matches!(
+            self.borrow().def,
+            SymbolDefinition::Module(..) | SymbolDefinition::SourceFile(..)
+        )
+    }
+
+    pub fn can_value(&self) -> bool {
+        matches!(
+            self.borrow().def,
+            SymbolDefinition::Function(..) | SymbolDefinition::Workbench(..)
+        )
+    }
+
+    pub fn can_prop(&self) -> bool {
+        matches!(self.borrow().def, SymbolDefinition::Workbench(..))
+    }
+
+    pub fn can_pub(&self) -> bool {
+        self.can_const()
+    }
+
+    pub fn set_value(&self, new_value: Value) -> ResolveResult<()> {
+        match &mut self.borrow_mut().def {
+            SymbolDefinition::Constant(_, _, value) => *value = new_value,
+            _ => todo!("symbol is not a value!"),
+        }
+        Ok(())
     }
 }
 
@@ -331,6 +349,8 @@ impl SrcReferrer for SymbolInner {
             | SymbolDefinition::Argument(identifier, _) => identifier.src_ref(),
             SymbolDefinition::Alias(_, identifier, _) => identifier.src_ref(),
             SymbolDefinition::UseAll(_, name) => name.src_ref(),
+            #[cfg(test)]
+            SymbolDefinition::Tester(id) => id.src_ref(),
         }
     }
 }

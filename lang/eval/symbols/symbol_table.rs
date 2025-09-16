@@ -59,9 +59,8 @@ impl SymbolTable {
             Err(err) => return Err(err)?,
         };
         log::trace!(
-            "{found} global symbol: '{name:?}' = '{full_name:?}'",
+            "{found} global symbol: {symbol}",
             found = crate::mark!(FOUND),
-            full_name = symbol.full_name()
         );
         Ok(symbol)
     }
@@ -83,9 +82,8 @@ impl SymbolTable {
         match symbol {
             Ok(symbol) => {
                 log::trace!(
-                    "{found} local symbol: '{name:?}' = '{full_name:?}'",
+                    "{found} local symbol: {symbol}",
                     found = crate::mark!(FOUND),
-                    full_name = symbol.full_name()
                 );
                 Ok(symbol)
             }
@@ -93,24 +91,40 @@ impl SymbolTable {
         }
     }
 
-    fn lookup_module(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        let module = self.stack.current_module_name();
-        log::trace!("Looking for symbol '{name:?}' in current module '{module:?}'");
-        let name = &name.with_prefix(&module).dissolve_super();
-        match self.lookup_global(name) {
-            Ok(symbol) => {
-                if !symbol.is_visible_within(&module) {
-                    return Err(EvalError::SymbolIsPrivate(name.clone(), module));
+    fn lookup_within(&mut self, what: &QualifiedName, within: QualifiedName) -> EvalResult<Symbol> {
+        log::trace!("Looking for symbol '{what:?}' within '{within:?}':",);
+
+        // process internal supers
+        let (what, within) = what.dissolve_super(within);
+
+        let parents = self.symbols.path_to(&within)?;
+        for (n, parent) in parents.iter().rev().enumerate() {
+            log::trace!("  Looking in: {:?} for {:?}", parent.full_name(), what);
+            if let Some(symbol) = parent.search(&what) {
+                let alias = self.follow_alias(&symbol)?;
+                if n > 0 {
+                    if symbol.is_private() {
+                        return Err(EvalError::SymbolIsPrivate {
+                            what: what.clone(),
+                            within,
+                        });
+                    }
+                    if alias != symbol && alias.is_private() {
+                        return Err(EvalError::SymbolBehindAliasIsPrivate {
+                            what: what.clone(),
+                            alias: alias.full_name(),
+                            within,
+                        });
+                    }
                 }
-                log::trace!(
-                    "{found} symbol in current module: '{name:?}' = '{full_name:?}'",
-                    found = crate::mark!(FOUND),
-                    full_name = symbol.full_name()
-                );
-                self.follow_alias(&symbol)
+                return Ok(alias);
             }
-            Err(err) => Err(err)?,
         }
+        Err(EvalError::SymbolNotFound(what.clone()))
+    }
+
+    fn lookup_mod(&mut self, what: &QualifiedName) -> EvalResult<Symbol> {
+        self.lookup_within(what, self.stack.current_module_name())
     }
 
     fn lookup_workbench(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
@@ -121,9 +135,8 @@ impl SymbolTable {
                 Ok(symbol) => {
                     if symbol.full_name() == *name {
                         log::trace!(
-                            "{found} symbol in current module: '{name:?}' = '{full_name:?}'",
+                            "{found} symbol in current module: {symbol}",
                             found = crate::mark!(FOUND),
-                            full_name = symbol.full_name()
                         );
                         return self.follow_alias(&symbol);
                     }
@@ -148,9 +161,8 @@ impl SymbolTable {
             log::trace!("Looking relatively for symbol '{name}'");
             let symbol = self.lookup_global(name)?;
             log::trace!(
-                "{found} symbol relatively: '{name}' = '{full_name}'",
+                "{found} symbol relatively: {symbol}",
                 found = crate::mark!(FOUND),
-                full_name = symbol.full_name()
             );
             return self.follow_alias(&symbol);
         }
@@ -190,20 +202,22 @@ impl SymbolTable {
 
 impl Lookup for SymbolTable {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::debug!("Lookup symbol '{name}'");
+        log::debug!("Lookup symbol '{name:?}' (at line {:?}):", name.src_ref());
 
         let name = &self.de_alias(name);
 
+        log::trace!("- lookups -------------------------------------------------------");
         // collect all symbols that can be found and remember origin
         let result = [
             ("local", self.lookup_local(name)),
-            ("module", self.lookup_module(name)),
+            ("module", self.lookup_mod(name)),
             ("workbench", self.lookup_workbench(name)),
             ("global", self.lookup_global(name).map_err(|e| e.into())),
             ("relative", self.lookup_relatively(name)),
         ]
         .into_iter();
 
+        log::trace!("- result --------------------------------------------------------");
         let mut errors = Vec::new();
 
         // collect ok-results and ambiguity errors
@@ -269,13 +283,22 @@ impl Lookup for SymbolTable {
             Some((origin, first)) => {
                 // check if all findings point to the same symbol
                 if !found.iter().all(|(_, x)| Rc::ptr_eq(x, first)) {
+                    log::debug!(
+                        "{ambiguous} symbol '{name:?}' in {origin}",
+                        ambiguous = crate::mark!(AMBIGUOUS),
+                        origin = found
+                            .iter()
+                            .map(|(id, _)| *id)
+                            .collect::<Vec<_>>()
+                            .join(" and ")
+                    );
                     Err(EvalError::AmbiguousSymbol {
                         ambiguous: name.clone(),
                         others: found.iter().map(|(_, x)| x.clone()).collect(),
                     })
                 } else {
                     log::debug!(
-                        "{found} symbol '{name:?}' found in {origin}",
+                        "{found} symbol '{name:?}' in {origin}",
                         found = crate::mark!(FOUND_INTERIM)
                     );
                     Ok(first.clone())
