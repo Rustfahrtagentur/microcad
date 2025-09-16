@@ -16,11 +16,5 @@ error: Function statement not available here
    2 |   fn f() {} // error
      |   ^^^^^^^^^
      |
-error: Missing return statement in <NO ID>::f
-  ---> <FROM STR>:2:10
-     |
-   2 |   fn f() {} // error
-     |          ^^
-     |
 -- Test Result --
 FAILED AS EXPECTED

@@ -21,11 +21,10 @@
 
 -- Output --
 -- Errors --
-error: Missing return statement in <NO ID>::std::math::abs
-  ---> <FROM STR>:7:37
-     |
-   7 |         fn abs(x: Scalar) -> Scalar {
-     |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+-- Model --
+  Group (root) ->
+
 -- Test Result --
-FAIL
+OK
+Could not determine output type.
+Nothing will be exported.

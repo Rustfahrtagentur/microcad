@@ -12,3 +12,17 @@
  6:     geo2d::Rect(x = 0.0, y = 0.0, width = 3.0, height = 3.0);
  7: }.ops::subtract();
 
+-- Output --
+-- Errors --
+-- Model --
+  Group (root) ->
+    Operation __builtin::ops::subtract()⏎ ->
+      #[color = rgba(1, 0, 0, 1)]
+      Group ->
+        Transform __builtin::ops::translate(x=1, y=1, z=0)⏎ ->
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=3)⏎ ->
+        Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)⏎ ->
+
+-- Test Result --
+OK
+Export successful.

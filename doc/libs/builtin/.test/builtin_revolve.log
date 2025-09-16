@@ -10,3 +10,17 @@
  4:     .ops::translate(x = 20.0, y = 0.0, z = 0.0)
  5:     .ops::revolve(circular_segments = 64, revolve_degrees = 360.0);
 
+-- Output --
+-- Errors --
+-- Model --
+  Group (root) ->
+    Operation __builtin::ops::revolve(circular_segments=64, revolve_degrees=360)⏎ ->
+      Transform __builtin::ops::translate(x=20, y=0, z=0)⏎ ->
+        Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) ->
+          - center = (x=0mm, y=0mm)
+          - radius = 10mm
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)⏎ ->
+
+-- Test Result --
+OK
+Export successful.

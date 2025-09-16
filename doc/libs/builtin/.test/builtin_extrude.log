@@ -10,3 +10,20 @@
  4: 
  5: a.ops::extrude(height = 4.0, n_divisions = 0, twist_degrees = 0.0, scale_top_x = 1.0, scale_top_y = 1.0);
 
+-- Output --
+-- Errors --
+-- Model --
+  Group (root) ->
+    Operation __builtin::ops::extrude(height=4, n_divisions=0, scale_top_x=1, scale_top_y=1, twist_degrees=0)⏎ ->
+      Operation subtract()⏎ ->
+        Group ->
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=8)⏎ ->
+          Multiplicity ->
+            Primitive2D __builtin::geo2d::Circle(cx=-3, cy=-3, radius=4)⏎ ->
+            Primitive2D __builtin::geo2d::Circle(cx=3, cy=-3, radius=4)⏎ ->
+            Primitive2D __builtin::geo2d::Circle(cx=-3, cy=3, radius=4)⏎ ->
+            Primitive2D __builtin::geo2d::Circle(cx=3, cy=3, radius=4)⏎ ->
+
+-- Test Result --
+OK
+Export successful.

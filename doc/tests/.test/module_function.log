@@ -10,11 +10,10 @@
 
 -- Output --
 -- Errors --
-error: Missing return statement in <NO ID>::k::f
-  ---> <FROM STR>:2:10
-     |
-   2 |   fn f() {}
-     |          ^^
-     |
+-- Model --
+  Group (root) ->
+
 -- Test Result --
-FAIL
+OK
+Could not determine output type.
+Nothing will be exported.

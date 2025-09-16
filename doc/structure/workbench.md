@@ -151,7 +151,7 @@ you will get an error:
 [![test](.test/missed_property.svg)](.test/missed_property.log)
 
 ```µcad,missed_property#fail
-sketch Wheel(radius: Length) { // warning (no output)
+sketch Wheel(radius: Length) {
     init( width: Length ) { } // error: misses to set `radius` from building plan
 }
 

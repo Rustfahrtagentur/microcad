@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: sketch Wheel(radius: Length) { // warning (no output)
+ 1: sketch Wheel(radius: Length) {
  2:     init( width: Length ) { } // error: misses to set `radius` from building plan
  3: }
  4: 
@@ -19,4 +19,4 @@ error: Workbench plan incomplete. Missing properties: radius
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
-FAILED BUT WITH WRONG ERRORS
+FAILED AS EXPECTED
