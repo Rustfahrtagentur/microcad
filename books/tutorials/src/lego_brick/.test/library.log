@@ -18,9 +18,11 @@
 12: third_3x2 = LegoBrick(rows = 3, columns = 2, base_height = 3.2mm);
 13: 
 14: // generate geometry placing all elements side by side
-15: single_4x2;
-16: double_2x2.translate(y = -40mm);
-17: third_3x2.translate(y = 40mm);
+15: use std::ops::translate;
+16: 
+17: single_4x2;
+18: double_2x2.translate(y = -40mm);
+19: third_3x2.translate(y = 40mm);
 
 -- Parse Error --
 Parser error:  --> 1:15
