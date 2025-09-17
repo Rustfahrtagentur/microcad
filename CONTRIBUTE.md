@@ -55,16 +55,14 @@ cargo build
 cargo install --path tools/cli
 ```
 
-### Contributing to Documentation
-
-#### User Manual
+### Contributing to User Manual
 
 The user manual consists of several *markdown* files stored in the `/doc` folder, starting with the inside [`README.md`](doc/README.md).
 
 The user manual is the *point of truth* about what µcad is capable to do and what not.
 This *document driven* approach guarantees to test each proper marked (see below) code example and show the test result in a banner above the test.
 
-##### Documentation driven tests
+#### Documentation driven tests
 
 One may insert *µcad* code into the *markdown* files, which then will get tested automatically if you run `cargo test` and name them like:
 
@@ -74,7 +72,7 @@ One may insert *µcad* code into the *markdown* files, which then will get teste
 
 The *markdown* will be searched for any *µcad* code and appropriate *rust* tests will be  [generated](https://github.com/Rustfahrtagentur/microcad/tree/master/tests/microcad_markdown_test).
 
-##### Test modes
+#### Test modes
 
 beside the name you may add a test mode (see table below):
 
@@ -91,7 +89,7 @@ They can be included in the *markdown*, if you use this code:
 ```µcad,my_test
 ````
 
-##### Accessing test logs
+#### Accessing test logs
 
 You may also give the reader access to the logs by clicking on the banner with:
 
@@ -100,11 +98,11 @@ You may also give the reader access to the logs by clicking on the banner with:
 ```µcad,my_test
 ````
 
-##### Automatically update test banners
+#### Automatically update test banners
 
 There is a [script](https://github.com/Rustfahrtagentur/microcad/tree/master/update_md_banner.sh) which updates all banners automatically.
 
-##### Test results and marks
+#### Test results and marks
 
 | Image                                            | MD Code Type | Mark         | Code                                     | What do do?            |
 | ------------------------------------------------ | ------------ | ------------ | ---------------------------------------- | ---------------------- |
@@ -122,7 +120,7 @@ There is a [script](https://github.com/Rustfahrtagentur/microcad/tree/master/upd
 | -                                                | -            | -            | Ignore completely                        | yolo!                  |
 | -                                                | *(other)*    | -            | Ignore completely                        | yolo!                  |
 
-##### Mark errors and warnings
+#### Mark errors and warnings
 
 Code lines which intentionally produce errors must be marked with `// error` to make the test succeed.
 Code lines which shall produce warnings can be marked with `// warning` to check if those warnings are happening.
@@ -137,4 +135,14 @@ sketch Wheel(radius: Length) { // warning (no output)
 }
 Wheel(width = 1.0mm);
 ```
+````
+
+#### Generating exports
+
+If test code produces geometry, that will be exported by running the tests too.
+Tests are run in **low resolution** to make them faster.
+If you require a test output to be **high resolution**, then add `(hires)` to the header line:
+
+````md
+```µcad,final(hires)
 ````
