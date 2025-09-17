@@ -1,4 +1,4 @@
-# Create new microcad file
+# Create new µcad file
 
 Before we design any geometry, we use the `microcad` command line tool to create a new µcad project:
 

@@ -2,7 +2,7 @@
 authors = ["Patrick Hoffmann"]
 language = "en"
 src = "src"
-title = "Microcad Tutorials"
+title = "µcad tutorials"
 
 [output.html]
 default-theme = "rust"

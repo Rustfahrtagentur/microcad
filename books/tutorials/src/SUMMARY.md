@@ -5,7 +5,7 @@
   - [Preparation](./lego_brick/preparation/README.md)
     - [Install µcad](./lego_brick/preparation/install.md)
     - [Install Plugins (VSCode)](./lego_brick/preparation/plugins.md)
-    - [Create new microcad file](./lego_brick/preparation/create.md)
+    - [Create new µcad file](./lego_brick/preparation/create.md)
   - [Sketch the base](./lego_brick/base/README.md)
     - [Create the frame](./lego_brick/base/frame/README.md)
       - [Create a rectangle](./lego_brick/base/frame/rect.md)
