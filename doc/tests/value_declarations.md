@@ -1,5 +1,17 @@
 # Value Declarations
 
+| Keyword(s)           | Context                                   | Description                                      | Example                      |
+| -------------------- | ----------------------------------------- | ------------------------------------------------ | ---------------------------- |
+| -                    | source, workbench, function               | local value                                      | `a=1`                        |
+| -                    | init                                      | property (if in building plan), else local value | `a=1`                        |
+| `prop`               | workbench                                 | model property                                   | `prop a=1`                   |
+| `const`              | module                                    | private module value                             | `const a=1;`                 |
+| `pub`, (`pub const`) | module                                    | public module value                              | `pub a=1;`, `pub const a=1;` |
+| `use`                | module, source, workbench, function, init | private usage                                    | `use std::geo3d;`            |
+| `pub use`            | module, source                            | public usage                                     | `pub use std::geo3d;`        |
+| `fn`                 | module, source, workbench                 | private function                                 | `fn() {}`                    |
+| `pub fn`             | module, source                            | public function                                  | `pub fn() {}`                |
+
 ```µcad,value_declarations
 use std::debug::*;
 
