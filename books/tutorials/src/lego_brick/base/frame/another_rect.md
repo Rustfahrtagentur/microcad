@@ -13,7 +13,7 @@ std::geo2d::Rect(width = 31.8mm - 2 * thickness, height = 15.8mm - 2 * thickness
 
 We have defined a new value `thickness = 1.2mm` to store the frame's wall thickness.
 Then, we construct a rectangle by taking the original width and height and subtracting
-twice the `thickness` from each other.
+twice the `thickness` from both.
 
 We can now output the inner and outer geometry simultaneously.
 Similar to the `thickness = 1.2mm`, we also assign `width` and `height` their respective
@@ -34,7 +34,7 @@ std::geo2d::Rect(width = width - 2 * thickness, height = height - 2 * thickness)
 Because the arguments we give to the first `std::geo2d::Rect()` match exactly the parameter
 names of it we do not need to write extra parameter names here.
 This is called *auto-matching*.
-It prevents us from having to re-write the argument names:
+It prevents us from having to write the argument names twice:
 
 ```µcad
 std::geo2d::Rect(width = width, height = height);

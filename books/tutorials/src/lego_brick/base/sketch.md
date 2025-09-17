@@ -6,9 +6,9 @@ In µcad, a reusable, parametric component that produces or transforms a geometr
 
 There are *three* kinds of workbenches:
 
-* [**sketches**](../structure/sketch.md): produce 2D geometry (e.g. a `Rect`).
-* [**parts**](../structure/part.md): produce 3D geometry, e.g. `Sphere`. We will create a `part` for our final Lego brick.
-* [**op**](../structure/op.md): Turn some input geometry into an output geometry, e.g. `translate`, `subtract`.
+* [**sketches**](../structure/sketch.md): produce 2D geometry, e.g. `Rect`.
+* [**parts**](../structure/part.md): produce 3D geometry, e.g. `Sphere`.
+* [**op**](../structure/op.md): Turn some input geometry into output geometry, e.g. `translate`, `union` or `subtract`.
 
 ## Definition of our first sketch
 
@@ -43,7 +43,7 @@ If we examine the syntax of the above example, we can see the following things:
 * The body `{ ... }` of `Base` constructs the actual geometry.
 * `Base(width = 15.8mm, height = 31.8mm)` is a call of the sketch.
 
-The best part: We don't even need additional value stores for our measures like `thickness`, `width` etc.
+And the best part: We don't even need additional value stores for our measures like `thickness`, `width` etc.
 Every measure has a meaningful name in the parameters.
 This makes the code clearer and changes easier.
 

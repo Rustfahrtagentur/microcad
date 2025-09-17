@@ -5,7 +5,8 @@ the remaining sections of the brick (`Cap` and `Knobs`) can be constructed swift
 
 ## Cap
 
-The `Cap` is nothing more than a rectangle. We do not have to define a specific `sketch Cap`, instead we can use an *alias*:
+The `Cap` is nothing more than a rectangle.
+We do not have to define a specific `sketch Cap`, instead we can use an *alias*:
 
 [![test](.test/cap.svg)](.test/cap.log)
 
@@ -36,8 +37,9 @@ std::geo2d::Circle(d = 4.8mm, c = (
 
 ![Picture](.test/knobs_multiplicity-out.svg)
 
-Because ranges can only deal with integers, calculating `x` and `y` is a bit tricky here, because with `x` getting `[-1..2]` (which is `[-1, 0, 1, 2]`)
-and `y` getting `[0..1]` we now have no element in the middle anymore.
+Because ranges can only deal with integers, calculating `x` and `y` is a bit tricky here,
+because `x` is `[-1..2]` (which is `[-1, 0, 1, 2]`) and `y` is `[0..1]`, we now have no
+element in the middle anymore.
 So we have to subtract `0.5` from all the array values before multiplying with `8mm` to get a centered result.
 
 To avoid this complication we can use the operation `align()`.

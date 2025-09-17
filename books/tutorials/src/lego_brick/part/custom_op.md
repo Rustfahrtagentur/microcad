@@ -1,6 +1,6 @@
 # Custom operation
 
-The knobs and struts are created using multiplicity by `translate` operation and the `align()` operation.
+The knobs and struts are created using multiplicity by `translate` and `align` operations.
 
 To make placing the elements more generic we will create an operation called `grid`
 which arranges elements in a grid which is centered to origin:

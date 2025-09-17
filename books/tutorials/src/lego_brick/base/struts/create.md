@@ -5,7 +5,7 @@ but our Lego brick needs *three* of them.
 
 The shape of each strut remains the same - they’re simply offset horizontally by `8mm` to left and right.
 From the concept we know already, a first solution could be to write the strut three times
-and translating them using `std::ops::translate()`.
+and translate them using `std::ops::translate()`.
 
 [![test](.test/multiple.svg)](.test/multiple.log)
 

@@ -62,4 +62,4 @@ LegoBrick();
 
 ![Picture](final-out.png)
 
-Let's make a library out of it and use it from another file in the next section.
+Let's make a library out of it, and use it from another file in the next section.

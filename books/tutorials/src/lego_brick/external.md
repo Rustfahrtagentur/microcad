@@ -1,6 +1,6 @@
 # External module
 
-Let's assume we want to use the `LegoBrick` from an external module - like a library.
+Let's assume we want to use the `LegoBrick` from an external file.
 
 Fortunately, this is simple!
 We just have to create a second file `my_brick.µcad`:
@@ -52,13 +52,9 @@ As you can see in the first line we use a `mod` statement to load our external m
 To make this work, we also need to change one line in our final part:
 
 ```µcad
-part LegoBrick(rows = 2, columns = 4, base_height = 9.6mm) {
+pub part LegoBrick(rows = 2, columns = 4, base_height = 9.6mm) {
 ```
 
 Here we add the keyword `pub` to make `LegoBrick` visible from outside modules (like our `my_brick.µcad`):
-
-```µcad
-pub part LegoBrick(rows = 2, columns = 4, base_height = 9.6mm) {
-```
 
 Now you can export `my_brick.µcad` to generate the result of our tutorial.

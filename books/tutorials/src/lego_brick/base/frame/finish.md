@@ -3,12 +3,12 @@
 Now we have successfully created a model which describes the frame by the difference of two rectangles.
 
 At first glance, it might seem a bit cumbersome to go through multiple steps just to create a simple frame.
-However, this example was intentionally designed to introduce you to the fundamental concepts of µcad - such as workbenches,
-operations and groups.
+However, this example was intentionally designed to introduce you to the fundamental concepts of µcad - such as *workbenches*,
+*operations* and *groups*.
 Those foundational steps give you a clearer understanding of how µcad works under the hood.
 
-Fortunately, µcad has a ready-to-go sketch to construct a frame geometry like we have constructed
-in the `std` library: the `Frame` sketch.
+Fortunately, µcad has a ready-to-go sketch in the `std` library to construct a frame geometry like
+we have constructed: the `Frame` sketch.
 Using it, we can achieve the same result as before but with a much simpler expression:
 
 [![test](.test/frame.svg)](.test/frame.log)
