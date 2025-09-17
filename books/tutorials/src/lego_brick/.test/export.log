@@ -17,12 +17,34 @@
 11: #[export = "third_3x2.stl"]
 12: third_3x2 = LegoBrick(rows = 5, columns = 1, base_height = 3.2mm);
 
--- Parse Error --
-Parser error:  --> 1:15
-  |
-1 | mod lego_brick;
-  |               ^---
-  |
-  = expected single_line_comment or body
+-- Output --
+-- Errors --
+error: No symbols found to use in <NO ID>::lego_brick
+  ---> <FROM STR>:3:5
+     |
+   3 | use lego_brick::*;
+     |     ^^^^^^^^^^
+     |
+error: Symbol LegoBrick not found.
+  ---> <FROM STR>:6:14
+     |
+   6 | double_2x2 = LegoBrick(rows = 2, columns = 2, base_height = 9.6mm * 2);
+     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot assign attribute to expression `LegoBrick(base_height = 9.6mm * 2, columns = 2, rows = 2)`
+error: Symbol LegoBrick not found.
+  ---> <FROM STR>:9:14
+     |
+   9 | single_4x2 = LegoBrick(rows = 4, columns = 2);
+     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot assign attribute to expression `LegoBrick(columns = 2, rows = 4)`
+error: Symbol LegoBrick not found.
+  ---> <FROM STR>:12:13
+     |
+  12 | third_3x2 = LegoBrick(rows = 5, columns = 1, base_height = 3.2mm);
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Cannot assign attribute to expression `LegoBrick(base_height = 3.2mm, columns = 1, rows = 5)`
 -- Test Result --
 FAIL
