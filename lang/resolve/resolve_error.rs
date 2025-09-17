@@ -53,6 +53,10 @@ pub enum ResolveError {
     /// Symbol is not a value
     #[error("Symbol {0} is not a value")]
     NotAValue(QualifiedName),
+
+    /// Declaration of property not allowed here
+    #[error("Declaration of {0} not allowed within {1}")]
+    DeclNotAllowed(Identifier, QualifiedName),
 }
 
 /// Result type of any resolve.

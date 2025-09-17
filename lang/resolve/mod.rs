@@ -177,34 +177,43 @@ impl Resolve for AssignmentStatement {
             // properties do not have a visibility
             (_, Qualifier::Prop) => {
                 if !parent.can_prop() {
-                    todo!("error: const not allowed");
+                    Err(ResolveError::DeclNotAllowed(
+                        self.assignment.id.clone(),
+                        parent.full_name(),
+                    ))
+                } else {
+                    Ok(None)
                 }
-                Ok(None)
             }
             // constants will be symbols (`pub` shall equal `pub const`)
             (_, Qualifier::Const) | (Visibility::Public, Qualifier::Value) => {
                 if !parent.can_const() {
-                    todo!("error: const not allowed");
-                }
-                log::trace!("Declare private value {}", self.assignment.id);
-                Ok(Some(Symbol::new(
-                    SymbolDefinition::Constant(
-                        self.assignment.visibility,
+                    Err(ResolveError::DeclNotAllowed(
                         self.assignment.id.clone(),
-                        Value::None,
-                    ),
-                    Some(parent.clone()),
-                )))
+                        parent.full_name(),
+                    ))
+                } else {
+                    log::trace!("Declare private value {}", self.assignment.id);
+                    Ok(Some(Symbol::new(
+                        SymbolDefinition::Constant(
+                            self.assignment.visibility,
+                            self.assignment.id.clone(),
+                            Value::None,
+                        ),
+                        Some(parent.clone()),
+                    )))
+                }
             }
             // value go on stack
             (Visibility::Private, Qualifier::Value) => {
                 if self.assignment.visibility == Visibility::Private && !parent.can_value() {
-                    todo!(
-                        "error: private value not allowed in {parent} at line {:?}",
-                        self.src_ref
-                    );
+                    Err(ResolveError::DeclNotAllowed(
+                        self.assignment.id.clone(),
+                        parent.full_name(),
+                    ))
+                } else {
+                    Ok(None)
                 }
-                Ok(None)
             }
         }
     }
