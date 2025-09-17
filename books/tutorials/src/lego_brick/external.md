@@ -44,3 +44,19 @@ third_3x2.translate(y = 40mm);
 ![Picture](.test/library-out.svg)
 
 As you can see in the first line we use a `mod` statement to load our external module `lego_brick`.
+
+## Visibility
+
+To make this work, we also need to change one line in our final part:
+
+```µcad
+part LegoBrick(rows = 2, columns = 4, base_height = 9.6mm) {
+```
+
+Here we add the keyword `pub` to make `LegoBrick` visible from outside modules (like our `my_brick.µcad`):
+
+```µcad
+pub part LegoBrick(rows = 2, columns = 4, base_height = 9.6mm) {
+```
+
+Now you can export `my_brick.µcad` to generate the result of our tutorial.
