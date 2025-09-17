@@ -1,6 +1,6 @@
 -- Test --
   value_declarations
-  ../doc/tests/value_declarations.md:3
+  ../doc/tests/value_declarations.md:15
 
 -- Code --
 
@@ -100,11 +100,10 @@
 
 -- Output --
 -- Errors --
-error: Unexpectedly found symbol <NO ID>::module::sub_module::PrivateWorkbench
-  ---> <FROM STR>:92:16
-     |
-  92 | assert_invalid(module::sub_module::PrivateWorkbench);
-     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+-- Model --
+  Group (root) ->
+
 -- Test Result --
-FAIL
+OK
+Could not determine output type.
+Nothing will be exported.
