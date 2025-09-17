@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**271** tests from markdown.
+**272** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -126,6 +126,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../books/tutorials/src/lego_brick/.test/knobs_align.svg)](../books/tutorials/src/lego_brick/.test/knobs_align.log) | [knobs_align](../books/tutorials/src/lego_brick/caps_knobs.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/knobs_multiplicity.svg)](../books/tutorials/src/lego_brick/.test/knobs_multiplicity.log) | [knobs_multiplicity](../books/tutorials/src/lego_brick/caps_knobs.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/library.svg)](../books/tutorials/src/lego_brick/.test/library.log) | [library](../books/tutorials/src/lego_brick/external.md) |
+| [![test](../doc/tests/.test/logo.svg)](../doc/tests/.test/logo.log) | [logo](../doc/tests/logo.md) |
 | [![test](../doc/libs/std/math/.test/math_abs.svg)](../doc/libs/std/math/.test/math_abs.log) | [math_abs](../doc/libs/std/math/README.md) |
 | [![test](../doc/libs/std/math/.test/math_trigonometric.svg)](../doc/libs/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/libs/std/math/README.md) |
 | [![test](../doc/nodes/.test/measure.svg)](../doc/nodes/.test/measure.log) | [measure](../doc/nodes/measures.md) |

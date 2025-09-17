@@ -12,6 +12,8 @@
 | `fn`                 | module, source, workbench                 | private function                                 | `fn() {}`                    |
 | `pub fn`             | module, source                            | public function                                  | `pub fn() {}`                |
 
+[![test](.test/value_declarations.svg)](.test/value_declarations.log)
+
 ```µcad,value_declarations
 use std::debug::*;
 
