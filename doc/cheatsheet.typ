@@ -41,7 +41,7 @@
 #block[
   == Basic syntax
 
-  #set par(spacing: 2.0mm)
+  #set par(spacing: 3.4mm)
 
   *use* std::geo2d::\*; \/\/ Use statement
 
@@ -108,6 +108,17 @@
   }
 ]
 
+#block[
+  == Functions
+
+  *fn* function(x: Length) {
+
+  #box() *return* x; \/\/ Return statement
+
+  }
+
+]
+
 
 #block[
   == std::geo2d
@@ -169,7 +180,7 @@
 #block[
   == std::ops
 
-  #set par(spacing: 5.25mm)
+  #set par(spacing: 2.85mm)
 
   .union() \/\/ | operator
 
