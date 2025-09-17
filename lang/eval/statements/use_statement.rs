@@ -16,6 +16,7 @@ pub trait UseSymbol {
     /// - `within`: Target symbol
     fn use_symbol(
         &mut self,
+        visibility: Visibility,
         name: &QualifiedName,
         id: Option<Identifier>,
         within: &QualifiedName,
@@ -30,6 +31,7 @@ pub trait UseSymbol {
     /// - `within`: Target symbol
     fn use_symbols_of(
         &mut self,
+        visibility: Visibility,
         name: &QualifiedName,
         within: &QualifiedName,
     ) -> EvalResult<Symbol>;
@@ -52,17 +54,17 @@ impl Eval<()> for UseDeclaration {
     fn eval(&self, context: &mut Context) -> EvalResult<()> {
         match &self {
             UseDeclaration::Use(visibility, name) => {
-                if let Err(err) = context.use_symbol(name, None) {
+                if let Err(err) = context.use_symbol(*visibility, name, None) {
                     context.error(name, err)?;
                 }
             }
             UseDeclaration::UseAll(visibility, name) => {
-                if let Err(err) = context.use_symbols_of(name) {
+                if let Err(err) = context.use_symbols_of(*visibility, name) {
                     context.error(name, err)?
                 }
             }
             UseDeclaration::UseAlias(visibility, name, alias) => {
-                if let Err(err) = context.use_symbol(name, Some(alias.clone())) {
+                if let Err(err) = context.use_symbol(*visibility, name, Some(alias.clone())) {
                     context.error(name, err)?;
                 }
             }

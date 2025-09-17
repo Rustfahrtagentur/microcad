@@ -49,6 +49,10 @@ pub enum ResolveError {
     /// Property is not allowed at this place
     #[error("Defining a property is not allowed here ({0})")]
     PropertyNotAllowed(SrcRef),
+
+    /// Symbol is not a value
+    #[error("Symbol {0} is not a value")]
+    NotAValue(QualifiedName),
 }
 
 /// Result type of any resolve.

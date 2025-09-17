@@ -213,9 +213,21 @@ impl Context {
                         None,
                     ))
                 }
-                Err(err) => Err(err),
+                Err(err) => {
+                    log::warn!(
+                        "{not_found} Property '{name:?}'",
+                        not_found = crate::mark!(NOT_FOUND_INTERIM)
+                    );
+                    Err(err)
+                }
             },
-            None => Err(EvalError::SymbolNotFound(name.clone())),
+            None => {
+                log::debug!(
+                    "{not_found} Property '{name:?}'",
+                    not_found = crate::mark!(NOT_FOUND_INTERIM)
+                );
+                Err(EvalError::SymbolNotFound(name.clone()))
+            }
         }
     }
 }
@@ -294,7 +306,13 @@ impl Lookup for Context {
                 ))
             }
             // throw error from lookup on any error
-            (Err(_), Err(_)) => symbol,
+            (Err(_), Err(_)) => {
+                log::debug!(
+                    "{not_found} symbol or property '{name:?}'",
+                    not_found = crate::mark!(NOT_FOUND)
+                );
+                symbol
+            }
         }
     }
 }
@@ -321,15 +339,22 @@ impl Context {
     /// use symbol in context
     pub fn use_symbol(
         &mut self,
+        visibility: Visibility,
         name: &QualifiedName,
         id: Option<Identifier>,
     ) -> EvalResult<Symbol> {
-        self.symbol_table.use_symbol(name, id, &self.current_name())
+        self.symbol_table
+            .use_symbol(visibility, name, id, &self.current_name())
     }
 
     /// use all symbols of given module in context
-    pub fn use_symbols_of(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        self.symbol_table.use_symbols_of(name, &self.current_name())
+    pub fn use_symbols_of(
+        &mut self,
+        visibility: Visibility,
+        name: &QualifiedName,
+    ) -> EvalResult<Symbol> {
+        self.symbol_table
+            .use_symbols_of(visibility, name, &self.current_name())
     }
 }
 

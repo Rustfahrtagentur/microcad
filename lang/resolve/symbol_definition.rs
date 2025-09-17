@@ -44,6 +44,26 @@ impl SymbolDefinition {
             Self::Tester(id) => id.clone(),
         }
     }
+
+    /// Return visibility of this symbol.
+    pub fn visibility(&self) -> Visibility {
+        match &self {
+            SymbolDefinition::SourceFile(..) => Visibility::Public,
+            SymbolDefinition::Builtin(..) => Visibility::Public,
+            SymbolDefinition::Argument(..) => Visibility::Private,
+
+            SymbolDefinition::Module(md) => md.visibility,
+            SymbolDefinition::Workbench(wd) => wd.visibility,
+            SymbolDefinition::Function(fd) => fd.visibility,
+
+            SymbolDefinition::Constant(visibility, ..)
+            | SymbolDefinition::Alias(visibility, ..)
+            | SymbolDefinition::UseAll(visibility, ..) => *visibility,
+
+            #[cfg(test)]
+            SymbolDefinition::Tester(..) => Visibility::Public,
+        }
+    }
 }
 
 impl std::fmt::Display for SymbolDefinition {

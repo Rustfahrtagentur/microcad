@@ -123,10 +123,6 @@ impl SymbolTable {
         Err(EvalError::SymbolNotFound(what.clone()))
     }
 
-    fn lookup_mod(&mut self, what: &QualifiedName) -> EvalResult<Symbol> {
-        self.lookup_within(what, self.stack.current_module_name())
-    }
-
     fn lookup_workbench(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         if let Some(workbench) = &self.stack.current_workbench_name() {
             log::trace!("Looking for symbol '{name:?}' in current workbench '{workbench:?}'");
@@ -143,28 +139,6 @@ impl SymbolTable {
                 }
                 Err(err) => return Err(err)?,
             };
-        }
-        Err(EvalError::SymbolNotFound(name.clone()))
-    }
-
-    /// Lookup a symbol from global symbols but relatively to the file the given `name` came from.
-    ///
-    /// - `name`: *Qualified`name* to search for (must have a proper *source code reference*.
-    ///
-    /// Returns found symbol or error if `name` does not have a *source code reference* or symbol could not be found.
-    fn lookup_relatively(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        if name.src_ref().is_some() {
-            let name = &name.with_prefix(
-                self.sources
-                    .get_name_by_hash(name.src_ref().source_hash())?,
-            );
-            log::trace!("Looking relatively for symbol '{name}'");
-            let symbol = self.lookup_global(name)?;
-            log::trace!(
-                "{found} symbol relatively: {symbol}",
-                found = crate::mark!(FOUND),
-            );
-            return self.follow_alias(&symbol);
         }
         Err(EvalError::SymbolNotFound(name.clone()))
     }
@@ -223,10 +197,12 @@ impl Lookup for SymbolTable {
         // collect all symbols that can be found and remember origin
         let result = [
             ("local", self.lookup_local(name)),
-            ("module", self.lookup_mod(name)),
+            (
+                "module",
+                self.lookup_within(name, self.stack.current_module_name()),
+            ),
             ("workbench", self.lookup_workbench(name)),
             ("global", self.lookup_global(name).map_err(|e| e.into())),
-            ("relative", self.lookup_relatively(name)),
         ]
         .into_iter();
 
@@ -362,6 +338,7 @@ impl Locals for SymbolTable {
 impl UseSymbol for SymbolTable {
     fn use_symbol(
         &mut self,
+        visibility: Visibility,
         name: &QualifiedName,
         id: Option<Identifier>,
         within: &QualifiedName,
@@ -371,14 +348,15 @@ impl UseSymbol for SymbolTable {
         let symbol = self.lookup(name)?;
         if self.is_module() {
             let id = id.clone().unwrap_or(symbol.id());
+            let symbol = symbol.clone_with_visibility(visibility);
             if within.is_empty() {
-                self.symbols.insert(id, symbol.clone());
+                self.symbols.insert(id, symbol);
             } else {
                 self.symbols
                     .search(within)?
                     .borrow_mut()
                     .children
-                    .insert(id, symbol.clone());
+                    .insert(id, symbol);
             }
             log::trace!("Symbol Table:\n{}", self.symbols);
         }
@@ -393,6 +371,7 @@ impl UseSymbol for SymbolTable {
 
     fn use_symbols_of(
         &mut self,
+        visibility: Visibility,
         name: &QualifiedName,
         within: &QualifiedName,
     ) -> EvalResult<Symbol> {
@@ -404,14 +383,15 @@ impl UseSymbol for SymbolTable {
         } else {
             if self.is_module() {
                 for (id, symbol) in symbol.borrow().children.iter() {
+                    let symbol = symbol.clone_with_visibility(visibility);
                     if within.is_empty() {
-                        self.symbols.insert(id.clone(), symbol.clone());
+                        self.symbols.insert(id.clone(), symbol);
                     } else {
                         self.symbols
                             .search(within)?
                             .borrow_mut()
                             .children
-                            .insert(id.clone(), symbol.clone());
+                            .insert(id.clone(), symbol);
                     }
                 }
                 log::trace!("Symbol Table:\n{}", self.symbols);

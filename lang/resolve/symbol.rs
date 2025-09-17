@@ -38,13 +38,19 @@ impl Default for SymbolInner {
 ///
 /// `Symbol` can be shared as mutable.
 #[derive(Debug, Clone, Deref, DerefMut)]
-pub struct Symbol(RcMut<SymbolInner>);
+pub struct Symbol {
+    visibility: Visibility,
+    #[deref]
+    #[deref_mut]
+    inner: RcMut<SymbolInner>,
+}
 
 /// List of qualified names which can pe displayed
 #[derive(Debug, Deref)]
 pub struct Symbols(Vec<Symbol>);
 
 impl Symbols {
+    /// Return all fully qualified names of all symbols.
     pub fn full_names(&self) -> QualifiedNames {
         self.iter().map(|symbol| symbol.full_name()).collect()
     }
@@ -52,14 +58,17 @@ impl Symbols {
 
 impl Default for Symbol {
     fn default() -> Self {
-        Self(RcMut::new(Default::default()))
+        Self {
+            visibility: Visibility::default(),
+            inner: RcMut::new(Default::default()),
+        }
     }
 }
 
 impl PartialEq for Symbol {
     fn eq(&self, other: &Self) -> bool {
-        // just compare the pointers - not the content
-        self.0.as_ptr() == other.0.as_ptr()
+        // just compare the visibility and the pointers - not the content
+        self.visibility == other.visibility && self.inner.as_ptr() == other.inner.as_ptr()
     }
 }
 
@@ -96,11 +105,14 @@ impl Symbol {
     /// - `def`: Symbol definition
     /// - `parent`: Symbol's parent symbol or none for root
     pub fn new(def: SymbolDefinition, parent: Option<Symbol>) -> Self {
-        Symbol(RcMut::new(SymbolInner {
-            def,
-            parent,
-            ..Default::default()
-        }))
+        Symbol {
+            visibility: def.visibility(),
+            inner: RcMut::new(SymbolInner {
+                def,
+                parent,
+                ..Default::default()
+            }),
+        }
     }
 
     /// Create a symbol node for a built-in.
@@ -144,7 +156,7 @@ impl Symbol {
                 "{:depth$}<#606060>{visibility}{id:?} {def} [{full_name}]</>",
                 "",
                 visibility = self.visibility(),
-                def = self.0.borrow().def,
+                def = self.inner.borrow().def,
                 full_name = self.full_name(),
             )?;
         } else {
@@ -152,7 +164,7 @@ impl Symbol {
                 f,
                 "{:depth$}{id:?} {} [{}]",
                 "",
-                self.0.borrow().def,
+                self.inner.borrow().def,
                 self.full_name(),
             )?;
         }
@@ -192,6 +204,13 @@ impl Symbol {
         });
     }
 
+    /// Clone this symbol but give the clone another visibility.
+    pub fn clone_with_visibility(&self, visibility: Visibility) -> Self {
+        let mut cloned = self.clone();
+        cloned.visibility = visibility;
+        cloned
+    }
+
     /// Return the internal *id* of this symbol.
     pub fn id(&self) -> Identifier {
         self.borrow().def.id()
@@ -211,22 +230,7 @@ impl Symbol {
 
     /// Return `true` if symbol's visibility is private
     pub fn visibility(&self) -> Visibility {
-        match &self.borrow().def {
-            SymbolDefinition::SourceFile(..) => Visibility::Public,
-            SymbolDefinition::Builtin(..) => Visibility::Public,
-            SymbolDefinition::Argument(..) => Visibility::Private,
-
-            SymbolDefinition::Module(md) => md.visibility,
-            SymbolDefinition::Workbench(wd) => wd.visibility,
-            SymbolDefinition::Function(fd) => fd.visibility,
-
-            SymbolDefinition::Constant(visibility, ..)
-            | SymbolDefinition::Alias(visibility, ..)
-            | SymbolDefinition::UseAll(visibility, ..) => *visibility,
-
-            #[cfg(test)]
-            SymbolDefinition::Tester(..) => Visibility::Public,
-        }
+        self.visibility
     }
 
     /// Return `true` if symbol's visibility set to is public.
@@ -237,17 +241,6 @@ impl Symbol {
     /// Return `true` if symbol's visibility set to is non-public.
     pub fn is_private(&self) -> bool {
         !self.is_public()
-    }
-
-    fn parents(&self, max: usize) -> Vec<Self> {
-        let mut parents = Vec::new();
-        if max > 0 {
-            if let Some(parent) = &self.borrow().parent {
-                parents.push(parent.clone());
-                parents.append(&mut parent.parents(max - 1));
-            }
-        }
-        parents
     }
 
     /// Search down the symbol tree for a qualified name.
@@ -305,10 +298,20 @@ impl Symbol {
     /// Overwrite any value in this symbol
     pub fn set_value(&self, new_value: Value) -> ResolveResult<()> {
         match &mut self.borrow_mut().def {
-            SymbolDefinition::Constant(_, _, value) => *value = new_value,
-            _ => todo!("symbol is not a value!"),
+            SymbolDefinition::Constant(_, _, value) => {
+                *value = new_value;
+                Ok(())
+            }
+            _ => Err(ResolveError::NotAValue(self.full_name())),
         }
-        Ok(())
+    }
+
+    /// Get any value of this symbol
+    pub fn get_value(&self) -> ResolveResult<Value> {
+        match &self.borrow().def {
+            SymbolDefinition::Constant(_, _, value) => Ok(value.clone()),
+            _ => Err(ResolveError::NotAValue(self.full_name())),
+        }
     }
 }
 
