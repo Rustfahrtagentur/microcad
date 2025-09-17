@@ -39,8 +39,8 @@ impl Context {
     ///
     /// # Arguments
     /// - `root`: Root symbol.
-    /// - `builtin`: The builtin library.
-    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
+    /// - `symbols`: Pre-loaded symbols.
+    /// - `sources`: Source file cache.
     /// - `output`: Output channel to use.
     pub fn new(
         root: Identifier,
@@ -48,7 +48,7 @@ impl Context {
         sources: Sources,
         output: Box<dyn Output>,
     ) -> Self {
-        log::debug!("Creating Context");
+        log::debug!("Creating evaluation context");
 
         // put all together
         Self {

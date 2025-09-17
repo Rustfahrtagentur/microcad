@@ -107,24 +107,24 @@ impl CallMethod<Option<Model>> for Model {
 impl CallMethod for Value {
     fn call_method(
         &self,
-        id: &QualifiedName,
+        name: &QualifiedName,
         args: &ArgumentValueList,
         context: &mut Context,
     ) -> EvalResult<Value> {
         match self {
-            Value::Integer(_) => eval_todo!(context, id, "call_method for Integer"),
-            Value::Quantity(_) => eval_todo!(context, id, "call_method for Quantity"),
-            Value::Bool(_) => eval_todo!(context, id, "call_method for Bool"),
-            Value::String(_) => eval_todo!(context, id, "call_method for String"),
-            Value::Tuple(_) => eval_todo!(context, id, "call_method for Tuple"),
-            Value::Matrix(_) => eval_todo!(context, id, "call_method for Matrix"),
-            Value::Array(list) => list.call_method(id, args, context),
+            Value::Integer(_) => eval_todo!(context, name, "call_method for Integer"),
+            Value::Quantity(_) => eval_todo!(context, name, "call_method for Quantity"),
+            Value::Bool(_) => eval_todo!(context, name, "call_method for Bool"),
+            Value::String(_) => eval_todo!(context, name, "call_method for String"),
+            Value::Tuple(_) => eval_todo!(context, name, "call_method for Tuple"),
+            Value::Matrix(_) => eval_todo!(context, name, "call_method for Matrix"),
+            Value::Array(list) => list.call_method(name, args, context),
             Value::Model(model) => Ok(model
-                .call_method(id, args, context)?
+                .call_method(name, args, context)?
                 .map(Value::Model)
                 .unwrap_or_default()),
             _ => {
-                context.error(id, EvalError::UnknownMethod(id.clone()))?;
+                context.error(name, EvalError::UnknownMethod(name.clone()))?;
                 Ok(Value::None)
             }
         }

@@ -24,12 +24,43 @@
 18: double_2x2.translate(y = -40mm);
 19: third_3x2.translate(y = 40mm);
 
--- Parse Error --
-Parser error:  --> 1:15
-  |
-1 | mod lego_brick;
-  |               ^---
-  |
-  = expected single_line_comment or body
+-- Output --
+-- Errors --
+error: No symbols found to use in <NO ID>::lego_brick
+  ---> <FROM STR>:3:5
+     |
+   3 | use lego_brick::*;
+     |     ^^^^^^^^^^
+     |
+error: Symbol LegoBrick not found.
+  ---> <FROM STR>:6:14
+     |
+   6 | double_2x2 = LegoBrick(rows = 2, columns = 2, base_height = 9.6mm * 2);
+     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol LegoBrick not found.
+  ---> <FROM STR>:9:14
+     |
+   9 | single_4x2 = LegoBrick(rows = 4, columns = 2);
+     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol LegoBrick not found.
+  ---> <FROM STR>:12:13
+     |
+  12 | third_3x2 = LegoBrick(rows = 3, columns = 2, base_height = 3.2mm);
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Unknown method `translate`
+  ---> <FROM STR>:18:12
+     |
+  18 | double_2x2.translate(y = -40mm);
+     |            ^^^^^^^^^
+     |
+error: Unknown method `translate`
+  ---> <FROM STR>:19:11
+     |
+  19 | third_3x2.translate(y = 40mm);
+     |           ^^^^^^^^^
+     |
 -- Test Result --
 FAIL
