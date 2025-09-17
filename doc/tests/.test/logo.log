@@ -1,0 +1,215 @@
+-- Test --
+  logo
+  ../doc/tests/logo.md:5
+
+-- Code --
+
+ 1: use std::geo2d::*;
+ 2: use std::ops::*;
+ 3: 
+ 4: sketch icon_part( radius: Length ) {
+ 5:     c = Circle(radius) - Rect(size = radius * 2).translate(y = radius );
+ 6:     r = Rect(width = radius, height = radius * 2);
+ 7:     c.translate(y = radius) | r.translate(x = -radius/2 );
+ 8: }
+ 9: 
+10: sketch icon( radius = 1cm ) {
+11:     gap = radius / 5;
+12:     icon_part(radius)
+13:         .translate(x = -radius-gap, y = 0mm, z = 0mm)
+14:         .rotate(z = [0°, -90°, -180°, -270°]); 
+15: }
+16: 
+17: icon(1cm);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group (root) ->
+    Workpiece(sketch) <NO ID>::icon(radius=10mm) ->
+      - radius = 10mm
+      Multiplicity ->
+        Workpiece(op) std::ops::rotate(x=0rad, y=0rad, z=0rad) ->
+          - matrix = Matrix3 [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+          Transform __builtin::ops::rotate(matrix=Matrix3 [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])⏎ ->
+            Workpiece(op) std::ops::translate(x=-12mm, y=0mm, z=0mm) (root) ->
+              - x = -12mm
+              - y = 0mm
+              - z = 0mm
+              Transform __builtin::ops::translate(x=-12, y=0, z=0)⏎ ->
+                Workpiece(sketch) <NO ID>::icon_part(radius=10mm) (root) ->
+                  - radius = 10mm
+                  Operation union()⏎ ->
+                    Group ->
+                      Workpiece(op) std::ops::translate(x=0mm, y=10mm, z=0mm) ->
+                        - x = 0mm
+                        - y = 10mm
+                        - z = 0mm
+                        Transform __builtin::ops::translate(x=0, y=10, z=0)⏎ ->
+                          Operation subtract()⏎ (root) ->
+                            Group ->
+                              Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) ->
+                                - center = (x=0mm, y=0mm)
+                                - radius = 10mm
+                                Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)⏎ ->
+                              Workpiece(op) std::ops::translate(x=0mm, y=10mm, z=0mm) ->
+                                - x = 0mm
+                                - y = 10mm
+                                - z = 0mm
+                                Transform __builtin::ops::translate(x=0, y=10, z=0)⏎ ->
+                                  Workpiece(sketch) std::geo2d::Rect(size=20mm) (root) ->
+                                    - height = 20mm
+                                    - width = 20mm
+                                    - x = -10mm
+                                    - y = -10mm
+                                    Primitive2D __builtin::geo2d::Rect(height=20, width=20, x=-10, y=-10)⏎ ->
+                      Workpiece(op) std::ops::translate(x=-5mm, y=0mm, z=0mm) ->
+                        - x = -5mm
+                        - y = 0mm
+                        - z = 0mm
+                        Transform __builtin::ops::translate(x=-5, y=0, z=0)⏎ ->
+                          Workpiece(sketch) std::geo2d::Rect(height=20mm, width=10mm) (root) ->
+                            - height = 20mm
+                            - width = 10mm
+                            - x = -5mm
+                            - y = -10mm
+                            Primitive2D __builtin::geo2d::Rect(height=20, width=10, x=-5, y=-10)⏎ ->
+        Workpiece(op) std::ops::rotate(x=0rad, y=0rad, z=-1.5707963267949rad) ->
+          - matrix = Matrix3 [[6.123233995736766e-17, -1.0, 0.0], [1.0, 6.123233995736766e-17, 0.0], [0.0, 0.0, 1.0]]
+          Transform __builtin::ops::rotate(matrix=Matrix3 [[6.123233995736766e-17, -1.0, 0.0], [1.0, 6.123233995736766e-17, 0.0], [0.0, 0.0, 1.0]])⏎ -…
+            Workpiece(op) std::ops::translate(x=-12mm, y=0mm, z=0mm) (root) ->
+              - x = -12mm
+              - y = 0mm
+              - z = 0mm
+              Transform __builtin::ops::translate(x=-12, y=0, z=0)⏎ ->
+                Workpiece(sketch) <NO ID>::icon_part(radius=10mm) (root) ->
+                  - radius = 10mm
+                  Operation union()⏎ ->
+                    Group ->
+                      Workpiece(op) std::ops::translate(x=0mm, y=10mm, z=0mm) ->
+                        - x = 0mm
+                        - y = 10mm
+                        - z = 0mm
+                        Transform __builtin::ops::translate(x=0, y=10, z=0)⏎ ->
+                          Operation subtract()⏎ (root) ->
+                            Group ->
+                              Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) ->
+                                - center = (x=0mm, y=0mm)
+                                - radius = 10mm
+                                Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)⏎ ->
+                              Workpiece(op) std::ops::translate(x=0mm, y=10mm, z=0mm) ->
+                                - x = 0mm
+                                - y = 10mm
+                                - z = 0mm
+                                Transform __builtin::ops::translate(x=0, y=10, z=0)⏎ ->
+                                  Workpiece(sketch) std::geo2d::Rect(size=20mm) (root) ->
+                                    - height = 20mm
+                                    - width = 20mm
+                                    - x = -10mm
+                                    - y = -10mm
+                                    Primitive2D __builtin::geo2d::Rect(height=20, width=20, x=-10, y=-10)⏎ ->
+                      Workpiece(op) std::ops::translate(x=-5mm, y=0mm, z=0mm) ->
+                        - x = -5mm
+                        - y = 0mm
+                        - z = 0mm
+                        Transform __builtin::ops::translate(x=-5, y=0, z=0)⏎ ->
+                          Workpiece(sketch) std::geo2d::Rect(height=20mm, width=10mm) (root) ->
+                            - height = 20mm
+                            - width = 10mm
+                            - x = -5mm
+                            - y = -10mm
+                            Primitive2D __builtin::geo2d::Rect(height=20, width=10, x=-5, y=-10)⏎ ->
+        Workpiece(op) std::ops::rotate(x=0rad, y=0rad, z=-3.14159265358979rad) ->
+          - matrix = Matrix3 [[-1.0, -1.2246467991473532e-16, 0.0], [1.2246467991473532e-16, -1.0, 0.0], [0.0, 0.0, 1.0]]
+          Transform __builtin::ops::rotate(matrix=Matrix3 [[-1.0, -1.2246467991473532e-16, 0.0], [1.2246467991473532e-16, -1.0, 0.0], [0.0, 0.0, 1.0]]…
+            Workpiece(op) std::ops::translate(x=-12mm, y=0mm, z=0mm) (root) ->
+              - x = -12mm
+              - y = 0mm
+              - z = 0mm
+              Transform __builtin::ops::translate(x=-12, y=0, z=0)⏎ ->
+                Workpiece(sketch) <NO ID>::icon_part(radius=10mm) (root) ->
+                  - radius = 10mm
+                  Operation union()⏎ ->
+                    Group ->
+                      Workpiece(op) std::ops::translate(x=0mm, y=10mm, z=0mm) ->
+                        - x = 0mm
+                        - y = 10mm
+                        - z = 0mm
+                        Transform __builtin::ops::translate(x=0, y=10, z=0)⏎ ->
+                          Operation subtract()⏎ (root) ->
+                            Group ->
+                              Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) ->
+                                - center = (x=0mm, y=0mm)
+                                - radius = 10mm
+                                Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)⏎ ->
+                              Workpiece(op) std::ops::translate(x=0mm, y=10mm, z=0mm) ->
+                                - x = 0mm
+                                - y = 10mm
+                                - z = 0mm
+                                Transform __builtin::ops::translate(x=0, y=10, z=0)⏎ ->
+                                  Workpiece(sketch) std::geo2d::Rect(size=20mm) (root) ->
+                                    - height = 20mm
+                                    - width = 20mm
+                                    - x = -10mm
+                                    - y = -10mm
+                                    Primitive2D __builtin::geo2d::Rect(height=20, width=20, x=-10, y=-10)⏎ ->
+                      Workpiece(op) std::ops::translate(x=-5mm, y=0mm, z=0mm) ->
+                        - x = -5mm
+                        - y = 0mm
+                        - z = 0mm
+                        Transform __builtin::ops::translate(x=-5, y=0, z=0)⏎ ->
+                          Workpiece(sketch) std::geo2d::Rect(height=20mm, width=10mm) (root) ->
+                            - height = 20mm
+                            - width = 10mm
+                            - x = -5mm
+                            - y = -10mm
+                            Primitive2D __builtin::geo2d::Rect(height=20, width=10, x=-5, y=-10)⏎ ->
+        Workpiece(op) std::ops::rotate(x=0rad, y=0rad, z=-4.71238898038469rad) ->
+          - matrix = Matrix3 [[-1.8369701987210297e-16, 1.0, 0.0], [-1.0, -1.8369701987210297e-16, 0.0], [0.0, 0.0, 1.0]]
+          Transform __builtin::ops::rotate(matrix=Matrix3 [[-1.8369701987210297e-16, 1.0, 0.0], [-1.0, -1.8369701987210297e-16, 0.0], [0.0, 0.0, 1.0]]…
+            Workpiece(op) std::ops::translate(x=-12mm, y=0mm, z=0mm) (root) ->
+              - x = -12mm
+              - y = 0mm
+              - z = 0mm
+              Transform __builtin::ops::translate(x=-12, y=0, z=0)⏎ ->
+                Workpiece(sketch) <NO ID>::icon_part(radius=10mm) (root) ->
+                  - radius = 10mm
+                  Operation union()⏎ ->
+                    Group ->
+                      Workpiece(op) std::ops::translate(x=0mm, y=10mm, z=0mm) ->
+                        - x = 0mm
+                        - y = 10mm
+                        - z = 0mm
+                        Transform __builtin::ops::translate(x=0, y=10, z=0)⏎ ->
+                          Operation subtract()⏎ (root) ->
+                            Group ->
+                              Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) ->
+                                - center = (x=0mm, y=0mm)
+                                - radius = 10mm
+                                Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)⏎ ->
+                              Workpiece(op) std::ops::translate(x=0mm, y=10mm, z=0mm) ->
+                                - x = 0mm
+                                - y = 10mm
+                                - z = 0mm
+                                Transform __builtin::ops::translate(x=0, y=10, z=0)⏎ ->
+                                  Workpiece(sketch) std::geo2d::Rect(size=20mm) (root) ->
+                                    - height = 20mm
+                                    - width = 20mm
+                                    - x = -10mm
+                                    - y = -10mm
+                                    Primitive2D __builtin::geo2d::Rect(height=20, width=20, x=-10, y=-10)⏎ ->
+                      Workpiece(op) std::ops::translate(x=-5mm, y=0mm, z=0mm) ->
+                        - x = -5mm
+                        - y = 0mm
+                        - z = 0mm
+                        Transform __builtin::ops::translate(x=-5, y=0, z=0)⏎ ->
+                          Workpiece(sketch) std::geo2d::Rect(height=20mm, width=10mm) (root) ->
+                            - height = 20mm
+                            - width = 10mm
+                            - x = -5mm
+                            - y = -10mm
+                            Primitive2D __builtin::geo2d::Rect(height=20, width=10, x=-5, y=-10)⏎ ->
+
+-- Test Result --
+OK
+Export successful.
