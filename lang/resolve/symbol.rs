@@ -252,13 +252,13 @@ impl Symbol {
             if let Some(child) = self.get(first) {
                 let name = &name.remove_first();
                 if name.is_empty() {
-                    log::trace!("Found {name} in {:?}", self.full_name());
+                    log::trace!("Found {name:?} in {:?}", self.full_name());
                     Some(child.clone())
                 } else {
                     child.search(name)
                 }
             } else {
-                log::trace!("No child in {:?} while searching for {name}", self.id());
+                log::trace!("No child in {:?} while searching for {name:?}", self.id());
                 None
             }
         } else {
