@@ -9,6 +9,7 @@ mod hull;
 mod orient;
 mod revolve;
 mod rotate;
+mod scale;
 mod translate;
 
 /// Creates the builtin `operation` module
@@ -23,6 +24,7 @@ pub fn ops() -> Symbol {
         .symbol(orient::Orient::symbol())
         .symbol(revolve::Revolve::symbol())
         .symbol(rotate::Rotate::symbol())
+        .symbol(scale::Scale::symbol())
         .symbol(translate::Translate::symbol())
         .build()
 }

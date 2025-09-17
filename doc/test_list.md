@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**272** tests from markdown.
+**274** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -191,6 +191,8 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../books/tutorials/src/lego_brick/base/struts/.test/ring.svg)](../books/tutorials/src/lego_brick/base/struts/.test/ring.log) | [ring](../books/tutorials/src/lego_brick/base/struts/finish.md) |
 | [![test](../doc/libs/std/ops/.test/rotate_2d.svg)](../doc/libs/std/ops/.test/rotate_2d.log) | [rotate_2d](../doc/libs/std/ops/rotate.md) |
 | [![test](../doc/libs/std/ops/.test/rotate_3d.svg)](../doc/libs/std/ops/.test/rotate_3d.log) | [rotate_3d](../doc/libs/std/ops/rotate.md) |
+| [![test](../doc/libs/std/ops/.test/scale_3d.svg)](../doc/libs/std/ops/.test/scale_3d.log) | [scale_3d](../doc/libs/std/ops/scale.md) |
+| [![test](../doc/libs/std/ops/.test/scale_uniform.svg)](../doc/libs/std/ops/.test/scale_uniform.log) | [scale_uniform](../doc/libs/std/ops/scale.md) |
 | [![test](../doc/tests/.test/scopes.svg)](../doc/tests/.test/scopes.log) | [scopes](../doc/tests/scopes.md) |
 | [![test](../doc/structure/.test/sketch_basic.svg)](../doc/structure/.test/sketch_basic.log) | [sketch_basic](../doc/structure/sketch.md) |
 | [![test](../doc/tests/.test/sketch_missing_semicolon.svg)](../doc/tests/.test/sketch_missing_semicolon.log) | [sketch_missing_semicolon](../doc/tests/semicolon.md) |
