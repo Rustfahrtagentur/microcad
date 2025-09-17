@@ -36,6 +36,8 @@ single_4x2 = LegoBrick(rows = 4, columns = 2);
 third_3x2 = LegoBrick(rows = 3, columns = 2, base_height = 3.2mm);
 
 // generate geometry placing all elements side by side
+use std::ops::translate;
+
 single_4x2;
 double_2x2.translate(y = -40mm);
 third_3x2.translate(y = 40mm);
