@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**272** tests from markdown.
+**271** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -126,7 +126,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../books/tutorials/src/lego_brick/.test/knobs_align.svg)](../books/tutorials/src/lego_brick/.test/knobs_align.log) | [knobs_align](../books/tutorials/src/lego_brick/caps_knobs.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/knobs_multiplicity.svg)](../books/tutorials/src/lego_brick/.test/knobs_multiplicity.log) | [knobs_multiplicity](../books/tutorials/src/lego_brick/caps_knobs.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/library.svg)](../books/tutorials/src/lego_brick/.test/library.log) | [library](../books/tutorials/src/lego_brick/external.md) |
-| [![test](../doc/tests/.test/locals.svg)](../doc/tests/.test/locals.log) | [locals](../doc/tests/locals.md) |
 | [![test](../doc/libs/std/math/.test/math_abs.svg)](../doc/libs/std/math/.test/math_abs.log) | [math_abs](../doc/libs/std/math/README.md) |
 | [![test](../doc/libs/std/math/.test/math_trigonometric.svg)](../doc/libs/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/libs/std/math/README.md) |
 | [![test](../doc/nodes/.test/measure.svg)](../doc/nodes/.test/measure.log) | [measure](../doc/nodes/measures.md) |
@@ -191,7 +190,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../books/tutorials/src/lego_brick/base/struts/.test/ring.svg)](../books/tutorials/src/lego_brick/base/struts/.test/ring.log) | [ring](../books/tutorials/src/lego_brick/base/struts/finish.md) |
 | [![test](../doc/libs/std/ops/.test/rotate_2d.svg)](../doc/libs/std/ops/.test/rotate_2d.log) | [rotate_2d](../doc/libs/std/ops/rotate.md) |
 | [![test](../doc/libs/std/ops/.test/rotate_3d.svg)](../doc/libs/std/ops/.test/rotate_3d.log) | [rotate_3d](../doc/libs/std/ops/rotate.md) |
-| [![test](../doc/tests/.test/scopes.svg)](../doc/tests/.test/scopes.log) | [scopes](../doc/tests/locals.md) |
+| [![test](../doc/tests/.test/scopes.svg)](../doc/tests/.test/scopes.log) | [scopes](../doc/tests/scopes.md) |
 | [![test](../doc/structure/.test/sketch_basic.svg)](../doc/structure/.test/sketch_basic.log) | [sketch_basic](../doc/structure/sketch.md) |
 | [![test](../doc/tests/.test/sketch_missing_semicolon.svg)](../doc/tests/.test/sketch_missing_semicolon.log) | [sketch_missing_semicolon](../doc/tests/semicolon.md) |
 | [![test](../doc/tests/.test/sketch_with_body.svg)](../doc/tests/.test/sketch_with_body.log) | [sketch_with_body](../doc/tests/semicolon.md) |

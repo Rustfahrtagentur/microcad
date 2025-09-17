@@ -182,6 +182,7 @@ impl Context {
                         return Err(EvalError::ValueAlreadyInitialized(
                             id.clone(),
                             previous_value,
+                            id.src_ref(),
                         ));
                     }
                 }

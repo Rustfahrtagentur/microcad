@@ -1,6 +1,6 @@
 -- Test --
   scopes
-  ../doc/tests/locals.md:56
+  ../doc/tests/scopes.md:7
 
 -- Code --
 

@@ -9,10 +9,10 @@
 
 -- Output --
 -- Errors --
-error: Assignment failed because value x already has been initialized with 4mm
-  ---> <FROM STR>:1:1
+error: Value x already has been initialized with 4mm (at line 1:1)
+  ---> <FROM STR>:2:1
      |
-   1 | x: Length = 4mm;   // explicit type declaration
+   2 | x = 4mm;           // implicit type declaration via units.
      | ^
      |
 -- Test Result --

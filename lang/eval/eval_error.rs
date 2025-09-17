@@ -231,8 +231,8 @@ pub enum EvalError {
     AmbiguousProperty(QualifiedName, Identifier),
 
     /// Assignment failed because value already has been initialized
-    #[error("Assignment failed because value {0} already has been initialized with {1}")]
-    ValueAlreadyInitialized(Identifier, Value),
+    #[error("Value {0} already has been initialized with {1} (at line {2})")]
+    ValueAlreadyInitialized(Identifier, Value, SrcRef),
 
     /// Assignment failed because left side is not an l-value
     #[error("Assignment failed because {0} is not an l-value")]

@@ -65,8 +65,12 @@ impl Eval<()> for AssignmentStatement {
                         None
                     } else {
                         Some((
-                            identifier.clone(),
-                            EvalError::ValueAlreadyInitialized(identifier.clone(), value.clone()),
+                            assignment.id.clone(),
+                            EvalError::ValueAlreadyInitialized(
+                                identifier.clone(),
+                                value.clone(),
+                                identifier.src_ref(),
+                            ),
                         ))
                     }
                 }
