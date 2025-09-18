@@ -38,7 +38,7 @@ impl Install {
 
     pub fn install_std_library(&self) -> Result<()> {
         let library_dir = self.library_dir();
-        log::info!("Install µcad library to {library_dir:?} ...");
+        println!("Install µcad library to {library_dir:?} ...");
 
         if !library_dir.exists() {
             log::debug!("Creating directory for µcad std library");
@@ -60,7 +60,7 @@ impl Install {
             log::trace!("Wrote µcad file: {dest_path:?}");
         }
 
-        log::info!("Successfully installed µcad library to {library_dir:?}.");
+        println!("Successfully installed µcad library to {library_dir:?}.");
 
         Ok(())
     }
