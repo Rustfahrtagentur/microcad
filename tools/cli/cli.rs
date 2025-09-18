@@ -41,6 +41,7 @@ impl Cli {
             Commands::Export(export) => export.run(self)?,
             Commands::Create(create) => create.run(self)?,
             Commands::Watch(watch) => watch.run(self)?,
+            Commands::Install(install) => install.run(self)?,
         }
 
         if self.time {
@@ -67,5 +68,13 @@ impl Cli {
             Some(config) => Config::load(config),
             None => Ok(Config::default()),
         }
+    }
+
+    /// Check if we have a std lib in search paths.
+    pub fn has_std_lib(&self) -> bool {
+        self.search_paths.iter().any(|dir| {
+            let file_path = dir.join("std/mod.µcad");
+            file_path.exists() && file_path.is_file()
+        })
     }
 }
