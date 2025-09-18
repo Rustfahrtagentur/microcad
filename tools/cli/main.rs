@@ -19,7 +19,7 @@ pub use watcher::*;
 /// Main of the command line interpreter
 fn main() -> anyhow::Result<()> {
     env_logger::init();
-    let cli = Cli::new()?;
+    let cli = Cli::new();
 
     cli.run()
 }

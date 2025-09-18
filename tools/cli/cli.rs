@@ -5,7 +5,7 @@
 
 use anyhow::anyhow;
 use clap::Parser;
-use microcad_lang::{eval::Context, resolve::*};
+use microcad_lang::eval::Context;
 
 use crate::commands::*;
 use crate::config::Config;
@@ -20,7 +20,7 @@ pub struct Cli {
 
     /// Paths to search for files.
     ///
-    /// Uses `~/.microcad/lib`
+    /// By default, `./lib` (if it exists) and `~/.microcad/lib` are used.
     #[arg(short = 'P', long = "search-path", action = clap::ArgAction::Append, global = true)]
     pub search_paths: Vec<std::path::PathBuf>,
 
@@ -34,28 +34,21 @@ pub struct Cli {
 
 impl Cli {
     /// Create a new CLI with default search paths.
-    ///
-    /// Also checks if there is a µcad std library installed and returns an error in case the library has not been found.
-    pub fn new() -> anyhow::Result<Self> {
+    pub fn new() -> Self {
         let mut cli: Self = Self::parse();
         cli.search_paths.append(&mut Self::default_search_paths());
-
-        if !cli.has_std_lib() {
-            Err(anyhow!(
-                "No std library was found. Use `microcad install std` to install the std library."
-            ))
-        } else {
-            Ok(cli)
-        }
+        cli
     }
 
-    /// `./lib` (if exists) and `~/.microcad/lib`.
+    /// `./lib` (if exists) and `~/.microcad/lib` (if exists).
     pub fn default_search_paths() -> Vec<std::path::PathBuf> {
         let local_dir = std::path::PathBuf::from("./lib");
         let mut search_paths = Vec::new();
 
         if let Some(global_root_dir) = Self::global_root_dir() {
-            search_paths.push(global_root_dir);
+            if global_root_dir.exists() {
+                search_paths.push(global_root_dir);
+            }
         }
         if local_dir.exists() {
             search_paths.push(local_dir);
@@ -64,13 +57,11 @@ impl Cli {
         search_paths
     }
 
-    /// Returns global root dir `~/.microcad/lib`, if it exists.
+    /// Returns global root dir `~/.microcad/lib`, even if it does not exist.
     pub fn global_root_dir() -> Option<std::path::PathBuf> {
         if let Some(home_dir) = home::home_dir() {
             let global_root_dir = home_dir.join(".microcad/lib");
-            if global_root_dir.exists() {
-                return Some(home_dir.join(".microcad/lib"));
-            }
+            return Some(global_root_dir);
         }
 
         None
@@ -97,15 +88,23 @@ impl Cli {
     }
 
     /// Make a new context from an input file.
-    pub fn make_context(&self, input: impl AsRef<std::path::Path>) -> ResolveResult<Context> {
-        microcad_builtin::builtin_context(
+    ///
+    /// Also checks if there is a µcad std library installed and returns an error in case the library has not been found.
+    pub fn make_context(&self, input: impl AsRef<std::path::Path>) -> anyhow::Result<Context> {
+        if !self.has_std_lib() {
+            return Err(anyhow!(
+                "No std library was found. Use `microcad install std` to install the std library."
+            ));
+        }
+
+        Ok(microcad_builtin::builtin_context(
             crate::commands::Resolve {
                 input: input.as_ref().to_path_buf(),
                 output: None,
             }
             .load()?,
             &self.search_paths,
-        )
+        )?)
     }
 
     /// Fetch a config from file or default config.
@@ -122,5 +121,11 @@ impl Cli {
             let file_path = dir.join("std/mod.µcad");
             file_path.exists() && file_path.is_file()
         })
+    }
+}
+
+impl Default for Cli {
+    fn default() -> Self {
+        Self::new()
     }
 }
