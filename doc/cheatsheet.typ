@@ -2,7 +2,9 @@
 
 #set text(font: "JetBrains Mono", size: 10pt)
 
-= µCAD Cheatsheet
+
+#image("images/logo.png", width: 50%)
+= Cheatsheet (v0.2.0)
 
 #set block(
   fill: luma(230),
@@ -10,11 +12,12 @@
   radius: 8pt,
   width: 100%,
 )
-
 #let section(header) = [ ]
 
 #block[
   == Basic syntax
+
+  #set par(spacing: 2.8mm)
 
   use std::geo2d::\*; \/\/ Use statement
 
@@ -33,14 +36,22 @@
 
   R(40mm).translate(x = [-40, 40]mm);
 
+  { R(40mm); Circle(r = 4mm); } \/\/ Group
+
   \/\/ If condition
 
   if a > 5mm { R(5mm) } else { R(10mm) }
 
 ]
 
+
+
 #block[
   == Workbenches
+
+  #set par(spacing: 2.8mm)
+
+  *mod* file; \/\/ Include µcad file.
 
   *mod* my_module {
 
@@ -70,9 +81,17 @@
 #block[
   == std::geo2d
 
+  #set par(spacing: 4.2mm)
+
   Circle(r = 40mm);
 
   Rect(width = 3.0mm, height = 4.0mm);
+
+  Line(p0 = (x = 0.0, y = 0.0), \ #box(width: 8.4mm) p1 = (x = 10.0, y = 20.0));
+
+  Frame(width = 2mm,\ #box(width: 10.2mm) height = 4mm, thickness = 1mm);
+
+  Ring(outer_r = 50mm, inner_r = 40mm);
 ]
 
 
@@ -86,45 +105,11 @@
   Cube(50mm);
 ]
 
-#block[
-  == std::ops
 
-  .union() \/\/ | operator
-
-  .intersect() \/\/ & operator
-
-  .subtract() \/\/ - operator
-
-  .hull() \/\/ Convex hull
-
-  .translate(x = 0mm,y = 1mm,z = 2mm)
-
-  .rotate(45°)
-
-  .rotate(45°, std::math::X)
-
-  .rotate(x = 30°, y = 10°)
-
-  .scale(2.0)
-
-  .scale(x = 1.0,y = 2.0,z = 3.0)
-
-  .orient(std::math::Y)
-
-  .mirror(-std::math::Z)
-
-  .align()
-
-  .extrude(height = 3.0mm)
-
-  .revolve()
-
-  .revolve(180°)
-]
 
 #block[
   == std::math
-  const PI = 3.14159;
+  const PI = 3.141592653589793238462643;
 
   const X = (1,0,0);
 
@@ -132,13 +117,7 @@
 
   const Z = (0,0,1);
 
-  abs(x);
-
-  sin(x);
-
-  cos(x);
-
-  tan(x);
+  abs(x); sin(x); cos(x); tan(x);
 ]
 
 #block[
@@ -152,7 +131,64 @@
 
   assert_eq([a, 40mm]);
 
-
 ]
 
+#block[
+  == std::ops
 
+  #set par(spacing: 3.5mm)
+
+  .union() \/\/ | operator
+
+  .intersect() \/\/ & operator
+
+  .subtract() \/\/ - operator
+
+  .hull() \/\/ Convex hull
+
+  .translate(x = 0mm,y = 1mm,z = 2mm)
+
+  .rotate(45°) \/\/ 2D rotate / rotate around Z
+
+  .rotate(45°, std::math::X)
+
+  .rotate(x = 30°, y = 10°)
+
+  .scale(2.0) \/\/ Uniform scale
+
+  .scale(x = 1.0, y = 2.0, z = 3.0)
+
+  .orient(std::math::Y) \/\/ Orient along axis
+
+  .mirror(-std::math::Z)
+
+  .align() \/\/ Align at center
+
+  .extrude(height = 3.0mm) \/\/ Linear extrude
+
+  .revolve() \/\/ Revolve extrude
+
+  .revolve(180°)
+]
+
+#block[
+  == Command line usage
+
+  #set par(spacing: 3.0mm)
+
+  \# Print syntax tree
+
+  microcad parse file.µcad
+
+  \# Print model tree
+
+  microcad eval file.µcad
+
+  \# Export geometry as STL or SVG
+
+  microcad export file.µcad
+
+  \# Update file on changes
+
+  microcad watch file.µcad
+]
