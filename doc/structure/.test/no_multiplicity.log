@@ -15,23 +15,51 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    op std::ops::translate(x: Length = -4mm, y: Length = -4mm, z: Length = 0mm) -> 2D
-      Transform __builtin::ops::translate(x: Scalar = -4, y: Scalar = -4, z: Scalar = 0)⏎ -> 2D
-        sketch std::geo2d::Rect(height: Length = 2mm, width: Length = 2mm) -> 2D (root)
-          Primitive2D __builtin::geo2d::Rect(height: Scalar = 2, width: Scalar = 2, x: Scalar = -1, y: Scalar = -1)⏎ -> 2D
-    op std::ops::translate(x: Length = -4mm, y: Length = 4mm, z: Length = 0mm) -> 2D
-      Transform __builtin::ops::translate(x: Scalar = -4, y: Scalar = 4, z: Scalar = 0)⏎ -> 2D
-        sketch std::geo2d::Rect(height: Length = 2mm, width: Length = 2mm) -> 2D (root)
-          Primitive2D __builtin::geo2d::Rect(height: Scalar = 2, width: Scalar = 2, x: Scalar = -1, y: Scalar = -1)⏎ -> 2D
-    op std::ops::translate(x: Length = 4mm, y: Length = -4mm, z: Length = 0mm) -> 2D
-      Transform __builtin::ops::translate(x: Scalar = 4, y: Scalar = -4, z: Scalar = 0)⏎ -> 2D
-        sketch std::geo2d::Rect(height: Length = 2mm, width: Length = 2mm) -> 2D (root)
-          Primitive2D __builtin::geo2d::Rect(height: Scalar = 2, width: Scalar = 2, x: Scalar = -1, y: Scalar = -1)⏎ -> 2D
-    op std::ops::translate(x: Length = 4mm, y: Length = 4mm, z: Length = 0mm) -> 2D
-      Transform __builtin::ops::translate(x: Scalar = 4, y: Scalar = 4, z: Scalar = 0)⏎ -> 2D
-        sketch std::geo2d::Rect(height: Length = 2mm, width: Length = 2mm) -> 2D (root)
-          Primitive2D __builtin::geo2d::Rect(height: Scalar = 2, width: Scalar = 2, x: Scalar = -1, y: Scalar = -1)⏎ -> 2D
+  Group (root) ->
+    Workpiece(op) std::ops::translate(x=-4mm, y=-4mm, z=0mm) ->
+      - x = -4mm
+      - y = -4mm
+      - z = 0mm
+      Transform __builtin::ops::translate(x=-4, y=-4, z=0)⏎ ->
+        Workpiece(sketch) std::geo2d::Rect(height=2mm, width=2mm) (root) ->
+          - height = 2mm
+          - width = 2mm
+          - x = -1mm
+          - y = -1mm
+          Primitive2D __builtin::geo2d::Rect(height=2, width=2, x=-1, y=-1)⏎ ->
+    Workpiece(op) std::ops::translate(x=-4mm, y=4mm, z=0mm) ->
+      - x = -4mm
+      - y = 4mm
+      - z = 0mm
+      Transform __builtin::ops::translate(x=-4, y=4, z=0)⏎ ->
+        Workpiece(sketch) std::geo2d::Rect(height=2mm, width=2mm) (root) ->
+          - height = 2mm
+          - width = 2mm
+          - x = -1mm
+          - y = -1mm
+          Primitive2D __builtin::geo2d::Rect(height=2, width=2, x=-1, y=-1)⏎ ->
+    Workpiece(op) std::ops::translate(x=4mm, y=-4mm, z=0mm) ->
+      - x = 4mm
+      - y = -4mm
+      - z = 0mm
+      Transform __builtin::ops::translate(x=4, y=-4, z=0)⏎ ->
+        Workpiece(sketch) std::geo2d::Rect(height=2mm, width=2mm) (root) ->
+          - height = 2mm
+          - width = 2mm
+          - x = -1mm
+          - y = -1mm
+          Primitive2D __builtin::geo2d::Rect(height=2, width=2, x=-1, y=-1)⏎ ->
+    Workpiece(op) std::ops::translate(x=4mm, y=4mm, z=0mm) ->
+      - x = 4mm
+      - y = 4mm
+      - z = 0mm
+      Transform __builtin::ops::translate(x=4, y=4, z=0)⏎ ->
+        Workpiece(sketch) std::geo2d::Rect(height=2mm, width=2mm) (root) ->
+          - height = 2mm
+          - width = 2mm
+          - x = -1mm
+          - y = -1mm
+          Primitive2D __builtin::geo2d::Rect(height=2, width=2, x=-1, y=-1)⏎ ->
 
 -- Test Result --
 OK

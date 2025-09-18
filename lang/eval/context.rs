@@ -1,7 +1,9 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{builtin::*, diag::*, eval::*, model::Model, rc::*, resolve::*, syntax::*};
+use crate::{
+    builtin::*, diag::*, eval::*, model::*, rc::*, resolve::*, syntax::*, tree_display::*,
+};
 
 /// Grant statements depending on context
 pub trait Grant<T> {
@@ -154,6 +156,81 @@ impl Context {
     pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
         self.symbol_table.search_paths()
     }
+
+    /// Get property from current model.
+    pub fn get_property(&self, id: &Identifier) -> EvalResult<Value> {
+        match self.get_model() {
+            Ok(model) => {
+                if let Some(value) = model.get_property(id) {
+                    Ok(value.clone())
+                } else {
+                    Err(EvalError::PropertyNotFound(id.clone()))
+                }
+            }
+            Err(err) => Err(err),
+        }
+    }
+
+    /// Initialize a property.
+    ///
+    /// Returns error if there is no model or the property has been initialized before.
+    pub fn init_property(&self, id: Identifier, value: Value) -> EvalResult<()> {
+        match self.get_model() {
+            Ok(model) => {
+                if let Some(previous_value) = model.borrow_mut().set_property(id.clone(), value) {
+                    if !previous_value.is_invalid() {
+                        return Err(EvalError::ValueAlreadyInitialized(
+                            id.clone(),
+                            previous_value,
+                            id.src_ref(),
+                        ));
+                    }
+                }
+                Ok(())
+            }
+            Err(err) => Err(err),
+        }
+    }
+
+    /// Return if the current frame is an init frame.
+    pub fn is_init(&mut self) -> bool {
+        matches!(
+            self.symbol_table.stack.current_frame(),
+            Some(StackFrame::Init(_))
+        )
+    }
+
+    /// Lookup a property by qualified name.
+    fn lookup_property(&self, name: &QualifiedName) -> EvalResult<Symbol> {
+        match name.single_identifier() {
+            Some(id) => match self.get_property(id) {
+                Ok(value) => {
+                    log::debug!(
+                        "{found} property '{name:?}'",
+                        found = crate::mark!(FOUND_INTERIM)
+                    );
+                    Ok(Symbol::new(
+                        SymbolDefinition::Constant(Visibility::Public, id.clone(), value),
+                        None,
+                    ))
+                }
+                Err(err) => {
+                    log::warn!(
+                        "{not_found} Property '{name:?}'",
+                        not_found = crate::mark!(NOT_FOUND_INTERIM)
+                    );
+                    Err(err)
+                }
+            },
+            None => {
+                log::debug!(
+                    "{not_found} Property '{name:?}'",
+                    not_found = crate::mark!(NOT_FOUND_INTERIM)
+                );
+                Err(EvalError::SymbolNotFound(name.clone()))
+            }
+        }
+    }
 }
 
 impl Locals for Context {
@@ -197,9 +274,47 @@ impl Default for Context {
         }
     }
 }
+
 impl Lookup for Context {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        self.symbol_table.lookup(name)
+        log::debug!("Lookup symbol or property '{name}'");
+        let symbol = self.symbol_table.lookup(name);
+        let property = self.lookup_property(name);
+
+        match (&symbol, &property) {
+            (Ok(_), Err(_)) => {
+                log::debug!(
+                    "{found} symbol '{name:?}'",
+                    found = crate::mark!(FOUND_FINAL)
+                );
+                symbol
+            }
+            (Err(_), Ok(_)) => {
+                log::debug!(
+                    "{found} property '{name:?}'",
+                    found = crate::mark!(FOUND_FINAL)
+                );
+                property
+            }
+            (Ok(symbol), Ok(property)) => {
+                log::debug!(
+                    "{ambiguous} symbol '{name:?}' in {symbol} and {property}:\n{self}",
+                    ambiguous = crate::mark!(AMBIGUOUS),
+                );
+                Err(EvalError::AmbiguousProperty(
+                    symbol.full_name(),
+                    property.id(),
+                ))
+            }
+            // throw error from lookup on any error
+            (Err(_), Err(_)) => {
+                log::debug!(
+                    "{not_found} symbol or property '{name:?}'",
+                    not_found = crate::mark!(NOT_FOUND)
+                );
+                symbol
+            }
+        }
     }
 }
 
@@ -221,17 +336,26 @@ impl Diag for Context {
     }
 }
 
-impl UseSymbol for Context {
-    fn use_symbol(&mut self, name: &QualifiedName, id: Option<Identifier>) -> EvalResult<Symbol> {
-        self.symbol_table.use_symbol(name, id)
+impl Context {
+    /// use symbol in context
+    pub fn use_symbol(
+        &mut self,
+        visibility: Visibility,
+        name: &QualifiedName,
+        id: Option<Identifier>,
+    ) -> EvalResult<Symbol> {
+        self.symbol_table
+            .use_symbol(visibility, name, id, &self.current_name())
     }
 
-    fn use_symbols_of(
+    /// use all symbols of given module in context
+    pub fn use_symbols_of(
         &mut self,
+        visibility: Visibility,
         name: &QualifiedName,
-        within: &QualifiedName,
     ) -> EvalResult<Symbol> {
-        self.symbol_table.use_symbols_of(name, within)
+        self.symbol_table
+            .use_symbols_of(visibility, name, &self.current_name())
     }
 }
 
@@ -251,12 +375,17 @@ impl GetSourceByHash for Context {
 
 impl std::fmt::Display for Context {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Ok(model) = self.get_model() {
+            write!(f, "\nModel:\n")?;
+            model.tree_print(f, 4.into())?;
+        }
         if self.has_errors() {
             writeln!(f, "{}\nErrors:", self.symbol_table)?;
-            self.diag_handler.pretty_print(f, &self.symbol_table)
+            self.diag_handler.pretty_print(f, &self.symbol_table)?;
         } else {
-            write!(f, "{}", self.symbol_table)
+            write!(f, "{}", self.symbol_table)?;
         }
+        Ok(())
     }
 }
 
@@ -417,24 +546,21 @@ impl Grant<AssignmentStatement> for Context {
     fn grant(&mut self, statement: &AssignmentStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.symbol_table.stack.current_frame() {
             match statement.assignment.qualifier {
-                Qualifier::Var => {
+                Qualifier::Const => {
+                    matches!(stack_frame, StackFrame::Source(..) | StackFrame::Module(..))
+                }
+                Qualifier::Value => {
                     matches!(
                         stack_frame,
-                        StackFrame::Source(_, _)
+                        StackFrame::Source(..)
+                            | StackFrame::Module(..)
                             | StackFrame::Body(_)
-                            | StackFrame::Workbench(_, _, _)
+                            | StackFrame::Workbench(..)
                             | StackFrame::Init(_)
                             | StackFrame::Function(_)
                     )
                 }
-                Qualifier::Const => matches!(
-                    stack_frame,
-                    StackFrame::Source(_, _)
-                        | StackFrame::Module(_, _)
-                        | StackFrame::Workbench(_, _, _)
-                        | StackFrame::Function(_)
-                ),
-                Qualifier::Prop => matches!(stack_frame, StackFrame::Workbench(_, _, _)),
+                Qualifier::Prop => matches!(stack_frame, StackFrame::Workbench(..)),
             }
         } else {
             false

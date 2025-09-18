@@ -87,7 +87,7 @@ impl Eval for Call {
             |context| match &symbol.borrow().def {
                 SymbolDefinition::Builtin(f) => f.call(&args, context),
                 SymbolDefinition::Workbench(w) => {
-                    if matches!(w.kind, WorkbenchKind::Operation) {
+                    if matches!(*w.kind, WorkbenchKind::Operation) {
                         context.error(self, EvalError::CannotCallOperationWithoutWorkpiece)?;
                         Ok(Value::None)
                     } else {

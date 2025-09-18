@@ -14,11 +14,11 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    Transform __builtin::ops::translate(x: Scalar = 15, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D
-      #[svg = svg = (fill: String = , style: String = fill:red)]
-      Transform __builtin::ops::translate(x: Scalar = 0, y: Scalar = 15, z: Scalar = 0)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Rect(height: Scalar = 10, width: Scalar = 10, x: Scalar = 0, y: Scalar = 0)⏎ -> 2D
+  Group (root) ->
+    Transform __builtin::ops::translate(x=15, y=0, z=0)⏎ ->
+      #[svg = svg = (fill=, style=fill:red)]
+      Transform __builtin::ops::translate(x=0, y=15, z=0)⏎ ->
+        Primitive2D __builtin::geo2d::Rect(height=10, width=10, x=0, y=0)⏎ ->
 
 -- Test Result --
 OK

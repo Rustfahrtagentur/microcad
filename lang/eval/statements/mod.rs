@@ -24,7 +24,7 @@ impl Eval for Statement {
                 Ok(Value::None)
             }
             Self::Module(m) => m.eval(context),
-            Self::Function(f) => f.as_ref().eval(context),
+            Self::Function(f) => f.eval(context),
             Self::Use(u) => {
                 u.eval(context)?;
                 Ok(Value::None)

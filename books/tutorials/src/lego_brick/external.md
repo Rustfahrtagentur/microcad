@@ -1,6 +1,6 @@
 # External module
 
-Let's assume we want to use the Lego_brick from an external module - like a library.
+Let's assume we want to use the `LegoBrick` from an external file.
 
 Fortunately, this is simple!
 We just have to create a second file `my_brick.µcad`:
@@ -36,6 +36,8 @@ single_4x2 = LegoBrick(rows = 4, columns = 2);
 third_3x2 = LegoBrick(rows = 3, columns = 2, base_height = 3.2mm);
 
 // generate geometry placing all elements side by side
+use std::ops::translate;
+
 single_4x2;
 double_2x2.translate(y = -40mm);
 third_3x2.translate(y = 40mm);
@@ -43,4 +45,16 @@ third_3x2.translate(y = 40mm);
 
 ![Picture](.test/library-out.svg)
 
-We use `mod` to load our external module
+As you can see in the first line we use a `mod` statement to load our external module `lego_brick`.
+
+## Visibility
+
+To make this work, we also need to change one line in our final part:
+
+```µcad
+pub part LegoBrick(rows = 2, columns = 4, base_height = 9.6mm) {
+```
+
+Here we add the keyword `pub` to make `LegoBrick` visible from outside modules (like our `my_brick.µcad`):
+
+Now you can export `my_brick.µcad` to generate the result of our tutorial.

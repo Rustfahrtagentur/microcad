@@ -15,7 +15,10 @@ impl ModuleBuilder {
     /// Create new module symbol with a name.
     pub fn new(id: Identifier) -> Self {
         Self {
-            module: Symbol::new_module(id),
+            module: Symbol::new(
+                SymbolDefinition::Module(ModuleDefinition::new(Visibility::Public, id)),
+                None,
+            ),
         }
     }
 

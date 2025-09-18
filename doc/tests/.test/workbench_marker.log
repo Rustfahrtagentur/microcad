@@ -11,9 +11,9 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    sketch <NO ID>::K() -> 2D
-      InputPlaceholder -> Undetermined
+  Group (root) ->
+    Workpiece(sketch) <NO ID>::K() ->
+      InputPlaceholder ->
 
 -- Test Result --
 OK

@@ -19,6 +19,17 @@ pub struct SymbolInner {
     pub used: bool,
 }
 
+impl Default for SymbolInner {
+    fn default() -> Self {
+        Self {
+            def: SymbolDefinition::SourceFile(SourceFile::default().into()),
+            parent: Default::default(),
+            children: Default::default(),
+            used: false,
+        }
+    }
+}
+
 /// Symbol
 ///
 /// Every `Symbol` has a [`SymbolDefinition`], a *parent* and *children* stored within a `Rc<RefCell<`[`SymbolInner`]`>`.
@@ -27,20 +38,37 @@ pub struct SymbolInner {
 ///
 /// `Symbol` can be shared as mutable.
 #[derive(Debug, Clone, Deref, DerefMut)]
-pub struct Symbol(RcMut<SymbolInner>);
+pub struct Symbol {
+    visibility: Visibility,
+    #[deref]
+    #[deref_mut]
+    inner: RcMut<SymbolInner>,
+}
 
 /// List of qualified names which can pe displayed
 #[derive(Debug, Deref)]
 pub struct Symbols(Vec<Symbol>);
 
+impl Symbols {
+    /// Return all fully qualified names of all symbols.
+    pub fn full_names(&self) -> QualifiedNames {
+        self.iter().map(|symbol| symbol.full_name()).collect()
+    }
+}
+
 impl Default for Symbol {
     fn default() -> Self {
-        Self(RcMut::new(SymbolInner {
-            def: SymbolDefinition::SourceFile(SourceFile::default().into()),
-            parent: Default::default(),
-            children: Default::default(),
-            used: false,
-        }))
+        Self {
+            visibility: Visibility::default(),
+            inner: RcMut::new(Default::default()),
+        }
+    }
+}
+
+impl PartialEq for Symbol {
+    fn eq(&self, other: &Self) -> bool {
+        // just compare the visibility and the pointers - not the content
+        self.visibility == other.visibility && self.inner.as_ptr() == other.inner.as_ptr()
     }
 }
 
@@ -73,21 +101,18 @@ impl FromIterator<Symbol> for Symbols {
 impl Symbol {
     /// Create new symbol without children.
     /// # Arguments
+    /// - `visibility`: Visibility of the symbol
     /// - `def`: Symbol definition
     /// - `parent`: Symbol's parent symbol or none for root
     pub fn new(def: SymbolDefinition, parent: Option<Symbol>) -> Self {
-        Symbol(RcMut::new(SymbolInner {
-            def,
-            parent,
-            children: Default::default(),
-            used: false,
-        }))
-    }
-    /// Create a symbol of a source file ([`SymbolDefinition::SourceFile`]).
-    /// # Arguments
-    /// - `source_file`: Resolved source file.
-    pub fn new_source(source_file: Rc<SourceFile>) -> Symbol {
-        Symbol::new(SymbolDefinition::SourceFile(source_file), None)
+        Symbol {
+            visibility: def.visibility(),
+            inner: RcMut::new(SymbolInner {
+                def,
+                parent,
+                ..Default::default()
+            }),
+        }
     }
 
     /// Create a symbol node for a built-in.
@@ -106,21 +131,6 @@ impl Symbol {
         )
     }
 
-    /// Create a symbol for module.
-    /// # Arguments
-    /// - `id`: Name of the symbol
-    pub fn new_module(id: Identifier) -> Symbol {
-        Symbol::new(SymbolDefinition::Module(ModuleDefinition::new(id)), None)
-    }
-
-    /// Create a new constant ([`SymbolDefinition::Constant`]).
-    /// # Arguments
-    /// - `id`: Name of the symbol
-    /// - `value`: The value to store
-    pub fn new_constant(id: Identifier, value: Value) -> Symbol {
-        Symbol::new(SymbolDefinition::Constant(id, value), None)
-    }
-
     /// Create a new argument ([`SymbolDefinition::Argument`]).
     pub fn new_call_argument(id: Identifier, value: Value) -> Symbol {
         Symbol::new(SymbolDefinition::Argument(id, value), None)
@@ -136,32 +146,37 @@ impl Symbol {
         f: &mut impl std::fmt::Write,
         id: Option<&Identifier>,
         depth: usize,
+        children: bool,
     ) -> std::fmt::Result {
         let self_id = &self.id();
         let id = id.unwrap_or(self_id);
         if cfg!(feature = "ansi-color") && !self.borrow().used {
-            color_print::cwriteln!(
+            color_print::cwrite!(
                 f,
-                "{:depth$}<#606060>{id:?} {} [{}]</>",
+                "{:depth$}<#606060>{visibility}{id:?} {def} [{full_name}]</>",
                 "",
-                self.0.borrow().def,
-                self.full_name(),
+                visibility = self.visibility(),
+                def = self.inner.borrow().def,
+                full_name = self.full_name(),
             )?;
         } else {
-            writeln!(
+            write!(
                 f,
                 "{:depth$}{id:?} {} [{}]",
                 "",
-                self.0.borrow().def,
+                self.inner.borrow().def,
                 self.full_name(),
             )?;
         }
-        let indent = 4; //format!("{id}").len();
+        if children {
+            writeln!(f)?;
+            let indent = 4;
 
-        self.borrow()
-            .children
-            .iter()
-            .try_for_each(|(id, child)| child.print_symbol(f, Some(id), depth + indent))
+            self.borrow().children.iter().try_for_each(|(id, child)| {
+                child.print_symbol(f, Some(id), depth + indent, true)
+            })?;
+        }
+        Ok(())
     }
 
     /// Insert child and change parent of child to new parent.
@@ -189,6 +204,13 @@ impl Symbol {
         });
     }
 
+    /// Clone this symbol but give the clone another visibility.
+    pub fn clone_with_visibility(&self, visibility: Visibility) -> Self {
+        let mut cloned = self.clone();
+        cloned.visibility = visibility;
+        cloned
+    }
+
     /// Return the internal *id* of this symbol.
     pub fn id(&self) -> Identifier {
         self.borrow().def.id()
@@ -206,26 +228,89 @@ impl Symbol {
         self.borrow().children.is_empty()
     }
 
+    /// Return `true` if symbol's visibility is private
+    pub fn visibility(&self) -> Visibility {
+        self.visibility
+    }
+
+    /// Return `true` if symbol's visibility set to is public.
+    pub fn is_public(&self) -> bool {
+        matches!(self.visibility(), Visibility::Public)
+    }
+
+    /// Return `true` if symbol's visibility set to is non-public.
+    pub fn is_private(&self) -> bool {
+        !self.is_public()
+    }
+
     /// Search down the symbol tree for a qualified name.
     /// # Arguments
     /// - `name`: Name to search for.
     pub fn search(&self, name: &QualifiedName) -> Option<Symbol> {
-        log::trace!("Searching {name} in {:?}", self.id());
+        log::trace!("Searching {name} in {:?}", self.full_name());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first) {
                 let name = &name.remove_first();
                 if name.is_empty() {
+                    log::trace!("Found {name:?} in {:?}", self.full_name());
                     Some(child.clone())
                 } else {
                     child.search(name)
                 }
             } else {
-                log::trace!("No child in {:?} while searching for {name}", self.id());
+                log::trace!("No child in {:?} while searching for {name:?}", self.id());
                 None
             }
         } else {
             log::warn!("Cannot search for an anonymous name");
             None
+        }
+    }
+
+    /// check if a private symbol may be declared within this symbol
+    pub fn can_const(&self) -> bool {
+        matches!(
+            self.borrow().def,
+            SymbolDefinition::Module(..) | SymbolDefinition::SourceFile(..)
+        )
+    }
+
+    /// check if a value on the stack may be declared within this symbol
+    pub fn can_value(&self) -> bool {
+        matches!(
+            self.borrow().def,
+            SymbolDefinition::Function(..)
+                | SymbolDefinition::Workbench(..)
+                | SymbolDefinition::SourceFile(..)
+        )
+    }
+
+    /// check if a property may be declared within this symbol
+    pub fn can_prop(&self) -> bool {
+        matches!(self.borrow().def, SymbolDefinition::Workbench(..))
+    }
+
+    /// check if a public symbol may be declared within this symbol
+    pub fn can_pub(&self) -> bool {
+        self.can_const()
+    }
+
+    /// Overwrite any value in this symbol
+    pub fn set_value(&self, new_value: Value) -> ResolveResult<()> {
+        match &mut self.borrow_mut().def {
+            SymbolDefinition::Constant(_, _, value) => {
+                *value = new_value;
+                Ok(())
+            }
+            _ => Err(ResolveError::NotAValue(self.full_name())),
+        }
+    }
+
+    /// Get any value of this symbol
+    pub fn get_value(&self) -> ResolveResult<Value> {
+        match &self.borrow().def {
+            SymbolDefinition::Constant(_, _, value) => Ok(value.clone()),
+            _ => Err(ResolveError::NotAValue(self.full_name())),
         }
     }
 }
@@ -251,16 +336,7 @@ impl FullyQualify for Symbol {
 
 impl std::fmt::Display for Symbol {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.print_symbol(f, None, 0)
-    }
-}
-
-/// Print symbols via [std::fmt::Display]
-pub struct FormatSymbol<'a>(pub &'a Symbol);
-
-impl std::fmt::Display for FormatSymbol<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.print_symbol(f, Some(&self.0.id()), 0)
+        self.print_symbol(f, None, 0, false)
     }
 }
 
@@ -274,10 +350,12 @@ impl SrcReferrer for SymbolInner {
             SymbolDefinition::Builtin(_) => {
                 unreachable!("builtin has no source code reference")
             }
-            SymbolDefinition::Constant(identifier, _)
+            SymbolDefinition::Constant(_, identifier, _)
             | SymbolDefinition::Argument(identifier, _) => identifier.src_ref(),
-            SymbolDefinition::Alias(identifier, _) => identifier.src_ref(),
-            SymbolDefinition::UseAll(name) => name.src_ref(),
+            SymbolDefinition::Alias(_, identifier, _) => identifier.src_ref(),
+            SymbolDefinition::UseAll(_, name) => name.src_ref(),
+            #[cfg(test)]
+            SymbolDefinition::Tester(id) => id.src_ref(),
         }
     }
 }

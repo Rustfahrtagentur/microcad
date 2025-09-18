@@ -1,6 +1,6 @@
 # Create a first version of the LegoBrick
 
-Let's make a brick out of our `Base`, the `Knobs` and the `Cap` sketch and integrate everything into a part.
+Let's make a brick out of our `Base`, the `Knobs` and the `Cap` sketches and integrate everything into a *part*.
 
 We extrude `Base`, `Knobs` and `Cap` and translate them in Z direction if necessary.
 Afterwards, we combine the three components using the `|` operator.
@@ -55,4 +55,4 @@ LegoBrick();
 
 When we export the code snippet above, an STL file will be exported instead of an SVG file.
 
-![Picture](.test/first_version-out.stl)
+![Picture](first_version-out.png)

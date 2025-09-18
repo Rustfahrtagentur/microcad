@@ -47,7 +47,7 @@ impl Externals {
             .0
             .iter()
             // filter all files which might include name
-            .filter(|(n, _)| name.is_sub_of(n))
+            .filter(|(n, _)| name.is_within(n))
             // find the file which has the longest name match
             .max_by_key(|(name, _)| name.len())
             // clone the references

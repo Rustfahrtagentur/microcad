@@ -4,7 +4,7 @@ Now, we want to convert the three 2D sketches into a 3D geometry part.
 This can be achieved by *extrusion*.
 The corresponding µcad operation is called [`std::ops::extrude`](../libs/std/ops/extrude.md).
 
-As a first example, let's take the cap of brick and extrude with a height of 1.0 mm.
+As a first example, let's take the cap of the brick and extrude it by 1.0 mm into 3D:
 
 [![test](.test/extrude_cap.svg)](.test/extrude_cap.log)
 
@@ -23,4 +23,4 @@ This will create a box with dimensions 15.8 ⨯ 31.8 ⨯ 1.0 mm.
 
 Note that with `std::ops::extrude()` we will extrude along Z-axis by default.
 
-![Picture](.test/extrude_cap-out.png)
+![Picture](extrude_cap-out.png)

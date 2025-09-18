@@ -9,7 +9,7 @@ mod qualified_name;
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{Id, parse::*, parser::Parser, src_ref::*, syntax::*};
+use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
 
 /// µcad identifier
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -48,6 +48,11 @@ impl Identifier {
         let id = format!("${num}");
         *num += 1;
         Identifier::no_ref(&id)
+    }
+
+    /// Check if id is the `super` id
+    pub fn is_super(&self) -> bool {
+        *self.0 == "super"
     }
 
     /// Check if this was created with none()

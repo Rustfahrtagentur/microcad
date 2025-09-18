@@ -4,9 +4,9 @@
    height="20"
    version="1.1"
    id="svg8"
-   sodipodi:docname="todo_fail.svg"
+   sodipodi:docname="not_todo_fail.svg"
    inkscape:version="1.4.2 (ebf0e94, 2025-05-08)"
-   inkscape:export-filename="todo_fail.svg"
+   inkscape:export-filename="not_todo_fail.svg"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -22,9 +22,9 @@
      inkscape:pageopacity="0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="5.0995782"
-     inkscape:cx="85.889457"
-     inkscape:cy="35.19899"
+     inkscape:zoom="7.2118927"
+     inkscape:cx="65.100802"
+     inkscape:cy="43.747184"
      inkscape:window-width="1888"
      inkscape:window-height="1127"
      inkscape:window-x="16"
@@ -32,12 +32,42 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="svg8" />
   <defs
-     id="defs8" />
+     id="defs8">
+    <mask
+       id="round-3">
+      <rect
+         width="192"
+         height="20"
+         rx="3"
+         fill="#ffffff"
+         id="rect2-6"
+         x="0"
+         y="0" />
+    </mask>
+    <linearGradient
+       id="smooth-7"
+       x2="0"
+       y2="61.967735"
+       gradientTransform="scale(3.0031053,0.32274861)"
+       x1="0"
+       y1="0"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#bbb"
+         stop-opacity=".1"
+         id="stop1-5" />
+      <stop
+         offset="1"
+         stop-opacity=".1"
+         id="stop2-3" />
+    </linearGradient>
+  </defs>
   <linearGradient
      id="smooth"
      x2="0"
      y2="61.967735"
-     gradientTransform="scale(3.0031053,0.32274861)"
+     gradientTransform="scale(3.0031054,0.32274861)"
      x1="0"
      y1="0"
      gradientUnits="userSpaceOnUse">
@@ -63,7 +93,7 @@
        y="0" />
   </mask>
   <g
-     mask="url(#round)"
+     mask="url(#round-3)"
      id="g5"
      transform="scale(1.0317276,1)"
      style="stroke-width:0.984504">
@@ -74,7 +104,7 @@
        fill="#dfb317"
        id="rect9"
        y="0"
-       style="display:inline;fill:#c49500;stroke-width:0.984505;fill-opacity:1"
+       style="display:inline;fill:#88aa00;stroke-width:0.984505"
        ry="3" />
     <rect
        width="46.68108"
@@ -89,7 +119,7 @@
        height="20"
        fill="url(#smooth)"
        id="rect5"
-       style="display:inline;fill:url(#smooth);stroke-width:0.984504"
+       style="display:inline;fill:url(#smooth-7);stroke-width:0.984504"
        x="0"
        y="0" />
   </g>
@@ -163,4 +193,9 @@
        d="m 224.74248,257.85814 v 11.27032 h 11.27413 a 11.270559,11.270559 0 0 0 11.20165,11.26978 h 0.0654 v -11.26978 -11.26924 -10e-4 z"
        id="path13" />
   </g>
+  <path
+     style="fill:#ff0000;stroke:#ff0000;stroke-width:3.202;stroke-dasharray:none;stroke-opacity:0.5;paint-order:markers fill stroke"
+     d="M 51.015475,16.868915 108.54603,4.5470646"
+     id="path11"
+     sodipodi:nodetypes="cc" />
 </svg>

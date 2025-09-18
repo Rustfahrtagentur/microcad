@@ -234,21 +234,37 @@ fn rotate_zyx() -> Symbol {
 
 pub fn math() -> Symbol {
     crate::ModuleBuilder::new("math".try_into().expect("unexpected name error"))
-        .symbol(Symbol::new_constant(
-            Identifier::no_ref("PI"),
-            Value::Quantity(Quantity::new(std::f64::consts::PI, QuantityType::Scalar)),
+        .symbol(Symbol::new(
+            SymbolDefinition::Constant(
+                Visibility::Public,
+                Identifier::no_ref("PI"),
+                Value::Quantity(Quantity::new(std::f64::consts::PI, QuantityType::Scalar)),
+            ),
+            None,
         ))
-        .symbol(Symbol::new_constant(
-            Identifier::no_ref("X"),
-            Value::Tuple(Box::new(Vec3::unit_x().into())),
+        .symbol(Symbol::new(
+            SymbolDefinition::Constant(
+                Visibility::Public,
+                Identifier::no_ref("X"),
+                Value::Tuple(Box::new(Vec3::unit_x().into())),
+            ),
+            None,
         ))
-        .symbol(Symbol::new_constant(
-            Identifier::no_ref("Y"),
-            Value::Tuple(Box::new(Vec3::unit_y().into())),
+        .symbol(Symbol::new(
+            SymbolDefinition::Constant(
+                Visibility::Public,
+                Identifier::no_ref("Y"),
+                Value::Tuple(Box::new(Vec3::unit_y().into())),
+            ),
+            None,
         ))
-        .symbol(Symbol::new_constant(
-            Identifier::no_ref("Z"),
-            Value::Tuple(Box::new(Vec3::unit_z().into())),
+        .symbol(Symbol::new(
+            SymbolDefinition::Constant(
+                Visibility::Public,
+                Identifier::no_ref("Z"),
+                Value::Tuple(Box::new(Vec3::unit_z().into())),
+            ),
+            None,
         ))
         .symbol(abs())
         .symbol(sqrt())

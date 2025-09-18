@@ -53,22 +53,21 @@ impl SymbolTable {
 
     /// Lookup a symbol from global symbols.
     pub fn lookup_global(&mut self, name: &QualifiedName) -> ResolveResult<Symbol> {
-        log::trace!("Looking for global symbol '{name}'");
+        log::trace!("Looking for global symbol '{name:?}'");
         let symbol = match self.symbols.search(name) {
             Ok(symbol) => symbol.clone(),
             Err(err) => return Err(err)?,
         };
         log::trace!(
-            "{found} global symbol: '{name}' = '{full_name}'",
+            "{found} global symbol: {symbol}",
             found = crate::mark!(FOUND),
-            full_name = symbol.full_name()
         );
         Ok(symbol)
     }
 
     /// Lookup a symbol from local stack.
     fn lookup_local(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("Looking for local symbol '{name}'");
+        log::trace!("Looking for local symbol '{name:?}'");
         let symbol = if let Some(id) = name.single_identifier() {
             self.stack.fetch(id)
         } else {
@@ -83,9 +82,8 @@ impl SymbolTable {
         match symbol {
             Ok(symbol) => {
                 log::trace!(
-                    "{found} local symbol: '{name}' = '{full_name}'",
+                    "{found} local symbol: {symbol}",
                     found = crate::mark!(FOUND),
-                    full_name = symbol.full_name()
                 );
                 Ok(symbol)
             }
@@ -93,34 +91,48 @@ impl SymbolTable {
         }
     }
 
-    fn lookup_current(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        let module = &self.stack.current_module_name();
-        log::trace!("Looking for symbol '{name}' in current module '{module}'");
-        let name = &name.with_prefix(module);
-        match self.lookup_global(name) {
-            Ok(symbol) => {
-                log::trace!(
-                    "{found} symbol in current module: '{name}' = '{full_name}'",
-                    found = crate::mark!(FOUND),
-                    full_name = symbol.full_name()
-                );
-                self.follow_alias(&symbol)
+    fn lookup_within(&mut self, what: &QualifiedName, within: QualifiedName) -> EvalResult<Symbol> {
+        log::trace!("Looking for symbol '{what:?}' within '{within:?}':",);
+
+        // process internal supers
+        let (what, within) = what.dissolve_super(within);
+
+        let parents = self.symbols.path_to(&within)?;
+        for (n, parent) in parents.iter().rev().enumerate() {
+            log::trace!("  Looking in: {:?} for {:?}", parent.full_name(), what);
+            if let Some(symbol) = parent.search(&what) {
+                let alias = self.follow_alias(&symbol)?;
+                if n > 0 {
+                    if symbol.is_private() {
+                        return Err(EvalError::SymbolIsPrivate {
+                            what: what.clone(),
+                            within,
+                        });
+                    }
+                    if alias != symbol && alias.is_private() {
+                        return Err(EvalError::SymbolBehindAliasIsPrivate {
+                            what: what.clone(),
+                            alias: alias.full_name(),
+                            within,
+                        });
+                    }
+                }
+                return Ok(alias);
             }
-            Err(err) => Err(err)?,
         }
+        Err(EvalError::SymbolNotFound(what.clone()))
     }
 
     fn lookup_workbench(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
         if let Some(workbench) = &self.stack.current_workbench_name() {
-            log::trace!("Looking for symbol '{name}' in current workbench '{workbench}'");
+            log::trace!("Looking for symbol '{name:?}' in current workbench '{workbench:?}'");
             let name = &name.with_prefix(workbench);
             match self.lookup_global(name) {
                 Ok(symbol) => {
                     if symbol.full_name() == *name {
                         log::trace!(
-                            "{found} symbol in current module: '{name}' = '{full_name}'",
+                            "{found} symbol in current module: {symbol}",
                             found = crate::mark!(FOUND),
-                            full_name = symbol.full_name()
                         );
                         return self.follow_alias(&symbol);
                     }
@@ -131,36 +143,13 @@ impl SymbolTable {
         Err(EvalError::SymbolNotFound(name.clone()))
     }
 
-    /// Lookup a symbol from global symbols but relatively to the file the given `name` came from.
-    ///
-    /// - `name`: *Qualified`name* to search for (must have a proper *source code reference*.
-    ///
-    /// Returns found symbol or error if `name` does not have a *source code reference* or symbol could not be found.
-    fn lookup_relatively(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        if name.src_ref().is_some() {
-            let name = &name.with_prefix(
-                self.sources
-                    .get_name_by_hash(name.src_ref().source_hash())?,
-            );
-            log::trace!("Looking relatively for symbol '{name}'");
-            let symbol = self.lookup_global(name)?;
-            log::trace!(
-                "{found} symbol relatively: '{name}' = '{full_name}'",
-                found = crate::mark!(FOUND),
-                full_name = symbol.full_name()
-            );
-            return self.follow_alias(&symbol);
-        }
-        Err(EvalError::SymbolNotFound(name.clone()))
-    }
-
     fn de_alias(&mut self, name: &QualifiedName) -> QualifiedName {
         for p in (1..name.len()).rev() {
             if let Ok(symbol) = self.lookup_global(&QualifiedName::no_ref(name[0..p].to_vec())) {
-                if let SymbolDefinition::Alias(_, alias) = &symbol.borrow().def {
+                if let SymbolDefinition::Alias(.., alias) = &symbol.borrow().def {
                     let suffix: QualifiedName = name[p..].iter().cloned().collect();
                     let new_name = suffix.with_prefix(alias);
-                    log::trace!("De-aliased name: {name} into {new_name}");
+                    log::trace!("De-aliased name: {name:?} into {new_name:?}");
                     return new_name;
                 }
             }
@@ -171,8 +160,8 @@ impl SymbolTable {
     fn follow_alias(&mut self, symbol: &Symbol) -> EvalResult<Symbol> {
         // execute alias from any use statement
         let def = &symbol.borrow().def;
-        if let SymbolDefinition::Alias(_, name) = def {
-            log::trace!("{found} alias => {name}", found = crate::mark!(FOUND));
+        if let SymbolDefinition::Alias(.., name) = def {
+            log::trace!("{found} alias => {name:?}", found = crate::mark!(FOUND));
             Ok(self.lookup(name)?)
         } else {
             Ok(symbol.clone())
@@ -183,24 +172,41 @@ impl SymbolTable {
     pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
         self.sources.search_paths()
     }
+
+    /// Check if current stack frame is code
+    pub fn is_code(&self) -> bool {
+        !matches!(self.stack.current_frame(), Some(StackFrame::Module(..)))
+    }
+
+    /// Check if current stack frame is a module
+    pub fn is_module(&self) -> bool {
+        matches!(
+            self.stack.current_frame(),
+            Some(StackFrame::Module(..) | StackFrame::Source(..))
+        )
+    }
 }
 
 impl Lookup for SymbolTable {
     fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::debug!("Lookup symbol '{name}'");
+        log::debug!("Lookup symbol '{name:?}' (at line {:?}):", name.src_ref());
 
         let name = &self.de_alias(name);
 
+        log::trace!("- lookups -------------------------------------------------------");
         // collect all symbols that can be found and remember origin
         let result = [
             ("local", self.lookup_local(name)),
-            ("current", self.lookup_current(name)),
+            (
+                "module",
+                self.lookup_within(name, self.stack.current_module_name()),
+            ),
             ("workbench", self.lookup_workbench(name)),
             ("global", self.lookup_global(name).map_err(|e| e.into())),
-            ("relative", self.lookup_relatively(name)),
         ]
         .into_iter();
 
+        log::trace!("- result --------------------------------------------------------");
         let mut errors = Vec::new();
 
         // collect ok-results and ambiguity errors
@@ -227,7 +233,7 @@ impl Lookup for SymbolTable {
 
         // log any unexpected errors and return early
         if !errors.is_empty() {
-            log::debug!("Unexpected errors while lookup symbol '{name}':");
+            log::debug!("Unexpected errors while lookup symbol '{name:?}':");
             errors
                 .iter()
                 .for_each(|(origin, err)| log::error!("Lookup ({origin}) error: {err}"));
@@ -238,7 +244,7 @@ impl Lookup for SymbolTable {
         // early emit any ambiguity error
         if !ambiguous.is_empty() {
             log::debug!(
-                "{ambiguous} Symbol '{name}':\n{}",
+                "{ambiguous} Symbol '{name:?}':\n{}",
                 ambiguous
                     .iter()
                     .map(|(origin, err)| format!("{origin}: {err}"))
@@ -266,19 +272,31 @@ impl Lookup for SymbolTable {
             Some((origin, first)) => {
                 // check if all findings point to the same symbol
                 if !found.iter().all(|(_, x)| Rc::ptr_eq(x, first)) {
+                    log::debug!(
+                        "{ambiguous} symbol '{name:?}' in {origin}:\n{self}",
+                        ambiguous = crate::mark!(AMBIGUOUS),
+                        origin = found
+                            .iter()
+                            .map(|(id, _)| *id)
+                            .collect::<Vec<_>>()
+                            .join(" and ")
+                    );
                     Err(EvalError::AmbiguousSymbol {
                         ambiguous: name.clone(),
                         others: found.iter().map(|(_, x)| x.clone()).collect(),
                     })
                 } else {
-                    log::debug!("{} symbol '{name}' found in {origin}", crate::mark!(FINAL));
+                    log::debug!(
+                        "{found} symbol '{name:?}' in {origin}",
+                        found = crate::mark!(FOUND_INTERIM)
+                    );
                     Ok(first.clone())
                 }
             }
             None => {
                 log::debug!(
-                    "{not_found} Symbol '{name}'",
-                    not_found = crate::mark!(NOT_FOUND)
+                    "{not_found} Symbol '{name:?}'",
+                    not_found = crate::mark!(NOT_FOUND_INTERIM)
                 );
 
                 Err(EvalError::SymbolNotFound(name.clone()))
@@ -318,40 +336,73 @@ impl Locals for SymbolTable {
 }
 
 impl UseSymbol for SymbolTable {
-    fn use_symbol(&mut self, name: &QualifiedName, id: Option<Identifier>) -> EvalResult<Symbol> {
-        log::debug!("Using symbol {name}");
+    fn use_symbol(
+        &mut self,
+        visibility: Visibility,
+        name: &QualifiedName,
+        id: Option<Identifier>,
+        within: &QualifiedName,
+    ) -> EvalResult<Symbol> {
+        log::debug!("Using symbol {name:?}");
 
         let symbol = self.lookup(name)?;
-        self.stack.put_local(id, symbol.clone())?;
-        log::trace!("Local Stack:\n{}", self.stack);
+        if self.is_module() {
+            let id = id.clone().unwrap_or(symbol.id());
+            let symbol = symbol.clone_with_visibility(visibility);
+            if within.is_empty() {
+                self.symbols.insert(id, symbol);
+            } else {
+                self.symbols
+                    .search(within)?
+                    .borrow_mut()
+                    .children
+                    .insert(id, symbol);
+            }
+            log::trace!("Symbol Table:\n{}", self.symbols);
+        }
+
+        if self.is_code() {
+            self.stack.put_local(id, symbol.clone())?;
+            log::trace!("Local Stack:\n{}", self.stack);
+        }
 
         Ok(symbol)
     }
 
     fn use_symbols_of(
         &mut self,
+        visibility: Visibility,
         name: &QualifiedName,
         within: &QualifiedName,
     ) -> EvalResult<Symbol> {
-        log::debug!("Using all symbols in {name}");
+        log::debug!("Using all symbols in {name:?}");
 
         let symbol = self.lookup(name)?;
         if symbol.is_empty() {
             Err(EvalError::NoSymbolsToUse(symbol.full_name()))
         } else {
-            for (id, symbol) in symbol.borrow().children.iter() {
-                self.stack.put_local(Some(id.clone()), symbol.clone())?;
-                if within.is_empty() {
-                    self.symbols.insert(id.clone(), symbol.clone());
-                } else {
-                    self.symbols
-                        .search(within)?
-                        .borrow_mut()
-                        .children
-                        .insert(id.clone(), symbol.clone());
+            if self.is_module() {
+                for (id, symbol) in symbol.borrow().children.iter() {
+                    let symbol = symbol.clone_with_visibility(visibility);
+                    if within.is_empty() {
+                        self.symbols.insert(id.clone(), symbol);
+                    } else {
+                        self.symbols
+                            .search(within)?
+                            .borrow_mut()
+                            .children
+                            .insert(id.clone(), symbol);
+                    }
                 }
+                log::trace!("Symbol Table:\n{}", self.symbols);
             }
-            log::trace!("Local Stack:\n{}", self.stack);
+
+            if self.is_code() {
+                for (id, symbol) in symbol.borrow().children.iter() {
+                    self.stack.put_local(Some(id.clone()), symbol.clone())?;
+                }
+                log::trace!("Local Stack:\n{}", self.stack);
+            }
             Ok(symbol)
         }
     }

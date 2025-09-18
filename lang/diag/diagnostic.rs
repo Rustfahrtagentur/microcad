@@ -4,7 +4,6 @@
 use crate::{diag::*, resolve::*, src_ref::*};
 
 /// Diagnostic message with source code reference attached.
-#[derive(Debug)]
 pub enum Diagnostic {
     /// Trace message.
     Trace(Refer<String>),
@@ -118,11 +117,6 @@ impl Diagnostic {
             }
         }
 
-        // Print stack trace
-        if let Diagnostic::Error(_) = self {
-            //stack.pretty_print(w, source_file_by_hash)?
-        }
-
         Ok(())
     }
 }
@@ -145,6 +139,17 @@ impl std::fmt::Display for Diagnostic {
             Diagnostic::Info(message) => write!(f, "info: {}: {message}", self.src_ref()),
             Diagnostic::Warning(error) => write!(f, "warning: {}: {error}", self.src_ref()),
             Diagnostic::Error(error) => write!(f, "error: {}: {error}", self.src_ref()),
+        }
+    }
+}
+
+impl std::fmt::Debug for Diagnostic {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Diagnostic::Trace(message) => write!(f, "trace: {}: {message}", self.src_ref()),
+            Diagnostic::Info(message) => write!(f, "info: {}: {message}", self.src_ref()),
+            Diagnostic::Warning(error) => write!(f, "warning: {}: {error:?}", self.src_ref()),
+            Diagnostic::Error(error) => write!(f, "error: {}: {error:?}", self.src_ref()),
         }
     }
 }

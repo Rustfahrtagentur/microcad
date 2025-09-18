@@ -45,7 +45,7 @@
 Hello
 -- Errors --
 -- Model --
-  Group -> Undetermined (root)
+  Group (root) ->
 
 -- Test Result --
 OK

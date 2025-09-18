@@ -15,13 +15,13 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    Operation __builtin::ops::subtract()⏎ -> 2D
+  Group (root) ->
+    Operation __builtin::ops::subtract()⏎ ->
       #[color = rgba(1, 0, 0, 1)]
-      Group -> 2D
-        Transform __builtin::ops::translate(x: Scalar = 1, y: Scalar = 1, z: Scalar = 0)⏎ -> 2D
-          Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 3)⏎ -> 2D
-        Primitive2D __builtin::geo2d::Rect(height: Scalar = 3, width: Scalar = 3, x: Scalar = 0, y: Scalar = 0)⏎ -> 2D
+      Group ->
+        Transform __builtin::ops::translate(x=1, y=1, z=0)⏎ ->
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=3)⏎ ->
+        Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)⏎ ->
 
 -- Test Result --
 OK

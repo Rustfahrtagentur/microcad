@@ -16,5 +16,11 @@ error: Assignment statement not available here
    2 |   const B = 1; // error
      |   ^^^^^^^^^^^^
      |
+error: Symbol B not found.
+  ---> <FROM STR>:2:3
+     |
+   2 |   const B = 1; // error
+     |   ^^^^^^^^^^^^
+     |
 -- Test Result --
 FAILED AS EXPECTED

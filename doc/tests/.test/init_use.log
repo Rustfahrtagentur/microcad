@@ -11,8 +11,8 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    sketch <NO ID>::K(l: Length = 10mm) -> 2D
+  Group (root) ->
+    Workpiece(sketch) <NO ID>::K(l=10mm) ->
 
 -- Test Result --
 OK

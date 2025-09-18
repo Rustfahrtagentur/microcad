@@ -2,7 +2,7 @@
 
 In this tutorial you should have learned about the following things:
 
-- Installing microcad
+- Installing µcad
 - Creating a new µcad file
 - Using basic 2D primitives in `std::geo2d`: `Rect`, `Circle`, `Frame`
 - Define and use named values and models

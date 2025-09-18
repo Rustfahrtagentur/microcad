@@ -21,24 +21,6 @@ impl Assignment {
     }
 }
 
-impl Eval<()> for Assignment {
-    fn eval(&self, context: &mut Context) -> EvalResult<()> {
-        let value: Value = self.expression.eval(context)?;
-
-        if let Err(err) = self.type_check(value.ty()) {
-            context.error(self, err)?;
-            return Ok(());
-        }
-
-        if let Err(err) = context.set_local_value(self.id.clone(), value) {
-            context.error(self, err)?;
-            return Ok(());
-        }
-
-        Ok(())
-    }
-}
-
 impl Eval<()> for AssignmentStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<()> {
         log::debug!("Evaluating assignment statement:\n{self}");
@@ -46,23 +28,26 @@ impl Eval<()> for AssignmentStatement {
 
         let assignment = &self.assignment;
 
-        let value: Value = assignment.expression.eval(context)?;
-        if let Err(err) = assignment.type_check(value.ty()) {
+        // evaluate assignment expression
+        let new_value: Value = assignment.expression.eval(context)?;
+        if let Err(err) = assignment.type_check(new_value.ty()) {
             context.error(self, err)?;
             return Ok(());
         }
 
-        let value = match value {
+        // apply any attributes to model value
+        let new_value = match new_value {
             Value::Model(model) => {
                 let attributes = self.attribute_list.eval(context)?;
                 model.borrow_mut().attributes = attributes.clone();
                 Value::Model(model)
             }
             value => {
+                // all other values can't have attributes
                 if !self.attribute_list.is_empty() {
                     context.error(
                         &self.attribute_list,
-                        AttributeError::CannotAssignToExpression(
+                        AttributeError::CannotAssignAttribute(
                             self.assignment.expression.clone().into(),
                         ),
                     )?;
@@ -71,9 +56,75 @@ impl Eval<()> for AssignmentStatement {
             }
         };
 
-        if let Err(err) = context.set_local_value(assignment.id.clone(), value) {
-            context.error(self, err)?;
+        // lookup if we find any existing symbol
+        if let Ok(symbol) = context.lookup(&QualifiedName::from_id(assignment.id.clone())) {
+            let err = match &mut symbol.borrow_mut().def {
+                SymbolDefinition::Constant(_, identifier, value) => {
+                    if value.is_invalid() {
+                        *value = new_value.clone();
+                        None
+                    } else {
+                        Some((
+                            assignment.id.clone(),
+                            EvalError::ValueAlreadyInitialized(
+                                identifier.clone(),
+                                value.clone(),
+                                identifier.src_ref(),
+                            ),
+                        ))
+                    }
+                }
+                _ => Some((
+                    assignment.id.clone(),
+                    EvalError::NotAnLValue(assignment.id.clone()),
+                )),
+            };
+            // because logging is blocked while `symbol.borrow_mut()` it must run outside the borrow
+            if let Some((id, err)) = err {
+                context.error(&id, err)?;
+            }
         }
+
+        // now check what to do with the value
+        match assignment.qualifier {
+            Qualifier::Const => {
+                if context.get_property(&assignment.id).is_ok() {
+                    todo!("property with that name exists")
+                }
+
+                let symbol = context.lookup(&assignment.id.clone().into());
+                match symbol {
+                    Ok(symbol) => {
+                        if let Err(err) = symbol.set_value(new_value) {
+                            context.error(self, err)?
+                        }
+                    }
+                    Err(err) => context.error(self, err)?,
+                }
+            }
+            Qualifier::Value => {
+                let result = if context.get_property(&assignment.id).is_ok() {
+                    if context.is_init() {
+                        context.init_property(assignment.id.clone(), new_value)
+                    } else {
+                        todo!("property with that name exists")
+                    }
+                } else {
+                    context.set_local_value(assignment.id.clone(), new_value)
+                };
+                if let Err(err) = result {
+                    context.error(self, err)?;
+                }
+            }
+            Qualifier::Prop => {
+                if context.get_local_value(&assignment.id).is_ok() {
+                    todo!("local value with that name exists")
+                }
+                if let Err(err) = context.init_property(assignment.id.clone(), new_value) {
+                    context.error(self, err)?;
+                }
+            }
+        };
 
         Ok(())
     }

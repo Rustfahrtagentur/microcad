@@ -25,7 +25,7 @@ pub fn init() {
     let _ = env_logger::builder().try_init();
 }
 
-#[allow(dead_code)]
+#[allow(dead_code, clippy::too_many_arguments)]
 pub fn run_test(
     name: &str,
     params: &str,
@@ -232,7 +232,7 @@ pub fn run_test(
 
                         // get print output
                         write!(log_out, "-- Model --\n{}\n", FormatTree(&model))
-                            .expect("no output error");
+                            .expect("output error");
 
                         let _ = fs::hard_link("images/ok.svg", banner);
                         writeln!(log_out, "-- Test Result --\nOK").expect("no output error");

@@ -44,7 +44,7 @@ pub struct WorkbenchDefinition {
     /// Visibility from outside modules.
     pub visibility: Visibility,
     /// Workbench kind.
-    pub kind: WorkbenchKind,
+    pub kind: Refer<WorkbenchKind>,
     /// Workbench name.
     pub id: Identifier,
     /// Workbench's building plan.
@@ -53,6 +53,15 @@ pub struct WorkbenchDefinition {
     pub body: Body,
     /// Workbench code reference
     pub src_ref: SrcRef,
+}
+
+impl WorkbenchDefinition {
+    /// Return the source code reference of the head of the definition.
+    ///
+    /// This excludes any attribute, visibility and body.
+    pub fn src_ref_head(&self) -> SrcRef {
+        SrcRef::merge(&self.kind, &self.plan)
+    }
 }
 
 impl<'a> Initialized<'a> for WorkbenchDefinition {

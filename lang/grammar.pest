@@ -25,7 +25,7 @@ alpha       = _{ alpha_lower | alpha_upper }
 digit       = _{ '0'..'9' }
 
 COMMENT = {
-  single_line_comment
+    single_line_comment
   | multi_line_comment
 }
 
@@ -204,7 +204,7 @@ attribute_access = { "#" ~ identifier }
 element_access = _{ method_call | array_element_access | tuple_element_access | attribute_access }
 
 // `pub`: ok
-visibility = { "pub" }
+visibility = { "pub" | "" }
 
 // `use a;`: ok # Import a single module
 // `use ;`: error # Must import at least one module
@@ -220,8 +220,6 @@ use_all = { qualified_name ~ ws* ~ "::" ~ ws* ~ "*" }
 
 // `std::math as my_math`: ok # Import math from std as my_math
 use_alias = { qualified_name ~ ws+ ~ "as" ~ ws+ ~ identifier }
-
-nested_with_body = _{ ((call | qualified_name) ~ (ws+ ~ (call | qualified_name))*)? ~ ws* ~ body }
 
 // `-5.0mm`: ok # Negate
 // `(a+b)*(c-a)`: ok
@@ -361,7 +359,7 @@ qualifier = { "const" | "prop" }
 // `r`: error # neither type specifier or default value
 // `const r = 5.0mm`: Make value of assignment a public constant
 // `prop r = 5.0mm`: Make value of assignment a public property
-assignment = { (qualifier ~ ws*)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
+assignment = { (visibility ~ ws+)? ~ (qualifier ~ ws+)? ~ identifier ~ ws* ~ type_annotation? ~ ws* ~ "=" ~ ws* ~ expression }
 
 assignment_statement = { (attribute_list ~ ws+)? ~ assignment ~ ws* ~ ";" }
 
@@ -435,7 +433,7 @@ init_definition = { doc_block? ~ "init" ~ ws* ~ parameter_list ~ ws* ~ body }
 
 // `mod math { }`: ok # module
 // `mod math { fn pi() -> Scalar { return 3.14159; } }`: ok # module with function
-module_definition = { "mod" ~ ws+ ~ identifier ~ ws* ~ body }
+module_definition = { visibility ~ "mod" ~ ws+ ~ identifier ~ ws* ~ body }
 
 statement = {
     workbench_definition

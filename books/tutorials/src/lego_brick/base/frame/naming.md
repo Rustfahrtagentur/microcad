@@ -53,7 +53,7 @@ outer - inner;
 
 Now any reader can easily understand what's going on.
 
-As you might mentioned we do not need the line `use std::ops::subtract;` anymore.
+As you might have mentioned, we do not need the line `use std::ops::subtract;` anymore.
 This is because µcad brings some builtin binary *operators* which are hard-linked to builtin *operations*:
 
 | Operator | Builtin Operation      | Description              |
@@ -67,4 +67,3 @@ Those builtin operations are from the *builtin library* which can be found withi
 Usually there is no need to use the builtin library directly, because all builtin
 functionalities are also accessible via the *standard library* and with a more
 convenient interface.
-

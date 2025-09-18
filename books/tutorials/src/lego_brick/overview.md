@@ -1,6 +1,6 @@
 # Putting it together
 
-Below is an intermediate result of the sketches of the three components that have now been defined:
+Below is an intermediate result of the sketches of the three components which we now successfully have defined:
 
 [![test](.test/overview.svg)](.test/overview.log)
 
@@ -38,6 +38,7 @@ Knobs();
 
 Across the Lego universe, the spacing of `8mm` is used everywhere.
 To address this we can store it in a *constant* named `SPACING` using the `const` keyword.
+This makes `SPACING` available in all sketches within that file (or *module*).
 The name of a constant must be in capital letters.
 It can be used from within the current module/file and from all sketches and parts within that module.
 

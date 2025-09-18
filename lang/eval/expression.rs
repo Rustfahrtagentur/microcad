@@ -107,7 +107,7 @@ impl Eval<Option<Symbol>> for QualifiedName {
 impl Eval for QualifiedName {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
         match &context.lookup(self)?.borrow().def {
-            SymbolDefinition::Constant(_, value) | SymbolDefinition::Argument(_, value) => {
+            SymbolDefinition::Constant(.., value) | SymbolDefinition::Argument(_, value) => {
                 Ok(value.clone())
             }
             SymbolDefinition::Module(ns) => Err(EvalError::UnexpectedNested("mod", ns.id.clone())),
@@ -120,7 +120,7 @@ impl Eval for QualifiedName {
             SymbolDefinition::Builtin(bm) => {
                 Err(EvalError::UnexpectedNested("builtin", bm.id.clone()))
             }
-            SymbolDefinition::Alias(id, _) => {
+            SymbolDefinition::Alias(_, id, _) => {
                 unreachable!("Unexpected alias {id} in expression")
             }
             SymbolDefinition::SourceFile(sf) => {
@@ -129,8 +129,12 @@ impl Eval for QualifiedName {
                     sf.filename_as_str()
                 )
             }
-            SymbolDefinition::UseAll(name) => {
+            SymbolDefinition::UseAll(_, name) => {
                 unreachable!("Unexpected use {name} in expression")
+            }
+            #[cfg(test)]
+            SymbolDefinition::Tester(..) => {
+                unreachable!()
             }
         }
     }
@@ -158,7 +162,7 @@ impl Expression {
                 if !attribute_list.is_empty() {
                     context.error(
                         attribute_list,
-                        AttributeError::CannotAssignToExpression(self.clone().into()),
+                        AttributeError::CannotAssignAttribute(self.clone().into()),
                     )?;
                 }
                 Ok(value)

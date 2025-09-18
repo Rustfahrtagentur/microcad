@@ -3,12 +3,7 @@
 
 //! Work piece element
 
-use crate::{
-    eval::*,
-    model::*,
-    syntax::{Identifier, WorkbenchKind},
-    value::Value,
-};
+use crate::{eval::*, model::*, syntax::*, value::*};
 
 /// A workpiece is an element produced by a workbench.
 #[derive(Debug, Clone)]
@@ -52,9 +47,9 @@ impl Workpiece {
 impl std::fmt::Display for Workpiece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.kind {
-            WorkbenchKind::Part => write!(f, "part {}", self.creator),
-            WorkbenchKind::Sketch => write!(f, "sketch {}", self.creator),
-            WorkbenchKind::Operation => write!(f, "op {}", self.creator),
+            WorkbenchKind::Part => write!(f, "Workpiece(part) {}", self.creator),
+            WorkbenchKind::Sketch => write!(f, "Workpiece(sketch) {}", self.creator),
+            WorkbenchKind::Operation => write!(f, "Workpiece(op) {}", self.creator),
         }
     }
 }
@@ -62,6 +57,13 @@ impl std::fmt::Display for Workpiece {
 impl PropertiesAccess for Workpiece {
     fn get_property(&self, id: &Identifier) -> Option<&Value> {
         self.properties.get(id)
+    }
+
+    fn set_property(&mut self, id: Identifier, value: Value) -> Option<Value> {
+        self.properties.insert(id, value)
+    }
+    fn get_properties(&self) -> Option<&Properties> {
+        Some(&self.properties)
     }
 
     fn add_properties(&mut self, props: Properties) {

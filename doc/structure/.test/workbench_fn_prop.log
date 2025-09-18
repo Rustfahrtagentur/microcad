@@ -6,7 +6,7 @@
 
  1: part PunchedDisk(radius: Length) {
  2:     fn inner() { 
- 3:         prop hole = radius/2;  // eval error: prop not allowed in function
+ 3:         prop hole = radius/2;  // error: prop not allowed in function
  4:         return hole;
  5:     }
  6:     inner();
@@ -14,13 +14,3 @@
  8: 
  9: PunchedDisk(1cm);
 
--- Output --
--- Errors --
-error: Assignment statement not available here
-  ---> <FROM STR>:3:9
-     |
-   3 |         prop hole = radius/2;  // eval error: prop not allowed in function
-     |         ^^^^^^^^^^^^^^^^^^^^^
-     |
--- Test Result --
-FAILED BUT WITH WRONG ERRORS

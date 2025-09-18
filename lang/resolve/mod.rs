@@ -29,7 +29,7 @@ pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
 
-use crate::syntax::*;
+use crate::{syntax::*, value::Value};
 
 /// Trait for items which can be fully qualified.
 pub trait FullyQualify {
@@ -40,6 +40,8 @@ pub trait FullyQualify {
 trait Resolve<T = Option<Symbol>> {
     /// Resolve into Symbol
     fn resolve(&self, parent: &Symbol) -> ResolveResult<T>;
+
+    //    fn resolve2(&self, parent: &Symbol
 }
 
 #[test]
@@ -99,12 +101,14 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
             Statement::Module(md) => Ok(Some((md.id.clone(), md.resolve(parent)?))),
             Statement::Function(fd) => Ok(Some((fd.id.clone(), fd.resolve(parent)?))),
             Statement::Use(us) => us.resolve(parent),
+            Statement::Assignment(a) => Ok(a
+                .resolve(parent)?
+                .map(|symbol| (a.assignment.id.clone(), symbol))),
             // Not producing any symbols
             Statement::Init(_)
             | Statement::Return(_)
             | Statement::If(_)
             | Statement::InnerAttribute(_)
-            | Statement::Assignment(_)
             | Statement::Expression(_) => Ok(None),
         }
     }
@@ -168,8 +172,50 @@ impl Resolve for Attribute {
 }
 
 impl Resolve for AssignmentStatement {
-    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
-        Ok(None)
+    fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+        match (self.assignment.visibility, self.assignment.qualifier) {
+            // properties do not have a visibility
+            (_, Qualifier::Prop) => {
+                if !parent.can_prop() {
+                    Err(ResolveError::DeclNotAllowed(
+                        self.assignment.id.clone(),
+                        parent.full_name(),
+                    ))
+                } else {
+                    Ok(None)
+                }
+            }
+            // constants will be symbols (`pub` shall equal `pub const`)
+            (_, Qualifier::Const) | (Visibility::Public, Qualifier::Value) => {
+                if !parent.can_const() {
+                    Err(ResolveError::DeclNotAllowed(
+                        self.assignment.id.clone(),
+                        parent.full_name(),
+                    ))
+                } else {
+                    log::trace!("Declare private value {}", self.assignment.id);
+                    Ok(Some(Symbol::new(
+                        SymbolDefinition::Constant(
+                            self.assignment.visibility,
+                            self.assignment.id.clone(),
+                            Value::None,
+                        ),
+                        Some(parent.clone()),
+                    )))
+                }
+            }
+            // value go on stack
+            (Visibility::Private, Qualifier::Value) => {
+                if self.assignment.visibility == Visibility::Private && !parent.can_value() {
+                    Err(ResolveError::DeclNotAllowed(
+                        self.assignment.id.clone(),
+                        parent.full_name(),
+                    ))
+                } else {
+                    Ok(None)
+                }
+            }
+        }
     }
 }
 
@@ -188,21 +234,21 @@ impl Resolve<SymbolMap> for Body {
 impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
     fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
-            UseDeclaration::Use(name) => {
+            UseDeclaration::Use(visibility, name) => {
                 let identifier = name.last().expect("Identifier");
                 Ok(Some((
                     identifier.clone(),
                     Symbol::new(
-                        SymbolDefinition::Alias(identifier.clone(), name.clone()),
+                        SymbolDefinition::Alias(*visibility, identifier.clone(), name.clone()),
                         Some(parent.clone()),
                     ),
                 )))
             }
-            UseDeclaration::UseAll(_) => Ok(None),
-            UseDeclaration::UseAlias(name, alias) => Ok(Some((
+            UseDeclaration::UseAll(visibility, _) => Ok(None),
+            UseDeclaration::UseAlias(visibility, name, alias) => Ok(Some((
                 alias.clone(),
                 Symbol::new(
-                    SymbolDefinition::Alias(alias.clone(), name.clone()),
+                    SymbolDefinition::Alias(*visibility, alias.clone(), name.clone()),
                     Some(parent.clone()),
                 ),
             ))),

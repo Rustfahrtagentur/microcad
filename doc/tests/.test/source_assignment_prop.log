@@ -6,13 +6,3 @@
 
  1: prop a = 1;  // error
 
--- Output --
--- Errors --
-error: Assignment statement not available here
-  ---> <FROM STR>:1:1
-     |
-   1 | prop a = 1;  // error
-     | ^^^^^^^^^^^
-     |
--- Test Result --
-FAILED AS EXPECTED

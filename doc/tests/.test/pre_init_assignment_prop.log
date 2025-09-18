@@ -9,6 +9,6 @@
  3: init(l:Length) {} } K();
 
 -- Parse Error --
-Statement not allowed prior initializers
+Statement not allowed prior initializers (2:3)
 -- Test Result --
 FAILED AS EXPECTED (PARSE: Cannot check error line)

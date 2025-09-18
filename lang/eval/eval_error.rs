@@ -221,6 +221,42 @@ pub enum EvalError {
     /// Function missing return statement
     #[error("Missing return statement in {0}")]
     MissingReturn(QualifiedName),
+
+    /// There is no model in this workbench
+    #[error("Missing model in workbench")]
+    NoModelInWorkbench,
+
+    /// Found a symbol and a property with that name
+    #[error("Found a symbol and a property with names {0} and {1}")]
+    AmbiguousProperty(QualifiedName, Identifier),
+
+    /// Assignment failed because value already has been initialized
+    #[error("Value {0} already has been initialized with {1} (at line {2})")]
+    ValueAlreadyInitialized(Identifier, Value, SrcRef),
+
+    /// Assignment failed because left side is not an l-value
+    #[error("Assignment failed because {0} is not an l-value")]
+    NotAnLValue(Identifier),
+
+    /// Found symbol but it's not visible to user
+    #[error("Symbol {what} is private from within {within}")]
+    SymbolIsPrivate {
+        /// what was searched
+        what: QualifiedName,
+        /// where it was searched
+        within: QualifiedName,
+    },
+
+    /// Found symbol but it's not visible to user
+    #[error("Symbol {what} (aliased from {alias}) is private from within {within}")]
+    SymbolBehindAliasIsPrivate {
+        /// what was searched
+        what: QualifiedName,
+        /// the alias in between
+        alias: QualifiedName,
+        /// where it was searched
+        within: QualifiedName,
+    },
 }
 
 /// Result type of any evaluation.

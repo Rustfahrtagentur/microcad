@@ -83,6 +83,16 @@ pub fn assert_eq() -> Symbol {
                                     }),
                                 )?;
                             }
+                        } else {
+                            let message: String = a.get("message");
+                            context.error(
+                                args,
+                                EvalError::AssertionFailed(if message.is_empty() {
+                                    format!("Invalid: {a_value}")
+                                } else {
+                                    "{message}".to_string()
+                                }),
+                            )?;
                         }
                     }
                 }
@@ -102,8 +112,18 @@ pub fn assert_valid() -> Symbol {
     Symbol::new_builtin(id, None, &|_, args, context| {
         if let Ok((_, arg)) = args.get_single() {
             if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
-                if let Err(err) = context.lookup(&name) {
-                    context.error(arg, err)?;
+                match context.lookup(&name) {
+                    Ok(symbol) => {
+                        if let Ok(value) = symbol.get_value() {
+                            if value.is_invalid() {
+                                context.error(
+                                    &arg,
+                                    EvalError::AssertionFailed(format!("invalid value: {value}")),
+                                )?;
+                            }
+                        }
+                    }
+                    Err(err) => context.error(&arg, err)?,
                 }
             }
         }
@@ -117,7 +137,11 @@ pub fn assert_invalid() -> Symbol {
         if let Ok((_, arg)) = args.get_single() {
             if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
                 if let Ok(symbol) = context.lookup(&name) {
-                    context.error(name, EvalError::SymbolFound(symbol.full_name()))?;
+                    if let Ok(value) = symbol.get_value() {
+                        if !value.is_invalid() {
+                            context.error(&arg, EvalError::SymbolFound(symbol.full_name()))?
+                        }
+                    }
                 }
             }
         }

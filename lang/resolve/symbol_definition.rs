@@ -17,13 +17,16 @@ pub enum SymbolDefinition {
     /// Builtin symbol.
     Builtin(Rc<Builtin>),
     /// Constant.
-    Constant(Identifier, Value),
+    Constant(Visibility, Identifier, Value),
     /// Argument value.
     Argument(Identifier, Value),
     /// Alias of a pub use statement.
-    Alias(Identifier, QualifiedName),
+    Alias(Visibility, Identifier, QualifiedName),
     /// Use all available symbols in the module with the given name.
-    UseAll(QualifiedName),
+    UseAll(Visibility, QualifiedName),
+    /// Just a dummy for testing
+    #[cfg(test)]
+    Tester(Identifier),
 }
 
 impl SymbolDefinition {
@@ -35,8 +38,30 @@ impl SymbolDefinition {
             Self::Function(f) => f.id.clone(),
             Self::SourceFile(s) => s.id(),
             Self::Builtin(m) => m.id(),
-            Self::Constant(id, _) | Self::Argument(id, _) | Self::Alias(id, _) => id.clone(),
-            Self::UseAll(_) => Identifier::none(),
+            Self::Constant(_, id, _) | Self::Argument(id, _) | Self::Alias(_, id, _) => id.clone(),
+            Self::UseAll(..) => Identifier::none(),
+            #[cfg(test)]
+            Self::Tester(id) => id.clone(),
+        }
+    }
+
+    /// Return visibility of this symbol.
+    pub fn visibility(&self) -> Visibility {
+        match &self {
+            SymbolDefinition::SourceFile(..) => Visibility::Public,
+            SymbolDefinition::Builtin(..) => Visibility::Public,
+            SymbolDefinition::Argument(..) => Visibility::Private,
+
+            SymbolDefinition::Module(md) => md.visibility,
+            SymbolDefinition::Workbench(wd) => wd.visibility,
+            SymbolDefinition::Function(fd) => fd.visibility,
+
+            SymbolDefinition::Constant(visibility, ..)
+            | SymbolDefinition::Alias(visibility, ..)
+            | SymbolDefinition::UseAll(visibility, ..) => *visibility,
+
+            #[cfg(test)]
+            SymbolDefinition::Tester(..) => Visibility::Public,
         }
     }
 }
@@ -45,14 +70,16 @@ impl std::fmt::Display for SymbolDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Workbench(w) => write!(f, "({})", w.kind),
-            Self::Module(_) => write!(f, "(module)"),
-            Self::Function(_) => write!(f, "(function)"),
-            Self::SourceFile(_) => write!(f, "(file)"),
-            Self::Builtin(_) => write!(f, "(builtin)"),
-            Self::Constant(_, value) => write!(f, "(constant) = {value}"),
-            Self::Argument(_, value) => write!(f, "(call_argument) = {value}"),
-            Self::Alias(_, name) => write!(f, "(alias) => {name}"),
-            Self::UseAll(name) => write!(f, "(use all) => {name}"),
+            Self::Module(..) => write!(f, "(module)"),
+            Self::Function(..) => write!(f, "(function)"),
+            Self::SourceFile(..) => write!(f, "(file)"),
+            Self::Builtin(..) => write!(f, "(builtin)"),
+            Self::Constant(.., value) => write!(f, "(constant) = {value}"),
+            Self::Argument(.., value) => write!(f, "(call_argument) = {value}"),
+            Self::Alias(.., name) => write!(f, "(alias) => {name}"),
+            Self::UseAll(.., name) => write!(f, "(use all) => {name}"),
+            #[cfg(test)]
+            Self::Tester(id) => write!(f, "(tester) => {id}"),
         }
     }
 }

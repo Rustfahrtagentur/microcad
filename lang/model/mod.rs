@@ -170,13 +170,12 @@ impl Model {
     /// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
     pub fn signature(&self) -> String {
         format!(
-            "{id}{element} -> {output_type}{is_root}",
+            "{id}{element}{is_root} ->",
             id = match &self.borrow().id {
                 Some(id) => format!("{id}: "),
                 None => String::new(),
             },
             element = *self.borrow().element,
-            output_type = self.deduce_output_type(),
             is_root = if self.parents().next().is_some() {
                 ""
             } else {
@@ -208,6 +207,23 @@ impl Model {
     /// Ancestors iterator.
     pub fn ancestors(&self) -> Ancestors {
         Ancestors::new(self.clone())
+    }
+
+    /// Get a property from this model.
+    pub fn get_property(&self, id: &Identifier) -> Option<Value> {
+        self.borrow().element.get_property(id).cloned()
+    }
+
+    /// Set a property in this model.
+    pub fn set_property(&mut self, id: Identifier, value: Value) -> Option<Value> {
+        self.borrow_mut().element.set_property(id, value)
+    }
+
+    /// Add a new property to the model.
+    pub fn add_property(&self, id: Identifier, value: Value) {
+        self.borrow_mut()
+            .element
+            .add_properties([(id, value)].into_iter().collect())
     }
 }
 
@@ -255,18 +271,18 @@ impl TreeDisplay for Model {
         f: &mut std::fmt::Formatter,
         mut tree_state: TreeState,
     ) -> std::fmt::Result {
-        writeln!(
-            f,
-            "{:tree_state$}{signature}",
-            "",
-            signature = crate::shorten!(self.signature(), tree_state.shorten)
-        )?;
-        tree_state.indent();
+        let signature = crate::shorten!(self.signature(), tree_state.shorten);
         let self_ = self.borrow();
-        self_.attributes.tree_print(f, tree_state)?;
         if let Some(output) = &self_.output {
-            output.tree_print(f, tree_state)?;
+            writeln!(f, "{:tree_state$}{signature} {output}", "",)?;
+        } else {
+            writeln!(f, "{:tree_state$}{signature}", "",)?;
         }
+        tree_state.indent();
+        if let Some(props) = self_.get_properties() {
+            props.tree_print(f, tree_state)?;
+        }
+        self_.attributes.tree_print(f, tree_state)?;
         self_.children.tree_print(f, tree_state)
     }
 }

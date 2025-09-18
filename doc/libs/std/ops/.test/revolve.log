@@ -12,13 +12,19 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 3D (root)
-    op std::ops::revolve(angle: Angle = 3.14159265358979rad) -> 3D
-      Operation __builtin::ops::revolve(circular_segments: Integer = 64, revolve_degrees: Scalar = 180)⏎ -> 3D
-        op std::ops::translate(x: Length = 40mm, y: Length = 0mm, z: Length = 0mm) -> 2D (root)
-          Transform __builtin::ops::translate(x: Scalar = 40, y: Scalar = 0, z: Scalar = 0)⏎ -> 2D
-            sketch std::geo2d::Circle(center: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), radius: Length = 10mm) -> 2D (root)
-              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 10)⏎ -> 2D
+  Group (root) ->
+    Workpiece(op) std::ops::revolve(angle=3.14159265358979rad) ->
+      - angle = 3.14159265358979rad
+      Operation __builtin::ops::revolve(circular_segments=64, revolve_degrees=180)⏎ ->
+        Workpiece(op) std::ops::translate(x=40mm, y=0mm, z=0mm) (root) ->
+          - x = 40mm
+          - y = 0mm
+          - z = 0mm
+          Transform __builtin::ops::translate(x=40, y=0, z=0)⏎ ->
+            Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) (root) ->
+              - center = (x=0mm, y=0mm)
+              - radius = 10mm
+              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)⏎ ->
 
 -- Test Result --
 OK

@@ -19,6 +19,16 @@ impl From<Tuple> for SymbolMap {
     }
 }
 
+impl FromIterator<(Identifier, Value)> for SymbolMap {
+    fn from_iter<T: IntoIterator<Item = (Identifier, Value)>>(iter: T) -> Self {
+        let mut symbol_map = SymbolMap::default();
+        for (id, value) in iter {
+            symbol_map.add_node(Symbol::new_call_argument(id.clone(), value.clone()))
+        }
+        symbol_map
+    }
+}
+
 impl WriteToFile for SymbolMap {}
 
 impl SymbolMap {
@@ -48,12 +58,11 @@ impl SymbolMap {
         } else {
             let (id, leftover) = name.split_first();
             if let Some(symbol) = self.get(&id) {
+                symbol.borrow_mut().used = true;
                 if leftover.is_empty() {
-                    log::trace!("Fetched {name} from globals (symbol map)");
-                    symbol.borrow_mut().used = true;
+                    log::trace!("Fetched {name:?} from globals (symbol map)");
                     return Ok(symbol.clone());
                 } else if let Some(symbol) = symbol.search(&leftover) {
-                    symbol.borrow_mut().used = true;
                     return Ok(symbol);
                 }
             }
@@ -73,7 +82,7 @@ impl SymbolMap {
     /// Print contained symbols with indention.
     pub fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
         for (id, symbol) in self.0.iter() {
-            symbol.print_symbol(f, Some(id), depth)?;
+            symbol.print_symbol(f, Some(id), depth, true)?;
         }
 
         Ok(())
@@ -93,14 +102,45 @@ impl SymbolMap {
             self.insert(id.clone(), child.clone());
         });
     }
+
+    /// Collect all symbols engaged in that name.
+    ///
+    /// Example: `what`=`a::b::c` will return the symbols: `a`,`a::b` and `a::b::c`
+    pub fn path_to(&self, what: &QualifiedName) -> ResolveResult<Symbols> {
+        (1..(what.len() + 1))
+            .map(|n| what[0..n].iter().cloned().collect())
+            .map(|what| self.search(&what))
+            .collect()
+    }
 }
 
 impl std::fmt::Display for SymbolMap {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (id, symbol) in self.0.iter() {
-            symbol.print_symbol(f, Some(id), 4)?;
+            symbol.print_symbol(f, Some(id), 0, true)?;
         }
 
         Ok(())
     }
+}
+
+#[test]
+fn symbol_map_path_to() {
+    let mut symbols = SymbolMap::new();
+    let a = Symbol::new(SymbolDefinition::Tester("a".into()), None);
+    let b = Symbol::new(SymbolDefinition::Tester("b".into()), Some(a.clone()));
+    let c = Symbol::new(SymbolDefinition::Tester("c".into()), Some(b.clone()));
+    Symbol::add_child(&b, c);
+    Symbol::add_child(&a, b);
+    symbols.add_node(a);
+
+    let name: QualifiedName = "a::b::c".into();
+
+    log::trace!("symbols:\n{}", symbols);
+    let symbols = symbols.path_to(&name).expect("test error");
+    log::trace!("parents of {name}: {}", symbols.full_names());
+    assert_eq!(
+        symbols.full_names().to_string(),
+        "a, a::b, a::b::c".to_string(),
+    );
 }

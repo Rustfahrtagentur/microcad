@@ -60,7 +60,7 @@ impl Parameter {
                 let value: Value = default_value.eval(context)?;
                 if specified_type.ty() != value.ty() {
                     context.error(
-                        self.src_ref.clone(),
+                        &self.src_ref,
                         EvalError::TypeMismatch {
                             id: self.id.clone(),
                             expected: specified_type.ty(),

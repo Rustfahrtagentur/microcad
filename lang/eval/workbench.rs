@@ -26,23 +26,32 @@ impl WorkbenchDefinition {
 
         let arguments = creator.arguments.clone();
 
+        // copy all arguments which are part of the building plan into properties
+        let (mut properties, non_properties): (Vec<_>, Vec<_>) = arguments
+            .named_iter()
+            .map(|(id, value)| (id.clone(), value.clone()))
+            .partition(|(id, _)| self.plan.contains_key(id));
+
+        // create uninitialized values for all missing building plan properties
+        let missing: Vec<_> = self
+            .plan
+            .iter()
+            .filter(|param| !properties.iter().any(|(id, _)| param.id == *id))
+            .map(|param| param.id.clone())
+            .collect();
+        missing
+            .into_iter()
+            .for_each(|id| properties.push((id, Value::None)));
+
+        log::trace!("Properties: {properties:?}");
+        log::trace!("Non-Properties: {non_properties:?}");
+
         // Create model
         let model = ModelBuilder::new(
             Element::Workpiece(Workpiece {
-                kind: self.kind,
-
+                kind: *self.kind,
                 // copy all arguments which are part of the building plan to properties
-                properties: creator
-                    .arguments
-                    .named_iter()
-                    .filter_map(|(id, arg)| {
-                        if self.plan.contains_key(id) {
-                            Some((id.clone(), arg.clone()))
-                        } else {
-                            None
-                        }
-                    })
-                    .collect(),
+                properties: properties.into_iter().collect(),
                 creator,
             }),
             call_src_ref,
@@ -51,7 +60,11 @@ impl WorkbenchDefinition {
         .build();
 
         context.scope(
-            StackFrame::Workbench(model, self.id.clone(), arguments.clone().into()),
+            StackFrame::Workbench(
+                model,
+                self.id.clone(),
+                non_properties.clone().into_iter().collect(),
+            ),
             |context| {
                 let model = context.get_model()?;
 
@@ -62,13 +75,8 @@ impl WorkbenchDefinition {
                         id = self.id,
                         kind = self.kind
                     );
-                    if let Err(err) = match init.eval(&self.plan, arguments.clone(), context) {
-                        Ok(props) => props.iter().try_for_each(|(id, value)| {
-                            context.set_local_value(id.clone(), value.clone())
-                        }),
-                        Err(err) => context.error(init, err),
-                    } {
-                        context.error(self, err)?;
+                    if let Err(err) = init.eval(non_properties.into_iter().collect(), context) {
+                        context.error(&self.src_ref_head(), err)?;
                     }
                 }
 
@@ -86,11 +94,15 @@ impl WorkbenchDefinition {
                             let result = workpiece.check_output_type(output_type);
                             match result {
                                 Ok(()) => {}
-                                Err(EvalError::WorkbenchNoOutput(_, _)) => {
-                                    context.warning(self, result.expect_err("Error"))?;
+                                Err(EvalError::WorkbenchNoOutput(..)) => {
+                                    context.warning(
+                                        &self.src_ref_head(),
+                                        result.expect_err("Error"),
+                                    )?;
                                 }
                                 result => {
-                                    context.error(self, result.expect_err("Error"))?;
+                                    context
+                                        .error(&self.src_ref_head(), result.expect_err("Error"))?;
                                 }
                             }
                         }

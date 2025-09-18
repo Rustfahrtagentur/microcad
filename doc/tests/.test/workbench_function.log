@@ -11,8 +11,8 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    sketch <NO ID>::K() -> 2D
+  Group (root) ->
+    Workpiece(sketch) <NO ID>::K() ->
 
 -- Test Result --
 OK

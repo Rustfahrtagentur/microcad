@@ -14,25 +14,45 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 2D (root)
-    Operation __builtin::ops::hull()⏎ -> 2D
-      Multiplicity -> 2D
-        op std::ops::translate(x: Length = -10mm, y: Length = -10mm, z: Length = 0mm) -> 2D
-          Transform __builtin::ops::translate(x: Scalar = -10, y: Scalar = -10, z: Scalar = 0)⏎ -> 2D
-            sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), r: Length = 4mm) -> 2D
-              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 4)⏎ -> 2D
-        op std::ops::translate(x: Length = 10mm, y: Length = -10mm, z: Length = 0mm) -> 2D
-          Transform __builtin::ops::translate(x: Scalar = 10, y: Scalar = -10, z: Scalar = 0)⏎ -> 2D
-            sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), r: Length = 4mm) -> 2D
-              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 4)⏎ -> 2D
-        op std::ops::translate(x: Length = -10mm, y: Length = 10mm, z: Length = 0mm) -> 2D
-          Transform __builtin::ops::translate(x: Scalar = -10, y: Scalar = 10, z: Scalar = 0)⏎ -> 2D
-            sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), r: Length = 4mm) -> 2D
-              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 4)⏎ -> 2D
-        op std::ops::translate(x: Length = 10mm, y: Length = 10mm, z: Length = 0mm) -> 2D
-          Transform __builtin::ops::translate(x: Scalar = 10, y: Scalar = 10, z: Scalar = 0)⏎ -> 2D
-            sketch std::geo2d::Circle(c: (x: Length, y: Length) = (x: Length = 0mm, y: Length = 0mm), r: Length = 4mm) -> 2D
-              Primitive2D __builtin::geo2d::Circle(cx: Scalar = 0, cy: Scalar = 0, radius: Scalar = 4)⏎ -> 2D
+  Group (root) ->
+    Operation __builtin::ops::hull()⏎ ->
+      Multiplicity ->
+        Workpiece(op) std::ops::translate(x=-10mm, y=-10mm, z=0mm) ->
+          - x = -10mm
+          - y = -10mm
+          - z = 0mm
+          Transform __builtin::ops::translate(x=-10, y=-10, z=0)⏎ ->
+            Workpiece(sketch) std::geo2d::Circle(c=(x=0mm, y=0mm), r=4mm) ->
+              - center = (x=0mm, y=0mm)
+              - radius = 4mm
+              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=4)⏎ ->
+        Workpiece(op) std::ops::translate(x=10mm, y=-10mm, z=0mm) ->
+          - x = 10mm
+          - y = -10mm
+          - z = 0mm
+          Transform __builtin::ops::translate(x=10, y=-10, z=0)⏎ ->
+            Workpiece(sketch) std::geo2d::Circle(c=(x=0mm, y=0mm), r=4mm) ->
+              - center = (x=0mm, y=0mm)
+              - radius = 4mm
+              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=4)⏎ ->
+        Workpiece(op) std::ops::translate(x=-10mm, y=10mm, z=0mm) ->
+          - x = -10mm
+          - y = 10mm
+          - z = 0mm
+          Transform __builtin::ops::translate(x=-10, y=10, z=0)⏎ ->
+            Workpiece(sketch) std::geo2d::Circle(c=(x=0mm, y=0mm), r=4mm) ->
+              - center = (x=0mm, y=0mm)
+              - radius = 4mm
+              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=4)⏎ ->
+        Workpiece(op) std::ops::translate(x=10mm, y=10mm, z=0mm) ->
+          - x = 10mm
+          - y = 10mm
+          - z = 0mm
+          Transform __builtin::ops::translate(x=10, y=10, z=0)⏎ ->
+            Workpiece(sketch) std::geo2d::Circle(c=(x=0mm, y=0mm), r=4mm) ->
+              - center = (x=0mm, y=0mm)
+              - radius = 4mm
+              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=4)⏎ ->
 
 -- Test Result --
 OK

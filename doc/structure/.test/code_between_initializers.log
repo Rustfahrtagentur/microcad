@@ -16,6 +16,6 @@
 10: Wheel(radius = 1.0mm);
 
 -- Parse Error --
-Code between initializers is not allowed
+Code between initializers is not allowed (5:5)
 -- Test Result --
 FAILED AS EXPECTED (PARSE: Cannot check error line)

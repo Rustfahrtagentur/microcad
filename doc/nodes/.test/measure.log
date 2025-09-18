@@ -26,5 +26,11 @@ error: Array elements have different types: [<INVALID TYPE>, Area]
    1 | __builtin::debug::assert_eq([
      |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
+error: Assertion failed: Invalid: <INVALID VALUE>
+  ---> <FROM STR>:1:29
+     |
+   1 | __builtin::debug::assert_eq([
+     |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
 TODO

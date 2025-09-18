@@ -370,6 +370,7 @@ fn create_test<'a>(
 /// - `banner`: file for banner link
 /// - `log`: file for log output
 /// - `todo`:
+#[allow(clippy::too_many_arguments)]
 fn create_test_code(
     name: &str,
     params: Option<&str>,

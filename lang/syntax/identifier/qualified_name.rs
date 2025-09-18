@@ -75,7 +75,7 @@ impl QualifiedName {
     }
 
     /// Tells if self is in a specified module
-    pub fn is_sub_of(&self, module: &QualifiedName) -> bool {
+    pub fn is_within(&self, module: &QualifiedName) -> bool {
         self.starts_with(module)
     }
 
@@ -139,6 +139,39 @@ impl QualifiedName {
         name.push(suffix.clone());
         name
     }
+
+    /// If name includes any "super" ids those will be dissolved.
+    pub fn dissolve_super(&self, mut within: QualifiedName) -> (Self, Self) {
+        // dissolve any leading supers
+        let what: QualifiedName = self
+            .iter()
+            .filter(|id| {
+                if id.is_super() {
+                    within.pop();
+                    false
+                } else {
+                    true
+                }
+            })
+            .cloned()
+            .collect();
+
+        // check for more supers
+        if what.iter().any(Identifier::is_super) {
+            todo!("error: super allowed only at begin of qualified name");
+        }
+        (what, within)
+    }
+}
+
+#[test]
+fn dissolve_super() {
+    let what: QualifiedName = "super::super::c::x".into();
+    let within: QualifiedName = "a::b::c::d".into();
+
+    let (what, within) = what.dissolve_super(within);
+    assert_eq!(what, "c::x".into());
+    assert_eq!(within, "a::b".into());
 }
 
 impl std::fmt::Display for QualifiedName {

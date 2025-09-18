@@ -10,9 +10,10 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 3D (root)
-    part std::geo3d::Sphere(radius: Length = 10mm) -> 3D
-      Primitive3D __builtin::geo3d::Sphere(radius: Scalar = 10)⏎ -> 3D
+  Group (root) ->
+    Workpiece(part) std::geo3d::Sphere(radius=10mm) ->
+      - radius = 10mm
+      Primitive3D __builtin::geo3d::Sphere(radius=10)⏎ ->
 
 -- Test Result --
 OK

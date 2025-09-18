@@ -28,11 +28,11 @@
 
 -- Output --
 -- Errors --
-error: Missing return statement in <NO ID>::math::pow
-  ---> <FROM STR>:4:37
+error: Missing arguments: n
+  ---> <FROM STR>:15:13
      |
-   4 |     fn pow( x: Scalar, n: Integer ) {
-     |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 |         pow(x, 2.0)
+     |             ^^^^^^
      |
 -- Test Result --
 FAIL(TODO)

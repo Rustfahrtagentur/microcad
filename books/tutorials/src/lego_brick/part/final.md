@@ -1,14 +1,6 @@
 # The final part
 
-Additionally, to the `grid` operation, we have to compute
-the overall width and height in the `LegoBrick` part:
-
-* `width = rows * 8mm - 0.2mm`
-* `height = columns * 8mm - 0.2mm`
-
-Now we are ready to write the final part of a `LegoBrick`.
-
-We add some default values for `rows` and `columns` in the building plan and use
+First we add some default values for `rows` and `columns` in the building plan and use
 them in the last statement where we call `LegoBrick()`.
 
 [![test](.test/final.svg)](.test/final.log)
@@ -68,6 +60,6 @@ part LegoBrick(rows = 2, columns = 4, base_height = 9.6mm) {
 LegoBrick();
 ```
 
-![Picture](.test/final-out.png)
+![Picture](final-out.png)
 
-Let's make a library out of it and use it from another file in the next section.
+Let's make a library out of it, and use it from another file in the next section.

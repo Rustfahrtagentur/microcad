@@ -20,9 +20,9 @@
 -- Output --
 -- Errors --
 -- Model --
-  Group -> 3D (root)
-    part <NO ID>::a::b::c::M1() -> 3D
-    part <NO ID>::a::M2() -> 3D
+  Group (root) ->
+    Workpiece(part) <NO ID>::a::b::c::M1() ->
+    Workpiece(part) <NO ID>::a::M2() ->
 
 -- Test Result --
 OK
