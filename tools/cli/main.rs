@@ -17,12 +17,9 @@ use commands::*;
 pub use watcher::*;
 
 /// Main of the command line interpreter
-fn main() {
+fn main() -> anyhow::Result<()> {
     env_logger::init();
+    let cli = Cli::new()?;
 
-    let cli: Cli = clap::Parser::parse();
-
-    if let Err(err) = cli.run() {
-        eprintln!("{err}")
-    }
+    cli.run()
 }

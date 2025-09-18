@@ -10,11 +10,6 @@ use walkdir::WalkDir;
 
 /// Generate Rust HashMap that contain the standard library.
 fn generate_builtin_std_library() -> Result<()> {
-    // Helper function to escape quotes in strings
-    fn escape_string(s: &str) -> String {
-        s.replace('"', r#"\""#)
-    }
-
     // Get the directory to scan from the environment variable,
     // or use a default (e.g., "assets" in your project root).
     let dir = env::var("MICROCAD_STD_DIR").unwrap_or_else(|_| "../../lib/std".to_string());
@@ -51,7 +46,6 @@ fn generate_builtin_std_library() -> Result<()> {
 
     for (path, content) in files {
         let path_str = path.to_string_lossy();
-        let content = escape_string(&content);
         code.push_str(&format!(
             "        m.insert(PathBuf::from(r#\"{path_str}\"#), r#\"{content}\"#.to_string());\n"
         ));

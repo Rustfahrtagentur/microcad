@@ -30,8 +30,8 @@ impl Install {
             Some(root) => root.clone(),
             // If root has not been passed as argument, install to home directory
             None => {
-                let home_dir = home::home_dir().unwrap_or(".".into());
-                home_dir.join(format!(".microcad/lib/{}", self.library))
+                let root_dir = Cli::global_root_dir().unwrap_or(std::path::PathBuf::from("./lib"));
+                root_dir.join(self.library.clone())
             }
         }
     }
