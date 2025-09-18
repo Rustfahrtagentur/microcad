@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 [package]
-name = "microcad-cli"
+name = "microcad"
 description = "µcad Command Line Interface"
-documentation = "https://docs.rs/microcad-cli"
+documentation = "https://docs.rs/microcad"
 authors.workspace = true
 edition.workspace = true
 homepage.workspace = true
