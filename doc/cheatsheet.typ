@@ -8,26 +8,58 @@
 
 #set block(
   fill: luma(230),
-  inset: 8pt,
+  inset: 6pt,
   radius: 8pt,
   width: 100%,
 )
 #let section(header) = [ ]
 
+
+#block[
+  == Command line usage
+
+  #set par(spacing: 3.3mm)
+
+  \# Print syntax tree
+
+  *microcad parse file.µcad*
+
+  \# Print model tree
+
+  *microcad eval file.µcad*
+
+  \# Export geometry as STL or SVG
+
+  *microcad export file.µcad*
+
+  \# Update file on changes
+
+  *microcad watch file.µcad*
+]
+
+
 #block[
   == Basic syntax
 
-  #set par(spacing: 2.8mm)
+  #set par(spacing: 3.4mm)
 
-  use std::geo2d::\*; \/\/ Use statement
+  *use* std::geo2d::\*; \/\/ Use statement
 
-  Circle(r = 40mm); \/\/ Expression
+  *use* Rect *as* R; \/\/ Name alias
+
+  *pub use* Rect *as* R; \/\/ Public name alias
+
+  Circle(r = 40mm); \/\/ Sketch/part call
 
   \#[export = "example.stl"] \/\/ Attribute
 
-  rect = Rect(40mm); \/\/ Assignment
+  rect = R(40mm); \/\/ Assignment
 
-  use Rect as R; \/\/ Name alias
+  *const* rect = R(4mm); \/\/ Private value
+
+  *pub* rect = R(40mm); \/\/ Public value
+
+  *prop* rect = R(40mm); \/\/ Property
 
   \/\/ Apply *rotate* operation by 45°
   R(40mm).rotate(45°);
@@ -41,9 +73,7 @@
   \/\/ If condition
 
   if a > 5mm { R(5mm) } else { R(10mm) }
-
 ]
-
 
 
 #block[
@@ -79,9 +109,21 @@
 ]
 
 #block[
+  == Functions
+
+  *fn* function(x: Length) {
+
+  #box() *return* x; \/\/ Return statement
+
+  }
+
+]
+
+
+#block[
   == std::geo2d
 
-  #set par(spacing: 4.2mm)
+  #set par(spacing: 2.2mm)
 
   Circle(r = 40mm);
 
@@ -97,6 +139,7 @@
 
 #block[
   == std::geo3d
+  #set par(spacing: 2.2mm)
 
   Cylinder(r = 42mm, h = 20mm);
 
@@ -106,6 +149,19 @@
 ]
 
 
+#block[
+  == std::debug
+  #set par(spacing: 2.2mm)
+
+  a = 40mm;
+
+  print("Hello World: {a}");
+
+  assert(a > 30mm);
+
+  assert_eq([a, 40mm]);
+
+]
 
 #block[
   == std::math
@@ -120,23 +176,11 @@
   abs(x); sin(x); cos(x); tan(x);
 ]
 
-#block[
-  == std::debug
-
-  a = 40mm;
-
-  print("Hello World: {a}");
-
-  assert(a > 30mm);
-
-  assert_eq([a, 40mm]);
-
-]
 
 #block[
   == std::ops
 
-  #set par(spacing: 3.5mm)
+  #set par(spacing: 2.85mm)
 
   .union() \/\/ | operator
 
@@ -171,24 +215,4 @@
   .revolve(180°)
 ]
 
-#block[
-  == Command line usage
 
-  #set par(spacing: 3.0mm)
-
-  \# Print syntax tree
-
-  microcad parse file.µcad
-
-  \# Print model tree
-
-  microcad eval file.µcad
-
-  \# Export geometry as STL or SVG
-
-  microcad export file.µcad
-
-  \# Update file on changes
-
-  microcad watch file.µcad
-]
