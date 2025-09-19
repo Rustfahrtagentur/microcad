@@ -4,6 +4,7 @@
 //! Parser errors
 
 use crate::{parse::*, ty::*};
+use microcad_core::CoreError;
 use thiserror::Error;
 
 /// Parsing errors
@@ -144,6 +145,9 @@ pub enum ParseError {
     /// Unknown type
     #[error("Unknown type: {0}")]
     UnknownType(String),
+
+    #[error("Core error: ")]
+    CoreError(#[from] CoreError),
 }
 
 /// Result with parse error

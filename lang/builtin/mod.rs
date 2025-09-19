@@ -47,6 +47,10 @@ pub enum BuiltinTypeHelper {
     Bool,
     /// Color type.
     Color,
+    /// Direction
+    Direction,
+    /// Alignment
+    Alignment,
 }
 
 impl From<BuiltinTypeHelper> for Type {
@@ -63,6 +67,8 @@ impl From<BuiltinTypeHelper> for Type {
             BuiltinTypeHelper::String => Type::String,
             BuiltinTypeHelper::Bool => Type::Bool,
             BuiltinTypeHelper::Color => Type::Tuple(TupleType::new_color().into()),
+            BuiltinTypeHelper::Direction => Type::Direction,
+            BuiltinTypeHelper::Alignment => Type::Alignment,
         }
     }
 }
