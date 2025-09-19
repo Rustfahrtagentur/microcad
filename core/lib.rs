@@ -5,8 +5,10 @@
 
 mod boolean_op;
 
+pub mod alignment;
 pub mod color;
 pub mod core_error;
+pub mod direction;
 pub mod geo2d;
 #[cfg(feature = "geo3d")]
 pub mod geo3d;
@@ -33,9 +35,11 @@ pub type Mat4 = cgmath::Matrix4<Scalar>;
 /// Primitive angle type
 pub type Angle = cgmath::Rad<Scalar>;
 
+pub use alignment::*;
 pub use boolean_op::BooleanOp;
 pub use color::*;
 pub use core_error::*;
+pub use direction::*;
 pub use geo2d::*;
 pub use geo3d::*;
 pub use render_resolution::*;

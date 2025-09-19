@@ -13,39 +13,53 @@
  7:     }
  8: 
  9:     sketch IconElement( radius: Length ) {
-10:         c = HalfCircle(radius);
-11:         r = Rect(width = radius, height = radius * 2);
-12:         c.translate(y = radius) | r.translate(x = -radius/2 );
-13:     }
-14: 
-15:     pub sketch Icon( radius: Length ) {
-16:         prop gap = radius / 5;
-17:         IconElement(radius)
-18:             .translate(x = -radius-gap, y = 0mm, z = 0mm)
-19:             .rotate(z = [0°, -90°, -180°, -270°]); 
-20:     }
-21: 
-22:     pub sketch Micro( radius: Length, thickness: Length ) {
-23:         u = HalfCircle(radius) - HalfCircle(radius-thickness);
-24:         r_l = Rect(width = thickness, height = radius * 3);
-25:         r_r = Rect(width = thickness, height = radius * 2);
-26:         u.translate(y = radius/2)
-27:             | r_l.translate(x = -(radius-thickness/2) ) 
-28:             | r_r.translate(x = radius-thickness/2, y=radius/2 );
-29:     }
-30: }
-31: 
-32: use std::ops::*;
-33: 
-34: radius = 1cm;
-35: thickness = 4mm;
-36: icon = microcad::Icon(radius);
-37: icon;
-38: 
-39: microcad::Micro(radius, thickness).translate(x=radius*2+gap, y=-radius/2);
-40: 
+10:         {
+11:             HalfCircle(radius);
+12:             Rect(width = radius, height = radius * 2);
+13:         }.align(X,NEAR);
+14:     }
+15: 
+16:     pub sketch Icon( radius: Length ) {
+17:         prop gap = radius / 5;
+18:         IconElement(radius)
+19:             .translate(x = -radius-gap, y = 0mm, z = 0mm)
+20:             .rotate(z = [0°, -90°, -180°, -270°]); 
+21:     }
+22: 
+23:     pub sketch Micro( radius: Length, thickness: Length ) {
+24:         u = HalfCircle(radius) - HalfCircle(radius-thickness);
+25:         r_l = Rect(width = thickness, height = radius * 3);
+26:         r_r = Rect(width = thickness, height = radius * 2);
+27:         u.translate(y = radius/2)
+28:             | r_l.translate(x = -(radius-thickness/2) ) 
+29:             | r_r.translate(x = radius-thickness/2, y=radius/2 );
+30: 
+31:         {
+32:             HalfCircle(radius) - HalfCircle(radius-thickness);
+33:             Rect(width = thickness, height = radius * 3);
+34:             Rect(width = thickness, height = radius * 2);
+35:         }.distribute(distance=5mm,dir=X)
+36: 
+37:     }
+38: }
+39: 
+40: use std::ops::*;
+41: 
+42: radius = 1cm;
+43: thickness = 4mm;
+44: icon = microcad::Icon(radius);
+45: icon;
+46: 
+47: microcad::Micro(radius, thickness).translate(x=radius*2+gap, y=-radius/2);
+48: 
 
 -- Output --
 -- Errors --
+error: Symbol distribute not found.
+  ---> <FROM STR>:35:11
+     |
+  35 |         }.distribute(distance=5mm,dir=X)
+     |           ^^^^^^^^^^
+     |
 Symbol gap not found.-- Test Result --
 FAIL

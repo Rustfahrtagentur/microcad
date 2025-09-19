@@ -5,10 +5,16 @@
 
 use std::rc::Rc;
 
+use microcad_core::{Alignment, Direction};
 use microcad_lang::{builtin::*, render::*};
 
 #[derive(Debug)]
-pub struct Align;
+pub struct Align {
+    /// Alignment kind
+    alignment: Alignment,
+    /// Alignment direction
+    direction: Direction,
+}
 
 impl Operation for Align {
     fn process_2d(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
@@ -16,7 +22,9 @@ impl Operation for Align {
             let model_ = model.borrow();
             let geometry: Geometry2DOutput = model_.children.render(context)?;
             use microcad_core::traits::Align;
-            Ok(geometry.map(|geometry| Rc::new(geometry.align(&resolution))))
+            Ok(geometry.map(|geometry| {
+                Rc::new(geometry.align(self.direction, self.alignment, &resolution))
+            }))
         })
     }
 
@@ -39,6 +47,20 @@ impl BuiltinWorkbenchDefinition for Align {
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
-        &|_| Ok(BuiltinWorkpieceOutput::Operation(Box::new(Align)))
+        &|args| {
+            Ok(BuiltinWorkpieceOutput::Operation(Box::new(Align {
+                direction: args.get("direction"),
+                alignment: args.get("alignment"),
+            })))
+        }
+    }
+
+    fn parameters() -> ParameterValueList {
+        [
+            parameter!(direction: Direction),
+            parameter!(alignment: Alignment),
+        ]
+        .into_iter()
+        .collect()
     }
 }
