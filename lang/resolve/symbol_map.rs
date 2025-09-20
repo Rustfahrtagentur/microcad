@@ -136,7 +136,7 @@ fn symbol_map_path_to() {
 
     let name: QualifiedName = "a::b::c".into();
 
-    log::trace!("symbols:\n{}", symbols);
+    log::trace!("symbols:\n{symbols}");
     let symbols = symbols.path_to(&name).expect("test error");
     log::trace!("parents of {name}: {}", symbols.full_names());
     assert_eq!(

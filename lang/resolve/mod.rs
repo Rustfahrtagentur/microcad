@@ -244,7 +244,7 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
                     ),
                 )))
             }
-            UseDeclaration::UseAll(visibility, _) => Ok(None),
+            UseDeclaration::UseAll(_visibility, _) => Ok(None),
             UseDeclaration::UseAlias(visibility, name, alias) => Ok(Some((
                 alias.clone(),
                 Symbol::new(
