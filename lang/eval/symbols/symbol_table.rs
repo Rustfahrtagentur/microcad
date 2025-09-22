@@ -144,28 +144,41 @@ impl SymbolTable {
     }
 
     fn de_alias(&mut self, name: &QualifiedName) -> QualifiedName {
-        for p in (1..name.len()).rev() {
-            if let Ok(symbol) = self.lookup_global(&QualifiedName::no_ref(name[0..p].to_vec())) {
-                if let SymbolDefinition::Alias(.., alias) = &symbol.borrow().def {
-                    let suffix: QualifiedName = name[p..].iter().cloned().collect();
-                    let new_name = suffix.with_prefix(alias);
-                    log::trace!("De-aliased name: {name:?} into {new_name:?}");
-                    return new_name;
+        (1..name.len())
+            .rev()
+            .filter_map(|p| {
+                if let Ok(symbol) = self.lookup_global(&QualifiedName::no_ref(name[0..p].to_vec()))
+                {
+                    Some((p, symbol))
+                } else {
+                    None
                 }
-            }
-        }
-        name.clone()
+            })
+            .find_map(|(p, symbol)| {
+                symbol.with_def(|def| {
+                    if let SymbolDefinition::Alias(.., alias) = def {
+                        let suffix: QualifiedName = name[p..].iter().cloned().collect();
+                        let new_name = suffix.with_prefix(alias);
+                        log::trace!("De-aliased name: {name:?} into {new_name:?}");
+                        Some(new_name)
+                    } else {
+                        None
+                    }
+                })
+            })
+            .unwrap_or(name.clone())
     }
 
     fn follow_alias(&mut self, symbol: &Symbol) -> EvalResult<Symbol> {
         // execute alias from any use statement
-        let def = &symbol.borrow().def;
-        if let SymbolDefinition::Alias(.., name) = def {
-            log::trace!("{found} alias => {name:?}", found = crate::mark!(FOUND));
-            Ok(self.lookup(name)?)
-        } else {
-            Ok(symbol.clone())
-        }
+        symbol.with_def(|def| {
+            if let SymbolDefinition::Alias(.., name) = def {
+                log::trace!("{found} alias => {name:?}", found = crate::mark!(FOUND));
+                Ok(self.lookup(name)?)
+            } else {
+                Ok(symbol.clone())
+            }
+        })
     }
 
     /// Return search paths of this symbol table.
@@ -271,7 +284,7 @@ impl Lookup for SymbolTable {
         match found.first() {
             Some((origin, first)) => {
                 // check if all findings point to the same symbol
-                if !found.iter().all(|(_, x)| Rc::ptr_eq(x, first)) {
+                if !found.iter().all(|(_, x)| x == first) {
                     log::debug!(
                         "{ambiguous} symbol '{name:?}' in {origin}:\n{self}",
                         ambiguous = crate::mark!(AMBIGUOUS),
@@ -352,11 +365,7 @@ impl UseSymbol for SymbolTable {
             if within.is_empty() {
                 self.symbols.insert(id, symbol);
             } else {
-                self.symbols
-                    .search(within)?
-                    .borrow_mut()
-                    .children
-                    .insert(id, symbol);
+                self.symbols.search(within)?.insert(id, symbol);
             }
             log::trace!("Symbol Table:\n{}", self.symbols);
         }
@@ -382,24 +391,26 @@ impl UseSymbol for SymbolTable {
             Err(EvalError::NoSymbolsToUse(symbol.full_name()))
         } else {
             if self.is_module() {
-                for (id, symbol) in symbol.borrow().children.iter() {
+                let within = if within.is_empty() {
+                    None
+                } else {
+                    Some(self.symbols.search(within)?)
+                };
+                for (id, symbol) in symbol.clone_children() {
                     let symbol = symbol.clone_with_visibility(visibility);
-                    if within.is_empty() {
-                        self.symbols.insert(id.clone(), symbol);
+                    if let Some(within) = &within {
+                        within.insert(id.clone(), symbol);
                     } else {
-                        self.symbols
-                            .search(within)?
-                            .borrow_mut()
-                            .children
-                            .insert(id.clone(), symbol);
+                        self.symbols.insert(id.clone(), symbol);
                     }
                 }
+
                 log::trace!("Symbol Table:\n{}", self.symbols);
             }
 
             if self.is_code() {
-                for (id, symbol) in symbol.borrow().children.iter() {
-                    self.stack.put_local(Some(id.clone()), symbol.clone())?;
+                for (id, symbol) in symbol.clone_children() {
+                    self.stack.put_local(Some(id), symbol)?;
                 }
                 log::trace!("Local Stack:\n{}", self.stack);
             }

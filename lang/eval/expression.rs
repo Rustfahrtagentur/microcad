@@ -106,7 +106,7 @@ impl Eval<Option<Symbol>> for QualifiedName {
 
 impl Eval for QualifiedName {
     fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        match &context.lookup(self)?.borrow().def {
+        context.lookup(self)?.with_def(|def| match def {
             SymbolDefinition::Constant(.., value) | SymbolDefinition::Argument(_, value) => {
                 Ok(value.clone())
             }
@@ -136,7 +136,7 @@ impl Eval for QualifiedName {
             SymbolDefinition::Tester(..) => {
                 unreachable!()
             }
-        }
+        })
     }
 }
 

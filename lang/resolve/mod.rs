@@ -64,7 +64,7 @@ impl SourceFile {
         let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone().into()), None);
 
         let mut context = Context::default();
-        symbol.borrow_mut().children = self.statements.resolve(&symbol, &mut context)?;
+        symbol.set_children(self.statements.resolve(&symbol, &mut context)?);
         log::trace!("Created symbol from source file {name}:\n{symbol}");
         Ok(symbol)
     }
@@ -78,7 +78,7 @@ impl Resolve<Symbol> for ModuleDefinition {
             Some(parent.clone()),
         );
         if let Some(body) = &self.body {
-            symbol.borrow_mut().children = body.resolve(&symbol, context)?;
+            symbol.set_children(body.resolve(&symbol, context)?);
         } else {
             todo!("load module")
         }
@@ -131,7 +131,7 @@ impl Resolve<Symbol> for WorkbenchDefinition {
             SymbolDefinition::Workbench(self.clone().into()),
             Some(parent.clone()),
         );
-        symbol.borrow_mut().children = self.body.resolve(&symbol, context)?;
+        symbol.set_children(self.body.resolve(&symbol, context)?);
         Ok(symbol)
     }
 }
@@ -142,7 +142,7 @@ impl Resolve<Symbol> for FunctionDefinition {
             SymbolDefinition::Function((*self).clone().into()),
             Some(parent.clone()),
         );
-        symbol.borrow_mut().children = self.body.resolve(&symbol, context)?;
+        symbol.set_children(self.body.resolve(&symbol, context)?);
 
         Ok(symbol)
     }

@@ -174,12 +174,12 @@ impl Locals for Stack {
 
     fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {
         match self.fetch(id) {
-            Ok(symbol) => match &symbol.borrow().def {
+            Ok(symbol) => symbol.with_def(|def| match def {
                 SymbolDefinition::Constant(.., value) | SymbolDefinition::Argument(.., value) => {
                     Ok(value.clone())
                 }
                 _ => Err(EvalError::LocalNotFound(id.clone())),
-            },
+            }),
             Err(_) => Err(EvalError::LocalNotFound(id.clone())),
         }
     }
@@ -268,10 +268,10 @@ fn local_stack() {
 
     let fetch_int = |stack: &Stack, id: &str| -> Option<i64> {
         match stack.fetch(&id.into()) {
-            Ok(node) => match &node.borrow().def {
+            Ok(node) => node.with_def(|def| match def {
                 SymbolDefinition::Constant(.., Value::Integer(value)) => Some(*value),
                 _ => todo!("error"),
-            },
+            }),
             _ => None,
         }
     };
