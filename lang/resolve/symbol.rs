@@ -3,11 +3,11 @@
 
 use crate::{builtin::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
-use derive_more::{Deref, DerefMut};
+use derive_more::Deref;
 
 /// Symbol content
 #[derive(Debug, Clone)]
-pub struct SymbolInner {
+pub(super) struct SymbolInner {
     /// Symbol definition
     pub def: SymbolDefinition,
     /// Symbol's parent
@@ -37,11 +37,9 @@ impl Default for SymbolInner {
 /// the resolved symbols by it's original structure in the source code and by it's *id*.
 ///
 /// `Symbol` can be shared as mutable.
-#[derive(Debug, Clone, Deref, DerefMut)]
+#[derive(Debug, Clone)]
 pub struct Symbol {
     visibility: Visibility,
-    #[deref]
-    #[deref_mut]
     inner: RcMut<SymbolInner>,
 }
 
@@ -67,8 +65,8 @@ impl Default for Symbol {
 
 impl PartialEq for Symbol {
     fn eq(&self, other: &Self) -> bool {
-        // just compare the visibility and the pointers - not the content
-        self.visibility == other.visibility && self.inner.as_ptr() == other.inner.as_ptr()
+        // just compare the pointers - not the content
+        self.inner.as_ptr() == other.inner.as_ptr()
     }
 }
 
@@ -150,7 +148,7 @@ impl Symbol {
     ) -> std::fmt::Result {
         let self_id = &self.id();
         let id = id.unwrap_or(self_id);
-        if cfg!(feature = "ansi-color") && !self.borrow().used {
+        if cfg!(feature = "ansi-color") && !self.inner.borrow().used {
             color_print::cwrite!(
                 f,
                 "{:depth$}<#606060>{visibility}{id:?} {def} [{full_name}]</>",
@@ -172,9 +170,13 @@ impl Symbol {
             writeln!(f)?;
             let indent = 4;
 
-            self.borrow().children.iter().try_for_each(|(id, child)| {
-                child.print_symbol(f, Some(id), depth + indent, true)
-            })?;
+            self.inner
+                .borrow()
+                .children
+                .iter()
+                .try_for_each(|(id, child)| {
+                    child.print_symbol(f, Some(id), depth + indent, true)
+                })?;
         }
         Ok(())
     }
@@ -184,9 +186,9 @@ impl Symbol {
     /// - `parent`: New parent symbol (will be changed in child!).
     /// - `child`: Child to insert
     pub fn add_child(parent: &Symbol, child: Symbol) {
-        child.borrow_mut().parent = Some(parent.clone());
+        child.inner.borrow_mut().parent = Some(parent.clone());
         let id = child.id();
-        parent.borrow_mut().children.insert(id, child);
+        parent.inner.borrow_mut().children.insert(id, child);
     }
 
     /// Insert new child
@@ -205,8 +207,8 @@ impl Symbol {
     }
 
     pub fn set_children(&self, new_children: SymbolMap) {
-        assert!(self.borrow().children.is_empty());
-        self.borrow_mut().children = new_children;
+        assert!(self.inner.borrow().children.is_empty());
+        self.inner.borrow_mut().children = new_children;
     }
 
     /// Move all children from another symbol into this one.
@@ -218,10 +220,23 @@ impl Symbol {
     /// themselves as child of `self` (e.g when providing fully qualified name).
     pub fn move_children(&self, from: &Symbol) {
         // copy children
-        from.borrow().children.iter().for_each(|(id, child)| {
-            child.borrow_mut().parent = Some(self.clone());
-            self.borrow_mut().children.insert(id.clone(), child.clone());
+        from.inner.borrow().children.iter().for_each(|(id, child)| {
+            child.inner.borrow_mut().parent = Some(self.clone());
+            self.inner
+                .borrow_mut()
+                .children
+                .insert(id.clone(), child.clone());
         });
+    }
+
+    /// Create a vector of cloned children.
+    pub fn clone_children(&self) -> Vec<(Identifier, Symbol)> {
+        self.inner
+            .borrow()
+            .children
+            .iter()
+            .map(|(id, symbol)| (id.clone(), symbol.clone()))
+            .collect()
     }
 
     /// Clone this symbol but give the clone another visibility.
@@ -233,19 +248,19 @@ impl Symbol {
 
     /// Return the internal *id* of this symbol.
     pub fn id(&self) -> Identifier {
-        self.borrow().def.id()
+        self.inner.borrow().def.id()
     }
 
     /// Get any child with the given `id`.
     /// # Arguments
     /// - `id`: Anticipated *id* of the possible child.
     pub fn get(&self, id: &Identifier) -> Option<Symbol> {
-        self.borrow().children.get(id).cloned()
+        self.inner.borrow().children.get(id).cloned()
     }
 
     /// True if symbol has any children
     pub fn is_empty(&self) -> bool {
-        self.borrow().children.is_empty()
+        self.inner.borrow().children.is_empty()
     }
 
     /// Return `true` if symbol's visibility is private
@@ -290,7 +305,7 @@ impl Symbol {
     /// check if a private symbol may be declared within this symbol
     pub fn can_const(&self) -> bool {
         matches!(
-            self.borrow().def,
+            self.inner.borrow().def,
             SymbolDefinition::Module(..) | SymbolDefinition::SourceFile(..)
         )
     }
@@ -298,7 +313,7 @@ impl Symbol {
     /// check if a value on the stack may be declared within this symbol
     pub fn can_value(&self) -> bool {
         matches!(
-            self.borrow().def,
+            self.inner.borrow().def,
             SymbolDefinition::Function(..)
                 | SymbolDefinition::Workbench(..)
                 | SymbolDefinition::SourceFile(..)
@@ -307,7 +322,7 @@ impl Symbol {
 
     /// check if a property may be declared within this symbol
     pub fn can_prop(&self) -> bool {
-        matches!(self.borrow().def, SymbolDefinition::Workbench(..))
+        matches!(self.inner.borrow().def, SymbolDefinition::Workbench(..))
     }
 
     /// check if a public symbol may be declared within this symbol
@@ -317,7 +332,7 @@ impl Symbol {
 
     /// Overwrite any value in this symbol
     pub fn set_value(&self, new_value: Value) -> ResolveResult<()> {
-        match &mut self.borrow_mut().def {
+        match &mut self.inner.borrow_mut().def {
             SymbolDefinition::Constant(_, _, value) => {
                 *value = new_value;
                 Ok(())
@@ -328,13 +343,14 @@ impl Symbol {
 
     /// Get any value of this symbol
     pub fn get_value(&self) -> ResolveResult<Value> {
-        match &self.borrow().def {
+        match &self.inner.borrow().def {
             SymbolDefinition::Constant(_, _, value) => Ok(value.clone()),
             _ => Err(ResolveError::NotAValue(self.full_name())),
         }
     }
 
-    pub fn current_path(&self) -> Option<std::path::PathBuf> {
+    /// Return file path of top level parent source file.
+    pub fn source_path(&self) -> Option<std::path::PathBuf> {
         if let SymbolDefinition::SourceFile(source_file) = &self.inner.borrow().def {
             return source_file
                 .filename()
@@ -345,7 +361,27 @@ impl Symbol {
             .borrow()
             .parent
             .as_ref()
-            .and_then(|parent| parent.current_path())
+            .and_then(|parent| parent.source_path())
+    }
+
+    /// Mark this symbol as *used*.
+    pub fn set_use(&self) {
+        self.inner.borrow_mut().used = true;
+    }
+
+    /// Detach from parent.
+    pub fn detach(&self) {
+        self.inner.borrow_mut().parent = None;
+    }
+
+    /// Work with the symbol definition.
+    pub fn with_def<T>(&self, mut f: impl FnMut(&SymbolDefinition) -> T) -> T {
+        f(&self.inner.borrow().def)
+    }
+
+    /// Work with the mutable symbol definition.
+    pub fn with_def_mut<T>(&self, mut f: impl FnMut(&mut SymbolDefinition) -> T) -> T {
+        f(&mut self.inner.borrow_mut().def)
     }
 }
 
@@ -353,7 +389,7 @@ impl FullyQualify for Symbol {
     /// Get fully qualified name.
     fn full_name(&self) -> QualifiedName {
         let id = self.id();
-        match &self.borrow().parent {
+        match &self.inner.borrow().parent {
             Some(parent) => {
                 let mut name = parent.full_name();
                 name.push(id);

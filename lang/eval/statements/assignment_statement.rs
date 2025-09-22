@@ -58,7 +58,7 @@ impl Eval<()> for AssignmentStatement {
 
         // lookup if we find any existing symbol
         if let Ok(symbol) = context.lookup(&QualifiedName::from_id(assignment.id.clone())) {
-            let err = match &mut symbol.borrow_mut().def {
+            let err = symbol.with_def_mut(|def| match def {
                 SymbolDefinition::Constant(_, identifier, value) => {
                     if value.is_invalid() {
                         *value = new_value.clone();
@@ -78,7 +78,7 @@ impl Eval<()> for AssignmentStatement {
                     assignment.id.clone(),
                     EvalError::NotAnLValue(assignment.id.clone()),
                 )),
-            };
+            });
             // because logging is blocked while `symbol.borrow_mut()` it must run outside the borrow
             if let Some((id, err)) = err {
                 context.error(&id, err)?;

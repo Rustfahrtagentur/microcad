@@ -78,7 +78,7 @@ impl SourceFile {
     /// Resolve into Symbol
     pub fn symbolize(&self, diag: &DiagHandler) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone().into()), None);
-        symbol.borrow_mut().children = self.statements.symbolize(&symbol, diag)?;
+        symbol.set_children(self.statements.symbolize(&symbol, diag)?);
         Ok(symbol)
     }
 }
@@ -93,7 +93,7 @@ impl Resolve<Symbol> for ModuleDefinition {
             );
             symbol.set_children(body.symbolize(&symbol, diag)?);
             symbol
-        } else if let Some(parent_path) = parent.current_path() {
+        } else if let Some(parent_path) = parent.source_path() {
             let file_path = find_source_file(parent_path, &self.id)?;
             let source_file = SourceFile::load(file_path)?;
             source_file.symbolize(diag)?
@@ -149,7 +149,7 @@ impl Resolve<Symbol> for WorkbenchDefinition {
             SymbolDefinition::Workbench(self.clone().into()),
             Some(parent.clone()),
         );
-        symbol.borrow_mut().children = self.body.symbolize(&symbol, diag)?;
+        symbol.set_children(self.body.symbolize(&symbol, diag)?);
         Ok(symbol)
     }
 }
@@ -160,7 +160,7 @@ impl Resolve<Symbol> for FunctionDefinition {
             SymbolDefinition::Function((*self).clone().into()),
             Some(parent.clone()),
         );
-        symbol.borrow_mut().children = self.body.symbolize(&symbol, diag)?;
+        symbol.set_children(self.body.symbolize(&symbol, diag)?);
 
         Ok(symbol)
     }

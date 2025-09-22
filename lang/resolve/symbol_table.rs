@@ -84,31 +84,40 @@ impl SymbolTable {
     /// my::geo2d::rect(1mm);
     /// ```
     pub fn de_alias(&self, name: &QualifiedName) -> QualifiedName {
-        for p in (1..name.len()).rev() {
-            if let Ok(symbol) = self.lookup(&QualifiedName::no_ref(name[0..p].to_vec())) {
-                if let SymbolDefinition::Alias(.., alias) = &symbol.borrow().def {
-                    let suffix: QualifiedName = name[p..].iter().cloned().collect();
-                    let new_name = suffix.with_prefix(alias);
-                    log::trace!("De-aliased name: {name:?} into {new_name:?}");
-                    return new_name;
+        (1..name.len())
+            .rev()
+            .filter_map(|p| {
+                if let Ok(symbol) = self.lookup(&QualifiedName::no_ref(name[0..p].to_vec())) {
+                    Some((p, symbol))
+                } else {
+                    None
                 }
-            }
-        }
-        name.clone()
+            })
+            .find_map(|(p, symbol)| {
+                symbol.with_def(|def| {
+                    if let SymbolDefinition::Alias(.., alias) = def {
+                        let suffix: QualifiedName = name[p..].iter().cloned().collect();
+                        let new_name = suffix.with_prefix(alias);
+                        log::trace!("De-aliased name: {name:?} into {new_name:?}");
+                        Some(new_name)
+                    } else {
+                        None
+                    }
+                })
+            })
+            .unwrap_or(name.clone())
     }
 
-    /// Solve any alias symbol.
-    ///
-    /// If the given symbol is an alias this will be followed.
     pub fn follow_alias(&self, symbol: &Symbol) -> ResolveResult<Symbol> {
         // execute alias from any use statement
-        let def = &symbol.borrow().def;
-        if let SymbolDefinition::Alias(.., name) = def {
-            log::trace!("{found} alias => {name:?}", found = crate::mark!(FOUND));
-            Ok(self.lookup(name)?)
-        } else {
-            Ok(symbol.clone())
-        }
+        symbol.with_def(|def| {
+            if let SymbolDefinition::Alias(.., name) = def {
+                log::trace!("{found} alias => {name:?}", found = crate::mark!(FOUND));
+                Ok(self.lookup(name)?)
+            } else {
+                Ok(symbol.clone())
+            }
+        })
     }
 
     /// Return search paths of this symbol table.
