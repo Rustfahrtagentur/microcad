@@ -8,13 +8,30 @@ use anyhow::{Context, Result};
 use std::{env, fs, path::Path};
 use walkdir::WalkDir;
 
+/// for debugging purpose
+#[allow(unused)]
+macro_rules! warning {
+    ($($tokens: tt)*) => {
+        // HINT: switch `note` -> `warning` to activate debug messages
+        println!("cargo:warning={}", format!($($tokens)*))
+    }
+}
+
 /// Generate Rust HashMap that contain the standard library.
 fn generate_builtin_std_library() -> Result<()> {
-    // Get the directory to scan from the environment variable,
-    // or use a default (e.g., "assets" in your project root).
-    let dir = env::var("MICROCAD_STD_DIR").unwrap_or_else(|_| "../../lib/std".to_string());
-    let out_dir = env::var("OUT_DIR").expect("Some output dir");
-    let dest_path = Path::new(&out_dir).join("microcad_std.rs");
+    use std::path::PathBuf;
+    let manifest_dir = env::var("CARGO_MANIFEST_DIR")
+        .map(PathBuf::from)
+        .expect("Manifest dir");
+
+    let dir = env::var("MICROCAD_STD_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| manifest_dir.join("lib/std"));
+
+    let dest_path = env::var("OUT_DIR")
+        .map(PathBuf::from)
+        .expect("Output dir")
+        .join("microcad_std.rs");
 
     // Collect all .µcad files recursively
     let mut files = Vec::new();
@@ -65,7 +82,7 @@ fn generate_builtin_std_library() -> Result<()> {
         // write all rust code at once
         {
             fs::write(&dest_path, code).context(format!("cannot create file '{dest_path:?}'"))?;
-            println!("cargo:rerun-if-changed={dir}");
+            println!("cargo:rerun-if-changed={dir}", dir = dir.display());
             Ok(())
         }
         Err(rustfmt_wrapper::Error::Rustfmt(msg)) => {
