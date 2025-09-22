@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::traits::Align;
+use crate::traits::*;
 
 use super::*;
 
@@ -131,9 +131,24 @@ impl Transformed2D for Geometry2D {
 }
 
 impl Align for Geometry2D {
-    fn align(&self, resolution: &RenderResolution) -> Self {
+    fn align(
+        &self,
+        direction: Direction,
+        alignment: Alignment,
+        resolution: &RenderResolution,
+    ) -> Self {
         if let Some(bounds) = self.fetch_bounds_2d().rect() {
-            let d: Vec2 = bounds.center().x_y().into();
+            let mut d: Vec2 = match alignment {
+                Alignment::Fix => Vec2::new(0.0, 0.0),
+                Alignment::Near => bounds.min().x_y().into(),
+                Alignment::Center => bounds.center().x_y().into(),
+                Alignment::Far => bounds.max().x_y().into(),
+            };
+            match direction {
+                Direction::X => d.y = 0.0,
+                Direction::Y => d.x = 0.0,
+                Direction::Z => todo!("error"),
+            }
             self.transformed_2d(resolution, &Mat3::from_translation(-d))
         } else {
             self.clone()

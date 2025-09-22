@@ -59,6 +59,10 @@ pub enum Value {
     Model(Model),
     /// Return value
     Return(Box<Value>),
+    /// Direction (X,Y or Z)
+    Direction(Direction),
+    /// Alignment
+    Alignment(Alignment),
 }
 
 impl Value {
@@ -174,6 +178,8 @@ impl crate::ty::Ty for Value {
             Value::Matrix(matrix) => matrix.ty(),
             Value::Model(_) => Type::Models,
             Value::Return(r) => r.ty(),
+            Value::Direction(_) => Type::Direction,
+            Value::Alignment(_) => Type::Alignment,
         }
     }
 }
@@ -368,6 +374,8 @@ impl std::fmt::Display for Value {
             Value::Matrix(m) => write!(f, "{m}"),
             Value::Model(n) => write!(f, "{n}"),
             Value::Return(r) => write!(f, "{r}"),
+            Value::Direction(d) => write!(f, "{d}"),
+            Value::Alignment(a) => write!(f, "{a}"),
         }
     }
 }
@@ -385,6 +393,8 @@ impl std::fmt::Debug for Value {
             Value::Matrix(m) => write!(f, "{m}"),
             Value::Model(n) => write!(f, "Models:\n {n}"),
             Value::Return(r) => write!(f, "Return: {r}"),
+            Value::Direction(d) => write!(f, "{d}"),
+            Value::Alignment(a) => write!(f, "{a}"),
         }
     }
 }
@@ -474,6 +484,28 @@ impl TryFrom<&Value> for Mat3 {
     }
 }
 
+impl TryFrom<&Value> for Direction {
+    type Error = ValueError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Direction(direction) => Ok(*direction),
+            _ => Err(ValueError::CannotConvert(value.clone(), "Direction".into())),
+        }
+    }
+}
+
+impl TryFrom<&Value> for Alignment {
+    type Error = ValueError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Alignment(alignment) => Ok(*alignment),
+            _ => Err(ValueError::CannotConvert(value.clone(), "Alignment".into())),
+        }
+    }
+}
+
 impl From<f32> for Value {
     fn from(f: f32) -> Self {
         Value::Quantity((f as Scalar).into())
@@ -513,6 +545,18 @@ impl FromIterator<Value> for Value {
 impl From<Model> for Value {
     fn from(model: Model) -> Self {
         Self::Model(model)
+    }
+}
+
+impl From<Direction> for Value {
+    fn from(direction: Direction) -> Self {
+        Value::Direction(direction)
+    }
+}
+
+impl From<Alignment> for Value {
+    fn from(alignment: Alignment) -> Self {
+        Value::Alignment(alignment)
     }
 }
 

@@ -6,6 +6,7 @@
 mod number_literal;
 mod units;
 
+use microcad_core::*;
 pub use number_literal::*;
 pub use units::*;
 
@@ -20,6 +21,8 @@ pub enum Literal {
     Number(NumberLiteral),
     /// Boolean literal
     Bool(Refer<bool>),
+    Direction(Refer<Direction>),
+    Alignment(Refer<Alignment>),
 }
 
 impl Literal {
@@ -29,6 +32,8 @@ impl Literal {
             Self::Integer(value) => Value::Integer(*value.clone()),
             Self::Number(value) => value.value(),
             Self::Bool(value) => Value::Bool(*value.clone()),
+            Self::Direction(value) => Value::Direction(**value),
+            Self::Alignment(value) => Value::Alignment(**value),
         }
     }
 }
@@ -39,6 +44,8 @@ impl SrcReferrer for Literal {
             Literal::Number(n) => n.src_ref(),
             Literal::Integer(i) => i.src_ref(),
             Literal::Bool(b) => b.src_ref(),
+            Literal::Direction(d) => d.src_ref(),
+            Literal::Alignment(a) => a.src_ref(),
         }
     }
 }
@@ -49,6 +56,8 @@ impl crate::ty::Ty for Literal {
             Literal::Integer(_) => Type::Integer,
             Literal::Number(n) => n.ty(),
             Literal::Bool(_) => Type::Bool,
+            Literal::Direction(_) => Type::Direction,
+            Literal::Alignment(_) => Type::Alignment,
         }
     }
 }
@@ -59,6 +68,8 @@ impl std::fmt::Display for Literal {
             Literal::Integer(i) => write!(f, "{i}"),
             Literal::Number(n) => write!(f, "{n}"),
             Literal::Bool(b) => write!(f, "{b}"),
+            Literal::Direction(d) => write!(f, "{d}"),
+            Literal::Alignment(a) => write!(f, "{a}"),
         }
     }
 }
@@ -71,11 +82,6 @@ impl From<Literal> for Value {
 
 impl TreeDisplay for Literal {
     fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
-        write!(f, "{:depth$}Literal: ", "")?;
-        match self {
-            Literal::Integer(i) => writeln!(f, "{i}"),
-            Literal::Number(n) => writeln!(f, "{n}"),
-            Literal::Bool(b) => writeln!(f, "{b}"),
-        }
+        write!(f, "{:depth$}Literal: {self}", "")
     }
 }

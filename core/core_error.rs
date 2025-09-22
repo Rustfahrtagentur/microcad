@@ -51,6 +51,14 @@ pub enum CoreError {
     /// Cannot detect export format from extension
     #[error("Cannot detect export format from extension")]
     CannotDetectExportFormatFromExtension,
+
+    /// Unexpected direction value
+    #[error("Bad direction '{0}'")]
+    BadDirection(String),
+
+    /// Unexpected alignment value
+    #[error("Bad alignment '{0}'")]
+    BadAlignment(String),
 }
 
 /// Core result type

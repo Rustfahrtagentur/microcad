@@ -12,9 +12,10 @@ mod microcad {
     }
 
     sketch IconElement( radius: Length ) {
-        c = HalfCircle(radius);
-        r = Rect(width = radius, height = radius * 2);
-        c.translate(y = radius) | r.translate(x = -radius/2 );
+        {
+            HalfCircle(radius);
+            Rect(width = radius, height = radius * 2);
+        }.align(X,NEAR);
     }
 
     pub sketch Icon( radius: Length ) {

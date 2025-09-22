@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use microcad_core::Integer;
+use microcad_core::{Alignment, Direction, Integer};
 
 use crate::{parse::*, parser::*, syntax::*};
 
@@ -25,6 +25,8 @@ impl Parse for Literal {
                 "false" => Literal::Bool(Refer::new(false, pair.into())),
                 _ => unreachable!(),
             },
+            Rule::direction_literal => Literal::Direction(Refer::<Direction>::parse(inner)?),
+            Rule::alignment_literal => Literal::Alignment(Refer::<Alignment>::parse(inner)?),
             _ => unreachable!(),
         };
 
@@ -141,5 +143,21 @@ impl std::str::FromStr for Unit {
             // Unknown
             _ => Err(ParseError::UnknownUnit(s.to_string())),
         }
+    }
+}
+
+impl Parse for Refer<Direction> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Parser::ensure_rule(&pair, Rule::direction_literal);
+        use std::str::FromStr;
+        Ok(Refer::new(Direction::from_str(pair.as_str())?, pair.into()))
+    }
+}
+
+impl Parse for Refer<Alignment> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Parser::ensure_rule(&pair, Rule::alignment_literal);
+        use std::str::FromStr;
+        Ok(Refer::new(Alignment::from_str(pair.as_str())?, pair.into()))
     }
 }
