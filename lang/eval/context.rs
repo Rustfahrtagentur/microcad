@@ -106,10 +106,10 @@ impl Context {
 
     /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Model> {
-        let source_file = match &self.symbol_table.root().borrow().def {
+        let source_file = self.symbol_table.root().with_def(|def| match def {
             SymbolDefinition::SourceFile(source_file) => source_file.clone(),
             _ => todo!(),
-        };
+        });
         source_file.eval(self)
     }
 
@@ -491,7 +491,7 @@ impl Lookup<EvalError> for Context {
         match found.first() {
             Some((origin, first)) => {
                 // check if all findings point to the same symbol
-                if !found.iter().all(|(_, x)| Rc::ptr_eq(x, first)) {
+                if !found.iter().all(|(_, x)| x == first) {
                     log::debug!(
                         "{ambiguous} symbol '{name:?}' in {origin}:\n{self}",
                         ambiguous = crate::mark!(AMBIGUOUS),

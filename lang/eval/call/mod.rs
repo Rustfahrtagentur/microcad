@@ -51,7 +51,7 @@ impl Eval for Call {
                 // For builtin calls ONLY: If arguments cannot be evaluated put
                 // the native argument code into a ArgumentValueList.
                 // E.g. this is needed to give assert_valid() a qualified name.
-                if matches!(symbol.borrow().def, SymbolDefinition::Builtin(..)) {
+                if symbol.with_def(|def| matches!(def, SymbolDefinition::Builtin(..))) {
                     self.argument_list
                         .iter()
                         .map(|arg| match context.source_code(&arg.value) {
@@ -84,29 +84,34 @@ impl Eval for Call {
                 args: args.clone(),
                 src_ref: self.src_ref(),
             },
-            |context| match &symbol.borrow().def {
-                SymbolDefinition::Builtin(f) => f.call(&args, context),
-                SymbolDefinition::Workbench(w) => {
-                    if matches!(*w.kind, WorkbenchKind::Operation) {
-                        context.error(self, EvalError::CannotCallOperationWithoutWorkpiece)?;
-                        Ok(Value::None)
-                    } else {
-                        Ok(Value::Model(w.call(
-                            self.src_ref(),
-                            symbol.clone(),
-                            &args,
-                            context,
-                        )?))
+            |context| {
+                symbol.with_def(|def| match def {
+                    SymbolDefinition::Builtin(f) => f.call(&args, context),
+                    SymbolDefinition::Workbench(w) => {
+                        if matches!(*w.kind, WorkbenchKind::Operation) {
+                            context.error(self, EvalError::CannotCallOperationWithoutWorkpiece)?;
+                            Ok(Value::None)
+                        } else {
+                            Ok(Value::Model(w.call(
+                                self.src_ref(),
+                                symbol.clone(),
+                                &args,
+                                context,
+                            )?))
+                        }
                     }
-                }
-                SymbolDefinition::Function(f) => f.call(&args, context),
-                def => {
-                    context.error(
-                        self,
-                        EvalError::SymbolCannotBeCalled(symbol.full_name(), Box::new(def.clone())),
-                    )?;
-                    Ok(Value::None)
-                }
+                    SymbolDefinition::Function(f) => f.call(&args, context),
+                    def => {
+                        context.error(
+                            self,
+                            EvalError::SymbolCannotBeCalled(
+                                symbol.full_name(),
+                                Box::new(def.clone()),
+                            ),
+                        )?;
+                        Ok(Value::None)
+                    }
+                })
             },
         ) {
             Ok(value) => Ok(value),

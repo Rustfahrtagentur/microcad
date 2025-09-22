@@ -67,7 +67,7 @@ impl CallMethod<Option<Model>> for Model {
                     src_ref: SrcRef::merge(name, args),
                 },
                 |context| {
-                    Ok(match &symbol.borrow().def {
+                    symbol.with_def(|def| match def {
                         SymbolDefinition::Workbench(workbench_definition) => {
                             let model = workbench_definition.call(
                                 SrcRef::merge(name, args),
@@ -76,12 +76,12 @@ impl CallMethod<Option<Model>> for Model {
                                 context,
                             )?;
 
-                            Some(model.replace_input_placeholders(self))
+                            Ok::<_, EvalError>(Some(model.replace_input_placeholders(self)))
                         }
                         SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
                             Value::Model(model) => {
                                 model.append(self.make_deep_copy());
-                                Some(model.clone())
+                                Ok(Some(model.clone()))
                             }
                             value => panic!("Builtin call returned {value} but no models."),
                         },
@@ -93,7 +93,7 @@ impl CallMethod<Option<Model>> for Model {
                                     Box::new(def.clone()),
                                 ),
                             )?;
-                            None
+                            Ok(None)
                         }
                     })
                 },
