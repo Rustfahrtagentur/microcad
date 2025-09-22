@@ -107,6 +107,10 @@ format_spec_width = { "0" ~ int }
 // `False`: error
 bool_literal = @{ "true" | "false" }
 
+direction_literal = { "X" | "Y" | "Z" }
+
+alignment_literal = { "FIXED" | "NEAR" | "CENTER" | "FAR" }
+
 // `m`: ok
 // `mm`: ok
 // `µm`: ok
@@ -124,10 +128,14 @@ unit = @{ (alpha_lower+ ~ ((("/" ~ alpha_lower+)? ~ ("²" | "³")))?) | "°" | "
 // `1.0mm`: ok # Number (Length)
 // `1.0`: ok # Scalar
 // `true`: ok # Boolean
+// `X`: ok # Direction
+// `NEAR`: ok # Alignment
 literal = {
     number_literal
   | integer_literal
   | bool_literal
+  | direction_literal
+  | alignment_literal
 }
 
 // `a`: ok # Single identifier
@@ -149,7 +157,7 @@ type = {
   | unit
 }
 
-base_type = { "Integer" | "String" | "Bool" | "Models" }
+base_type = { "Integer" | "String" | "Bool" | "Models" | "Direction" | "Alignment" }
 
 quantity_type = { "Scalar" | "Length" | "Area" | "Volume" | "Density" | "Angle" | "Weight" }
 
