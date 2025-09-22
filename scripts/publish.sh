@@ -38,6 +38,5 @@ PACKAGES=(
 
 # Publish all packages.
 for package in "${PACKAGES[@]}"; do
-    #cargo publish -p $package $ARGS
-    echo $package $ARGS
+    cargo publish -p $package $ARGS
 done
