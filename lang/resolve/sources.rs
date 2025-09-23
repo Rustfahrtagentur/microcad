@@ -76,51 +76,13 @@ impl Sources {
     pub fn root(&self) -> Rc<SourceFile> {
         self.source_files
             .first()
-            .expect("empty source cache has not root")
+            .expect("empty source cache has no root")
             .clone()
-    }
-
-    /// Creates symbol map from externals.
-    fn create_modules(externals: &Externals) -> SymbolMap {
-        let mut map = SymbolMap::new();
-        externals.iter().for_each(|(basename, _)| {
-            let (id, name) = basename.split_first();
-            let module = match map.get(&id) {
-                Some(symbol) => symbol.clone(),
-                _ => Symbol::new(
-                    SymbolDefinition::Module(ModuleDefinition::new(Visibility::Public, id.clone())),
-                    None,
-                ),
-            };
-            Self::recursive_create_modules(&module, &name);
-            map.insert(id.clone(), module);
-        });
-        map
-    }
-
-    fn recursive_create_modules(parent: &Symbol, name: &QualifiedName) -> Option<Symbol> {
-        if name.is_empty() {
-            return None;
-        }
-
-        let node_id = name.first().expect("Non-empty qualified name");
-        if let Some(child) = parent.get(node_id) {
-            return Some(child.clone());
-        }
-
-        let child = Symbol::new(
-            SymbolDefinition::Module(ModuleDefinition::new(Visibility::Public, node_id.clone())),
-            None,
-        );
-        Symbol::add_child(parent, child.clone());
-
-        Self::recursive_create_modules(&child, &name.remove_first());
-        Some(child)
     }
 
     /// Create initial symbol map from externals.
     pub fn resolve(&self) -> ResolveResult<SymbolMap> {
-        let mut symbols = Self::create_modules(&self.externals);
+        let mut symbols = SymbolMap::default();
         symbols.insert(
             self.root().id(),
             Symbol::new(SymbolDefinition::SourceFile(self.root()), None),

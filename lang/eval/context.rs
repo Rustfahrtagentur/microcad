@@ -81,7 +81,7 @@ impl Context {
     ) -> EvalResult<Self> {
         let root = SourceFile::load(root)?;
         let root_id = root.id();
-        let sources = Sources::load(root, search_paths)?;
+        let sources = Sources::default(); //load(root, search_paths)?;
         let mut symbols = sources.resolve()?;
         symbols.insert(Identifier::no_ref("__builtin"), builtin);
         Ok(Self::new(root_id, symbols, sources, Box::new(Stdout)))

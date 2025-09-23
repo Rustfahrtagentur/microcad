@@ -14,17 +14,15 @@ impl Context {
     /// Create a new context from a source file.
     ///
     /// # Arguments
-    /// - `root`: Root symbol.
-    /// - `builtin`: The builtin library.
+    /// - `root`: Root source file definition.
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
-    /// - `output`: Output channel to use.
-    pub fn new(root: Identifier, sources: Sources) -> Self {
+    pub fn new(root: SourceFile, search_paths: impl AsRef<std::path::Path>) -> Self {
         log::debug!("Creating resolve context");
 
         // put all together
         Self {
             root,
-            sources,
+            sources: Sources::search(search_paths),
             diag_handler: Default::default(),
         }
     }

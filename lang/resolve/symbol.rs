@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{builtin::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{builtin::*, diag::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
 use derive_more::Deref;
 
@@ -89,6 +89,8 @@ impl std::fmt::Display for Symbols {
         )
     }
 }
+
+impl WriteToFile for Symbol {}
 
 impl FromIterator<Symbol> for Symbols {
     fn from_iter<T: IntoIterator<Item = Symbol>>(iter: T) -> Self {
@@ -195,7 +197,15 @@ impl Symbol {
     ///
     /// The parent of `new_child` wont be changed!
     pub fn insert(&self, id: Identifier, new_child: Symbol) {
-        self.inner.borrow_mut().children.insert(id, new_child);
+        if self
+            .inner
+            .borrow_mut()
+            .children
+            .insert(id, new_child)
+            .is_some()
+        {
+            todo!("symbol already existing");
+        }
     }
 
     /// Move all children from another symbol into this one.
@@ -359,6 +369,20 @@ impl Symbol {
     /// Work with the mutable symbol definition.
     pub fn with_def_mut<T>(&self, mut f: impl FnMut(&mut SymbolDefinition) -> T) -> T {
         f(&mut self.inner.borrow_mut().def)
+    }
+
+    pub fn current_path(&self) -> Option<std::path::PathBuf> {
+        if let SymbolDefinition::SourceFile(source_file) = &self.inner.borrow().def {
+            return source_file
+                .filename()
+                .parent()
+                .map(|path| path.to_path_buf());
+        }
+        self.inner
+            .borrow()
+            .parent
+            .as_ref()
+            .and_then(|parent| parent.current_path())
     }
 }
 

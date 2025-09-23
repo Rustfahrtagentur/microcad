@@ -17,6 +17,7 @@
 
 mod context;
 mod externals;
+mod info;
 mod resolve_error;
 mod sources;
 mod symbol;
@@ -71,17 +72,21 @@ impl SourceFile {
 }
 
 impl Resolve<Symbol> for ModuleDefinition {
-    /// Resolve into Symbol
     fn symbolize(&self, parent: &Symbol, context: &mut Context) -> ResolveResult<Symbol> {
-        let symbol = Symbol::new(
-            SymbolDefinition::Module(self.clone().into()),
-            Some(parent.clone()),
-        );
-        if let Some(body) = &self.body {
+        let symbol = if let Some(body) = &self.body {
+            let symbol = Symbol::new(
+                SymbolDefinition::Module(self.clone().into()),
+                Some(parent.clone()),
+            );
             symbol.set_children(body.symbolize(&symbol, context)?);
+            symbol
+        } else if let Some(parent_path) = parent.current_path() {
+            let file_path = info::find_source_file(parent_path, &self.id)?;
+            let source_file = SourceFile::load(file_path)?;
+            source_file.resolve()?
         } else {
-            todo!("load module")
-        }
+            todo!("no top-level source file")
+        };
         Ok(symbol)
     }
 }

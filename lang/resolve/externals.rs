@@ -5,7 +5,7 @@
 
 use crate::{resolve::*, syntax::*, MICROCAD_EXTENSIONS};
 use derive_more::Deref;
-
+use scan_dir::ScanDir;
 /// External files register.
 ///
 /// A map of *qualified name* -> *source file path* which is generated at creation
@@ -93,22 +93,77 @@ impl Externals {
         externals
     }
 
+    /// Return `true` if given path has a valid microcad extension
+    fn is_microcad_extension(p: &std::path::PathBuf) -> bool {
+        p.extension()
+            .map(|ext| {
+                MICROCAD_EXTENSIONS
+                    .iter()
+                    .any(|extension| *extension == ext)
+            })
+            .unwrap_or(false)
+    }
+
+    /// Return `true` if given path is a file called `mod` plus a valid microcad extension
+    fn is_mod_file(p: &std::path::PathBuf) -> bool {
+        Self::is_microcad_extension(p)
+            && p.file_stem()
+                .and_then(|s| s.to_str())
+                .is_some_and(|s| s == "mod")
+    }
+
+    fn find_mod_dir_files(
+        path: impl AsRef<std::path::Path>,
+    ) -> ResolveResult<Vec<std::path::PathBuf>> {
+        Ok(ScanDir::files().read(path, |iter| {
+            iter.map(|(ref entry, _)| entry.path())
+                .filter(|path| Self::is_mod_file(path))
+                .collect::<Vec<_>>()
+        })?)
+    }
+
+    fn find_mod_dir_file(
+        path: impl AsRef<std::path::Path>,
+    ) -> ResolveResult<Option<std::path::PathBuf>> {
+        let files = Self::find_mod_dir_files(path)?;
+        if let Some(file) = files.first() {
+            match files.len() {
+                1 => Ok(Some(file.clone())),
+                _ => Err(ResolveError::AmbiguousExternals(files)),
+            }
+        } else {
+            Ok(None)
+        }
+    }
+
     /// Scan in a specified path for all available files with one of the given extensions.
     fn scan_path(
         search_path: std::path::PathBuf,
         extensions: &[&str],
     ) -> std::vec::Vec<std::path::PathBuf> {
-        use scan_dir::ScanDir;
-
-        ScanDir::files()
-            .walk(search_path, |iter| {
+        let mut files = ScanDir::files()
+            .read(search_path.clone(), |iter| {
                 iter.filter(|(_, name)| {
                     extensions.iter().any(|extension| name.ends_with(extension))
                 })
                 .map(|(ref entry, _)| entry.path())
                 .collect::<Vec<_>>()
             })
-            .expect("scan_path failed")
+            .expect("scan_path failed");
+
+        files.append(
+            &mut ScanDir::dirs()
+                .read(search_path, |iter| {
+                    iter.filter_map(|(entry, _)| match Self::find_mod_dir_file(&entry.path()) {
+                        Ok(Some(file)) => Some(file),
+                        _ => None,
+                    })
+                    .collect::<Vec<_>>()
+                })
+                .expect("scan_path failed"),
+        );
+
+        files
     }
 }
 
