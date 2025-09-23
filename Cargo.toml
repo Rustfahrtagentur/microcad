@@ -33,7 +33,7 @@ authors = [
     "Michael Winkelmann (michael@winkelmann.site)",
     "Patrick Hoffmann (p.hoffmann@berlin.de)",
 ]
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 homepage = "https://microcad.xyz"
 repository = "https://github.com/rustfahrtagentur/microcad"
@@ -46,8 +46,8 @@ keywords = ["cad", "geometry", "3d", "printing", "cnc", "openscad"]
 
 [workspace.dependencies]
 debug-cell = { git = "https://github.com/fightling/debug-cell.git", version = "0.1.1" }
-microcad-core = { path = "core", version = "0.2.1" }
-microcad-import = { path = "import", version = "0.2.1" }
-microcad-export = { path = "export", version = "0.2.1" }
-microcad-lang = { path = "lang", version = "0.2.1" }
-microcad-builtin = { path = "builtin", version = "0.2.1" }
+microcad-core = { path = "core", version = "0.2.2" }
+microcad-import = { path = "import", version = "0.2.2" }
+microcad-export = { path = "export", version = "0.2.2" }
+microcad-lang = { path = "lang", version = "0.2.2" }
+microcad-builtin = { path = "builtin", version = "0.2.2" }
