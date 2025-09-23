@@ -5,17 +5,8 @@
 
 use anyhow::{Context, Result};
 
-use std::{env, fs, path::Path};
+use std::{env, fs};
 use walkdir::WalkDir;
-
-/// for debugging purpose
-#[allow(unused)]
-macro_rules! warning {
-    ($($tokens: tt)*) => {
-        // HINT: switch `note` -> `warning` to activate debug messages
-        println!("cargo:warning={}", format!($($tokens)*))
-    }
-}
 
 /// Generate Rust HashMap that contain the standard library.
 fn generate_builtin_std_library() -> Result<()> {
@@ -26,7 +17,7 @@ fn generate_builtin_std_library() -> Result<()> {
 
     let dir = env::var("MICROCAD_STD_DIR")
         .map(PathBuf::from)
-        .unwrap_or_else(|_| manifest_dir.join("lib/std"));
+        .unwrap_or_else(|_| manifest_dir.join("../../lib/std"));
 
     let dest_path = env::var("OUT_DIR")
         .map(PathBuf::from)
