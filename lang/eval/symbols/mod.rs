@@ -3,25 +3,11 @@
 
 mod stack;
 mod stack_frame;
-mod symbol_table;
 
 pub use stack::*;
 pub use stack_frame::*;
-pub use symbol_table::*;
 
 use crate::{eval::*, model::*, syntax::*};
-
-/// Trait to handle symbol table.
-pub trait Lookup<E: std::error::Error> {
-    /// Lookup for local or global symbol by qualified name.
-    ///
-    /// - looks on *stack*
-    /// - looks in *symbol table*
-    /// - follows *aliases* (use statements)
-    /// - detect any ambiguity
-    /// - loads *external files*
-    fn lookup(&self, name: &QualifiedName) -> Result<Symbol, E>;
-}
 
 /// Trait to manage the *locals*.
 ///

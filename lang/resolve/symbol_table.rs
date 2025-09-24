@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{eval::*, resolve::*, syntax::*};
+use crate::{resolve::*, syntax::*};
 
 /// *Symbol table* holding global and local symbols.
 ///
@@ -90,7 +90,7 @@ impl SymbolTable {
     }
 }
 
-impl Lookup<ResolveError> for SymbolTable {
+impl Lookup for SymbolTable {
     /// Lookup a symbol from global symbols.
     fn lookup(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         log::trace!("Looking for global symbol '{name:?}'");

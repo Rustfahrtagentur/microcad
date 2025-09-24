@@ -21,6 +21,7 @@ mod sources;
 mod symbol;
 mod symbol_definition;
 mod symbol_map;
+mod symbol_table;
 
 pub use externals::*;
 pub use resolve_error::*;
@@ -28,8 +29,21 @@ pub use sources::*;
 pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
+pub use symbol_table::*;
 
 use crate::{syntax::*, value::Value};
+
+/// Trait to handle symbol table.
+pub trait Lookup<E: std::error::Error = ResolveError> {
+    /// Lookup for local or global symbol by qualified name.
+    ///
+    /// - looks on *stack*
+    /// - looks in *symbol table*
+    /// - follows *aliases* (use statements)
+    /// - detect any ambiguity
+    /// - loads *external files*
+    fn lookup(&self, name: &QualifiedName) -> Result<Symbol, E>;
+}
 
 /// Trait for items which can be fully qualified.
 pub trait FullyQualify {
@@ -52,7 +66,7 @@ fn resolve_test() {
     let symbols = sources.resolve().expect("resolve failed");
     log::trace!("Symbols:\n{symbols}");
 
-    crate::eval::SymbolTable::new(root_id, symbols, sources).expect("new symbol table");
+    SymbolTable::new(root_id, symbols, sources).expect("new symbol table");
 }
 
 impl SourceFile {
