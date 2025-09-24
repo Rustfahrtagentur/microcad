@@ -60,16 +60,18 @@ trait Resolve<T = Option<Symbol>> {
 
 #[test]
 fn resolve_test() {
-    let root = SourceFile::load("../examples/lego_brick.µcad").expect("loading failed");
-    //    let symbol_table = root.load(search_paths); // 1 (root,symbol_map,sources)
-    //  let symbol_table = root.resolve(search_paths);
+    let root = SourceFile::load("../examples/lego_brick.µcad")
+        .expect("loading of root source file failed");
+    log::trace!("Root source file:\n{root}");
 
-    let sources = Sources::load(root.clone(), &["../lib".into()]).expect("loading failed");
-    let root_id = sources.root().id();
-    let symbols = sources.resolve().expect("resolve failed");
-    log::trace!("Symbols:\n{symbols}");
+    let mut symbol_table =
+        SymbolTable::load(root, &["../lib"]).expect("loading of symbol table failed");
+    log::trace!("Initial symbol table:\n{symbol_table}");
 
-    SymbolTable::new(root_id, symbols, sources).expect("new symbol table");
+    symbol_table.resolve().expect("resolve failed");
+    log::trace!("Resolved symbol table:\n{symbol_table}");
+
+    symbol_table.check().expect("check failed");
 }
 
 impl SourceFile {
@@ -77,15 +79,6 @@ impl SourceFile {
     pub fn symbolize(&self) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone().into()), None);
         symbol.borrow_mut().children = self.statements.resolve(&symbol)?;
-        Ok(symbol)
-    }
-    /// Resolve into Symbol
-    pub fn resolve(&self) -> ResolveResult<Symbol> {
-        let name = self.filename_as_str();
-        log::debug!("Creating symbol from source file {name}");
-        let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone().into()), None);
-        symbol.borrow_mut().children = self.statements.resolve(&symbol)?;
-        log::trace!("Created symbol from source file {name}:\n{symbol}");
         Ok(symbol)
     }
 }
@@ -281,7 +274,8 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
 
 #[test]
 fn resolve_source_file() {
-    let source_file =
+    todo!()
+    /*  let source_file =
         SourceFile::load_from_str(r#"part A() { part B() {} } "#).expect("Valid source");
 
     let symbol = source_file.resolve().expect("expecting resolve success");
@@ -309,4 +303,5 @@ fn resolve_source_file() {
     //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());
 
     log::trace!("{symbol}");
+    */
 }

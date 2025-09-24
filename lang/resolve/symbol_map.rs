@@ -29,6 +29,16 @@ impl FromIterator<(Identifier, Value)> for SymbolMap {
     }
 }
 
+impl FromIterator<Symbol> for SymbolMap {
+    fn from_iter<T: IntoIterator<Item = Symbol>>(iter: T) -> Self {
+        Self(
+            iter.into_iter()
+                .map(|symbol| (symbol.id(), symbol))
+                .collect(),
+        )
+    }
+}
+
 impl WriteToFile for SymbolMap {}
 
 impl SymbolMap {

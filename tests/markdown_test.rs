@@ -101,7 +101,7 @@ pub fn run_test(
                 // evaluate the code including µcad std library
                 let mut context = ContextBuilder::from_source_captured(
                     source.clone(),
-                    &["../lib".into(), "../doc/assets".into()],
+                    &["../lib", "../doc/assets"],
                 )
                 .expect("resolve error")
                 .build();
@@ -204,7 +204,7 @@ pub fn run_test(
                 // evaluate the code including µcad std library
                 let mut context = ContextBuilder::from_source_captured(
                     source.clone(),
-                    &["../lib".into(), "../doc/assets".into()],
+                    &["../lib", "../doc/assets"],
                 )
                 .expect("resolve error")
                 .build();

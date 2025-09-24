@@ -40,21 +40,15 @@ impl Context {
     /// Create a new context from a source file.
     ///
     /// # Arguments
-    /// - `root`: Root symbol.
     /// - `builtin`: The builtin library.
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
     /// - `output`: Output channel to use.
-    pub fn new(
-        root: Identifier,
-        symbols: SymbolMap,
-        sources: Sources,
-        output: Box<dyn Output>,
-    ) -> Self {
+    pub fn new(symbols: SymbolMap, sources: Sources, output: Box<dyn Output>) -> Self {
         log::debug!("Creating Context");
 
         // put all together
         Self {
-            symbol_table: SymbolTable::new(root, symbols, sources).expect("unknown root id"),
+            symbol_table: SymbolTable::new(symbols, sources).expect("unknown root id"),
             output,
             ..Default::default()
         }
@@ -74,14 +68,13 @@ impl Context {
     pub fn from_source(
         root: impl AsRef<std::path::Path> + std::fmt::Debug,
         builtin: Symbol,
-        search_paths: &[std::path::PathBuf],
+        search_paths: &[impl AsRef<std::path::Path>],
     ) -> EvalResult<Self> {
         let root = SourceFile::load(root)?;
-        let root_id = root.id();
         let sources = Sources::load(root, search_paths)?;
         let mut symbols = sources.resolve()?;
         symbols.insert(Identifier::no_ref("__builtin"), builtin);
-        Ok(Self::new(root_id, symbols, sources, Box::new(Stdout)))
+        Ok(Self::new(symbols, sources, Box::new(Stdout)))
     }
 
     /// Access captured output.
@@ -114,16 +107,11 @@ impl Context {
 
     /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Model> {
-        let source_file = match &self.symbol_table.root.borrow().def {
+        let source_file = match &self.symbol_table.root().borrow().def {
             SymbolDefinition::SourceFile(source_file) => source_file.clone(),
             _ => todo!(),
         };
         source_file.eval(self)
-    }
-
-    /// Peek into root node for testing.
-    pub fn root(&self) -> &Symbol {
-        &self.symbol_table.root
     }
 
     /// Run the closure `f` within the given `stack_frame`.
