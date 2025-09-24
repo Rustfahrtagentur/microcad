@@ -189,6 +189,26 @@ impl Symbol {
         parent.borrow_mut().children.insert(id, child);
     }
 
+    /// Insert new child
+    ///
+    /// The parent of `new_child` wont be changed!
+    pub fn insert(&self, id: Identifier, new_child: Symbol) {
+        if self
+            .inner
+            .borrow_mut()
+            .children
+            .insert(id, new_child)
+            .is_some()
+        {
+            todo!("symbol already existing");
+        }
+    }
+
+    pub fn set_children(&self, new_children: SymbolMap) {
+        assert!(self.borrow().children.is_empty());
+        self.borrow_mut().children = new_children;
+    }
+
     /// Move all children from another symbol into this one.
     /// # Arguments
     /// - `from`: Append this symbol's children
@@ -312,6 +332,20 @@ impl Symbol {
             SymbolDefinition::Constant(_, _, value) => Ok(value.clone()),
             _ => Err(ResolveError::NotAValue(self.full_name())),
         }
+    }
+
+    pub fn current_path(&self) -> Option<std::path::PathBuf> {
+        if let SymbolDefinition::SourceFile(source_file) = &self.inner.borrow().def {
+            return source_file
+                .filename()
+                .parent()
+                .map(|path| path.to_path_buf());
+        }
+        self.inner
+            .borrow()
+            .parent
+            .as_ref()
+            .and_then(|parent| parent.current_path())
     }
 }
 

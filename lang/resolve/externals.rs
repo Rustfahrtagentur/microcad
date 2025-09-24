@@ -96,7 +96,7 @@ impl Externals {
         let mut files = ScanDir::files()
             .read(search_path.as_ref(), |iter| {
                 iter.map(|(entry, _)| entry.path())
-                    .filter(|p| is_microcad_file(p))
+                    .filter(is_microcad_file)
                     .collect::<Vec<_>>()
             })
             .expect("scan_path failed");
@@ -164,10 +164,9 @@ fn find_mod_dir_file(
 }
 
 /// Return `true` if given path has a valid microcad extension
-fn is_microcad_file(p: impl AsRef<std::path::Path>) -> bool {
-    p.as_ref().is_file()
-        && p.as_ref()
-            .extension()
+fn is_microcad_file(p: &std::path::PathBuf) -> bool {
+    p.is_file()
+        && p.extension()
             .map(|ext| {
                 MICROCAD_EXTENSIONS
                     .iter()
@@ -182,6 +181,73 @@ fn is_mod_file(p: &std::path::PathBuf) -> bool {
         && p.file_stem()
             .and_then(|s| s.to_str())
             .is_some_and(|s| s == "mod")
+}
+
+/// Find a module file at the [path].
+///
+/// File stem must match [id] and have a valid microcad file extension:
+///
+/// - <path>`/`<id>`.`*ext*
+///
+pub fn find_source_file(
+    path: impl AsRef<std::path::Path>,
+    id: &Identifier,
+) -> ResolveResult<std::path::PathBuf> {
+    // Can"t really use ScanDir here because we need to be aware of ambiguity
+    use std::fs;
+    let files: Vec<_> = fs::read_dir(path)?
+        .filter_map(Result::ok)
+        .map(|e| e.path())
+        .filter_map(|p| {
+            if p.is_file() {
+                Some(p)
+            } else if p.is_symlink() {
+                todo!("symlink as external")
+            } else {
+                None
+            }
+        })
+        .filter(is_microcad_file)
+        .filter(matches_id(id))
+        .collect();
+
+    if let Some(file) = files.first() {
+        match files.len() {
+            1 => Ok(file.clone()),
+            _ => Err(ResolveError::AmbiguousExternal(id.clone(), files)),
+        }
+    } else {
+        Err(ResolveError::ExternalNotFound(id.clone()))
+    }
+}
+
+pub fn find_source_files(
+    path: impl AsRef<std::path::Path>,
+) -> ResolveResult<Vec<std::path::PathBuf>> {
+    // Can"t really use ScanDir here because we need to be aware of ambiguity
+    Ok(std::fs::read_dir(path)?
+        .filter_map(Result::ok)
+        .map(|e| e.path())
+        .filter_map(|p| {
+            if p.is_file() {
+                Some(p)
+            } else if p.is_symlink() {
+                todo!("symlink as external")
+            } else {
+                None
+            }
+        })
+        .filter(is_microcad_file)
+        .collect())
+}
+
+/// Returns a closure which matches the file stem of a [path] with [id].
+fn matches_id(id: &Identifier) -> impl Fn(&std::path::PathBuf) -> bool {
+    |p| {
+        p.file_stem()
+            .and_then(|s| s.to_str())
+            .is_some_and(|s| s == &id.to_string())
+    }
 }
 
 #[test]
