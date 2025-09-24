@@ -22,8 +22,6 @@ pub struct SymbolTable {
     pub stack: Stack,
     /// Global symbols (including root).
     pub symbols: SymbolMap,
-    /// Source file diagnostics.
-    pub diag_handler: DiagHandler,
 }
 
 impl SymbolTable {
@@ -39,7 +37,6 @@ impl SymbolTable {
             root: symbols.search(&QualifiedName::from_id(root))?,
             stack: Default::default(),
             symbols,
-            diag_handler: Default::default(),
         };
         log::trace!("Initial symbol table:\n{symbol_table}");
         Ok(symbol_table)
