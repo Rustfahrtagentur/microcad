@@ -53,7 +53,7 @@ pub trait FullyQualify {
 
 trait Resolve<T = Option<Symbol>> {
     /// Resolve into Symbol
-    fn resolve(&self, parent: &Symbol) -> ResolveResult<T>;
+    fn symbolize(&self, parent: &Symbol) -> ResolveResult<T>;
 
     //    fn resolve2(&self, parent: &Symbol
 }
@@ -78,30 +78,30 @@ impl SourceFile {
     /// Resolve into Symbol
     pub fn symbolize(&self) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone().into()), None);
-        symbol.borrow_mut().children = self.statements.resolve(&symbol)?;
+        symbol.borrow_mut().children = self.statements.symbolize(&symbol)?;
         Ok(symbol)
     }
 }
 
 impl Resolve<Symbol> for ModuleDefinition {
     /// Resolve into Symbol
-    fn resolve(&self, parent: &Symbol) -> ResolveResult<Symbol> {
+    fn symbolize(&self, parent: &Symbol) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(
             SymbolDefinition::Module(self.clone().into()),
             Some(parent.clone()),
         );
-        symbol.borrow_mut().children = self.body.resolve(&symbol)?;
+        symbol.borrow_mut().children = self.body.symbolize(&symbol)?;
         Ok(symbol)
     }
 }
 
 impl Resolve<SymbolMap> for StatementList {
-    fn resolve(&self, parent: &Symbol) -> ResolveResult<SymbolMap> {
+    fn symbolize(&self, parent: &Symbol) -> ResolveResult<SymbolMap> {
         let mut symbols = SymbolMap::default();
 
         // Iterate over all statement fetch definitions
         for statement in &self.0 {
-            if let Some((id, symbol)) = statement.resolve(parent)? {
+            if let Some((id, symbol)) = statement.symbolize(parent)? {
                 symbols.insert(id, symbol);
             }
         }
@@ -111,14 +111,14 @@ impl Resolve<SymbolMap> for StatementList {
 }
 
 impl Resolve<Option<(Identifier, Symbol)>> for Statement {
-    fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
+    fn symbolize(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
-            Statement::Workbench(wd) => Ok(Some((wd.id.clone(), wd.resolve(parent)?))),
-            Statement::Module(md) => Ok(Some((md.id.clone(), md.resolve(parent)?))),
-            Statement::Function(fd) => Ok(Some((fd.id.clone(), fd.resolve(parent)?))),
-            Statement::Use(us) => us.resolve(parent),
+            Statement::Workbench(wd) => Ok(Some((wd.id.clone(), wd.symbolize(parent)?))),
+            Statement::Module(md) => Ok(Some((md.id.clone(), md.symbolize(parent)?))),
+            Statement::Function(fd) => Ok(Some((fd.id.clone(), fd.symbolize(parent)?))),
+            Statement::Use(us) => us.symbolize(parent),
             Statement::Assignment(a) => Ok(a
-                .resolve(parent)?
+                .symbolize(parent)?
                 .map(|symbol| (a.assignment.id.clone(), symbol))),
             // Not producing any symbols
             Statement::Init(_)
@@ -131,64 +131,64 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
 }
 
 impl Resolve<Symbol> for WorkbenchDefinition {
-    fn resolve(&self, parent: &Symbol) -> ResolveResult<Symbol> {
+    fn symbolize(&self, parent: &Symbol) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(
             SymbolDefinition::Workbench(self.clone().into()),
             Some(parent.clone()),
         );
-        symbol.borrow_mut().children = self.body.resolve(&symbol)?;
+        symbol.borrow_mut().children = self.body.symbolize(&symbol)?;
         Ok(symbol)
     }
 }
 
 impl Resolve<Symbol> for FunctionDefinition {
-    fn resolve(&self, parent: &Symbol) -> ResolveResult<Symbol> {
+    fn symbolize(&self, parent: &Symbol) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(
             SymbolDefinition::Function((*self).clone().into()),
             Some(parent.clone()),
         );
-        symbol.borrow_mut().children = self.body.resolve(&symbol)?;
+        symbol.borrow_mut().children = self.body.symbolize(&symbol)?;
 
         Ok(symbol)
     }
 }
 
 impl Resolve for InitDefinition {
-    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
         Ok(None)
     }
 }
 
 impl Resolve<Option<(Identifier, Symbol)>> for UseStatement {
-    fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
+    fn symbolize(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self.visibility {
             Visibility::Private => Ok(None),
             // Public symbols are put into resolving symbol map
-            Visibility::Public => self.decl.resolve(parent),
+            Visibility::Public => self.decl.symbolize(parent),
         }
     }
 }
 
 impl Resolve for ReturnStatement {
-    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
         Ok(None)
     }
 }
 
 impl Resolve for IfStatement {
-    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
         Ok(None)
     }
 }
 
 impl Resolve for Attribute {
-    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
         Ok(None)
     }
 }
 
 impl Resolve for AssignmentStatement {
-    fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(&self, parent: &Symbol) -> ResolveResult<Option<Symbol>> {
         match (self.assignment.visibility, self.assignment.qualifier) {
             // properties do not have a visibility
             (_, Qualifier::Prop) => {
@@ -236,19 +236,19 @@ impl Resolve for AssignmentStatement {
 }
 
 impl Resolve for ExpressionStatement {
-    fn resolve(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(&self, _parent: &Symbol) -> ResolveResult<Option<Symbol>> {
         Ok(None)
     }
 }
 
 impl Resolve<SymbolMap> for Body {
-    fn resolve(&self, parent: &Symbol) -> ResolveResult<SymbolMap> {
-        self.statements.resolve(parent)
+    fn symbolize(&self, parent: &Symbol) -> ResolveResult<SymbolMap> {
+        self.statements.symbolize(parent)
     }
 }
 
 impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
-    fn resolve(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
+    fn symbolize(&self, parent: &Symbol) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
             UseDeclaration::Use(visibility, name) => {
                 let identifier = name.last().expect("Identifier");
