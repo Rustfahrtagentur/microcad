@@ -171,8 +171,11 @@ impl Stack {
     }
 }
 
+/// Include either a symbol or a qualified name.
 pub enum SymbolOrName {
+    /// Includes a symbol.
     Symbol(Symbol),
+    /// Includes a qualified name.
     Name(QualifiedName),
 }
 

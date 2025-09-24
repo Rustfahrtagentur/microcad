@@ -61,6 +61,9 @@ trait Resolve<T = Option<Symbol>> {
 #[test]
 fn resolve_test() {
     let root = SourceFile::load("../examples/lego_brick.µcad").expect("loading failed");
+    //    let symbol_table = root.load(search_paths); // 1 (root,symbol_map,sources)
+    //  let symbol_table = root.resolve(search_paths);
+
     let sources = Sources::load(root.clone(), &["../lib".into()]).expect("loading failed");
     let root_id = sources.root().id();
     let symbols = sources.resolve().expect("resolve failed");
@@ -70,6 +73,12 @@ fn resolve_test() {
 }
 
 impl SourceFile {
+    /// Resolve into Symbol
+    pub fn symbolize(&self) -> ResolveResult<Symbol> {
+        let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone().into()), None);
+        symbol.borrow_mut().children = self.statements.resolve(&symbol)?;
+        Ok(symbol)
+    }
     /// Resolve into Symbol
     pub fn resolve(&self) -> ResolveResult<Symbol> {
         let name = self.filename_as_str();
