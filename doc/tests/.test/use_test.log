@@ -44,10 +44,17 @@
 -- Output --
 Hello
 -- Errors --
--- Model --
-  Group (root) ->
-
+error: Symbol std::test::foo::Bar not found.
+  ---> <FROM STR>:18:5
+     |
+  18 | use std::test::foo::Bar as baz;
+     |     ^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol baz not found.
+  ---> <FROM STR>:19:14
+     |
+  19 | assert_valid(baz);
+     |              ^^^
+     |
 -- Test Result --
-OK
-Could not determine output type.
-Nothing will be exported.
+FAIL

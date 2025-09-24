@@ -129,41 +129,41 @@ impl StackFrame {
             } else {
                 String::new()
             };
-            match &symbol.borrow().def {
+            symbol.with_def(|def| match def {
                 SymbolDefinition::Constant(visibility, id, value) => writeln!(
                     f,
                     "{:depth$}- {visibility}{id:?} = {value}{full_name} (constant)",
                     ""
-                )?,
+                ),
                 SymbolDefinition::Argument(id, value) => {
-                    writeln!(f, "{:depth$}- {id:?} = {value}{full_name} (argument)", "")?
+                    writeln!(f, "{:depth$}- {id:?} = {value}{full_name} (argument)", "")
                 }
                 SymbolDefinition::SourceFile(source) => {
-                    writeln!(f, "{:depth$}- {:?} (source)", "", source.filename())?
+                    writeln!(f, "{:depth$}- {:?} (source)", "", source.filename())
                 }
                 SymbolDefinition::Module(def) => {
-                    writeln!(f, "{:depth$}- {:?}{full_name} (module)", "", def.id)?
+                    writeln!(f, "{:depth$}- {:?}{full_name} (module)", "", def.id)
                 }
                 SymbolDefinition::Workbench(def) => {
-                    writeln!(f, "{:depth$}- {:?}{full_name} (workbench)", "", def.id)?
+                    writeln!(f, "{:depth$}- {:?}{full_name} (workbench)", "", def.id)
                 }
                 SymbolDefinition::Function(def) => {
-                    writeln!(f, "{:depth$}- {:?}{full_name} (function)", "", def.id)?
+                    writeln!(f, "{:depth$}- {:?}{full_name} (function)", "", def.id)
                 }
                 SymbolDefinition::Builtin(builtin) => {
-                    writeln!(f, "{:depth$}- {:?}{full_name} (builtin)", "", builtin.id)?
+                    writeln!(f, "{:depth$}- {:?}{full_name} (builtin)", "", builtin.id)
                 }
                 SymbolDefinition::Alias(visibility, id, name) => writeln!(
                     f,
                     "{:depth$}- {visibility}{id:?}{full_name} -> {name} (alias)",
                     ""
-                )?,
+                ),
                 SymbolDefinition::UseAll(visibility, name) => {
-                    writeln!(f, "{:depth$}- {visibility}{name}{full_name} (use all)", "")?
+                    writeln!(f, "{:depth$}- {visibility}{name}{full_name} (use all)", "")
                 }
                 #[cfg(test)]
-                SymbolDefinition::Tester(id) => writeln!(f, "{:depth$}- {id} (tester)", "")?,
-            }
+                SymbolDefinition::Tester(id) => writeln!(f, "{:depth$}- {id} (tester)", ""),
+            })?
         }
 
         Ok(())

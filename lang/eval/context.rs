@@ -39,8 +39,8 @@ impl Context {
     ///
     /// # Arguments
     /// - `root`: Root symbol.
-    /// - `builtin`: The builtin library.
-    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
+    /// - `symbols`: Pre-loaded symbols.
+    /// - `sources`: Source file cache.
     /// - `output`: Output channel to use.
     pub fn new(
         root: Identifier,
@@ -48,7 +48,7 @@ impl Context {
         sources: Sources,
         output: Box<dyn Output>,
     ) -> Self {
-        log::debug!("Creating Context");
+        log::debug!("Creating evaluation context");
 
         // put all together
         Self {
@@ -81,7 +81,7 @@ impl Context {
     ) -> EvalResult<Self> {
         let root = SourceFile::load(root)?;
         let root_id = root.id();
-        let sources = Sources::load(root, search_paths)?;
+        let sources = Sources::default(); //load(root, search_paths)?;
         let mut symbols = sources.resolve()?;
         symbols.insert(Identifier::no_ref("__builtin"), builtin);
         Ok(Self::new(root_id, symbols, sources, Box::new(Stdout)))
@@ -117,10 +117,10 @@ impl Context {
 
     /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Model> {
-        let source_file = match &self.symbol_table.root.borrow().def {
+        let source_file = self.symbol_table.root.with_def(|def| match def {
             SymbolDefinition::SourceFile(source_file) => source_file.clone(),
             _ => todo!(),
-        };
+        });
         source_file.eval(self)
     }
 

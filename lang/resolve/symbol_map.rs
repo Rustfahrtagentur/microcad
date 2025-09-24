@@ -52,13 +52,13 @@ impl SymbolMap {
     pub fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         if name.is_empty() {
             if let Some(symbol) = self.get(&Identifier::none()) {
-                symbol.borrow_mut().used = true;
+                symbol.set_use();
                 return Ok(symbol.clone());
             }
         } else {
             let (id, leftover) = name.split_first();
             if let Some(symbol) = self.get(&id) {
-                symbol.borrow_mut().used = true;
+                symbol.set_use();
                 if leftover.is_empty() {
                     log::trace!("Fetched {name:?} from globals (symbol map)");
                     return Ok(symbol.clone());
@@ -74,7 +74,7 @@ impl SymbolMap {
     /// detach children from their parent
     pub fn detach_from_parent(mut self) -> Self {
         for child in self.iter_mut() {
-            child.1.borrow_mut().parent = None;
+            child.1.detach();
         }
         self
     }
@@ -86,21 +86,6 @@ impl SymbolMap {
         }
 
         Ok(())
-    }
-
-    /// Move all children from another symbol into this map.
-    /// # Arguments
-    /// - `from`: Append this symbol's children
-    ///
-    /// Technically, nothing will be moved here because of the `Rc<RefCell<>>`,
-    /// but by resetting the parent of all moved  children, those will see
-    /// themselves as root symbols.
-    pub fn move_children(&mut self, from: &Symbol) {
-        // copy children
-        from.borrow().children.iter().for_each(|(id, child)| {
-            child.borrow_mut().parent = None;
-            self.insert(id.clone(), child.clone());
-        });
     }
 
     /// Collect all symbols engaged in that name.

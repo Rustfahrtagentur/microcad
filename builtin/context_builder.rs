@@ -26,17 +26,12 @@ impl ContextBuilder {
     }
 
     /// Create a new context from a source file and capture output (see [`Output`]).
-    ///
-    /// # Arguments
-    /// - `root`: Resolved root source file.
-    /// - `builtin`: The builtin library.
-    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
     pub fn from_source_captured(
         root: Rc<SourceFile>,
-        search_paths: &[std::path::PathBuf],
+        libs: &[std::path::PathBuf],
     ) -> ResolveResult<Self> {
         let root_id = root.id();
-        let sources = Sources::load(root, search_paths)?;
+        let sources = Sources::default(); //load(root, search_paths)?;
         let mut symbols = sources.resolve()?;
         symbols.add_node(crate::builtin_module());
         Ok(

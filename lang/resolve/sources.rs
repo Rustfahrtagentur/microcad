@@ -33,7 +33,10 @@ impl Sources {
     /// Create source cache
     ///
     /// Inserts the `root` file and loads all files from `search_paths`.
-    pub fn load(root: Rc<SourceFile>, search_paths: &[std::path::PathBuf]) -> ParseResult<Self> {
+    pub fn load(
+        root: Rc<SourceFile>,
+        search_paths: &[impl AsRef<std::path::Path>],
+    ) -> ParseResult<Self> {
         let mut source_files = Vec::new();
         let mut by_name = HashMap::new();
         let mut by_hash = HashMap::new();
@@ -68,7 +71,10 @@ impl Sources {
             by_hash,
             by_path,
             by_name,
-            search_paths: search_paths.to_vec(),
+            search_paths: search_paths
+                .iter()
+                .map(|path| path.as_ref().to_path_buf())
+                .collect(),
         })
     }
 
@@ -76,51 +82,13 @@ impl Sources {
     pub fn root(&self) -> Rc<SourceFile> {
         self.source_files
             .first()
-            .expect("empty source cache has not root")
+            .expect("empty source cache has no root")
             .clone()
-    }
-
-    /// Creates symbol map from externals.
-    fn create_modules(externals: &Externals) -> SymbolMap {
-        let mut map = SymbolMap::new();
-        externals.iter().for_each(|(basename, _)| {
-            let (id, name) = basename.split_first();
-            let module = match map.get(&id) {
-                Some(symbol) => symbol.clone(),
-                _ => Symbol::new(
-                    SymbolDefinition::Module(ModuleDefinition::new(Visibility::Public, id.clone())),
-                    None,
-                ),
-            };
-            Self::recursive_create_modules(&module, &name);
-            map.insert(id.clone(), module);
-        });
-        map
-    }
-
-    fn recursive_create_modules(parent: &Symbol, name: &QualifiedName) -> Option<Symbol> {
-        if name.is_empty() {
-            return None;
-        }
-
-        let node_id = name.first().expect("Non-empty qualified name");
-        if let Some(child) = parent.get(node_id) {
-            return Some(child.clone());
-        }
-
-        let child = Symbol::new(
-            SymbolDefinition::Module(ModuleDefinition::new(Visibility::Public, node_id.clone())),
-            None,
-        );
-        Symbol::add_child(parent, child.clone());
-
-        Self::recursive_create_modules(&child, &name.remove_first());
-        Some(child)
     }
 
     /// Create initial symbol map from externals.
     pub fn resolve(&self) -> ResolveResult<SymbolMap> {
-        let mut symbols = Self::create_modules(&self.externals);
+        let mut symbols = SymbolMap::default();
         symbols.insert(
             self.root().id(),
             Symbol::new(SymbolDefinition::SourceFile(self.root()), None),

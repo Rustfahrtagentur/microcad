@@ -28,12 +28,12 @@ impl Resolve {
 
 impl RunCommand for Resolve {
     fn run(&self, cli: &Cli) -> anyhow::Result<()> {
-        let root = self.load()?;
-        let sources = Sources::load(root, &cli.search_paths)?;
-        let symbols = sources.resolve()?;
+        let source_file = self.load()?;
+        let context = resolve(source_file, &cli.search_paths)?;
+        let root = context.root()?;
         match &self.output {
-            Some(filename) => symbols.write_to_file(&filename)?,
-            None => println!("{symbols}"),
+            Some(filename) => root.write_to_file(&filename)?,
+            None => println!("{root}"),
         }
 
         Ok(())

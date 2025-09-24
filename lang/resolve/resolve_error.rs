@@ -57,6 +57,26 @@ pub enum ResolveError {
     /// Declaration of property not allowed here
     #[error("Declaration of {0} not allowed within {1}")]
     DeclNotAllowed(Identifier, QualifiedName),
+
+    /// I/O Error
+    #[error("I/O Error: {0}")]
+    IoError(#[from] std::io::Error),
+
+    /// Sternal module file not found
+    #[error("External module file not found for '{0}'")]
+    ExternalNotFound(Identifier),
+
+    /// Sternal module file not found
+    #[error("Ambiguous external module files found for '{0}': {1:?}")]
+    AmbiguousExternal(Identifier, Vec<std::path::PathBuf>),
+
+    /// Sternal module file not found
+    #[error("Ambiguous external module files found {0:?}")]
+    AmbiguousExternals(Vec<std::path::PathBuf>),
+
+    /// ScanDir Error
+    #[error("ScanDir Error: {0}")]
+    ScanDirError(#[from] scan_dir::Error),
 }
 
 /// Result type of any resolve.
