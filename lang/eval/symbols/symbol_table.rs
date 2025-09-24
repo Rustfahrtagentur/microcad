@@ -63,7 +63,11 @@ impl SymbolTable {
     }
 
     /// Lookup a symbol from local stack.
-    fn lookup_local(&self, name: &QualifiedName) -> EvalResult<Symbol> {
+    fn lookup_local(
+        &self,
+        name: &QualifiedName,
+        lookup: impl Fn(&QualifiedName) -> EvalResult<Symbol>,
+    ) -> EvalResult<Symbol> {
         log::trace!("Looking for local symbol '{name:?}'");
         let symbol = if let Some(id) = name.single_identifier() {
             self.stack.fetch(id)
@@ -73,7 +77,7 @@ impl SymbolTable {
             let mut alias = local.full_name();
             alias.append(&mut tail);
             log::trace!("Following alias {alias}");
-            self.lookup(&alias)
+            lookup(&alias)
         };
 
         match symbol {
@@ -193,7 +197,7 @@ impl Lookup for SymbolTable {
         log::trace!("- lookups -------------------------------------------------------");
         // collect all symbols that can be found and remember origin
         let result = [
-            ("local", self.lookup_local(name)),
+            ("local", self.lookup_local(name, |name| self.lookup(name))),
             (
                 "module",
                 self.lookup_within(name, self.stack.current_module_name()),
