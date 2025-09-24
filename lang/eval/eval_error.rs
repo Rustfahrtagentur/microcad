@@ -70,6 +70,10 @@ pub enum EvalError {
     #[error("Property not found: {0}")]
     PropertyNotFound(Identifier),
 
+    /// A property of a value was not found.
+    #[error("Not a property id: {0}")]
+    NoPropertyId(QualifiedName),
+
     /// Argument count mismatch.
     #[error("Argument count mismatch: expected {expected}, got {found} in {args}")]
     ArgumentCountMismatch {
@@ -204,7 +208,7 @@ pub enum EvalError {
 
     /// Resolve Error
     #[error("Resolve error {0}")]
-    ResolveError(#[from] ResolveError),
+    ResolveError(ResolveError),
 
     /// Unexpected source file in expression
     #[error("{0} is not operation.")]
@@ -261,3 +265,12 @@ pub enum EvalError {
 
 /// Result type of any evaluation.
 pub type EvalResult<T> = std::result::Result<T, EvalError>;
+
+impl From<ResolveError> for EvalError {
+    fn from(value: ResolveError) -> Self {
+        match value {
+            ResolveError::SymbolNotFound(name) => EvalError::SymbolNotFound(name),
+            other => EvalError::ResolveError(other),
+        }
+    }
+}

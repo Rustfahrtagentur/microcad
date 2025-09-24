@@ -68,6 +68,7 @@ impl SourceFile {
         self.source.lines().count()
     }
 }
+
 impl std::fmt::Display for SourceFile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.statements.iter().try_for_each(|s| writeln!(f, "{s}"))
