@@ -20,7 +20,7 @@ pub trait Lookup {
     /// - follows *aliases* (use statements)
     /// - detect any ambiguity
     /// - loads *external files*
-    fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol>;
+    fn lookup(&self, name: &QualifiedName) -> EvalResult<Symbol>;
 }
 
 /// Trait to manage the *locals*.

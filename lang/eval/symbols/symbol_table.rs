@@ -49,7 +49,7 @@ impl SymbolTable {
     }
 
     /// Lookup a symbol from global symbols.
-    pub fn lookup_global(&mut self, name: &QualifiedName) -> ResolveResult<Symbol> {
+    pub fn lookup_global(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         log::trace!("Looking for global symbol '{name:?}'");
         let symbol = match self.symbols.search(name) {
             Ok(symbol) => symbol.clone(),
@@ -63,7 +63,7 @@ impl SymbolTable {
     }
 
     /// Lookup a symbol from local stack.
-    fn lookup_local(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+    fn lookup_local(&self, name: &QualifiedName) -> EvalResult<Symbol> {
         log::trace!("Looking for local symbol '{name:?}'");
         let symbol = if let Some(id) = name.single_identifier() {
             self.stack.fetch(id)
@@ -88,7 +88,7 @@ impl SymbolTable {
         }
     }
 
-    fn lookup_within(&mut self, what: &QualifiedName, within: QualifiedName) -> EvalResult<Symbol> {
+    fn lookup_within(&self, what: &QualifiedName, within: QualifiedName) -> EvalResult<Symbol> {
         log::trace!("Looking for symbol '{what:?}' within '{within:?}':",);
 
         // process internal supers
@@ -120,7 +120,7 @@ impl SymbolTable {
         Err(EvalError::SymbolNotFound(what.clone()))
     }
 
-    fn lookup_workbench(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+    fn lookup_workbench(&self, name: &QualifiedName) -> EvalResult<Symbol> {
         if let Some(workbench) = &self.stack.current_workbench_name() {
             log::trace!("Looking for symbol '{name:?}' in current workbench '{workbench:?}'");
             let name = &name.with_prefix(workbench);
@@ -140,7 +140,7 @@ impl SymbolTable {
         Err(EvalError::SymbolNotFound(name.clone()))
     }
 
-    fn de_alias(&mut self, name: &QualifiedName) -> QualifiedName {
+    fn de_alias(&self, name: &QualifiedName) -> QualifiedName {
         for p in (1..name.len()).rev() {
             if let Ok(symbol) = self.lookup_global(&QualifiedName::no_ref(name[0..p].to_vec())) {
                 if let SymbolDefinition::Alias(.., alias) = &symbol.borrow().def {
@@ -154,7 +154,7 @@ impl SymbolTable {
         name.clone()
     }
 
-    fn follow_alias(&mut self, symbol: &Symbol) -> EvalResult<Symbol> {
+    fn follow_alias(&self, symbol: &Symbol) -> EvalResult<Symbol> {
         // execute alias from any use statement
         let def = &symbol.borrow().def;
         if let SymbolDefinition::Alias(.., name) = def {
@@ -185,7 +185,7 @@ impl SymbolTable {
 }
 
 impl Lookup for SymbolTable {
-    fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+    fn lookup(&self, name: &QualifiedName) -> EvalResult<Symbol> {
         log::debug!("Lookup symbol '{name:?}' (at line {:?}):", name.src_ref());
 
         let name = &self.de_alias(name);

@@ -276,7 +276,7 @@ impl Default for Context {
 }
 
 impl Lookup for Context {
-    fn lookup(&mut self, name: &QualifiedName) -> EvalResult<Symbol> {
+    fn lookup(&self, name: &QualifiedName) -> EvalResult<Symbol> {
         log::debug!("Lookup symbol or property '{name}'");
         let symbol = self.symbol_table.lookup(name);
         let property = self.lookup_property(name);
