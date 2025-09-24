@@ -6,14 +6,14 @@
 use crate::{rc::*, src_ref::*, syntax::*};
 
 /// Module definition.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct ModuleDefinition {
     /// Visibility of the module.
     pub visibility: Visibility,
     /// Name of the module.
     pub id: Identifier,
-    /// Module body.
-    pub body: Body,
+    /// Module body. ('None' if external module
+    pub body: Option<Body>,
     /// Source code reference.
     pub src_ref: SrcRef,
 }
@@ -24,8 +24,7 @@ impl ModuleDefinition {
         Rc::new(Self {
             visibility,
             id,
-            body: Body::default(),
-            src_ref: SrcRef(None),
+            ..Default::default()
         })
     }
 }
@@ -38,8 +37,12 @@ impl SrcReferrer for ModuleDefinition {
 
 impl TreeDisplay for ModuleDefinition {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
-        writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.id)?;
-        depth.indent();
-        self.body.tree_print(f, depth)
+        if let Some(body) = &self.body {
+            writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.id)?;
+            depth.indent();
+            body.tree_print(f, depth)
+        } else {
+            writeln!(f, "{:depth$}ModuleDefinition '{}' (external)", "", self.id)
+        }
     }
 }

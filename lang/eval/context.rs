@@ -26,8 +26,6 @@ pub struct Context {
     symbol_table: SymbolTable,
     /// Stack of currently opened scopes with symbols while evaluation.
     stack: Stack,
-    /// Source file diagnostics.
-    diag_handler: DiagHandler,
     /// Output channel for [__builtin::print].
     output: Box<dyn Output>,
     /// Exporter registry.
@@ -48,7 +46,8 @@ impl Context {
 
         // put all together
         Self {
-            symbol_table: SymbolTable::new(symbols, sources).expect("unknown root id"),
+            symbol_table: SymbolTable::new(symbols, sources, DiagHandler::default())
+                .expect("unknown root id"),
             output,
             ..Default::default()
         }
@@ -393,7 +392,6 @@ impl Default for Context {
         Self {
             symbol_table: Default::default(),
             stack: Default::default(),
-            diag_handler: Default::default(),
             output: Box::new(Stdout),
             exporters: Default::default(),
             importers: Default::default(),
@@ -573,19 +571,19 @@ impl Lookup for Context {
 */
 impl Diag for Context {
     fn fmt_diagnosis(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result {
-        self.diag_handler.pretty_print(f, &self.symbol_table)
+        self.symbol_table.fmt_diagnosis(f)
     }
 
     fn error_count(&self) -> u32 {
-        self.diag_handler.error_count()
+        self.symbol_table.error_count()
     }
 
     fn error_lines(&self) -> std::collections::HashSet<usize> {
-        self.diag_handler.error_lines()
+        self.symbol_table.error_lines()
     }
 
     fn warning_lines(&self) -> std::collections::HashSet<usize> {
-        self.diag_handler.warning_lines()
+        self.symbol_table.warning_lines()
     }
 }
 /*
@@ -612,7 +610,7 @@ impl Context {
 */
 impl PushDiag for Context {
     fn push_diag(&mut self, diag: Diagnostic) -> EvalResult<()> {
-        let result = self.diag_handler.push_diag(diag);
+        let result = self.symbol_table.push_diag(diag);
         log::trace!("Error Context:\n{self}");
         result
     }
@@ -639,7 +637,7 @@ impl std::fmt::Display for Context {
 
         if self.has_errors() {
             writeln!(f, "{}\nErrors:", self.symbol_table)?;
-            self.diag_handler.pretty_print(f, &self.symbol_table)?;
+            self.symbol_table.fmt_diagnosis(f)?;
         } else {
             write!(f, "{}", self.symbol_table)?;
         }

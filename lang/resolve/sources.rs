@@ -129,15 +129,18 @@ impl Sources {
     }
 
     /// Create a symbol out of all sources (without resolving them).
-    pub fn symbolize(&self) -> ResolveResult<SymbolMap> {
+    pub fn symbolize(&self, diag: &DiagHandler) -> ResolveResult<SymbolMap> {
         let symbols = self
             .iter()
-            .map(
-                |source| match (self.name_from_path(&source.filename()), source.symbolize()) {
+            .map(|source| {
+                match (
+                    self.name_from_path(&source.filename()),
+                    source.symbolize(diag),
+                ) {
                     (Ok(name), Ok(symbol)) => Ok((name, symbol)),
                     (Ok(_), Err(err)) | (Err(err), _) => Err(err),
-                },
-            )
+                }
+            })
             .collect::<ResolveResult<Vec<_>>>()?;
 
         let mut symbol_map = SymbolMap::default();

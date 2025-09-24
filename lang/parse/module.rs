@@ -5,10 +5,12 @@ use crate::{parse::*, parser::*, rc::*, syntax::*};
 
 impl Parse for Rc<ModuleDefinition> {
     fn parse(pair: Pair) -> ParseResult<Self> {
+        let body: Body = crate::find_rule!(pair, body)?;
+
         Ok(Rc::new(ModuleDefinition {
             visibility: crate::find_rule!(pair, visibility)?,
             id: crate::find_rule!(pair, identifier)?,
-            body: crate::find_rule!(pair, body)?,
+            body: if body.is_empty() { None } else { Some(body) },
             src_ref: pair.clone().into(),
         }))
     }

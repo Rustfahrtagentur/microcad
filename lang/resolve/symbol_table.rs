@@ -19,6 +19,8 @@ pub struct SymbolTable {
     pub sources: Sources,
     /// Global symbols (including root).
     symbols: SymbolMap,
+    /// Diagnostics handler.
+    diag: DiagHandler,
 }
 
 impl SymbolTable {
@@ -26,26 +28,44 @@ impl SymbolTable {
     /// List of all global symbols.
     /// Stack of currently opened scopes with local symbols while evaluation.
     /// Source file cache containing all source files loaded in the context and their syntax trees.
-    pub fn new(symbols: SymbolMap, sources: Sources) -> ResolveResult<Self> {
+    pub fn new(symbols: SymbolMap, sources: Sources, diag: DiagHandler) -> ResolveResult<Self> {
         // prepare symbol map
 
-        let symbol_table = Self { sources, symbols };
+        let symbol_table = Self {
+            sources,
+            symbols,
+            diag,
+        };
         log::trace!("Initial symbol table:\n{symbol_table}");
         Ok(symbol_table)
     }
 
+    /// Load a symbol table from sources.
+    ///
+    /// # Arguments
+    /// - `root`: root file
+    /// - `search_paths`: paths to search for external modules
+    ///
+    /// Returns a symbol table which is unresolved.
     pub fn load(
         root: Rc<SourceFile>,
         search_paths: &[impl AsRef<std::path::Path>],
+        diag: DiagHandler,
     ) -> ResolveResult<Self> {
         // load syntax of root source and external sources
         let sources = Sources::load(root.clone(), search_paths)?;
-        let symbols: SymbolMap = sources.symbolize()?;
-        let symbol_table = Self { sources, symbols };
+
+        let symbols: SymbolMap = sources.symbolize(&diag)?;
+        let symbol_table = Self {
+            sources,
+            symbols,
+            diag,
+        };
         log::trace!("Initial symbol table:\n{symbol_table}");
         Ok(symbol_table)
     }
 
+    /// Resolve the symbol map.
     pub fn resolve(&mut self) -> ResolveResult<()> {
         todo!()
     }
@@ -134,5 +154,29 @@ impl std::fmt::Display for SymbolTable {
 impl GetSourceByHash for SymbolTable {
     fn get_by_hash(&self, hash: u64) -> ResolveResult<std::rc::Rc<SourceFile>> {
         self.sources.get_by_hash(hash)
+    }
+}
+
+impl Diag for SymbolTable {
+    fn fmt_diagnosis(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result {
+        self.diag.pretty_print(f, self)
+    }
+
+    fn error_count(&self) -> u32 {
+        self.diag.error_count()
+    }
+
+    fn error_lines(&self) -> std::collections::HashSet<usize> {
+        self.diag.error_lines()
+    }
+
+    fn warning_lines(&self) -> std::collections::HashSet<usize> {
+        self.diag.warning_lines()
+    }
+}
+
+impl PushDiag for SymbolTable {
+    fn push_diag(&mut self, diag: Diagnostic) -> crate::eval::EvalResult<()> {
+        self.diag.push_diag(diag)
     }
 }
