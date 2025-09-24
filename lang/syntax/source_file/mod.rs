@@ -13,7 +13,7 @@ pub struct SourceFile {
     /// Root code body.
     pub statements: StatementList,
     /// Name of loaded file.
-    pub filename: Option<std::path::PathBuf>,
+    filename: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
     pub source: String,
 
@@ -25,11 +25,26 @@ pub struct SourceFile {
 }
 
 impl SourceFile {
+    /// Create new source file from existing source.
+    pub fn new(statements: StatementList, source: String, hash: u64) -> Self {
+        Self {
+            statements,
+            source,
+            hash,
+            ..Default::default()
+        }
+    }
     /// Return filename of loaded file or `<no file>`
     pub fn filename(&self) -> std::path::PathBuf {
         self.filename
             .clone()
             .unwrap_or(std::path::PathBuf::from(crate::invalid_no_ansi!(SOURCE)))
+    }
+
+    /// Return filename of loaded file or `<no file>`
+    pub fn set_filename(&mut self, path: impl AsRef<std::path::Path>) {
+        assert!(self.filename.is_none());
+        self.filename = Some(path.as_ref().canonicalize().expect("path not found"))
     }
 
     /// Return filename of loaded file or `<no file>`
