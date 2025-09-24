@@ -19,7 +19,7 @@ impl Externals {
     /// Recursively scans given `search_paths` for µcad files but files will not be loaded.
     /// # Arguments
     /// - `search_paths`: Paths to search for any external files.
-    pub fn new(search_paths: &[std::path::PathBuf]) -> Self {
+    pub fn new(search_paths: &[impl AsRef<std::path::Path>]) -> Self {
         let no_search_paths = search_paths.is_empty();
         let new = Self(Self::search_externals(search_paths));
         if no_search_paths {
@@ -72,30 +72,29 @@ impl Externals {
 
     /// Searches for external source code files (*external modules*) in given *search paths*.
     fn search_externals(
-        search_paths: &[std::path::PathBuf],
+        search_paths: &[impl AsRef<std::path::Path>],
     ) -> std::collections::HashMap<QualifiedName, std::path::PathBuf> {
         let mut externals = std::collections::HashMap::new();
         search_paths.iter().for_each(|search_path| {
-            Self::scan_path(search_path.clone(), MICROCAD_EXTENSIONS)
-                .iter()
-                .for_each(|file| {
-                    externals.insert(
-                        (*file
-                            .strip_prefix(search_path)
-                            .expect("cannot strip search path from file name")
-                            .with_extension(""))
-                        .into(),
-                        file.canonicalize().expect("path not found"),
-                    );
-                });
+            Self::scan_path(search_path).iter().for_each(|file| {
+                externals.insert(
+                    (*file
+                        .strip_prefix(search_path)
+                        .expect("cannot strip search path from file name")
+                        .with_extension(""))
+                    .into(),
+                    file.canonicalize().expect("path not found"),
+                );
+            });
         });
 
         externals
     }
 
     /// Return `true` if given path has a valid microcad extension
-    fn is_microcad_extension(p: &std::path::PathBuf) -> bool {
-        p.extension()
+    fn is_microcad_extension(p: &impl AsRef<std::path::Path>) -> bool {
+        p.as_ref()
+            .extension()
             .map(|ext| {
                 MICROCAD_EXTENSIONS
                     .iter()
@@ -117,7 +116,7 @@ impl Externals {
     ) -> ResolveResult<Vec<std::path::PathBuf>> {
         Ok(ScanDir::files().read(path, |iter| {
             iter.map(|(ref entry, _)| entry.path())
-                .filter(|path| Self::is_mod_file(path))
+                .filter(Self::is_mod_file)
                 .collect::<Vec<_>>()
         })?)
     }
@@ -137,28 +136,21 @@ impl Externals {
     }
 
     /// Scan in a specified path for all available files with one of the given extensions.
-    fn scan_path(
-        search_path: std::path::PathBuf,
-        extensions: &[&str],
-    ) -> std::vec::Vec<std::path::PathBuf> {
+    fn scan_path(search_path: &impl AsRef<std::path::Path>) -> std::vec::Vec<std::path::PathBuf> {
         let mut files = ScanDir::files()
             .read(search_path.clone(), |iter| {
-                iter.filter(|(_, name)| {
-                    extensions.iter().any(|extension| name.ends_with(extension))
-                })
-                .map(|(ref entry, _)| entry.path())
-                .collect::<Vec<_>>()
+                iter.map(|(ref entry, _)| entry.path())
+                    .filter(Self::is_microcad_extension)
+                    .collect::<Vec<_>>()
             })
             .expect("scan_path failed");
 
         files.append(
             &mut ScanDir::dirs()
                 .read(search_path, |iter| {
-                    iter.filter_map(|(entry, _)| match Self::find_mod_dir_file(&entry.path()) {
-                        Ok(Some(file)) => Some(file),
-                        _ => None,
-                    })
-                    .collect::<Vec<_>>()
+                    iter.map(|(ref entry, _)| entry.path())
+                        .filter_map(|path| Self::find_mod_dir_file(&path).ok().flatten())
+                        .collect::<Vec<_>>()
                 })
                 .expect("scan_path failed"),
         );
@@ -179,7 +171,7 @@ impl std::fmt::Display for Externals {
 
 #[test]
 fn resolve_external_file() {
-    let externals = Externals::new(&["../lib".into()]);
+    let externals = Externals::new(&["../lib"]);
 
     assert!(!externals.is_empty());
 

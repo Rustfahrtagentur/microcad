@@ -15,9 +15,9 @@
 //!
 //! To "run" the source file (and get the expected output) it must now be evaluated (see [`crate::eval`])  .
 
-mod context;
 mod externals;
 mod info;
+mod resolve_context;
 mod resolve_error;
 mod sources;
 mod symbol;
@@ -25,13 +25,14 @@ mod symbol_definition;
 mod symbol_map;
 
 pub use externals::*;
+pub use resolve_context::*;
 pub use resolve_error::*;
 pub use sources::*;
 pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
 
-use crate::{resolve::context::*, syntax::*, value::Value};
+use crate::{rc::*, syntax::*, value::Value};
 
 /// Trait for items which can be fully qualified.
 pub trait FullyQualify {
@@ -39,9 +40,16 @@ pub trait FullyQualify {
     fn full_name(&self) -> QualifiedName;
 }
 
+pub fn resolve(
+    root: Rc<SourceFile>,
+    search_paths: &[impl AsRef<std::path::Path>],
+) -> ResolveResult<ResolveContext> {
+    Ok(ResolveContext::new(search_paths)?)
+}
+
 trait Resolve<T = Option<Symbol>> {
     /// Resolve into Symbol
-    fn symbolize(&self, parent: &Symbol, context: &mut Context) -> ResolveResult<T>;
+    fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<T>;
 
     //    fn resolve2(&self, parent: &Symbol
 }
@@ -49,7 +57,7 @@ trait Resolve<T = Option<Symbol>> {
 #[test]
 fn resolve_test() {
     let root = SourceFile::load("../examples/lego_brick.µcad").expect("loading failed");
-    let sources = Sources::load(root.clone(), &["../lib".into()]).expect("loading failed");
+    let sources = Sources::load(root.clone(), &["../lib"]).expect("loading failed");
     let root_id = sources.root().id();
     let symbols = sources.resolve().expect("resolve failed");
     log::trace!("Symbols:\n{symbols}");
@@ -59,20 +67,18 @@ fn resolve_test() {
 
 impl SourceFile {
     /// Resolve into Symbol
-    pub fn resolve(&self) -> ResolveResult<Symbol> {
+    pub fn resolve(&self, context: &mut ResolveContext) -> ResolveResult<Symbol> {
         let name = self.filename_as_str();
         log::debug!("Creating symbol from source file {name}");
         let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone().into()), None);
-
-        let mut context = Context::default();
-        symbol.set_children(self.statements.symbolize(&symbol, &mut context)?);
+        symbol.set_children(self.statements.symbolize(&symbol, context)?);
         log::trace!("Created symbol from source file {name}:\n{symbol}");
         Ok(symbol)
     }
 }
 
 impl Resolve<Symbol> for ModuleDefinition {
-    fn symbolize(&self, parent: &Symbol, context: &mut Context) -> ResolveResult<Symbol> {
+    fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<Symbol> {
         let symbol = if let Some(body) = &self.body {
             let symbol = Symbol::new(
                 SymbolDefinition::Module(self.clone().into()),
@@ -83,7 +89,7 @@ impl Resolve<Symbol> for ModuleDefinition {
         } else if let Some(parent_path) = parent.current_path() {
             let file_path = info::find_source_file(parent_path, &self.id)?;
             let source_file = SourceFile::load(file_path)?;
-            source_file.resolve()?
+            source_file.resolve(context)?
         } else {
             todo!("no top-level source file")
         };
@@ -92,7 +98,7 @@ impl Resolve<Symbol> for ModuleDefinition {
 }
 
 impl Resolve<SymbolMap> for StatementList {
-    fn symbolize(&self, parent: &Symbol, context: &mut Context) -> ResolveResult<SymbolMap> {
+    fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<SymbolMap> {
         let mut symbols = SymbolMap::default();
 
         // Iterate over all statement fetch definitions
@@ -110,7 +116,7 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
     fn symbolize(
         &self,
         parent: &Symbol,
-        context: &mut Context,
+        context: &mut ResolveContext,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
             Statement::Workbench(wd) => Ok(Some((wd.id.clone(), wd.symbolize(parent, context)?))),
@@ -131,7 +137,7 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
 }
 
 impl Resolve<Symbol> for WorkbenchDefinition {
-    fn symbolize(&self, parent: &Symbol, context: &mut Context) -> ResolveResult<Symbol> {
+    fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(
             SymbolDefinition::Workbench(self.clone().into()),
             Some(parent.clone()),
@@ -142,7 +148,7 @@ impl Resolve<Symbol> for WorkbenchDefinition {
 }
 
 impl Resolve<Symbol> for FunctionDefinition {
-    fn symbolize(&self, parent: &Symbol, context: &mut Context) -> ResolveResult<Symbol> {
+    fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(
             SymbolDefinition::Function((*self).clone().into()),
             Some(parent.clone()),
@@ -154,7 +160,11 @@ impl Resolve<Symbol> for FunctionDefinition {
 }
 
 impl Resolve for InitDefinition {
-    fn symbolize(&self, _parent: &Symbol, _context: &mut Context) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(
+        &self,
+        _parent: &Symbol,
+        _context: &mut ResolveContext,
+    ) -> ResolveResult<Option<Symbol>> {
         Ok(None)
     }
 }
@@ -163,7 +173,7 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseStatement {
     fn symbolize(
         &self,
         parent: &Symbol,
-        context: &mut Context,
+        context: &mut ResolveContext,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self.visibility {
             Visibility::Private => Ok(None),
@@ -174,25 +184,41 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseStatement {
 }
 
 impl Resolve for ReturnStatement {
-    fn symbolize(&self, _parent: &Symbol, _context: &mut Context) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(
+        &self,
+        _parent: &Symbol,
+        _context: &mut ResolveContext,
+    ) -> ResolveResult<Option<Symbol>> {
         Ok(None)
     }
 }
 
 impl Resolve for IfStatement {
-    fn symbolize(&self, _parent: &Symbol, _context: &mut Context) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(
+        &self,
+        _parent: &Symbol,
+        _context: &mut ResolveContext,
+    ) -> ResolveResult<Option<Symbol>> {
         Ok(None)
     }
 }
 
 impl Resolve for Attribute {
-    fn symbolize(&self, _parent: &Symbol, _context: &mut Context) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(
+        &self,
+        _parent: &Symbol,
+        _context: &mut ResolveContext,
+    ) -> ResolveResult<Option<Symbol>> {
         Ok(None)
     }
 }
 
 impl Resolve for AssignmentStatement {
-    fn symbolize(&self, parent: &Symbol, context: &mut Context) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(
+        &self,
+        parent: &Symbol,
+        context: &mut ResolveContext,
+    ) -> ResolveResult<Option<Symbol>> {
         match (self.assignment.visibility, self.assignment.qualifier) {
             // properties do not have a visibility
             (_, Qualifier::Prop) => {
@@ -240,13 +266,17 @@ impl Resolve for AssignmentStatement {
 }
 
 impl Resolve for ExpressionStatement {
-    fn symbolize(&self, _parent: &Symbol, _context: &mut Context) -> ResolveResult<Option<Symbol>> {
+    fn symbolize(
+        &self,
+        _parent: &Symbol,
+        _context: &mut ResolveContext,
+    ) -> ResolveResult<Option<Symbol>> {
         Ok(None)
     }
 }
 
 impl Resolve<SymbolMap> for Body {
-    fn symbolize(&self, parent: &Symbol, context: &mut Context) -> ResolveResult<SymbolMap> {
+    fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<SymbolMap> {
         self.statements.symbolize(parent, context)
     }
 }
@@ -255,7 +285,7 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
     fn symbolize(
         &self,
         parent: &Symbol,
-        context: &mut Context,
+        context: &mut ResolveContext,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
             UseDeclaration::Use(visibility, name) => {

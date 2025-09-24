@@ -29,7 +29,8 @@ impl Resolve {
 impl RunCommand for Resolve {
     fn run(&self, cli: &Cli) -> anyhow::Result<()> {
         let source_file = self.load()?;
-        let root = source_file.resolve(cli.search_paths)?;
+        let context = resolve(source_file, &cli.search_paths)?;
+        let root = context.root()?;
         match &self.output {
             Some(filename) => root.write_to_file(&filename)?,
             None => println!("{root}"),

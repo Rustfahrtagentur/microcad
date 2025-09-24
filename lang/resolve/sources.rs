@@ -33,7 +33,10 @@ impl Sources {
     /// Create source cache
     ///
     /// Inserts the `root` file and loads all files from `search_paths`.
-    pub fn load(root: Rc<SourceFile>, search_paths: &[std::path::PathBuf]) -> ParseResult<Self> {
+    pub fn load(
+        root: Rc<SourceFile>,
+        search_paths: &[impl AsRef<std::path::Path>],
+    ) -> ParseResult<Self> {
         let mut source_files = Vec::new();
         let mut by_name = HashMap::new();
         let mut by_hash = HashMap::new();
@@ -68,7 +71,10 @@ impl Sources {
             by_hash,
             by_path,
             by_name,
-            search_paths: search_paths.to_vec(),
+            search_paths: search_paths
+                .iter()
+                .map(|path| path.as_ref().to_path_buf())
+                .collect(),
         })
     }
 
