@@ -14,14 +14,9 @@ pub struct ContextBuilder {
 
 impl ContextBuilder {
     /// Create new context.
-    pub fn new(
-        root: Identifier,
-        symbols: SymbolMap,
-        sources: Sources,
-        output: Box<dyn Output>,
-    ) -> Self {
+    pub fn new(symbols: SymbolMap, sources: Sources, output: Box<dyn Output>) -> Self {
         Self {
-            context: Context::new(root, symbols, sources, output),
+            context: Context::new(symbols, sources, output),
         }
     }
 
@@ -33,17 +28,14 @@ impl ContextBuilder {
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
     pub fn from_source_captured(
         root: Rc<SourceFile>,
-        search_paths: &[std::path::PathBuf],
+        search_paths: &[impl AsRef<std::path::Path>],
     ) -> ResolveResult<Self> {
-        let root_id = root.id();
         let sources = Sources::load(root, search_paths)?;
         let mut symbols = sources.resolve()?;
         symbols.add_node(crate::builtin_module());
-        Ok(
-            Self::new(root_id, symbols, sources, Box::new(Capture::new()))
-                .importers(crate::builtin_importers())
-                .exporters(crate::builtin_exporters()),
-        )
+        Ok(Self::new(symbols, sources, Box::new(Capture::new()))
+            .importers(crate::builtin_importers())
+            .exporters(crate::builtin_exporters()))
     }
 
     /// Set importers to context.

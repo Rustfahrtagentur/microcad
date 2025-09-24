@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{resolve::*, syntax::*};
+use crate::{rc::*, resolve::*, syntax::*};
 
 /// *Symbol table* holding global and local symbols.
 ///
@@ -17,8 +17,6 @@ use crate::{resolve::*, syntax::*};
 pub struct SymbolTable {
     /// Source file cache.
     pub sources: Sources,
-    /// Symbol of the initial source file.
-    pub root: Symbol,
     /// Global symbols (including root).
     symbols: SymbolMap,
 }
@@ -28,16 +26,32 @@ impl SymbolTable {
     /// List of all global symbols.
     /// Stack of currently opened scopes with local symbols while evaluation.
     /// Source file cache containing all source files loaded in the context and their syntax trees.
-    pub fn new(root: Identifier, symbols: SymbolMap, sources: Sources) -> ResolveResult<Self> {
+    pub fn new(symbols: SymbolMap, sources: Sources) -> ResolveResult<Self> {
         // prepare symbol map
 
-        let symbol_table = Self {
-            sources,
-            root: symbols.search(&QualifiedName::from_id(root))?,
-            symbols,
-        };
+        let symbol_table = Self { sources, symbols };
         log::trace!("Initial symbol table:\n{symbol_table}");
         Ok(symbol_table)
+    }
+
+    pub fn load(
+        root: Rc<SourceFile>,
+        search_paths: &[impl AsRef<std::path::Path>],
+    ) -> ResolveResult<Self> {
+        // load syntax of root source and external sources
+        let sources = Sources::load(root.clone(), search_paths)?;
+        let symbols: SymbolMap = sources.symbolize()?;
+        let symbol_table = Self { sources, symbols };
+        log::trace!("Initial symbol table:\n{symbol_table}");
+        Ok(symbol_table)
+    }
+
+    pub fn resolve(&mut self) -> ResolveResult<()> {
+        todo!()
+    }
+
+    pub fn check(&self) -> ResolveResult<()> {
+        todo!()
     }
 
     /// Solve any alias within the given qualified name.
@@ -87,6 +101,10 @@ impl SymbolTable {
     /// Example: `what`=`a::b::c` will return the symbols: `a`,`a::b` and `a::b::c`
     pub fn path_to(&self, what: &QualifiedName) -> ResolveResult<Symbols> {
         self.symbols.path_to(what)
+    }
+
+    pub fn root(&self) -> Symbol {
+        todo!()
     }
 }
 

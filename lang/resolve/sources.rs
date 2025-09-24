@@ -3,6 +3,8 @@
 
 //! Source file cache
 
+use derive_more::Deref;
+
 use crate::{parse::*, rc::*, resolve::*, src_ref::*, syntax::*};
 use std::collections::HashMap;
 
@@ -13,7 +15,7 @@ use std::collections::HashMap;
 ///
 /// The *root model* (given at creation) will be stored but will only be accessible by hash and path
 /// but not by it's qualified name.
-#[derive(Default)]
+#[derive(Default, Deref)]
 pub struct Sources {
     /// External files read from search path.
     externals: Externals,
@@ -22,7 +24,11 @@ pub struct Sources {
     by_path: HashMap<std::path::PathBuf, usize>,
     by_name: HashMap<QualifiedName, usize>,
 
+    //root source file.
+    root: Rc<SourceFile>,
+
     /// External source files.
+    #[deref]
     source_files: Vec<Rc<SourceFile>>,
 
     /// Search paths.
@@ -33,7 +39,10 @@ impl Sources {
     /// Create source cache
     ///
     /// Inserts the `root` file and loads all files from `search_paths`.
-    pub fn load(root: Rc<SourceFile>, search_paths: &[std::path::PathBuf]) -> ParseResult<Self> {
+    pub fn load(
+        root: Rc<SourceFile>,
+        search_paths: &[impl AsRef<std::path::Path>],
+    ) -> ParseResult<Self> {
         let mut source_files = Vec::new();
         let mut by_name = HashMap::new();
         let mut by_hash = HashMap::new();
@@ -42,7 +51,7 @@ impl Sources {
         by_hash.insert(root.hash, 0);
         by_path.insert(root.filename(), 0);
         by_name.insert(root.name.clone(), 0);
-        source_files.push(root);
+        source_files.push(root.clone());
 
         // search for external source files
         let externals = Externals::new(search_paths);
@@ -64,20 +73,21 @@ impl Sources {
 
         Ok(Self {
             externals,
+            root,
             source_files,
             by_hash,
             by_path,
             by_name,
-            search_paths: search_paths.to_vec(),
+            search_paths: search_paths
+                .iter()
+                .map(|path| path.as_ref().to_path_buf())
+                .collect(),
         })
     }
 
     /// Return root file.
     pub fn root(&self) -> Rc<SourceFile> {
-        self.source_files
-            .first()
-            .expect("empty source cache has not root")
-            .clone()
+        self.root.clone()
     }
 
     /// Creates symbol map from externals.
@@ -118,6 +128,12 @@ impl Sources {
         Some(child)
     }
 
+    pub fn symbolize(&self) -> ResolveResult<SymbolMap> {
+        self.iter()
+            .map(|source| source.symbolize())
+            .collect::<ResolveResult<SymbolMap>>()
+    }
+
     /// Create initial symbol map from externals.
     pub fn resolve(&self) -> ResolveResult<SymbolMap> {
         let mut symbols = Self::create_modules(&self.externals);
@@ -135,7 +151,7 @@ impl Sources {
                     resolve = crate::mark!(RESOLVE),
                     path = source_file.filename(),
                 );
-                let symbol = source_file.resolve()?;
+                let symbol = todo!(); //source_file.resolve()?;
 
                 // search module where to place loaded source file into
                 let target = symbols.search(name)?;

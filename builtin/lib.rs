@@ -86,17 +86,14 @@ pub fn builtin_exporters() -> ExporterRegistry {
 /// Built-in context.
 pub fn builtin_context(
     root: Rc<SourceFile>,
-    search_paths: &[std::path::PathBuf],
+    search_paths: &[impl AsRef<std::path::Path>],
 ) -> ResolveResult<microcad_lang::eval::Context> {
-    let root_id = root.id();
     let sources = Sources::load(root, search_paths)?;
     let mut symbols = sources.resolve()?;
     symbols.add_node(builtin_module());
 
-    Ok(
-        ContextBuilder::new(root_id, symbols, sources, Box::new(Stdout))
-            .importers(builtin_importers())
-            .exporters(builtin_exporters())
-            .build(),
-    )
+    Ok(ContextBuilder::new(symbols, sources, Box::new(Stdout))
+        .importers(builtin_importers())
+        .exporters(builtin_exporters())
+        .build())
 }
