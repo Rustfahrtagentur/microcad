@@ -52,6 +52,8 @@ impl Eval<()> for UseStatement {
 
 impl Eval<()> for UseDeclaration {
     fn eval(&self, context: &mut Context) -> EvalResult<()> {
+        todo!()
+        /*
         match &self {
             UseDeclaration::Use(visibility, name) => {
                 if let Err(err) = context.use_symbol(*visibility, name, None) {
@@ -70,5 +72,6 @@ impl Eval<()> for UseDeclaration {
             }
         };
         Ok(())
+        */
     }
 }

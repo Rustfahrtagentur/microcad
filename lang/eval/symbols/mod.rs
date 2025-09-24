@@ -12,7 +12,7 @@ pub use symbol_table::*;
 use crate::{eval::*, model::*, syntax::*};
 
 /// Trait to handle symbol table.
-pub trait Lookup {
+pub trait Lookup<E: std::error::Error> {
     /// Lookup for local or global symbol by qualified name.
     ///
     /// - looks on *stack*
@@ -20,7 +20,7 @@ pub trait Lookup {
     /// - follows *aliases* (use statements)
     /// - detect any ambiguity
     /// - loads *external files*
-    fn lookup(&self, name: &QualifiedName) -> EvalResult<Symbol>;
+    fn lookup(&self, name: &QualifiedName) -> Result<Symbol, E>;
 }
 
 /// Trait to manage the *locals*.

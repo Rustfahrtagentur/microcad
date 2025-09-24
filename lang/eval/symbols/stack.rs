@@ -144,6 +144,36 @@ impl Stack {
     pub(crate) fn current_symbol(&self) -> Option<Symbol> {
         self.0.iter().rev().find_map(|frame| frame.symbol())
     }
+
+    /// Lookup a symbol from local stack.
+    pub fn lookup(&self, name: &QualifiedName) -> EvalResult<SymbolOrName> {
+        log::trace!("Looking for local symbol '{name:?}'");
+        let symbol = if let Some(id) = name.single_identifier() {
+            self.fetch(id)
+        } else {
+            let (id, mut tail) = name.split_first();
+            let local = self.fetch(&id)?;
+            let mut alias = local.full_name();
+            alias.append(&mut tail);
+            return Ok(SymbolOrName::Name(alias));
+        };
+
+        match symbol {
+            Ok(symbol) => {
+                log::trace!(
+                    "{found} local symbol: {symbol}",
+                    found = crate::mark!(FOUND),
+                );
+                Ok(SymbolOrName::Symbol(symbol))
+            }
+            Err(err) => Err(err),
+        }
+    }
+}
+
+pub enum SymbolOrName {
+    Symbol(Symbol),
+    Name(QualifiedName),
 }
 
 impl Locals for Stack {
