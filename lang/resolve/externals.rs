@@ -78,11 +78,10 @@ impl Externals {
         search_paths.iter().for_each(|search_path| {
             Self::scan_path(search_path).iter().for_each(|file| {
                 externals.insert(
-                    (*file
-                        .strip_prefix(search_path)
-                        .expect("cannot strip search path from file name")
-                        .with_extension(""))
-                    .into(),
+                    make_symbol_name(
+                        file.strip_prefix(search_path)
+                            .expect("cannot strip search path from file name"),
+                    ),
                     file.canonicalize().expect("path not found"),
                 );
             });
@@ -127,6 +126,19 @@ impl std::fmt::Display for Externals {
         v.iter()
             .try_for_each(|file| writeln!(f, "{} => {}", file.0, file.1.to_string_lossy()))
     }
+}
+
+fn make_symbol_name(relative_path: impl AsRef<std::path::Path>) -> QualifiedName {
+    let path = relative_path.as_ref();
+    let stem = path.file_stem().map(|s| s.to_string_lossy().to_string());
+    let name = if stem == Some("mod".into()) {
+        path.parent().expect("mod file without parent folder")
+    } else {
+        path
+    };
+    name.iter()
+        .map(|id| Identifier::no_ref(id.to_string_lossy().as_ref()))
+        .collect()
 }
 
 fn find_mod_dir_files(path: impl AsRef<std::path::Path>) -> ResolveResult<Vec<std::path::PathBuf>> {

@@ -128,10 +128,27 @@ impl Sources {
         Some(child)
     }
 
+    /// Create a symbol out of all sources (without resolving them).
     pub fn symbolize(&self) -> ResolveResult<SymbolMap> {
-        self.iter()
-            .map(|source| source.symbolize())
-            .collect::<ResolveResult<SymbolMap>>()
+        let symbols = self
+            .iter()
+            .map(
+                |source| match (self.name_from_path(&source.filename()), source.symbolize()) {
+                    (Ok(name), Ok(symbol)) => Ok((name, symbol)),
+                    (Ok(_), Err(err)) | (Err(err), _) => Err(err),
+                },
+            )
+            .collect::<ResolveResult<Vec<_>>>()?;
+
+        let mut symbol_map = SymbolMap::default();
+        for (name, symbol) in symbols {
+            if let Some(id) = name.single_identifier() {
+                symbol_map.insert(id.clone(), symbol);
+            } else {
+                todo!()
+            }
+        }
+        Ok(symbol_map)
     }
 
     /// Create initial symbol map from externals.
@@ -164,8 +181,12 @@ impl Sources {
     }
 
     /// Return the qualified name of a file by it's path
-    pub fn name_by_path(&self, filename: &std::path::Path) -> ResolveResult<QualifiedName> {
-        Ok(self.externals.get_name(filename)?.clone())
+    pub fn name_from_path(&self, filename: &std::path::Path) -> ResolveResult<QualifiedName> {
+        if self.root.filename() == filename {
+            Ok(QualifiedName::from_id(self.root.id()))
+        } else {
+            Ok(self.externals.get_name(filename)?.clone())
+        }
     }
 
     /// Convenience function to get a source file by from a `SrcReferrer`.
@@ -195,9 +216,9 @@ impl Sources {
     }
 
     /// Get *qualified name* of a file by *hash value*.
-    pub fn get_name_by_hash(&self, hash: u64) -> ResolveResult<&QualifiedName> {
+    pub fn get_name_by_hash(&self, hash: u64) -> ResolveResult<QualifiedName> {
         match self.get_by_hash(hash) {
-            Ok(file) => self.externals.get_name(&file.filename()),
+            Ok(file) => self.name_from_path(&file.filename()),
             Err(err) => Err(err),
         }
     }

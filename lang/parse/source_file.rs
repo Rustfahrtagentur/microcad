@@ -34,7 +34,7 @@ impl SourceFile {
 
         let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, &buf, 0)?;
         assert_ne!(source_file.hash, 0);
-        source_file.filename = Some(path.as_ref().to_path_buf());
+        source_file.set_filename(path.as_ref());
         source_file.name = name;
         log::debug!(
             "Successfully loaded file {} to {}",
@@ -50,9 +50,8 @@ impl SourceFile {
     /// The hash of the result will be of `crate::from_str!()`.
     pub fn load_from_str(s: &str) -> ParseResult<Rc<Self>> {
         log::trace!("{load} source from string", load = crate::mark!(LOAD));
-        let mut source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, 0)?;
+        let source_file: Self = Parser::parse_rule(crate::parser::Rule::source_file, s, 0)?;
         log::debug!("Successfully loaded source from string");
-        source_file.filename = None;
         log::trace!("Syntax tree:\n{}", FormatTree(&source_file));
         Ok(Rc::new(source_file))
     }
@@ -71,13 +70,11 @@ impl Parse for SourceFile {
         let hash = Self::calculate_hash(pair.as_str());
         pair.set_source_hash(hash);
 
-        Ok(SourceFile {
-            statements: crate::find_rule!(pair, statement_list)?,
-            filename: Default::default(),
-            source: pair.as_span().as_str().to_string(),
+        Ok(SourceFile::new(
+            crate::find_rule!(pair, statement_list)?,
+            pair.as_span().as_str().to_string(),
             hash,
-            name: QualifiedName::default(),
-        })
+        ))
     }
 }
 
