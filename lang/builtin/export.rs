@@ -16,6 +16,10 @@ pub enum ExportError {
     #[error("IO Error")]
     IoError(#[from] std::io::Error),
 
+    /// Format Error.
+    #[error("Format Error")]
+    FormatError(#[from] std::fmt::Error),
+
     /// The model does not contain any export attribute.
     #[error("No export attribute found in workbench (mark it with `#[export(\"filename\")`")]
     NoExportAttribute,
