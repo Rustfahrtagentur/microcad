@@ -609,7 +609,7 @@ impl Context {
 }
 */
 impl PushDiag for Context {
-    fn push_diag(&mut self, diag: Diagnostic) -> EvalResult<()> {
+    fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         let result = self.symbol_table.push_diag(diag);
         log::trace!("Error Context:\n{self}");
         result
@@ -686,14 +686,13 @@ impl Grant<WorkbenchDefinition> for Context {
         } else {
             false
         };
-        if granted {
-            Ok(())
-        } else {
+        if !granted {
             self.error(
                 statement,
                 EvalError::StatementNotSupported(statement.kind.as_str()),
-            )
+            )?;
         }
+        Ok(())
     }
 }
 
@@ -707,11 +706,10 @@ impl Grant<ModuleDefinition> for Context {
         } else {
             false
         };
-        if granted {
-            Ok(())
-        } else {
-            self.error(statement, EvalError::StatementNotSupported("Module"))
+        if !granted {
+            self.error(statement, EvalError::StatementNotSupported("Module"))?;
         }
+        Ok(())
     }
 }
 
@@ -727,11 +725,10 @@ impl Grant<FunctionDefinition> for Context {
         } else {
             false
         };
-        if granted {
-            Ok(())
-        } else {
-            self.error(statement, EvalError::StatementNotSupported("Function"))
+        if !granted {
+            self.error(statement, EvalError::StatementNotSupported("Function"))?;
         }
+        Ok(())
     }
 }
 impl Grant<InitDefinition> for Context {
@@ -741,21 +738,21 @@ impl Grant<InitDefinition> for Context {
         } else {
             false
         };
-        if granted {
-            Ok(())
-        } else {
-            self.error(statement, EvalError::StatementNotSupported("Init"))
+        if !granted {
+            self.error(statement, EvalError::StatementNotSupported("Init"))?;
         }
+        Ok(())
     }
 }
 
 impl Grant<UseStatement> for Context {
     fn grant(&mut self, statement: &UseStatement) -> EvalResult<()> {
         match (&statement.visibility, self.stack.current_frame()) {
-            (Visibility::Private, _) => Ok(()),
-            (Visibility::Public, Some(StackFrame::Source(..) | StackFrame::Module(..))) => Ok(()),
-            _ => self.error(statement, EvalError::StatementNotSupported("Use")),
+            (Visibility::Private, _)
+            | (Visibility::Public, Some(StackFrame::Source(..) | StackFrame::Module(..))) => (),
+            _ => self.error(statement, EvalError::StatementNotSupported("Use"))?,
         }
+        Ok(())
     }
 }
 
@@ -766,11 +763,10 @@ impl Grant<ReturnStatement> for Context {
         } else {
             false
         };
-        if granted {
-            Ok(())
-        } else {
-            self.error(statement, EvalError::StatementNotSupported("Return"))
+        if !granted {
+            self.error(statement, EvalError::StatementNotSupported("Return"))?;
         }
+        Ok(())
     }
 }
 
@@ -787,11 +783,10 @@ impl Grant<IfStatement> for Context {
         } else {
             false
         };
-        if granted {
-            Ok(())
-        } else {
-            self.error(statement, EvalError::StatementNotSupported("If"))
+        if !granted {
+            self.error(statement, EvalError::StatementNotSupported("If"))?;
         }
+        Ok(())
     }
 }
 
@@ -818,11 +813,10 @@ impl Grant<AssignmentStatement> for Context {
         } else {
             false
         };
-        if granted {
-            Ok(())
-        } else {
-            self.error(statement, EvalError::StatementNotSupported("Assignment"))
+        if !granted {
+            self.error(statement, EvalError::StatementNotSupported("Assignment"))?;
         }
+        Ok(())
     }
 }
 
@@ -839,11 +833,10 @@ impl Grant<ExpressionStatement> for Context {
         } else {
             false
         };
-        if granted {
-            Ok(())
-        } else {
-            self.error(statement, EvalError::StatementNotSupported("Expression"))
+        if !granted {
+            self.error(statement, EvalError::StatementNotSupported("Expression"))?;
         }
+        Ok(())
     }
 }
 
@@ -854,11 +847,10 @@ impl Grant<Marker> for Context {
         } else {
             false
         };
-        if granted {
-            Ok(())
-        } else {
-            self.error(statement, EvalError::StatementNotSupported("Expression"))
+        if !granted {
+            self.error(statement, EvalError::StatementNotSupported("Expression"))?;
         }
+        Ok(())
     }
 }
 
@@ -872,13 +864,12 @@ impl Grant<crate::syntax::Attribute> for Context {
         } else {
             false
         };
-        if granted {
-            Ok(())
-        } else {
+        if !granted {
             self.error(
                 statement,
                 EvalError::StatementNotSupported("InnerAttribute"),
-            )
+            )?;
         }
+        Ok(())
     }
 }

@@ -110,9 +110,9 @@ pub enum EvalError {
         found: Type,
     },
 
-    /// Cannot continue evaluation after error limit has been reached.
-    #[error("Error limit reached: Stopped evaluation after {0} errors")]
-    ErrorLimitReached(u32),
+    /// Diagnostic error
+    #[error("Diagnostic error: {0}")]
+    DiagError(#[from] DiagError),
 
     /// No locals  available on stack.
     #[error("Local stack needed to store {0}")]

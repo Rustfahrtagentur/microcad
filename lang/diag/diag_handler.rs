@@ -1,7 +1,7 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, resolve::*};
+use crate::{diag::*, resolve::*};
 
 /// Handler for diagnostics.
 #[derive(Default)]
@@ -74,16 +74,16 @@ impl DiagHandler {
 }
 
 impl PushDiag for DiagHandler {
-    fn push_diag(&mut self, diag: super::Diagnostic) -> crate::eval::EvalResult<()> {
+    fn push_diag(&mut self, diag: super::Diagnostic) -> DiagResult<()> {
         if let Some(error_limit) = self.error_limit {
             if self.error_count >= error_limit && !self.error_limit_reached {
                 self.error(
                     &SrcRef(None),
-                    Box::new(EvalError::ErrorLimitReached(error_limit)),
+                    Box::new(DiagError::ErrorLimitReached(error_limit)),
                 )?;
                 self.error_limit_reached = true;
             }
-            return Err(EvalError::ErrorLimitReached(error_limit));
+            return Err(DiagError::ErrorLimitReached(error_limit));
         }
 
         use super::Diagnostic;

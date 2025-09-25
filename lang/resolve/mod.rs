@@ -51,14 +51,16 @@ pub trait FullyQualify {
     fn full_name(&self) -> QualifiedName;
 }
 
-trait Resolve<T = Option<Symbol>> {
+trait Resolve<T: Default = Option<Symbol>> {
     /// Resolve into Symbol
     fn symbolize(
         &self,
-        parent: &Symbol,
-        diag: &DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<T>;
+        _parent: &Symbol,
+        _diag: &mut DiagHandler,
+        _sources: &mut Sources,
+    ) -> ResolveResult<T> {
+        Ok(T::default())
+    }
 
     //fn resolve(&self, parent: &Symbol);
 }
@@ -80,7 +82,11 @@ fn resolve_test() {
 
 impl SourceFile {
     /// Resolve into Symbol
-    pub fn symbolize(&self, diag: &DiagHandler, sources: &mut Sources) -> ResolveResult<Symbol> {
+    pub fn symbolize(
+        &self,
+        diag: &mut DiagHandler,
+        sources: &mut Sources,
+    ) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone().into()), None);
         symbol.set_children(self.statements.symbolize(&symbol, diag, sources)?);
         Ok(symbol)
@@ -92,7 +98,7 @@ impl Resolve<Symbol> for ModuleDefinition {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &DiagHandler,
+        diag: &mut DiagHandler,
         sources: &mut Sources,
     ) -> ResolveResult<Symbol> {
         let symbol = if let Some(body) = &self.body {
@@ -117,7 +123,7 @@ impl Resolve<SymbolMap> for StatementList {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &DiagHandler,
+        diag: &mut DiagHandler,
         sources: &mut Sources,
     ) -> ResolveResult<SymbolMap> {
         let mut symbols = SymbolMap::default();
@@ -137,7 +143,7 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &DiagHandler,
+        diag: &mut DiagHandler,
         sources: &mut Sources,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
@@ -168,7 +174,7 @@ impl Resolve<Symbol> for WorkbenchDefinition {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &DiagHandler,
+        diag: &mut DiagHandler,
         sources: &mut Sources,
     ) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(
@@ -184,7 +190,7 @@ impl Resolve<Symbol> for FunctionDefinition {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &DiagHandler,
+        diag: &mut DiagHandler,
         sources: &mut Sources,
     ) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(
@@ -197,22 +203,13 @@ impl Resolve<Symbol> for FunctionDefinition {
     }
 }
 
-impl Resolve for InitDefinition {
-    fn symbolize(
-        &self,
-        _parent: &Symbol,
-        diag: &DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<Option<Symbol>> {
-        Ok(None)
-    }
-}
+impl Resolve for InitDefinition {}
 
 impl Resolve<Option<(Identifier, Symbol)>> for UseStatement {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &DiagHandler,
+        diag: &mut DiagHandler,
         sources: &mut Sources,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self.visibility {
@@ -223,57 +220,32 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseStatement {
     }
 }
 
-impl Resolve for ReturnStatement {
-    fn symbolize(
-        &self,
-        _parent: &Symbol,
-        diag: &DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<Option<Symbol>> {
-        Ok(None)
-    }
-}
+impl Resolve for ReturnStatement {}
 
-impl Resolve for IfStatement {
-    fn symbolize(
-        &self,
-        _parent: &Symbol,
-        diag: &DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<Option<Symbol>> {
-        Ok(None)
-    }
-}
+impl Resolve for IfStatement {}
 
-impl Resolve for Attribute {
-    fn symbolize(
-        &self,
-        _parent: &Symbol,
-        diag: &DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<Option<Symbol>> {
-        Ok(None)
-    }
-}
+impl Resolve for Attribute {}
 
 impl Resolve for AssignmentStatement {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &DiagHandler,
+        diag: &mut DiagHandler,
         sources: &mut Sources,
     ) -> ResolveResult<Option<Symbol>> {
         match (self.assignment.visibility, self.assignment.qualifier) {
             // properties do not have a visibility
             (_, Qualifier::Prop) => {
                 if !parent.can_prop() {
-                    Err(ResolveError::DeclNotAllowed(
-                        self.assignment.id.clone(),
-                        parent.full_name(),
-                    ))
-                } else {
-                    Ok(None)
+                    diag.error(
+                        self,
+                        ResolveError::DeclNotAllowed(
+                            self.assignment.id.clone(),
+                            parent.full_name(),
+                        ),
+                    )?;
                 }
+                Ok(None)
             }
             // constants will be symbols (`pub` shall equal `pub const`)
             (_, Qualifier::Const) | (Visibility::Public, Qualifier::Value) => {
@@ -309,22 +281,13 @@ impl Resolve for AssignmentStatement {
     }
 }
 
-impl Resolve for ExpressionStatement {
-    fn symbolize(
-        &self,
-        _parent: &Symbol,
-        diag: &DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<Option<Symbol>> {
-        Ok(None)
-    }
-}
+impl Resolve for ExpressionStatement {}
 
 impl Resolve<SymbolMap> for Body {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &DiagHandler,
+        diag: &mut DiagHandler,
         sources: &mut Sources,
     ) -> ResolveResult<SymbolMap> {
         self.statements.symbolize(parent, diag, sources)
@@ -335,7 +298,7 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &DiagHandler,
+        diag: &mut DiagHandler,
         sources: &mut Sources,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
