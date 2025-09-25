@@ -20,10 +20,13 @@ impl ResolveContext {
     /// Load file into source cache and symbolize it into a symbol.
     pub fn symbolize_file(
         &mut self,
+        visibility: Visibility,
         parent_path: impl AsRef<std::path::Path>,
         id: &Identifier,
     ) -> ResolveResult<Symbol> {
-        self.sources.load_file(parent_path, id)?.symbolize(self)
+        self.sources
+            .load_file(parent_path, id)?
+            .symbolize(visibility, self)
     }
 
     /// Create a symbol out of all sources (without resolving them).
@@ -35,7 +38,7 @@ impl ResolveContext {
             .map(|source| {
                 match (
                     self.sources.generate_name_from_path(&source.filename()),
-                    source.symbolize(&mut self),
+                    source.symbolize(Visibility::Public, &mut self),
                 ) {
                     (Ok(name), Ok(symbol)) => Ok((name, symbol)),
                     (_, Err(err)) | (Err(err), _) => Err(err),

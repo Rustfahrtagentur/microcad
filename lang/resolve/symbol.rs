@@ -113,6 +113,26 @@ impl Symbol {
         }
     }
 
+    /// Create new symbol without children.
+    /// # Arguments
+    /// - `visibility`: Visibility of the symbol
+    /// - `def`: Symbol definition
+    /// - `parent`: Symbol's parent symbol or none for root
+    pub fn new_with_visibility(
+        visibility: Visibility,
+        def: SymbolDefinition,
+        parent: Option<Symbol>,
+    ) -> Self {
+        Symbol {
+            visibility,
+            inner: RcMut::new(SymbolInner {
+                def,
+                parent,
+                ..Default::default()
+            }),
+        }
+    }
+
     /// Create a symbol node for a built-in.
     /// # Arguments
     /// - `id`: Name of the symbol
