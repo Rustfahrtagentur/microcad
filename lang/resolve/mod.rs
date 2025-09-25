@@ -79,8 +79,16 @@ fn resolve_test() {
 
 impl SourceFile {
     /// Resolve into Symbol
-    pub fn symbolize(&self, context: &mut ResolveContext) -> ResolveResult<Symbol> {
-        let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone().into()), None);
+    pub fn symbolize(
+        &self,
+        visibility: Visibility,
+        context: &mut ResolveContext,
+    ) -> ResolveResult<Symbol> {
+        let symbol = Symbol::new_with_visibility(
+            visibility,
+            SymbolDefinition::SourceFile(self.clone().into()),
+            None,
+        );
         symbol.set_children(self.statements.symbolize(&symbol, context)?);
         Ok(symbol)
     }
@@ -97,7 +105,7 @@ impl Resolve<Symbol> for ModuleDefinition {
             symbol.set_children(body.symbolize(&symbol, context)?);
             symbol
         } else if let Some(parent_path) = parent.source_path() {
-            context.symbolize_file(parent_path, &self.id)?
+            context.symbolize_file(self.visibility, parent_path, &self.id)?
         } else {
             todo!("no top-level source file")
         };
