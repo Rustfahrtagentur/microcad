@@ -10,22 +10,24 @@
 //! - [`PushDiag`]: Collects error in [`DiagHandler`]
 //! - [`Diag`]: Get diagnostic messages
 
+mod diag_error;
 mod diag_handler;
 mod diag_list;
 mod diagnostic;
 mod level;
 
+pub use diag_error::*;
 pub use diag_handler::*;
 pub use diag_list::*;
 pub use diagnostic::*;
 pub use level::*;
 
-use crate::{eval::*, src_ref::*};
+use crate::src_ref::*;
 
 /// A trait to add diagnostics with different levels conveniently.
 pub trait PushDiag {
     /// Push a diagnostic message (must be implemented).
-    fn push_diag(&mut self, diag: Diagnostic) -> EvalResult<()>;
+    fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()>;
 
     /// Push new trace message.
     fn trace(&mut self, src: &impl SrcReferrer, message: String) {
@@ -42,7 +44,7 @@ pub trait PushDiag {
         &mut self,
         src: &impl SrcReferrer,
         error: impl std::error::Error + 'static,
-    ) -> EvalResult<()> {
+    ) -> DiagResult<()> {
         self.push_diag(Diagnostic::Warning(Refer::new(error.into(), src.src_ref())))
     }
     /// Push new error.
@@ -50,7 +52,7 @@ pub trait PushDiag {
         &mut self,
         src: &impl SrcReferrer,
         error: impl std::error::Error + 'static,
-    ) -> EvalResult<()> {
+    ) -> DiagResult<()> {
         let err = Diagnostic::Error(Refer::new(error.into(), src.src_ref()));
         log::error!("{err}");
         self.push_diag(err)

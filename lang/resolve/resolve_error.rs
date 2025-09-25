@@ -5,7 +5,7 @@
 
 use thiserror::Error;
 
-use crate::{parse::ParseError, src_ref::*, syntax::*};
+use crate::{diag::*, parse::*, src_ref::*, syntax::*};
 
 /// Resolve error.
 #[derive(Debug, Error)]
@@ -81,6 +81,10 @@ pub enum ResolveError {
     /// Invalid path.
     #[error("Invalid path: {0:?}")]
     InvalidPath(std::path::PathBuf),
+
+    /// Diagnostic error
+    #[error("Diagnostic error: {0}")]
+    DiagError(#[from] DiagError),
 }
 
 /// Result type of any resolve.

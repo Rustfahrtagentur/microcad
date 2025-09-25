@@ -138,7 +138,7 @@ impl Sources {
     }
 
     /// Create a symbol out of all sources (without resolving them).
-    pub fn symbolize(mut self, diag: DiagHandler) -> ResolveResult<SymbolTable> {
+    pub fn symbolize(mut self, mut diag: DiagHandler) -> ResolveResult<SymbolTable> {
         let named_symbols = self
             .source_files
             .clone()
@@ -146,7 +146,7 @@ impl Sources {
             .map(|source| {
                 match (
                     self.generate_name_from_path(&source.filename()),
-                    source.symbolize(&diag, &mut self),
+                    source.symbolize(&mut diag, &mut self),
                 ) {
                     (Ok(name), Ok(symbol)) => Ok((name, symbol)),
                     (_, Err(err)) | (Err(err), _) => Err(err),

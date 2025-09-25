@@ -19,7 +19,7 @@ pub fn error() -> Symbol {
         None,
         &|_params, args, context| {
             args.iter()
-                .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                .try_for_each(|(_, arg)| -> Result<(), DiagError> {
                     context.error(
                         args,
                         EvalError::BuiltinError(format!("{value}", value = arg.value)),
@@ -36,7 +36,7 @@ pub fn warning() -> Symbol {
         None,
         &|_params, args, context| {
             args.iter()
-                .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                .try_for_each(|(_, arg)| -> Result<(), DiagError> {
                     context.warning(
                         args,
                         EvalError::BuiltinError(format!("{value}", value = arg.value)),
@@ -68,7 +68,7 @@ pub fn todo() -> Symbol {
         None,
         &|_params, args, context| {
             args.iter()
-                .try_for_each(|(_, arg)| -> Result<(), EvalError> {
+                .try_for_each(|(_, arg)| -> Result<(), DiagError> {
                     context.error(args, EvalError::Todo(format!("{value}", value = arg.value)))
                 })?;
             Ok(Value::None)

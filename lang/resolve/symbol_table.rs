@@ -180,7 +180,7 @@ impl Diag for SymbolTable {
 }
 
 impl PushDiag for SymbolTable {
-    fn push_diag(&mut self, diag: Diagnostic) -> crate::eval::EvalResult<()> {
+    fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         self.diag.push_diag(diag)
     }
 }
