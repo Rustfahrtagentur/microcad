@@ -19,9 +19,9 @@ impl Externals {
     /// Recursively scans given `search_paths` for µcad files but files will not be loaded.
     /// # Arguments
     /// - `search_paths`: Paths to search for any external files.
-    pub fn new(search_paths: &[impl AsRef<std::path::Path>]) -> Self {
+    pub fn new(search_paths: &[impl AsRef<std::path::Path>]) -> ResolveResult<Self> {
         let no_search_paths = search_paths.is_empty();
-        let new = Self(Self::search_externals(search_paths));
+        let new = Self(Self::search_externals(search_paths)?);
         if no_search_paths {
             log::info!("No external search paths were given");
         } else if new.is_empty() {
@@ -30,7 +30,7 @@ impl Externals {
             log::info!("Found {} external module(s)", new.len());
             log::trace!("Externals:\n{new}");
         }
-        new
+        Ok(new)
     }
 
     /// Search for an external file which may include a given qualified name.
@@ -73,48 +73,36 @@ impl Externals {
     /// Searches for external source code files (*external modules*) in given *search paths*.
     fn search_externals(
         search_paths: &[impl AsRef<std::path::Path>],
-    ) -> std::collections::HashMap<QualifiedName, std::path::PathBuf> {
-        let mut externals = std::collections::HashMap::new();
-        search_paths.iter().for_each(|search_path| {
-            Self::scan_path(search_path).iter().for_each(|file| {
-                externals.insert(
-                    make_symbol_name(
-                        file.strip_prefix(search_path)
-                            .expect("cannot strip search path from file name"),
-                    ),
-                    file.canonicalize().expect("path not found"),
-                );
-            });
-        });
-
-        externals
-    }
-
-    /// Scan in a specified path for all available files with one of the given extensions.
-    fn scan_path(search_path: impl AsRef<std::path::Path>) -> Vec<std::path::PathBuf> {
-        use scan_dir::ScanDir;
-        let mut files = ScanDir::files()
-            .read(search_path.as_ref(), |iter| {
-                iter.map(|(entry, _)| entry.path())
-                    .filter(is_microcad_file)
-                    .collect::<Vec<_>>()
+    ) -> ResolveResult<std::collections::HashMap<QualifiedName, std::path::PathBuf>> {
+        search_paths
+            .iter()
+            .inspect(|p| log::trace!("Searching externals in: {:?}", p.as_ref()))
+            .map(|search_path| {
+                scan_dir::ScanDir::all()
+                    .read(search_path.as_ref(), |iter| {
+                        iter.map(|(entry, _)| entry.path())
+                            .map(find_external_mod)
+                            // catch eny errors here
+                            .collect::<Result<Vec<_>, _>>()?
+                            .into_iter()
+                            .flatten()
+                            .map(|file| {
+                                let name = make_symbol_name(
+                                    file.strip_prefix(search_path)
+                                        .expect("cannot strip search path from file name"),
+                                );
+                                let path = file.canonicalize().expect("path not found");
+                                log::debug!("Found external: {name} {path:?}");
+                                Ok((name, path))
+                            })
+                            .collect::<Result<Vec<_>, _>>()
+                    })
+                    .into_iter()
+                    .collect::<Result<Vec<_>, _>>()
+                    .map(|v| v.into_iter().flatten())
             })
-            .expect("scan_path failed");
-
-        files.append(
-            &mut ScanDir::dirs()
-                .read(search_path, |iter| {
-                    iter.map(|(entry, _)| entry.path())
-                        .filter_map(|p| match find_mod_dir_file(p) {
-                            Ok(Some(file)) => Some(file),
-                            _ => None,
-                        })
-                        .collect::<Vec<_>>()
-                })
-                .expect("scan_path failed"),
-        );
-
-        files
+            .collect::<Result<Vec<_>, _>>()
+            .map(|v| v.into_iter().flatten().collect())
     }
 }
 
@@ -141,18 +129,15 @@ fn make_symbol_name(relative_path: impl AsRef<std::path::Path>) -> QualifiedName
         .collect()
 }
 
-fn find_mod_dir_files(path: impl AsRef<std::path::Path>) -> ResolveResult<Vec<std::path::PathBuf>> {
-    Ok(scan_dir::ScanDir::files().read(path, |iter| {
+fn search_mod_dir_file(
+    path: impl AsRef<std::path::Path>,
+) -> ResolveResult<Option<std::path::PathBuf>> {
+    log::trace!("find_mod_dir_file: {:?}", path.as_ref());
+    let files = scan_dir::ScanDir::files().read(path, |iter| {
         iter.map(|(ref entry, _)| entry.path())
             .filter(is_mod_file)
             .collect::<Vec<_>>()
-    })?)
-}
-
-fn find_mod_dir_file(
-    path: impl AsRef<std::path::Path>,
-) -> ResolveResult<Option<std::path::PathBuf>> {
-    let files = find_mod_dir_files(path)?;
+    })?;
     if let Some(file) = files.first() {
         match files.len() {
             1 => Ok(Some(file.clone())),
@@ -184,56 +169,69 @@ fn is_mod_file(p: &std::path::PathBuf) -> bool {
             .is_some_and(|s| s == "mod")
 }
 
-/// Find a module file at the [path].
+/// Find a module file by path and id.
 ///
-/// File stem must match [id] and have a valid microcad file extension:
+/// Module files might be on of the following:
 ///
 /// - <path>`/`<id>`.`*ext*
+/// - <path>`/`<id>`/mod.`*ext*
 ///
-pub fn find_source_file(
+/// *ext* = any valid microcad file extension.
+pub fn find_mod_file_by_id(
     path: impl AsRef<std::path::Path>,
     id: &Identifier,
 ) -> ResolveResult<std::path::PathBuf> {
-    // Can"t really use ScanDir here because we need to be aware of ambiguity
-    use std::fs;
-    let files: Vec<_> = fs::read_dir(path)?
-        .filter_map(Result::ok)
-        .map(|e| e.path())
-        .filter_map(|p| {
-            if p.is_file() {
-                Some(p)
-            } else if p.is_symlink() {
-                todo!("symlink as external")
-            } else {
-                None
-            }
-        })
-        .filter(is_microcad_file)
-        .filter(matches_id(id))
-        .collect();
-
-    if let Some(file) = files.first() {
-        match files.len() {
-            1 => Ok(file.clone()),
-            _ => Err(ResolveError::AmbiguousExternal(id.clone(), files)),
-        }
-    } else {
-        Err(ResolveError::ExternalNotFound(id.clone()))
+    let path = path.as_ref();
+    log::trace!("find_mod_file_by_id: {path:?} {id:?}");
+    match (
+        search_mod_file_by_id(path, id),
+        search_mod_dir_file(path.join(id.to_string())),
+    ) {
+        (Ok(file), Ok(Some(dir))) => Err(ResolveError::AmbiguousExternals(vec![file, dir])),
+        (Ok(file), Err(_) | Ok(None)) | (Err(_), Ok(Some(file))) => Ok(file),
+        (Err(err), _) => Err(err),
     }
 }
 
-/// Returns a closure which matches the file stem of a [path] with [id].
-fn matches_id(id: &Identifier) -> impl Fn(&std::path::PathBuf) -> bool {
-    move |p| {
-        p.file_stem()
-            .and_then(|s| s.to_str())
-            .is_some_and(|s| id == s)
+fn find_external_mod(
+    path: impl AsRef<std::path::Path>,
+) -> ResolveResult<Option<std::path::PathBuf>> {
+    log::trace!("find mod file ex: {:?}", path.as_ref());
+    let path = path.as_ref().to_path_buf();
+    if path.is_dir() {
+        return search_mod_dir_file(&path);
+    }
+    if is_microcad_file(&path) {
+        Ok(Some(path))
+    } else {
+        Ok(None)
+    }
+}
+
+fn search_mod_file_by_id(
+    path: impl AsRef<std::path::Path>,
+    id: &Identifier,
+) -> ResolveResult<std::path::PathBuf> {
+    let path = path.as_ref();
+    log::trace!("search_mod_file_by_id: {path:?} {id}");
+    if let Some(path) = scan_dir::ScanDir::files().read(path, |iter| {
+        iter.map(|(entry, _)| entry.path())
+            .filter(is_microcad_file)
+            .find(|p| {
+                p.file_stem()
+                    .map(|stem| *stem == *id.to_string())
+                    .unwrap_or(false)
+            })
+    })? {
+        Ok(path)
+    } else {
+        Err(ResolveError::InvalidPath(path.to_path_buf()))
     }
 }
 
 #[test]
 fn resolve_external_file() {
-    let externals = Externals::new(&["../lib"]);
+    let externals = Externals::new(&["../lib"]).expect("test error");
 
     assert!(!externals.is_empty());
 

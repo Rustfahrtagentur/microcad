@@ -60,7 +60,7 @@ trait Resolve<T = Option<Symbol>> {
         sources: &mut Sources,
     ) -> ResolveResult<T>;
 
-    //    fn resolve2(&self, parent: &Symbol
+    //fn resolve(&self, parent: &Symbol);
 }
 
 #[test]
@@ -103,11 +103,9 @@ impl Resolve<Symbol> for ModuleDefinition {
             symbol.set_children(body.symbolize(&symbol, diag, sources)?);
             symbol
         } else if let Some(parent_path) = parent.source_path() {
-            let file_path = find_source_file(parent_path, &self.id)?;
-            let name = sources.generate_name_from_path(&file_path)?;
-            let source_file = SourceFile::load_with_name(&file_path, name)?;
-            sources.insert(source_file.clone());
-            source_file.symbolize(diag, sources)?
+            sources
+                .load_file(parent_path, &self.id)?
+                .symbolize(diag, sources)?
         } else {
             todo!("no top-level source file")
         };

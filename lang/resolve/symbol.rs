@@ -206,6 +206,9 @@ impl Symbol {
         }
     }
 
+    /// Initially set children.
+    ///
+    /// Panics if children already exist.
     pub fn set_children(&self, new_children: SymbolMap) {
         assert!(self.inner.borrow().children.is_empty());
         self.inner.borrow_mut().children = new_children;

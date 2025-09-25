@@ -106,7 +106,7 @@ impl Context {
 
     /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Model> {
-        let source_file = self.symbol_table.root().with_def(|def| match def {
+        let source_file = self.symbol_table.main()?.with_def(|def| match def {
             SymbolDefinition::SourceFile(source_file) => source_file.clone(),
             _ => todo!(),
         });
