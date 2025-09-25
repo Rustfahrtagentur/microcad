@@ -81,6 +81,7 @@ pub fn builtin_exporters() -> ExporterRegistry {
         .insert(microcad_export::svg::SvgExporter)
         .insert(microcad_export::stl::StlExporter)
         .insert(microcad_export::json::JsonExporter)
+        .insert(microcad_export::wkt::WktExporter)
 }
 
 /// Built-in context.

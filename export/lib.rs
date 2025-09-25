@@ -7,3 +7,4 @@ pub mod json;
 pub mod ply;
 pub mod stl;
 pub mod svg;
+pub mod wkt;
