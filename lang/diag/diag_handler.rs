@@ -74,7 +74,7 @@ impl DiagHandler {
 }
 
 impl PushDiag for DiagHandler {
-    fn push_diag(&mut self, diag: super::Diagnostic) -> DiagResult<()> {
+    fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         if let Some(error_limit) = self.error_limit {
             if self.error_count >= error_limit && !self.error_limit_reached {
                 self.error(
@@ -86,7 +86,6 @@ impl PushDiag for DiagHandler {
             return Err(DiagError::ErrorLimitReached(error_limit));
         }
 
-        use super::Diagnostic;
         match &diag {
             Diagnostic::Error(_) => {
                 self.error_count += 1;

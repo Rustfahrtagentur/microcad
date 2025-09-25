@@ -16,6 +16,7 @@
 //! To "run" the source file (and get the expected output) it must now be evaluated (see [`crate::eval`])  .
 
 mod externals;
+mod resolve_context;
 mod resolve_error;
 mod sources;
 mod symbol;
@@ -24,6 +25,7 @@ mod symbol_map;
 mod symbol_table;
 
 pub use externals::*;
+pub use resolve_context::*;
 pub use resolve_error::*;
 pub use sources::*;
 pub use symbol::*;
@@ -53,12 +55,7 @@ pub trait FullyQualify {
 
 trait Resolve<T: Default = Option<Symbol>> {
     /// Resolve into Symbol
-    fn symbolize(
-        &self,
-        _parent: &Symbol,
-        _diag: &mut DiagHandler,
-        _sources: &mut Sources,
-    ) -> ResolveResult<T> {
+    fn symbolize(&self, _parent: &Symbol, _context: &mut ResolveContext) -> ResolveResult<T> {
         Ok(T::default())
     }
 
@@ -82,36 +79,25 @@ fn resolve_test() {
 
 impl SourceFile {
     /// Resolve into Symbol
-    pub fn symbolize(
-        &self,
-        diag: &mut DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<Symbol> {
+    pub fn symbolize(&self, context: &mut ResolveContext) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(SymbolDefinition::SourceFile(self.clone().into()), None);
-        symbol.set_children(self.statements.symbolize(&symbol, diag, sources)?);
+        symbol.set_children(self.statements.symbolize(&symbol, context)?);
         Ok(symbol)
     }
 }
 
 impl Resolve<Symbol> for ModuleDefinition {
     /// Resolve into Symbol
-    fn symbolize(
-        &self,
-        parent: &Symbol,
-        diag: &mut DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<Symbol> {
+    fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<Symbol> {
         let symbol = if let Some(body) = &self.body {
             let symbol = Symbol::new(
                 SymbolDefinition::Module(self.clone().into()),
                 Some(parent.clone()),
             );
-            symbol.set_children(body.symbolize(&symbol, diag, sources)?);
+            symbol.set_children(body.symbolize(&symbol, context)?);
             symbol
         } else if let Some(parent_path) = parent.source_path() {
-            sources
-                .load_file(parent_path, &self.id)?
-                .symbolize(diag, sources)?
+            context.symbolize_file(parent_path, &self.id)?
         } else {
             todo!("no top-level source file")
         };
@@ -120,17 +106,12 @@ impl Resolve<Symbol> for ModuleDefinition {
 }
 
 impl Resolve<SymbolMap> for StatementList {
-    fn symbolize(
-        &self,
-        parent: &Symbol,
-        diag: &mut DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<SymbolMap> {
+    fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<SymbolMap> {
         let mut symbols = SymbolMap::default();
 
         // Iterate over all statement fetch definitions
         for statement in &self.0 {
-            if let Some((id, symbol)) = statement.symbolize(parent, diag, sources)? {
+            if let Some((id, symbol)) = statement.symbolize(parent, context)? {
                 symbols.insert(id, symbol);
             }
         }
@@ -143,22 +124,15 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &mut DiagHandler,
-        sources: &mut Sources,
+        context: &mut ResolveContext,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
-            Statement::Workbench(wd) => {
-                Ok(Some((wd.id.clone(), wd.symbolize(parent, diag, sources)?)))
-            }
-            Statement::Module(md) => {
-                Ok(Some((md.id.clone(), md.symbolize(parent, diag, sources)?)))
-            }
-            Statement::Function(fd) => {
-                Ok(Some((fd.id.clone(), fd.symbolize(parent, diag, sources)?)))
-            }
-            Statement::Use(us) => us.symbolize(parent, diag, sources),
+            Statement::Workbench(wd) => Ok(Some((wd.id.clone(), wd.symbolize(parent, context)?))),
+            Statement::Module(md) => Ok(Some((md.id.clone(), md.symbolize(parent, context)?))),
+            Statement::Function(fd) => Ok(Some((fd.id.clone(), fd.symbolize(parent, context)?))),
+            Statement::Use(us) => us.symbolize(parent, context),
             Statement::Assignment(a) => Ok(a
-                .symbolize(parent, diag, sources)?
+                .symbolize(parent, context)?
                 .map(|symbol| (a.assignment.id.clone(), symbol))),
             // Not producing any symbols
             Statement::Init(_)
@@ -171,33 +145,23 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
 }
 
 impl Resolve<Symbol> for WorkbenchDefinition {
-    fn symbolize(
-        &self,
-        parent: &Symbol,
-        diag: &mut DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<Symbol> {
+    fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(
             SymbolDefinition::Workbench(self.clone().into()),
             Some(parent.clone()),
         );
-        symbol.set_children(self.body.symbolize(&symbol, diag, sources)?);
+        symbol.set_children(self.body.symbolize(&symbol, context)?);
         Ok(symbol)
     }
 }
 
 impl Resolve<Symbol> for FunctionDefinition {
-    fn symbolize(
-        &self,
-        parent: &Symbol,
-        diag: &mut DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<Symbol> {
+    fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<Symbol> {
         let symbol = Symbol::new(
             SymbolDefinition::Function((*self).clone().into()),
             Some(parent.clone()),
         );
-        symbol.set_children(self.body.symbolize(&symbol, diag, sources)?);
+        symbol.set_children(self.body.symbolize(&symbol, context)?);
 
         Ok(symbol)
     }
@@ -209,13 +173,12 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseStatement {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &mut DiagHandler,
-        sources: &mut Sources,
+        context: &mut ResolveContext,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self.visibility {
             Visibility::Private => Ok(None),
             // Public symbols are put into resolving symbol map
-            Visibility::Public => self.decl.symbolize(parent, diag, sources),
+            Visibility::Public => self.decl.symbolize(parent, context),
         }
     }
 }
@@ -230,14 +193,13 @@ impl Resolve for AssignmentStatement {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &mut DiagHandler,
-        sources: &mut Sources,
+        context: &mut ResolveContext,
     ) -> ResolveResult<Option<Symbol>> {
         match (self.assignment.visibility, self.assignment.qualifier) {
             // properties do not have a visibility
             (_, Qualifier::Prop) => {
                 if !parent.can_prop() {
-                    diag.error(
+                    context.error(
                         self,
                         ResolveError::DeclNotAllowed(
                             self.assignment.id.clone(),
@@ -284,13 +246,8 @@ impl Resolve for AssignmentStatement {
 impl Resolve for ExpressionStatement {}
 
 impl Resolve<SymbolMap> for Body {
-    fn symbolize(
-        &self,
-        parent: &Symbol,
-        diag: &mut DiagHandler,
-        sources: &mut Sources,
-    ) -> ResolveResult<SymbolMap> {
-        self.statements.symbolize(parent, diag, sources)
+    fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<SymbolMap> {
+        self.statements.symbolize(parent, context)
     }
 }
 
@@ -298,8 +255,7 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
     fn symbolize(
         &self,
         parent: &Symbol,
-        diag: &mut DiagHandler,
-        sources: &mut Sources,
+        context: &mut ResolveContext,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
             UseDeclaration::Use(visibility, name) => {
