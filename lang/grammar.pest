@@ -433,7 +433,7 @@ init_definition = { doc_block? ~ "init" ~ ws* ~ parameter_list ~ ws* ~ body }
 
 // `mod math { }`: ok # module
 // `mod math { fn pi() -> Scalar { return 3.14159; } }`: ok # module with function
-module_definition = { visibility ~ "mod" ~ ws+ ~ identifier ~ ws* ~ (body | ";") }
+module_definition = { (visibility ~ ws+)? ~ "mod" ~ ws+ ~ identifier ~ ws* ~ (body | ";") }
 
 statement = {
     workbench_definition

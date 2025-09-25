@@ -77,6 +77,10 @@ pub enum ResolveError {
     /// ScanDir Error
     #[error("ScanDir Error: {0}")]
     ScanDirError(#[from] scan_dir::Error),
+
+    /// Invalid path.
+    #[error("Invalid path: {0:?}")]
+    InvalidPath(std::path::PathBuf),
 }
 
 /// Result type of any resolve.

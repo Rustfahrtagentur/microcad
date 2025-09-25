@@ -27,7 +27,7 @@ impl Externals {
         } else if new.is_empty() {
             log::warn!("Did not find any externals in any search path");
         } else {
-            log::info!("Found {} external modules", new.len());
+            log::info!("Found {} external module(s)", new.len());
             log::trace!("Externals:\n{new}");
         }
         new
@@ -164,6 +164,7 @@ fn find_mod_dir_file(
 }
 
 /// Return `true` if given path has a valid microcad extension
+#[allow(clippy::ptr_arg)]
 fn is_microcad_file(p: &std::path::PathBuf) -> bool {
     p.is_file()
         && p.extension()
@@ -221,32 +222,12 @@ pub fn find_source_file(
     }
 }
 
-pub fn find_source_files(
-    path: impl AsRef<std::path::Path>,
-) -> ResolveResult<Vec<std::path::PathBuf>> {
-    // Can"t really use ScanDir here because we need to be aware of ambiguity
-    Ok(std::fs::read_dir(path)?
-        .filter_map(Result::ok)
-        .map(|e| e.path())
-        .filter_map(|p| {
-            if p.is_file() {
-                Some(p)
-            } else if p.is_symlink() {
-                todo!("symlink as external")
-            } else {
-                None
-            }
-        })
-        .filter(is_microcad_file)
-        .collect())
-}
-
 /// Returns a closure which matches the file stem of a [path] with [id].
 fn matches_id(id: &Identifier) -> impl Fn(&std::path::PathBuf) -> bool {
-    |p| {
+    move |p| {
         p.file_stem()
             .and_then(|s| s.to_str())
-            .is_some_and(|s| s == &id.to_string())
+            .is_some_and(|s| id == s)
     }
 }
 

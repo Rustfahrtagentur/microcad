@@ -54,14 +54,7 @@ impl SymbolTable {
     ) -> ResolveResult<Self> {
         // load syntax of root source and external sources
         let sources = Sources::load(root.clone(), search_paths)?;
-
-        let symbols: SymbolMap = sources.symbolize(&diag)?;
-        let symbol_table = Self {
-            sources,
-            symbols,
-            diag,
-        };
-        log::trace!("Initial symbol table:\n{symbol_table}");
+        let symbol_table = sources.symbolize(diag)?;
         Ok(symbol_table)
     }
 

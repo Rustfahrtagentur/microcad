@@ -80,7 +80,7 @@ impl Sources {
             by_name,
             search_paths: search_paths
                 .iter()
-                .map(|path| path.as_ref().to_path_buf())
+                .map(|path| path.as_ref().canonicalize().expect("valid path"))
                 .collect(),
         })
     }
@@ -88,6 +88,15 @@ impl Sources {
     /// Return root file.
     pub fn root(&self) -> Rc<SourceFile> {
         self.root.clone()
+    }
+
+    /// Insert a file to the sources.
+    pub fn insert(&mut self, source_file: Rc<SourceFile>) {
+        let index = self.source_files.len();
+        self.source_files.push(source_file.clone());
+        self.by_hash.insert(source_file.hash, index);
+        self.by_path.insert(source_file.filename(), index);
+        self.by_name.insert(source_file.name.clone(), index);
     }
 
     /// Creates symbol map from externals.
@@ -129,13 +138,15 @@ impl Sources {
     }
 
     /// Create a symbol out of all sources (without resolving them).
-    pub fn symbolize(&self, diag: &DiagHandler) -> ResolveResult<SymbolMap> {
-        let symbols = self
+    pub fn symbolize(mut self, diag: DiagHandler) -> ResolveResult<SymbolTable> {
+        let named_symbols = self
+            .source_files
+            .clone()
             .iter()
             .map(|source| {
                 match (
-                    self.name_from_path(&source.filename()),
-                    source.symbolize(diag),
+                    self.generate_name_from_path(&source.filename()),
+                    source.symbolize(&diag, &mut self),
                 ) {
                     (Ok(name), Ok(symbol)) => Ok((name, symbol)),
                     (Ok(_), Err(err)) | (Err(err), _) => Err(err),
@@ -143,15 +154,16 @@ impl Sources {
             })
             .collect::<ResolveResult<Vec<_>>>()?;
 
-        let mut symbol_map = SymbolMap::default();
-        for (name, symbol) in symbols {
+        let mut symbols = SymbolMap::default();
+        for (name, symbol) in named_symbols {
+            log::trace!("Name: {name}");
             if let Some(id) = name.single_identifier() {
-                symbol_map.insert(id.clone(), symbol);
+                symbols.insert(id.clone(), symbol);
             } else {
                 todo!()
             }
         }
-        Ok(symbol_map)
+        SymbolTable::new(symbols, self, diag)
     }
 
     /// Create initial symbol map from externals.
@@ -184,11 +196,54 @@ impl Sources {
     }
 
     /// Return the qualified name of a file by it's path
-    pub fn name_from_path(&self, filename: &std::path::Path) -> ResolveResult<QualifiedName> {
-        if self.root.filename() == filename {
-            Ok(QualifiedName::from_id(self.root.id()))
+    pub fn generate_name_from_path(
+        &self,
+        file_path: &std::path::Path,
+    ) -> ResolveResult<QualifiedName> {
+        // check root file name
+        if self.root.filename() == file_path {
+            return Ok(QualifiedName::from_id(self.root.id()));
+        }
+
+        // check file names relative to search paths
+        let path = if let Some(path) = self
+            .search_paths
+            .iter()
+            .find_map(|path| file_path.strip_prefix(path).ok())
+        {
+            path.with_extension("")
+        }
+        // check file names relative to project root directory
+        else if let Some(root_dir) = self.root_dir() {
+            if let Ok(path) = file_path.strip_prefix(root_dir) {
+                path.with_extension("")
+            } else {
+                return Err(ResolveError::InvalidPath(file_path.to_path_buf()));
+            }
         } else {
-            Ok(self.externals.get_name(filename)?.clone())
+            return Err(ResolveError::InvalidPath(file_path.to_path_buf()));
+        };
+
+        // check if file is a mod file then it gets it"s name from the parent directory
+        let path = if path
+            .iter()
+            .next_back()
+            .map(|s| s.to_string_lossy().to_string())
+            == Some("mod".into())
+        {
+            path.parent()
+        } else {
+            Some(path.as_path())
+        };
+
+        // get name from path which was found
+        if let Some(path) = path {
+            Ok(path
+                .iter()
+                .map(|name| Identifier::no_ref(name.to_string_lossy().as_ref()))
+                .collect())
+        } else {
+            Err(ResolveError::InvalidPath(file_path.to_path_buf()))
         }
     }
 
@@ -219,9 +274,9 @@ impl Sources {
     }
 
     /// Get *qualified name* of a file by *hash value*.
-    pub fn get_name_by_hash(&self, hash: u64) -> ResolveResult<QualifiedName> {
+    pub fn get_name_by_hash(&self, hash: u64) -> ResolveResult<&QualifiedName> {
         match self.get_by_hash(hash) {
-            Ok(file) => self.name_from_path(&file.filename()),
+            Ok(file) => self.externals.get_name(&file.filename()),
             Err(err) => Err(err),
         }
     }
@@ -255,6 +310,10 @@ impl Sources {
     /// Return search paths of this cache.
     pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
         &self.search_paths
+    }
+
+    pub fn root_dir(&self) -> Option<std::path::PathBuf> {
+        self.root.filename().parent().map(|p| p.to_path_buf())
     }
 }
 
