@@ -151,6 +151,12 @@ impl std::str::FromStr for Identifier {
     }
 }
 
+impl From<&std::ffi::OsStr> for Identifier {
+    fn from(value: &std::ffi::OsStr) -> Self {
+        Identifier::no_ref(value.to_string_lossy().to_string().as_str())
+    }
+}
+
 #[cfg(test)]
 impl From<&str> for Identifier {
     fn from(value: &str) -> Self {

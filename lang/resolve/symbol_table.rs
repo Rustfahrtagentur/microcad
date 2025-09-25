@@ -101,6 +101,7 @@ impl SymbolTable {
             .unwrap_or(name.clone())
     }
 
+    /// If given symbol is an alias returns the target or the symbol itself if not.
     pub fn follow_alias(&self, symbol: &Symbol) -> ResolveResult<Symbol> {
         // execute alias from any use statement
         symbol.with_def(|def| {
@@ -125,8 +126,9 @@ impl SymbolTable {
         self.symbols.path_to(what)
     }
 
-    pub fn root(&self) -> Symbol {
-        todo!()
+    /// Return root symbol (evaluation starting point)
+    pub fn main(&self) -> ResolveResult<Symbol> {
+        self.symbols.search(&self.sources.root().name)
     }
 }
 

@@ -42,7 +42,7 @@ impl Sources {
     pub fn load(
         root: Rc<SourceFile>,
         search_paths: &[impl AsRef<std::path::Path>],
-    ) -> ParseResult<Self> {
+    ) -> ResolveResult<Self> {
         let mut source_files = Vec::new();
         let mut by_name = HashMap::new();
         let mut by_hash = HashMap::new();
@@ -54,7 +54,7 @@ impl Sources {
         source_files.push(root.clone());
 
         // search for external source files
-        let externals = Externals::new(search_paths);
+        let externals = Externals::new(search_paths)?;
 
         log::trace!("Externals:\n{externals}");
 
@@ -149,14 +149,13 @@ impl Sources {
                     source.symbolize(&diag, &mut self),
                 ) {
                     (Ok(name), Ok(symbol)) => Ok((name, symbol)),
-                    (Ok(_), Err(err)) | (Err(err), _) => Err(err),
+                    (_, Err(err)) | (Err(err), _) => Err(err),
                 }
             })
             .collect::<ResolveResult<Vec<_>>>()?;
 
         let mut symbols = SymbolMap::default();
         for (name, symbol) in named_symbols {
-            log::trace!("Name: {name}");
             if let Some(id) = name.single_identifier() {
                 symbols.insert(id.clone(), symbol);
             } else {
@@ -312,8 +311,22 @@ impl Sources {
         &self.search_paths
     }
 
-    pub fn root_dir(&self) -> Option<std::path::PathBuf> {
+    fn root_dir(&self) -> Option<std::path::PathBuf> {
         self.root.filename().parent().map(|p| p.to_path_buf())
+    }
+
+    /// Load another source file into cache.
+    pub fn load_file(
+        &mut self,
+        parent_path: impl AsRef<std::path::Path>,
+        id: &Identifier,
+    ) -> ResolveResult<Rc<SourceFile>> {
+        log::trace!("load_file: {:?} {id}", parent_path.as_ref());
+        let file_path = find_mod_file_by_id(parent_path, id)?;
+        let name = self.generate_name_from_path(&file_path)?;
+        let source_file = SourceFile::load_with_name(&file_path, name)?;
+        self.insert(source_file.clone());
+        Ok(source_file)
     }
 }
 
