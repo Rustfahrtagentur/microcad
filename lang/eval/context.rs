@@ -32,6 +32,8 @@ pub struct Context {
     exporters: ExporterRegistry,
     /// Importer registry.
     importers: ImporterRegistry,
+    /// Diagnostics handler.
+    diag: DiagHandler,
 }
 
 impl Context {
@@ -46,8 +48,7 @@ impl Context {
 
         // put all together
         Self {
-            symbol_table: SymbolTable::new(symbols, sources, DiagHandler::default())
-                .expect("unknown root id"),
+            symbol_table: SymbolTable::new(symbols, sources).expect("unknown root id"),
             output,
             ..Default::default()
         }
@@ -395,6 +396,7 @@ impl Default for Context {
             output: Box::new(Stdout),
             exporters: Default::default(),
             importers: Default::default(),
+            diag: Default::default(),
         }
     }
 }
@@ -571,19 +573,19 @@ impl Lookup for Context {
 */
 impl Diag for Context {
     fn fmt_diagnosis(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result {
-        self.symbol_table.fmt_diagnosis(f)
+        self.diag.pretty_print(f, self)
     }
 
     fn error_count(&self) -> u32 {
-        self.symbol_table.error_count()
+        self.diag.error_count()
     }
 
     fn error_lines(&self) -> std::collections::HashSet<usize> {
-        self.symbol_table.error_lines()
+        self.diag.error_lines()
     }
 
     fn warning_lines(&self) -> std::collections::HashSet<usize> {
-        self.symbol_table.warning_lines()
+        self.diag.warning_lines()
     }
 }
 /*
@@ -610,7 +612,7 @@ impl Context {
 */
 impl PushDiag for Context {
     fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
-        let result = self.symbol_table.push_diag(diag);
+        let result = self.diag.push_diag(diag);
         log::trace!("Error Context:\n{self}");
         result
     }
@@ -637,7 +639,7 @@ impl std::fmt::Display for Context {
 
         if self.has_errors() {
             writeln!(f, "{}\nErrors:", self.symbol_table)?;
-            self.symbol_table.fmt_diagnosis(f)?;
+            self.fmt_diagnosis(f)?;
         } else {
             write!(f, "{}", self.symbol_table)?;
         }

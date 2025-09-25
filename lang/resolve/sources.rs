@@ -137,34 +137,6 @@ impl Sources {
         Some(child)
     }
 
-    /// Create a symbol out of all sources (without resolving them).
-    pub fn symbolize(mut self, mut diag: DiagHandler) -> ResolveResult<SymbolTable> {
-        let named_symbols = self
-            .source_files
-            .clone()
-            .iter()
-            .map(|source| {
-                match (
-                    self.generate_name_from_path(&source.filename()),
-                    source.symbolize(&mut diag, &mut self),
-                ) {
-                    (Ok(name), Ok(symbol)) => Ok((name, symbol)),
-                    (_, Err(err)) | (Err(err), _) => Err(err),
-                }
-            })
-            .collect::<ResolveResult<Vec<_>>>()?;
-
-        let mut symbols = SymbolMap::default();
-        for (name, symbol) in named_symbols {
-            if let Some(id) = name.single_identifier() {
-                symbols.insert(id.clone(), symbol);
-            } else {
-                todo!()
-            }
-        }
-        SymbolTable::new(symbols, self, diag)
-    }
-
     /// Create initial symbol map from externals.
     pub fn resolve(&self) -> ResolveResult<SymbolMap> {
         let mut symbols = Self::create_modules(&self.externals);
