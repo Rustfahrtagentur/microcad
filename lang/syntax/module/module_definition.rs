@@ -46,3 +46,9 @@ impl TreeDisplay for ModuleDefinition {
         }
     }
 }
+
+impl std::fmt::Display for ModuleDefinition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "mod {}", self.id)
+    }
+}

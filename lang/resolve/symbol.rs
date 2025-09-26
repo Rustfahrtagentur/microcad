@@ -37,7 +37,7 @@ impl Default for SymbolInner {
 /// the resolved symbols by it's original structure in the source code and by it's *id*.
 ///
 /// `Symbol` can be shared as mutable.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Symbol {
     visibility: Visibility,
     inner: RcMut<SymbolInner>,
@@ -164,14 +164,15 @@ impl Symbol {
         f: &mut impl std::fmt::Write,
         id: Option<&Identifier>,
         depth: usize,
+        debug: bool,
         children: bool,
     ) -> std::fmt::Result {
         let self_id = &self.id();
         let id = id.unwrap_or(self_id);
-        if cfg!(feature = "ansi-color") && !self.inner.borrow().used {
+        if debug && cfg!(feature = "ansi-color") && !self.inner.borrow().used {
             color_print::cwrite!(
                 f,
-                "{:depth$}<#606060>{visibility}{id:?} {def} [{full_name}]</>",
+                "{:depth$}<#606060>{visibility}{id:?} {def} [{full_name:?}]</>",
                 "",
                 visibility = self.visibility(),
                 def = self.inner.borrow().def,
@@ -180,7 +181,7 @@ impl Symbol {
         } else {
             write!(
                 f,
-                "{:depth$}{id:?} {} [{}]",
+                "{:depth$}{id} {} [{}]",
                 "",
                 self.inner.borrow().def,
                 self.full_name(),
@@ -195,7 +196,7 @@ impl Symbol {
                 .children
                 .iter()
                 .try_for_each(|(id, child)| {
-                    child.print_symbol(f, Some(id), depth + indent, true)
+                    child.print_symbol(f, Some(id), depth + indent, debug, true)
                 })?;
         }
         Ok(())
@@ -429,7 +430,13 @@ impl FullyQualify for Symbol {
 
 impl std::fmt::Display for Symbol {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.print_symbol(f, None, 0, false)
+        self.print_symbol(f, None, 0, false, false)
+    }
+}
+
+impl std::fmt::Debug for Symbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.print_symbol(f, None, 0, true, false)
     }
 }
 

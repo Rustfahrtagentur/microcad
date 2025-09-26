@@ -41,3 +41,18 @@ impl TreeDisplay for FunctionSignature {
         Ok(())
     }
 }
+
+impl std::fmt::Display for FunctionSignature {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "({}){}",
+            self.parameters,
+            if let Some(ret) = &self.return_type {
+                format!("-> {ret}")
+            } else {
+                String::default()
+            }
+        )
+    }
+}
