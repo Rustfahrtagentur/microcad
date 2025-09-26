@@ -36,3 +36,9 @@ impl TreeDisplay for FunctionDefinition {
         self.body.tree_print(f, depth)
     }
 }
+
+impl std::fmt::Display for FunctionDefinition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "fn {}{}", self.id, self.signature)
+    }
+}

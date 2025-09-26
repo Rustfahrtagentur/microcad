@@ -59,6 +59,10 @@ trait Resolve<T: Default = Option<Symbol>> {
         Ok(T::default())
     }
 
+    fn grant(&self, _parent: &Symbol) -> ResolveResult<&Self> {
+        Ok(self)
+    }
+
     //fn resolve(&self, parent: &Symbol);
 }
 
@@ -89,7 +93,11 @@ impl SourceFile {
             SymbolDefinition::SourceFile(self.clone().into()),
             None,
         );
-        symbol.set_children(self.statements.symbolize(&symbol, context)?);
+        symbol.set_children(
+            self.statements
+                .grant(&symbol)?
+                .symbolize(&symbol, context)?,
+        );
         Ok(symbol)
     }
 }
@@ -102,7 +110,7 @@ impl Resolve<Symbol> for ModuleDefinition {
                 SymbolDefinition::Module(self.clone().into()),
                 Some(parent.clone()),
             );
-            symbol.set_children(body.symbolize(&symbol, context)?);
+            symbol.set_children(body.grant(&symbol)?.symbolize(&symbol, context)?);
             symbol
         } else if let Some(parent_path) = parent.source_path() {
             context.symbolize_file(self.visibility, parent_path, &self.id)?
@@ -110,6 +118,16 @@ impl Resolve<Symbol> for ModuleDefinition {
             todo!("no top-level source file")
         };
         Ok(symbol)
+    }
+
+    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
+        parent.with_def(|def| match def {
+            SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => Ok(self),
+            _ => Err(ResolveError::StatementNotSupported(
+                self.to_string(),
+                parent.to_string(),
+            )),
+        })
     }
 }
 
@@ -119,12 +137,25 @@ impl Resolve<SymbolMap> for StatementList {
 
         // Iterate over all statement fetch definitions
         for statement in &self.0 {
-            if let Some((id, symbol)) = statement.symbolize(parent, context)? {
+            if let Some((id, symbol)) = statement.grant(parent)?.symbolize(parent, context)? {
                 symbols.insert(id, symbol);
             }
         }
 
         Ok(symbols)
+    }
+
+    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
+        parent.with_def(|def| match def {
+            SymbolDefinition::SourceFile(..)
+            | SymbolDefinition::Module(..)
+            | SymbolDefinition::Workbench(..)
+            | SymbolDefinition::Function(..) => Ok(self),
+            _ => Err(ResolveError::StatementNotSupported(
+                self.to_string(),
+                parent.to_string(),
+            )),
+        })
     }
 }
 
@@ -135,11 +166,21 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
         context: &mut ResolveContext,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
-            Statement::Workbench(wd) => Ok(Some((wd.id.clone(), wd.symbolize(parent, context)?))),
-            Statement::Module(md) => Ok(Some((md.id.clone(), md.symbolize(parent, context)?))),
-            Statement::Function(fd) => Ok(Some((fd.id.clone(), fd.symbolize(parent, context)?))),
-            Statement::Use(us) => us.symbolize(parent, context),
+            Statement::Workbench(wd) => Ok(Some((
+                wd.id.clone(),
+                wd.grant(parent)?.symbolize(parent, context)?,
+            ))),
+            Statement::Module(md) => Ok(Some((
+                md.id.clone(),
+                md.grant(parent)?.symbolize(parent, context)?,
+            ))),
+            Statement::Function(fd) => Ok(Some((
+                fd.id.clone(),
+                fd.grant(parent)?.symbolize(parent, context)?,
+            ))),
+            Statement::Use(us) => us.grant(parent)?.symbolize(parent, context),
             Statement::Assignment(a) => Ok(a
+                .grant(parent)?
                 .symbolize(parent, context)?
                 .map(|symbol| (a.assignment.id.clone(), symbol))),
             // Not producing any symbols
@@ -150,6 +191,49 @@ impl Resolve<Option<(Identifier, Symbol)>> for Statement {
             | Statement::Expression(_) => Ok(None),
         }
     }
+    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
+        parent.with_def(|def| match (def, &self) {
+            (
+                SymbolDefinition::SourceFile(..),
+                Statement::Assignment(..)
+                | Statement::Expression(..)
+                | Statement::Function(..)
+                | Statement::If(..)
+                | Statement::Module(..)
+                | Statement::Use(..)
+                | Statement::Workbench(..),
+            )
+            | (
+                SymbolDefinition::Module(..),
+                Statement::Assignment(..)
+                | Statement::Expression(..)
+                | Statement::Function(..)
+                | Statement::Module(..)
+                | Statement::Use(..)
+                | Statement::Workbench(..),
+            )
+            | (
+                SymbolDefinition::Workbench(..),
+                Statement::Assignment(..)
+                | Statement::Expression(..)
+                | Statement::Function(..)
+                | Statement::If(..)
+                | Statement::Init(..)
+                | Statement::Use(..),
+            )
+            | (
+                SymbolDefinition::Function(..),
+                Statement::Assignment(..)
+                | Statement::If(..)
+                | Statement::Return(..)
+                | Statement::Use(..),
+            ) => Ok(self),
+            _ => Err(ResolveError::StatementNotSupported(
+                self.to_string(),
+                parent.to_string(),
+            )),
+        })
+    }
 }
 
 impl Resolve<Symbol> for WorkbenchDefinition {
@@ -158,8 +242,18 @@ impl Resolve<Symbol> for WorkbenchDefinition {
             SymbolDefinition::Workbench(self.clone().into()),
             Some(parent.clone()),
         );
-        symbol.set_children(self.body.symbolize(&symbol, context)?);
+        symbol.set_children(self.body.grant(&symbol)?.symbolize(&symbol, context)?);
         Ok(symbol)
+    }
+
+    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
+        parent.with_def(|def| match def {
+            SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => Ok(self),
+            _ => Err(ResolveError::StatementNotSupported(
+                self.to_string(),
+                parent.to_string(),
+            )),
+        })
     }
 }
 
@@ -169,31 +263,62 @@ impl Resolve<Symbol> for FunctionDefinition {
             SymbolDefinition::Function((*self).clone().into()),
             Some(parent.clone()),
         );
-        symbol.set_children(self.body.symbolize(&symbol, context)?);
+        symbol.set_children(self.body.grant(&symbol)?.symbolize(&symbol, context)?);
 
         Ok(symbol)
     }
-}
 
-impl Resolve for InitDefinition {}
-
-impl Resolve<Option<(Identifier, Symbol)>> for UseStatement {
-    fn symbolize(
-        &self,
-        parent: &Symbol,
-        context: &mut ResolveContext,
-    ) -> ResolveResult<Option<(Identifier, Symbol)>> {
-        match self.visibility {
-            Visibility::Private => Ok(None),
-            // Public symbols are put into resolving symbol map
-            Visibility::Public => self.decl.symbolize(parent, context),
-        }
+    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
+        parent.with_def(|def| match def {
+            SymbolDefinition::SourceFile(..)
+            | SymbolDefinition::Module(..)
+            | SymbolDefinition::Workbench(..) => Ok(self),
+            _ => Err(ResolveError::StatementNotSupported(
+                self.to_string(),
+                parent.to_string(),
+            )),
+        })
     }
 }
 
-impl Resolve for ReturnStatement {}
+impl Resolve for InitDefinition {
+    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
+        parent.with_def(|def| match def {
+            SymbolDefinition::Workbench(..) => Ok(self),
+            _ => Err(ResolveError::StatementNotSupported(
+                self.to_string(),
+                parent.to_string(),
+            )),
+        })
+    }
+}
 
-impl Resolve for IfStatement {}
+impl Resolve for ReturnStatement {
+    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
+        parent.with_def(|def| match def {
+            SymbolDefinition::Function(..) => Ok(self),
+            _ => Err(ResolveError::StatementNotSupported(
+                self.to_string(),
+                parent.to_string(),
+            )),
+        })
+    }
+}
+
+impl Resolve for IfStatement {
+    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
+        parent.with_def(|def| match def {
+            SymbolDefinition::SourceFile(..)
+            | SymbolDefinition::Module(..)
+            | SymbolDefinition::Workbench(..)
+            | SymbolDefinition::Function(..) => Ok(self),
+            _ => Err(ResolveError::StatementNotSupported(
+                self.to_string(),
+                parent.to_string(),
+            )),
+        })
+    }
+}
 
 impl Resolve for Attribute {}
 
@@ -249,42 +374,94 @@ impl Resolve for AssignmentStatement {
             }
         }
     }
+
+    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
+        parent.with_def(|def| match def {
+            SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => Ok(self),
+            SymbolDefinition::Workbench(..) | SymbolDefinition::Function(..) => {
+                match self.assignment.visibility {
+                    Visibility::Private => Ok(self),
+                    Visibility::Public => Err(ResolveError::StatementNotSupported(
+                        self.to_string(),
+                        parent.to_string(),
+                    )),
+                }
+            }
+            _ => Err(ResolveError::StatementNotSupported(
+                self.to_string(),
+                parent.to_string(),
+            )),
+        })
+    }
 }
 
 impl Resolve for ExpressionStatement {}
 
 impl Resolve<SymbolMap> for Body {
     fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<SymbolMap> {
-        self.statements.symbolize(parent, context)
+        self.statements.grant(parent)?.symbolize(parent, context)
+    }
+    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
+        parent.with_def(|def| match def {
+            SymbolDefinition::SourceFile(..)
+            | SymbolDefinition::Module(..)
+            | SymbolDefinition::Workbench(..)
+            | SymbolDefinition::Function(..) => Ok(self),
+            _ => Err(ResolveError::StatementNotSupported(
+                self.to_string(),
+                parent.to_string(),
+            )),
+        })
     }
 }
 
-impl Resolve<Option<(Identifier, Symbol)>> for UseDeclaration {
+impl Resolve<Option<(Identifier, Symbol)>> for UseStatement {
     fn symbolize(
         &self,
         parent: &Symbol,
-        context: &mut ResolveContext,
+        _: &mut ResolveContext,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
-        match self {
-            UseDeclaration::Use(visibility, name) => {
+        match &self.decl {
+            UseDeclaration::Use(name) => {
                 let identifier = name.last().expect("Identifier");
                 Ok(Some((
                     identifier.clone(),
                     Symbol::new(
-                        SymbolDefinition::Alias(*visibility, identifier.clone(), name.clone()),
+                        SymbolDefinition::Alias(self.visibility, identifier.clone(), name.clone()),
                         Some(parent.clone()),
                     ),
                 )))
             }
-            UseDeclaration::UseAll(_visibility, _) => Ok(None),
-            UseDeclaration::UseAlias(visibility, name, alias) => Ok(Some((
+            UseDeclaration::UseAll(_) => Ok(None),
+            UseDeclaration::UseAlias(name, alias) => Ok(Some((
                 alias.clone(),
                 Symbol::new(
-                    SymbolDefinition::Alias(*visibility, alias.clone(), name.clone()),
+                    SymbolDefinition::Alias(self.visibility, alias.clone(), name.clone()),
                     Some(parent.clone()),
                 ),
             ))),
         }
+    }
+
+    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
+        parent.with_def(|def| -> Result<&UseStatement, ResolveError> {
+            match def {
+                SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => Ok(self),
+                SymbolDefinition::Workbench(..) | SymbolDefinition::Function(..) => {
+                    match self.visibility {
+                        Visibility::Private => Ok(self),
+                        Visibility::Public => Err(ResolveError::StatementNotSupported(
+                            self.to_string(),
+                            parent.to_string(),
+                        )),
+                    }
+                }
+                _ => Err(ResolveError::StatementNotSupported(
+                    self.to_string(),
+                    parent.to_string(),
+                )),
+            }
+        })
     }
 }
 

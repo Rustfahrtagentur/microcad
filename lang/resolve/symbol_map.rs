@@ -6,7 +6,7 @@ use derive_more::{Deref, DerefMut};
 use std::collections::btree_map::BTreeMap;
 
 /// Map Id to SymbolNode reference
-#[derive(Debug, Default, Clone, Deref, DerefMut)]
+#[derive(Default, Clone, Deref, DerefMut)]
 pub struct SymbolMap(BTreeMap<Identifier, Symbol>);
 
 impl From<Tuple> for SymbolMap {
@@ -79,15 +79,6 @@ impl SymbolMap {
         self
     }
 
-    /// Print contained symbols with indention.
-    pub fn print(&self, f: &mut std::fmt::Formatter<'_>, depth: usize) -> std::fmt::Result {
-        for (id, symbol) in self.0.iter() {
-            symbol.print_symbol(f, Some(id), depth, true)?;
-        }
-
-        Ok(())
-    }
-
     /// Collect all symbols engaged in that name.
     ///
     /// Example: `what`=`a::b::c` will return the symbols: `a`,`a::b` and `a::b::c`
@@ -102,7 +93,17 @@ impl SymbolMap {
 impl std::fmt::Display for SymbolMap {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (id, symbol) in self.0.iter() {
-            symbol.print_symbol(f, Some(id), 0, true)?;
+            symbol.print_symbol(f, Some(id), 0, false, true)?;
+        }
+
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for SymbolMap {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for (id, symbol) in self.0.iter() {
+            symbol.print_symbol(f, Some(id), 0, true, true)?;
         }
 
         Ok(())

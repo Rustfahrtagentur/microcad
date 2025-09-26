@@ -85,6 +85,10 @@ pub enum ResolveError {
     /// Diagnostic error
     #[error("Diagnostic error: {0}")]
     DiagError(#[from] DiagError),
+
+    /// Statement is not supported in this context.
+    #[error("{0} statement not available in {0}")]
+    StatementNotSupported(String, String),
 }
 
 /// Result type of any resolve.
