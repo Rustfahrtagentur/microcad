@@ -65,6 +65,10 @@ trait Resolve<T: Default = Option<Symbol>> {
     fn symbolize(&self, _parent: &Symbol, _context: &mut ResolveContext) -> ResolveResult<T> {
         Ok(T::default())
     }
+
+    fn names(&self) -> Vec<&QualifiedName> {
+        Vec::new()
+    }
 }
 
 #[test]
@@ -99,6 +103,10 @@ impl SourceFile {
                 .symbolize(&symbol, context)?,
         );
         Ok(symbol)
+    }
+
+    pub fn names(&self) -> Vec<&QualifiedName> {
+        self.statements.names()
     }
 }
 
