@@ -43,7 +43,9 @@ pub trait Lookup<E: std::error::Error = ResolveError> {
     /// - looks in *symbol table*
     /// - follows *aliases* (use statements)
     /// - detect any ambiguity
-    /// - loads *external files*
+    ///
+    /// # Arguments
+    /// -`name`: qualified name to search for
     fn lookup(&self, name: &QualifiedName) -> Result<Symbol, E>;
 }
 
@@ -54,16 +56,15 @@ pub trait FullyQualify {
 }
 
 trait Resolve<T: Default = Option<Symbol>> {
-    /// Resolve into Symbol
-    fn symbolize(&self, _parent: &Symbol, _context: &mut ResolveContext) -> ResolveResult<T> {
-        Ok(T::default())
-    }
-
+    /// Checks if definition is allowed to occur within the given parent symbol.
     fn grant(&self, _parent: &Symbol) -> ResolveResult<&Self> {
         Ok(self)
     }
 
-    //fn resolve(&self, parent: &Symbol);
+    /// Resolve into Symbol
+    fn symbolize(&self, _parent: &Symbol, _context: &mut ResolveContext) -> ResolveResult<T> {
+        Ok(T::default())
+    }
 }
 
 #[test]
@@ -76,7 +77,6 @@ fn resolve_test() {
         .expect("loading of symbol table failed");
 
     symbol_table.resolve().expect("resolve failed");
-    log::trace!("Resolved symbol table:\n{symbol_table}");
 
     symbol_table.check().expect("check failed");
 }
@@ -113,7 +113,9 @@ impl Resolve<Symbol> for ModuleDefinition {
             symbol.set_children(body.grant(&symbol)?.symbolize(&symbol, context)?);
             symbol
         } else if let Some(parent_path) = parent.source_path() {
-            context.symbolize_file(self.visibility, parent_path, &self.id)?
+            let mut symbol = context.symbolize_file(self.visibility, parent_path, &self.id)?;
+            symbol.set_parent(parent.clone());
+            symbol
         } else {
             todo!("no top-level source file")
         };
@@ -432,7 +434,13 @@ impl Resolve<Option<(Identifier, Symbol)>> for UseStatement {
                     ),
                 )))
             }
-            UseDeclaration::UseAll(_) => Ok(None),
+            UseDeclaration::UseAll(name) => Ok(Some((
+                Identifier::unique(),
+                Symbol::new(
+                    SymbolDefinition::UseAll(self.visibility, name.clone()),
+                    Some(parent.clone()),
+                ),
+            ))),
             UseDeclaration::UseAlias(name, alias) => Ok(Some((
                 alias.clone(),
                 Symbol::new(

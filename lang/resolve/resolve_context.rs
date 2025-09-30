@@ -30,7 +30,7 @@ impl ResolveContext {
     }
 
     /// Create a symbol out of all sources (without resolving them).
-    pub fn symbolize(mut self) -> ResolveResult<SymbolTable> {
+    pub(crate) fn symbolize(mut self) -> ResolveResult<SymbolTable> {
         let named_symbols = self
             .sources
             .clone()

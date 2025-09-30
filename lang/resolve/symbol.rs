@@ -3,7 +3,7 @@
 
 use crate::{builtin::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 use custom_debug::Debug;
-use derive_more::Deref;
+use derive_more::{Deref, DerefMut};
 
 /// Symbol content
 #[derive(Debug, Clone)]
@@ -44,13 +44,23 @@ pub struct Symbol {
 }
 
 /// List of qualified names which can pe displayed
-#[derive(Debug, Deref)]
+#[derive(Debug, Deref, DerefMut, Default)]
 pub struct Symbols(Vec<Symbol>);
 
 impl Symbols {
     /// Return all fully qualified names of all symbols.
-    pub fn full_names(&self) -> QualifiedNames {
+    #[cfg(test)]
+    pub(super) fn full_names(&self) -> QualifiedNames {
         self.iter().map(|symbol| symbol.full_name()).collect()
+    }
+}
+
+impl FromIterator<Symbols> for Symbols {
+    fn from_iter<T: IntoIterator<Item = Symbols>>(iter: T) -> Self {
+        let mut symbols = Self::default();
+        iter.into_iter()
+            .for_each(|mut children| symbols.append(&mut children));
+        symbols
     }
 }
 
@@ -118,7 +128,7 @@ impl Symbol {
     /// - `visibility`: Visibility of the symbol
     /// - `def`: Symbol definition
     /// - `parent`: Symbol's parent symbol or none for root
-    pub fn new_with_visibility(
+    pub(super) fn new_with_visibility(
         visibility: Visibility,
         def: SymbolDefinition,
         parent: Option<Symbol>,
@@ -147,11 +157,6 @@ impl Symbol {
             SymbolDefinition::Builtin(Rc::new(Builtin { id, parameters, f })),
             None,
         )
-    }
-
-    /// Create a new argument ([`SymbolDefinition::Argument`]).
-    pub fn new_call_argument(id: Identifier, value: Value) -> Symbol {
-        Symbol::new(SymbolDefinition::Argument(id, value), None)
     }
 
     /// Print out symbols from that point.
@@ -235,6 +240,10 @@ impl Symbol {
         self.inner.borrow_mut().children = new_children;
     }
 
+    pub fn set_parent(&mut self, parent: Symbol) {
+        self.inner.borrow_mut().parent = Some(parent);
+    }
+
     /// Move all children from another symbol into this one.
     /// # Arguments
     /// - `from`: Append this symbol's children
@@ -254,12 +263,21 @@ impl Symbol {
     }
 
     /// Create a vector of cloned children.
-    pub fn clone_children(&self) -> Vec<(Identifier, Symbol)> {
+    pub fn public_children(&self, overwrite_visibility: Option<Visibility>) -> Symbols {
         self.inner
             .borrow()
             .children
-            .iter()
-            .map(|(id, symbol)| (id.clone(), symbol.clone()))
+            .values()
+            .filter(|symbol| symbol.is_public())
+            .map(|symbol| {
+                if let Some(visibility) = overwrite_visibility {
+                    let mut symbol = symbol.clone();
+                    symbol.visibility = visibility;
+                    symbol
+                } else {
+                    symbol.clone()
+                }
+            })
             .collect()
     }
 
@@ -398,6 +416,11 @@ impl Symbol {
         self.inner.borrow_mut().parent = None;
     }
 
+    /// Get a clone of the symbol definition.
+    pub fn get_def(&self) -> SymbolDefinition {
+        self.inner.borrow().def.clone()
+    }
+
     /// Work with the symbol definition.
     pub fn with_def<T>(&self, mut f: impl FnMut(&SymbolDefinition) -> T) -> T {
         f(&self.inner.borrow().def)
@@ -406,6 +429,81 @@ impl Symbol {
     /// Work with the mutable symbol definition.
     pub fn with_def_mut<T>(&self, mut f: impl FnMut(&mut SymbolDefinition) -> T) -> T {
         f(&mut self.inner.borrow_mut().def)
+    }
+
+    pub(super) fn resolvable(&self) -> bool {
+        matches!(
+            self.inner.borrow().def,
+            SymbolDefinition::SourceFile(..)
+                | SymbolDefinition::Module(..)
+                | SymbolDefinition::UseAll(..)
+        )
+    }
+
+    /// Resolve use statements.
+    pub(super) fn resolve(&self, symbol_table: &SymbolTable) -> ResolveResult<Symbols> {
+        // collect used symbols from children and from self
+        let (from_children, from_self): (Symbols, Symbols) = {
+            let inner = self.inner.borrow();
+
+            // check if we resolve recursive and collect symbols resolved from self
+            let (resolve_children, from_self) = match &inner.def {
+                SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => {
+                    (true, Symbols::default())
+                }
+                SymbolDefinition::UseAll(visibility, name) => (
+                    false,
+                    match symbol_table.lookup(name) {
+                        Ok(symbol) => symbol.public_children(Some(*visibility)),
+                        Err(err) => {
+                            if let Some(parent) = &inner.parent {
+                                match symbol_table.lookup(&name.with_prefix(&parent.full_name())) {
+                                    Ok(symbol) => symbol.public_children(Some(*visibility)),
+                                    Err(err) => panic!("{err}"),
+                                }
+                            } else {
+                                panic!("{err}")
+                            }
+                        }
+                    },
+                ),
+                // skip non-modules
+                _ => (false, Symbols::default()),
+            };
+
+            // collect symbols resolved from children
+            let from_children: Symbols = if resolve_children {
+                inner
+                    .children
+                    .values()
+                    .filter(|child| child.resolvable())
+                    .flat_map(|child| child.resolve(symbol_table))
+                    .collect()
+            } else {
+                Symbols::default()
+            };
+            (from_children, from_self)
+        };
+
+        // add symbols collected from children to self
+        self.inner.borrow_mut().children.extend(
+            from_children
+                .iter()
+                .map(|symbol| (symbol.id(), symbol.clone())),
+        );
+
+        // remove all `UseAll` symbols
+        self.inner
+            .borrow_mut()
+            .children
+            .retain(|_, symbol| !matches!(symbol.inner.borrow().def, SymbolDefinition::UseAll(..)));
+
+        // return symbols collected from self
+        Ok(from_self)
+    }
+
+    pub fn check(&self, symbol_table: &SymbolTable) -> ResolveResult<()> {
+        todo!()
     }
 }
 

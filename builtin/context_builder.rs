@@ -5,7 +5,7 @@
 
 use std::rc::Rc;
 
-use microcad_lang::{builtin::*, eval::*, resolve::*, syntax::*};
+use microcad_lang::{builtin::*, diag::*, eval::*, resolve::*, syntax::*};
 
 /// Context builder.
 pub struct ContextBuilder {
@@ -14,9 +14,9 @@ pub struct ContextBuilder {
 
 impl ContextBuilder {
     /// Create new context.
-    pub fn new(symbols: SymbolMap, sources: Sources, output: Box<dyn Output>) -> Self {
+    pub fn new(symbol_table: SymbolTable, output: Box<dyn Output>) -> Self {
         Self {
-            context: Context::new(symbols, sources, output),
+            context: Context::new(symbol_table, output),
         }
     }
 
@@ -30,10 +30,13 @@ impl ContextBuilder {
         root: Rc<SourceFile>,
         search_paths: &[impl AsRef<std::path::Path>],
     ) -> ResolveResult<Self> {
-        let sources = Sources::load(root, search_paths)?;
-        let mut symbols = sources.resolve()?;
-        symbols.add_node(crate::builtin_module());
-        Ok(Self::new(symbols, sources, Box::new(Capture::new()))
+        let symbol_table = SymbolTable::load_and_resolve(
+            root,
+            search_paths,
+            crate::builtin_module(),
+            DiagHandler::default(),
+        )?;
+        Ok(Self::new(symbol_table, Box::new(Capture::new()))
             .importers(crate::builtin_importers())
             .exporters(crate::builtin_exporters()))
     }

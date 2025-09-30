@@ -88,11 +88,14 @@ pub fn builtin_context(
     root: Rc<SourceFile>,
     search_paths: &[impl AsRef<std::path::Path>],
 ) -> ResolveResult<microcad_lang::eval::Context> {
-    let sources = Sources::load(root, search_paths)?;
-    let mut symbols = sources.resolve()?;
-    symbols.add_node(builtin_module());
+    let symbol_table = SymbolTable::load_and_resolve(
+        root,
+        search_paths,
+        builtin_module(),
+        DiagHandler::default(),
+    )?;
 
-    Ok(ContextBuilder::new(symbols, sources, Box::new(Stdout))
+    Ok(ContextBuilder::new(symbol_table, Box::new(Stdout))
         .importers(builtin_importers())
         .exporters(builtin_exporters())
         .build())

@@ -13,7 +13,10 @@ impl From<Tuple> for SymbolMap {
     fn from(tuple: Tuple) -> Self {
         let mut symbol_map = SymbolMap::default();
         for (id, value) in tuple.named.iter() {
-            symbol_map.add_node(Symbol::new_call_argument(id.clone(), value.clone()))
+            symbol_map.add_node(Symbol::new(
+                SymbolDefinition::Argument(id.clone(), value.clone()),
+                None,
+            ))
         }
         symbol_map
     }
@@ -23,7 +26,10 @@ impl FromIterator<(Identifier, Value)> for SymbolMap {
     fn from_iter<T: IntoIterator<Item = (Identifier, Value)>>(iter: T) -> Self {
         let mut symbol_map = SymbolMap::default();
         for (id, value) in iter {
-            symbol_map.add_node(Symbol::new_call_argument(id.clone(), value.clone()))
+            symbol_map.add_node(Symbol::new(
+                SymbolDefinition::Argument(id.clone(), value.clone()),
+                None,
+            ))
         }
         symbol_map
     }
@@ -43,22 +49,15 @@ impl SymbolMap {
         self.0.insert(id, symbol);
     }
 
-    /// Insert a not by it's own id.
-    pub fn insert_node(&mut self, id: Identifier, symbol: Symbol) {
-        self.0.insert(id, symbol);
-    }
-
     /// Search for a symbol in symbol map.
-    pub fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
+    pub(super) fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         if name.is_empty() {
             if let Some(symbol) = self.get(&Identifier::none()) {
-                symbol.set_use();
                 return Ok(symbol.clone());
             }
         } else {
             let (id, leftover) = name.split_first();
             if let Some(symbol) = self.get(&id) {
-                symbol.set_use();
                 if leftover.is_empty() {
                     log::trace!("Fetched {name:?} from globals (symbol map)");
                     return Ok(symbol.clone());
@@ -71,18 +70,10 @@ impl SymbolMap {
         Err(ResolveError::SymbolNotFound(name.clone()))
     }
 
-    /// detach children from their parent
-    pub fn detach_from_parent(mut self) -> Self {
-        for child in self.iter_mut() {
-            child.1.detach();
-        }
-        self
-    }
-
     /// Collect all symbols engaged in that name.
     ///
     /// Example: `what`=`a::b::c` will return the symbols: `a`,`a::b` and `a::b::c`
-    pub fn path_to(&self, what: &QualifiedName) -> ResolveResult<Symbols> {
+    pub(crate) fn path_to(&self, what: &QualifiedName) -> ResolveResult<Symbols> {
         (1..(what.len() + 1))
             .map(|n| what[0..n].iter().cloned().collect())
             .map(|what| self.search(&what))
