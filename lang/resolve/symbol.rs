@@ -240,6 +240,7 @@ impl Symbol {
         self.inner.borrow_mut().children = new_children;
     }
 
+    /// Set new parent.
     pub fn set_parent(&mut self, parent: Symbol) {
         self.inner.borrow_mut().parent = Some(parent);
     }
@@ -503,7 +504,29 @@ impl Symbol {
     }
 
     pub fn check(&self, symbol_table: &SymbolTable) -> ResolveResult<()> {
-        todo!()
+        // check names in symbol definition
+        let check_names = |names: &[&QualifiedName]| {
+            names.iter().try_for_each(|name| {
+                symbol_table.lookup(name)?;
+                Ok::<_, ResolveError>(())
+            })
+        };
+        match &self.inner.borrow().def {
+            SymbolDefinition::SourceFile(sf) => check_names(&sf.names())?,
+            SymbolDefinition::Module(m) => check_names(&m.names())?,
+            SymbolDefinition::Workbench(wb) => check_names(&wb.names())?,
+            SymbolDefinition::Function(f) => check_names(&f.names())?,
+            SymbolDefinition::Alias(.., name) => check_names(&[name])?,
+            SymbolDefinition::UseAll(_, name) => check_names(&[name])?,
+            _ => (),
+        }
+
+        // check children
+        self.inner
+            .borrow()
+            .children
+            .values()
+            .try_for_each(|symbol| symbol.check(symbol_table))
     }
 }
 

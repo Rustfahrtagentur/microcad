@@ -72,6 +72,7 @@ impl SymbolTable {
         let mut symbol_table = Self::load(root, search_paths, diag)?;
         symbol_table.add_symbol(builtin)?;
         symbol_table.resolve()?;
+        symbol_table.check()?;
 
         Ok(symbol_table)
     }
