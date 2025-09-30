@@ -57,18 +57,7 @@ impl SourceFile {
 
     /// Return the module name from the file name
     pub fn id(&self) -> Identifier {
-        match &self.filename {
-            Some(filename) => Identifier(Refer::new(
-                filename
-                    .file_stem()
-                    .expect("cannot get file stem")
-                    .to_str()
-                    .expect("File name error {filename:?}")
-                    .into(),
-                SrcRef::new(0..0, 0, 0, self.hash),
-            )),
-            None => Identifier::none(),
-        }
+        self.name.last().unwrap_or(&Identifier::none()).clone()
     }
 
     /// get a specific line

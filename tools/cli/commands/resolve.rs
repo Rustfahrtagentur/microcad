@@ -29,11 +29,15 @@ impl Resolve {
 impl RunCommand for Resolve {
     fn run(&self, cli: &Cli) -> anyhow::Result<()> {
         let root = self.load()?;
-        let sources = Sources::load(root, &cli.search_paths)?;
-        let symbols = sources.resolve()?;
+        let symbol_table = SymbolTable::load_and_resolve(
+            root,
+            &cli.search_paths,
+            microcad_builtin::builtin_module(),
+            DiagHandler::default(),
+        )?;
         match &self.output {
-            Some(filename) => symbols.write_to_file(&filename)?,
-            None => println!("{symbols}"),
+            Some(filename) => symbol_table.write_to_file(&filename)?,
+            None => println!("{symbol_table}"),
         }
 
         Ok(())

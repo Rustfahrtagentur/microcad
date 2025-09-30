@@ -30,7 +30,7 @@ impl SymbolTable {
         // prepare symbol map
 
         let symbol_table = Self { sources, symbols };
-        log::trace!("Initial symbol table:\n{symbol_table}");
+        log::trace!("Initial symbol table:\n{symbol_table:?}");
         Ok(symbol_table)
     }
 
@@ -39,9 +39,10 @@ impl SymbolTable {
     /// # Arguments
     /// - `root`: root file
     /// - `search_paths`: paths to search for external modules
+    /// - `diag`: Diagnostic handler.
     ///
     /// Returns a symbol table which is unresolved.
-    pub fn load(
+    pub(super) fn load(
         root: Rc<SourceFile>,
         search_paths: &[impl AsRef<std::path::Path>],
         diag: DiagHandler,
@@ -53,13 +54,48 @@ impl SymbolTable {
         Ok(symbol_table)
     }
 
-    /// Resolve the symbol map.
-    pub fn resolve(&mut self) -> ResolveResult<()> {
-        todo!()
+    /// Load a symbol table from sources and resolve it.
+    ///
+    /// # Arguments
+    /// - `root`: root file
+    /// - `search_paths`: paths to search for external modules
+    /// - `builtin`: additional builtin library
+    /// - `diag`: Diagnostic handler.
+    ///
+    /// Returns a symbol table which is unresolved.
+    pub fn load_and_resolve(
+        root: Rc<SourceFile>,
+        search_paths: &[impl AsRef<std::path::Path>],
+        builtin: Symbol,
+        diag: DiagHandler,
+    ) -> ResolveResult<Self> {
+        let mut symbol_table = Self::load(root, search_paths, diag)?;
+        symbol_table.add_symbol(builtin)?;
+        symbol_table.resolve()?;
+
+        Ok(symbol_table)
     }
 
-    pub fn check(&self) -> ResolveResult<()> {
-        todo!()
+    /// Resolve the symbol map.
+    pub fn resolve(&mut self) -> ResolveResult<()> {
+        let children = self.symbols.values().cloned().collect::<Vec<_>>();
+        children
+            .iter()
+            .filter(|child| child.resolvable())
+            .try_for_each(|child| {
+                child.resolve(self)?;
+                Ok::<_, ResolveError>(())
+            })?;
+
+        log::trace!("Resolved symbol table:\n{self:?}");
+
+        Ok(())
+    }
+
+    pub(super) fn check(&self) -> ResolveResult<()> {
+        self.symbols
+            .values()
+            .try_for_each(|symbol| symbol.check(self))
     }
 
     /// Solve any alias within the given qualified name.
@@ -123,7 +159,23 @@ impl SymbolTable {
 
     /// Return root symbol (evaluation starting point)
     pub fn main(&self) -> ResolveResult<Symbol> {
-        self.symbols.search(&self.sources.root().name)
+        self.lookup(&self.sources.root().name)
+    }
+
+    /// Add a new symbol to the table
+    pub fn add_symbol(&mut self, symbol: Symbol) -> ResolveResult<()> {
+        log::trace!("add symbol: {}", symbol.id());
+        if let Some(symbol) = self.symbols.insert(symbol.id(), symbol.clone()) {
+            Err(ResolveError::AmbiguousSymbol(symbol.id()))
+        } else {
+            symbol.resolve(self)?;
+            Ok(())
+        }
+    }
+
+    /// Write symbols into file
+    pub fn write_to_file(&self, filename: &impl AsRef<std::path::Path>) -> std::io::Result<()> {
+        self.symbols.write_to_file(filename)
     }
 }
 
@@ -147,6 +199,13 @@ impl std::fmt::Display for SymbolTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "\nLoaded files:\n{}", self.sources)?;
         writeln!(f, "\nSymbols:\n{}", self.symbols)
+    }
+}
+
+impl std::fmt::Debug for SymbolTable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "\nLoaded files:\n{}", self.sources)?;
+        writeln!(f, "\nSymbols:\n{:?}", self.symbols)
     }
 }
 

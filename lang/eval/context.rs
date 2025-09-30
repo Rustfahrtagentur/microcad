@@ -37,18 +37,13 @@ pub struct Context {
 }
 
 impl Context {
-    /// Create a new context from a source file.
-    ///
-    /// # Arguments
-    /// - `builtin`: The builtin library.
-    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
-    /// - `output`: Output channel to use.
-    pub fn new(symbols: SymbolMap, sources: Sources, output: Box<dyn Output>) -> Self {
+    /// Create a new context from a resolved symbol table.
+    pub fn new(symbol_table: SymbolTable, output: Box<dyn Output>) -> Self {
         log::debug!("Creating Context");
 
         // put all together
         Self {
-            symbol_table: SymbolTable::new(symbols, sources).expect("unknown root id"),
+            symbol_table,
             output,
             ..Default::default()
         }
@@ -71,10 +66,9 @@ impl Context {
         search_paths: &[impl AsRef<std::path::Path>],
     ) -> EvalResult<Self> {
         let root = SourceFile::load(root)?;
-        let sources = Sources::load(root, search_paths)?;
-        let mut symbols = sources.resolve()?;
-        symbols.insert(Identifier::no_ref("__builtin"), builtin);
-        Ok(Self::new(symbols, sources, Box::new(Stdout)))
+        let symbol_table =
+            SymbolTable::load_and_resolve(root, search_paths, builtin, DiagHandler::default())?;
+        Ok(Self::new(symbol_table, Box::new(Stdout)))
     }
 
     /// Access captured output.
@@ -413,7 +407,7 @@ impl Lookup<EvalError> for Context {
             (
                 "local",
                 match self.stack.lookup(name) {
-                    Ok(SymbolOrName::Name(name)) => self.lookup(&name),
+                    Ok(SymbolOrName::Name(name)) => Ok(self.symbol_table.lookup(&name)?),
                     Ok(SymbolOrName::Symbol(symbol)) => Ok(symbol),
                     Err(err) => Err(err),
                 },
@@ -491,9 +485,9 @@ impl Lookup<EvalError> for Context {
 
         // check for ambiguity in what's left
         match found.first() {
-            Some((origin, first)) => {
+            Some((origin, symbol)) => {
                 // check if all findings point to the same symbol
-                if !found.iter().all(|(_, x)| x == first) {
+                if !found.iter().all(|(_, x)| x == symbol) {
                     log::debug!(
                         "{ambiguous} symbol '{name:?}' in {origin}:\n{self}",
                         ambiguous = crate::mark!(AMBIGUOUS),
@@ -512,7 +506,8 @@ impl Lookup<EvalError> for Context {
                         "{found} symbol '{name:?}' in {origin}",
                         found = crate::mark!(FOUND_INTERIM)
                     );
-                    Ok(first.clone())
+                    symbol.set_use();
+                    Ok(symbol.clone())
                 }
             }
             None => {

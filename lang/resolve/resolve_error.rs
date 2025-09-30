@@ -74,6 +74,10 @@ pub enum ResolveError {
     #[error("Ambiguous external module files found {0:?}")]
     AmbiguousExternals(Vec<std::path::PathBuf>),
 
+    /// Ambiguous symbol was added
+    #[error("Ambiguous symbol added: {0}")]
+    AmbiguousSymbol(Identifier),
+
     /// ScanDir Error
     #[error("ScanDir Error: {0}")]
     ScanDirError(#[from] scan_dir::Error),
@@ -89,6 +93,10 @@ pub enum ResolveError {
     /// Statement is not supported in this context.
     #[error("{0} statement not available in {0}")]
     StatementNotSupported(String, String),
+
+    /// Given symbol has not children which can be used.
+    #[error("No symbols found to use in {0}")]
+    NoSymbolsToUse(QualifiedName),
 }
 
 /// Result type of any resolve.

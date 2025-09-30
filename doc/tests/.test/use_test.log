@@ -41,13 +41,3 @@
 35: 
 36: assert_valid(MyPart);
 
--- Output --
-Hello
--- Errors --
--- Model --
-  Group (root) ->
-
--- Test Result --
-OK
-Could not determine output type.
-Nothing will be exported.
