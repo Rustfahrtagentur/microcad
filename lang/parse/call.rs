@@ -72,7 +72,7 @@ impl Parse for Argument {
 impl Parse for MethodCall {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(MethodCall {
-            id: pair.find(Rule::qualified_name).expect(INTERNAL_PARSE_ERROR),
+            name: pair.find(Rule::qualified_name).expect(INTERNAL_PARSE_ERROR),
             argument_list: pair.find(Rule::argument_list).unwrap_or_default(),
             src_ref: pair.clone().into(),
         })
