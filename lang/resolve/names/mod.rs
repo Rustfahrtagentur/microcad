@@ -40,9 +40,11 @@ impl Names for StatementList {
 impl Names for Statement {
     fn names(&self) -> NameList {
         match self {
-            Statement::Workbench(wd) => NameList::default().add_as_name(&wd.id),
-            Statement::Module(m) => NameList::default().add_as_name(&m.id),
-            Statement::Function(f) => NameList::default().add_as_name(&f.id),
+            // Names of these will be collected directly from symbol
+            Statement::Workbench(_) => NameList::default(),
+            Statement::Module(_) => NameList::default(),
+            Statement::Function(_) => NameList::default(),
+
             Statement::InnerAttribute(_) => NameList::default(),
 
             Statement::Init(i) => i.names(),
