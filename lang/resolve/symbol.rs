@@ -577,6 +577,17 @@ impl Symbol {
             .iter()
             .for_each(|(_, child)| child.unchecked(unchecked));
     }
+
+    pub(super) fn unused(&self, unused: &mut Vec<Symbol>) {
+        let inner = self.inner.borrow();
+        if !inner.used {
+            unused.push(self.clone())
+        }
+        inner
+            .children
+            .iter()
+            .for_each(|(_, child)| child.unused(unused));
+    }
 }
 
 impl FullyQualify for Symbol {
