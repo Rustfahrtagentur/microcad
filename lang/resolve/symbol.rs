@@ -566,6 +566,17 @@ impl Symbol {
             }
         }
     }
+
+    pub(super) fn unchecked(&self, unchecked: &mut Vec<Symbol>) {
+        let inner = self.inner.borrow();
+        if !inner.checked {
+            unchecked.push(self.clone())
+        }
+        inner
+            .children
+            .iter()
+            .for_each(|(_, child)| child.unchecked(unchecked));
+    }
 }
 
 impl FullyQualify for Symbol {

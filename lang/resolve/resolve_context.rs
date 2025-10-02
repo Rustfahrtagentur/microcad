@@ -81,7 +81,15 @@ impl ResolveContext {
 
         log::debug!("Symbol table OK!");
 
-        log::trace!("{:?}", self.symbols);
+        log::trace!(
+            "Unused symbols:\n{}",
+            self.symbols
+                .unchecked()
+                .iter()
+                .map(|s| format!("{:?}", s))
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
 
         Ok(())
     }

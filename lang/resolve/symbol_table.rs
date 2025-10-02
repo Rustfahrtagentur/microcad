@@ -97,6 +97,14 @@ impl SymbolTable {
     pub(super) fn values(&self) -> Symbols {
         self.symbols.values().cloned().collect()
     }
+
+    pub fn unchecked(&self) -> Vec<Symbol> {
+        let mut unchecked = Vec::new();
+        self.symbols
+            .values()
+            .for_each(|symbol| symbol.unchecked(&mut unchecked));
+        unchecked
+    }
 }
 
 impl WriteToFile for SymbolTable {}
