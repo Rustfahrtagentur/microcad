@@ -14,9 +14,9 @@ pub struct ContextBuilder {
 
 impl ContextBuilder {
     /// Create new context.
-    pub fn new(symbol_table: SymbolTable, output: Box<dyn Output>) -> Self {
+    pub fn new(resolve_context: ResolveContext, output: Box<dyn Output>) -> Self {
         Self {
-            context: Context::new(symbol_table, output),
+            context: Context::new(resolve_context, output),
         }
     }
 
@@ -36,7 +36,7 @@ impl ContextBuilder {
             Some(crate::builtin_module()),
             DiagHandler::default(),
         )?;
-        let context = Self::new(context.symbols, Box::new(Capture::new()));
+        let context = Self::new(context, Box::new(Capture::new()));
         Ok(context
             .importers(crate::builtin_importers())
             .exporters(crate::builtin_exporters()))

@@ -23,7 +23,7 @@ fn init() {
 use std::str::FromStr;
 
 pub use microcad_lang::builtin::*;
-use microcad_lang::{diag::*, eval::*, rc::*, resolve::*, syntax::*, ty::Ty, value::*};
+use microcad_lang::{diag::*, eval::*, resolve::*, ty::Ty, value::*};
 
 pub use context_builder::*;
 
@@ -85,16 +85,9 @@ pub fn builtin_exporters() -> ExporterRegistry {
 
 /// Built-in context.
 pub fn builtin_context(
-    root: Rc<SourceFile>,
-    search_paths: &[impl AsRef<std::path::Path>],
+    resolve_context: ResolveContext,
 ) -> ResolveResult<microcad_lang::eval::Context> {
-    let context = ResolveContext::load_and_resolve(
-        root,
-        search_paths,
-        Some(crate::builtin_module()),
-        DiagHandler::default(),
-    )?;
-    Ok(ContextBuilder::new(context.symbols, Box::new(Stdout))
+    Ok(ContextBuilder::new(resolve_context, Box::new(Stdout))
         .importers(crate::builtin_importers())
         .exporters(crate::builtin_exporters())
         .build())
