@@ -134,7 +134,7 @@ impl QualifiedName {
     }
 
     /// Add a given identifier as suffix.
-    pub fn with_suffix(&self, suffix: Identifier) -> Self {
+    pub fn with_suffix(&self, suffix: &Identifier) -> Self {
         let mut name = self.clone();
         name.push(suffix.clone());
         name

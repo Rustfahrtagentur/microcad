@@ -29,15 +29,24 @@ impl Resolve {
 impl RunCommand for Resolve {
     fn run(&self, cli: &Cli) -> anyhow::Result<()> {
         let root = self.load()?;
-        let symbol_table = SymbolTable::load_and_resolve(
+
+        let mut context = match ResolveContext::load_and_resolve(
             root,
             &cli.search_paths,
-            microcad_builtin::builtin_module(),
+            Some(microcad_builtin::builtin_module()),
             DiagHandler::default(),
-        )?;
+        ) {
+            Ok(symbol_table) => symbol_table,
+            Err(err) => todo!(),
+        };
+        context.check()?;
+
+        if context.has_errors() {
+            print!("{}", context.diagnosis());
+        }
         match &self.output {
-            Some(filename) => symbol_table.write_to_file(&filename)?,
-            None => println!("{symbol_table}"),
+            Some(filename) => context.write_to_file(&filename)?,
+            None => println!("{context}"),
         }
 
         Ok(())

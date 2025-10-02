@@ -15,6 +15,8 @@ pub(super) struct SymbolInner {
     pub parent: Option<Symbol>,
     /// Symbol's children
     pub children: SymbolMap,
+    /// Flag if this symbol has been checked after resolving
+    pub checked: bool,
     /// Flag if this symbol was in use
     pub used: bool,
 }
@@ -25,6 +27,7 @@ impl Default for SymbolInner {
             def: SymbolDefinition::SourceFile(SourceFile::default().into()),
             parent: Default::default(),
             children: Default::default(),
+            checked: false,
             used: false,
         }
     }
@@ -61,22 +64,6 @@ impl FromIterator<Symbols> for Symbols {
         iter.into_iter()
             .for_each(|mut children| symbols.append(&mut children));
         symbols
-    }
-}
-
-impl Default for Symbol {
-    fn default() -> Self {
-        Self {
-            visibility: Visibility::default(),
-            inner: RcMut::new(Default::default()),
-        }
-    }
-}
-
-impl PartialEq for Symbol {
-    fn eq(&self, other: &Self) -> bool {
-        // just compare the pointers - not the content
-        self.inner.as_ptr() == other.inner.as_ptr()
     }
 }
 
@@ -177,11 +164,16 @@ impl Symbol {
         if debug && cfg!(feature = "ansi-color") && !self.inner.borrow().used {
             color_print::cwrite!(
                 f,
-                "{:depth$}<#606060>{visibility}{id:?} {def} [{full_name:?}]</>",
+                "{:depth$}<#606060>{visibility}{id:?} {def} [{full_name:?}]</>{checked}",
                 "",
                 visibility = self.visibility(),
                 def = self.inner.borrow().def,
                 full_name = self.full_name(),
+                checked = if self.inner.borrow().checked {
+                    " ✓"
+                } else {
+                    ""
+                }
             )?;
         } else {
             write!(
@@ -407,6 +399,11 @@ impl Symbol {
             .and_then(|parent| parent.source_path())
     }
 
+    /// Mark this symbol as *checked*.
+    pub fn set_check(&self) {
+        self.inner.borrow_mut().checked = true;
+    }
+
     /// Mark this symbol as *used*.
     pub fn set_use(&self) {
         self.inner.borrow_mut().used = true;
@@ -442,7 +439,7 @@ impl Symbol {
     }
 
     /// Resolve use statements.
-    pub(super) fn resolve(&self, symbol_table: &SymbolTable) -> ResolveResult<Symbols> {
+    pub(super) fn resolve(&self, context: &mut ResolveContext) -> ResolveResult<Symbols> {
         // collect used symbols from children and from self
         let (from_children, from_self): (Symbols, Symbols) = {
             let inner = self.inner.borrow();
@@ -454,11 +451,11 @@ impl Symbol {
                 }
                 SymbolDefinition::UseAll(visibility, name) => (
                     false,
-                    match symbol_table.lookup(name) {
+                    match context.lookup(name) {
                         Ok(symbol) => symbol.public_children(Some(*visibility)),
                         Err(err) => {
                             if let Some(parent) = &inner.parent {
-                                match symbol_table.lookup(&name.with_prefix(&parent.full_name())) {
+                                match context.lookup(&name.with_prefix(&parent.full_name())) {
                                     Ok(symbol) => symbol.public_children(Some(*visibility)),
                                     Err(err) => panic!("{err}"),
                                 }
@@ -478,7 +475,7 @@ impl Symbol {
                     .children
                     .values()
                     .filter(|child| child.resolvable())
-                    .flat_map(|child| child.resolve(symbol_table))
+                    .flat_map(|child| child.resolve(context))
                     .collect()
             } else {
                 Symbols::default()
@@ -503,22 +500,34 @@ impl Symbol {
         Ok(from_self)
     }
 
-    pub fn check(&self, symbol_table: &SymbolTable) -> ResolveResult<()> {
-        // check names in symbol definition
-        let check_names = |names: &[&QualifiedName]| {
-            names.iter().try_for_each(|name| {
-                symbol_table.lookup(name)?;
-                Ok::<_, ResolveError>(())
-            })
+    /// check names in symbol definition
+    pub fn check(&self, context: &mut ResolveContext) -> ResolveResult<()> {
+        let names = match &self.inner.borrow().def {
+            SymbolDefinition::SourceFile(sf) => sf.names(),
+            SymbolDefinition::Module(m) => m.names(),
+            SymbolDefinition::Workbench(wb) => wb.names(),
+            SymbolDefinition::Function(f) => f.names(),
+            SymbolDefinition::Alias(.., name) => name.into(),
+            SymbolDefinition::UseAll(_, name) => name.into(),
+            _ => Default::default(),
         };
-        match &self.inner.borrow().def {
-            SymbolDefinition::SourceFile(sf) => check_names(&sf.names())?,
-            SymbolDefinition::Module(m) => check_names(&m.names())?,
-            SymbolDefinition::Workbench(wb) => check_names(&wb.names())?,
-            SymbolDefinition::Function(f) => check_names(&f.names())?,
-            SymbolDefinition::Alias(.., name) => check_names(&[name])?,
-            SymbolDefinition::UseAll(_, name) => check_names(&[name])?,
-            _ => (),
+
+        let prefix = self.module_name().clone();
+
+        if !names.is_empty() {
+            log::debug!("checking symbols:\n{names:?}");
+
+            names
+                .iter()
+                .try_for_each(|name| match context.lookup(name) {
+                    Ok(_) => Ok::<_, ResolveError>(()),
+                    Err(err) => {
+                        if context.lookup(&name.with_prefix(&prefix)).is_err() {
+                            context.error(name, err)?;
+                        }
+                        Ok(())
+                    }
+                })?;
         }
 
         // check children
@@ -526,7 +535,36 @@ impl Symbol {
             .borrow()
             .children
             .values()
-            .try_for_each(|symbol| symbol.check(symbol_table))
+            .try_for_each(|symbol| symbol.check(context))
+    }
+
+    fn module_name(&self) -> QualifiedName {
+        let (id, is_module) = {
+            let def = &self.inner.borrow().def;
+            (
+                def.id(),
+                matches!(
+                    def,
+                    SymbolDefinition::Module(..) | SymbolDefinition::SourceFile(..)
+                ),
+            )
+        };
+        match is_module {
+            true => {
+                if let Some(parent) = &self.inner.borrow().parent {
+                    parent.module_name().with_suffix(&id)
+                } else {
+                    QualifiedName::from_id(id)
+                }
+            }
+            false => {
+                if let Some(parent) = &self.inner.borrow().parent {
+                    parent.module_name()
+                } else {
+                    unreachable!("root must be source file")
+                }
+            }
+        }
     }
 }
 
@@ -546,6 +584,22 @@ impl FullyQualify for Symbol {
                 QualifiedName::new(vec![id], src_ref)
             }
         }
+    }
+}
+
+impl Default for Symbol {
+    fn default() -> Self {
+        Self {
+            visibility: Visibility::default(),
+            inner: RcMut::new(Default::default()),
+        }
+    }
+}
+
+impl PartialEq for Symbol {
+    fn eq(&self, other: &Self) -> bool {
+        // just compare the pointers - not the content
+        self.inner.as_ptr() == other.inner.as_ptr()
     }
 }
 

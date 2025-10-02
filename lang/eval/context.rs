@@ -24,6 +24,8 @@ pub trait Grant<T> {
 pub struct Context {
     /// Symbol table
     symbol_table: SymbolTable,
+    /// Source cache
+    sources: Sources,
     /// Stack of currently opened scopes with symbols while evaluation.
     stack: Stack,
     /// Output channel for [__builtin::print].
@@ -62,13 +64,14 @@ impl Context {
     /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
     pub fn from_source(
         root: impl AsRef<std::path::Path> + std::fmt::Debug,
-        builtin: Symbol,
+        builtin: Option<Symbol>,
         search_paths: &[impl AsRef<std::path::Path>],
     ) -> EvalResult<Self> {
         let root = SourceFile::load(root)?;
-        let symbol_table =
-            SymbolTable::load_and_resolve(root, search_paths, builtin, DiagHandler::default())?;
-        Ok(Self::new(symbol_table, Box::new(Stdout)))
+        let context =
+            ResolveContext::load_and_resolve(root, search_paths, builtin, DiagHandler::default())?;
+
+        Ok(Self::new(context.symbols, Box::new(Stdout)))
     }
 
     /// Access captured output.
@@ -101,7 +104,8 @@ impl Context {
 
     /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Model> {
-        let source_file = self.symbol_table.main()?.with_def(|def| match def {
+        let root = self.lookup(&self.sources.root().name)?;
+        let source_file = root.with_def(|def| match def {
             SymbolDefinition::SourceFile(source_file) => source_file.clone(),
             _ => todo!(),
         });
@@ -133,7 +137,7 @@ impl Context {
 
     /// Return search paths of this context.
     pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
-        self.symbol_table.search_paths()
+        self.sources.search_paths()
     }
 
     /// Get property from current model.
@@ -386,6 +390,7 @@ impl Default for Context {
     fn default() -> Self {
         Self {
             symbol_table: Default::default(),
+            sources: Default::default(),
             stack: Default::default(),
             output: Box::new(Stdout),
             exporters: Default::default(),
@@ -615,7 +620,7 @@ impl PushDiag for Context {
 
 impl GetSourceByHash for Context {
     fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>> {
-        self.symbol_table.get_by_hash(hash)
+        self.sources.get_by_hash(hash)
     }
 }
 
@@ -629,8 +634,7 @@ impl std::fmt::Display for Context {
         writeln!(f, "\nModule: {}", self.stack.current_module_name())?;
         write!(f, "\nLocals Stack:\n{}", self.stack)?;
         writeln!(f, "\nCall Stack:")?;
-        self.stack
-            .pretty_print_call_trace(f, &self.symbol_table.sources)?;
+        self.stack.pretty_print_call_trace(f, &self.sources)?;
 
         if self.has_errors() {
             writeln!(f, "{}\nErrors:", self.symbol_table)?;

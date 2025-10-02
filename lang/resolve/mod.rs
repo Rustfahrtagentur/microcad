@@ -36,7 +36,6 @@ pub use symbol::*;
 pub use symbol_definition::*;
 pub use symbol_map::*;
 pub use symbol_table::*;
-pub use symbolize::*;
 
 use grant::*;
 use names::*;
@@ -67,12 +66,11 @@ fn resolve_test() {
         SourceFile::load("../examples/my_brick.µcad").expect("loading of root source file failed");
     log::trace!("Root source file:\n{root}");
 
-    let mut symbol_table = SymbolTable::load(root, &["../lib"], DiagHandler::default())
+    let mut context = ResolveContext::load(root, &["../lib"], DiagHandler::default())
         .expect("loading of symbol table failed");
 
-    symbol_table.resolve().expect("resolve failed");
-
-    symbol_table.check().expect("check failed");
+    context.resolve().expect("resolve failed");
+    context.check().expect("symbol check failed");
 }
 
 #[test]
