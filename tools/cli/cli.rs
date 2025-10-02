@@ -106,8 +106,7 @@ impl Cli {
                 input: input.as_ref().to_path_buf(),
                 output: None,
             }
-            .load()?,
-            &self.search_paths,
+            .load(&self.search_paths)?,
         )?)
     }
 

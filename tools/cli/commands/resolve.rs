@@ -16,29 +16,25 @@ pub struct Resolve {
 }
 
 impl Resolve {
-    pub fn load(&self) -> ResolveResult<Rc<SourceFile>> {
-        let source = crate::commands::parse::Parse {
+    pub fn load(
+        &self,
+        search_paths: &[impl AsRef<std::path::Path>],
+    ) -> ResolveResult<ResolveContext> {
+        let root = crate::commands::parse::Parse {
             input: self.input.clone(),
         }
         .parse()?;
-        log::info!("Resolved successfully!");
-        Ok(source)
-    }
-}
-
-impl RunCommand for Resolve {
-    fn run(&self, cli: &Cli) -> anyhow::Result<()> {
-        let root = self.load()?;
 
         let mut context = match ResolveContext::load_and_resolve(
             root,
-            &cli.search_paths,
+            search_paths,
             Some(microcad_builtin::builtin_module()),
             DiagHandler::default(),
         ) {
             Ok(symbol_table) => symbol_table,
             Err(err) => todo!(),
         };
+
         let unchecked = context.check()?;
 
         if context.has_errors() {
@@ -52,6 +48,14 @@ impl RunCommand for Resolve {
             None => println!("{context}"),
         }
 
+        log::info!("Resolved successfully!");
+        Ok(context)
+    }
+}
+
+impl RunCommand for Resolve {
+    fn run(&self, cli: &Cli) -> anyhow::Result<()> {
+        self.load(&cli.search_paths)?;
         Ok(())
     }
 }

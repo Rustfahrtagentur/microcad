@@ -588,6 +588,13 @@ impl Symbol {
             .iter()
             .for_each(|(_, child)| child.unused(unused));
     }
+
+    pub(crate) fn with_children<E: std::error::Error>(
+        &self,
+        f: impl FnMut((&Identifier, &Symbol)) -> Result<(), E>,
+    ) -> Result<(), E> {
+        self.inner.borrow().children.iter().try_for_each(f)
+    }
 }
 
 impl FullyQualify for Symbol {

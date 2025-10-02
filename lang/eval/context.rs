@@ -40,12 +40,14 @@ pub struct Context {
 
 impl Context {
     /// Create a new context from a resolved symbol table.
-    pub fn new(symbol_table: SymbolTable, output: Box<dyn Output>) -> Self {
+    pub fn new(resolve_context: ResolveContext, output: Box<dyn Output>) -> Self {
         log::debug!("Creating Context");
 
         // put all together
         Self {
-            symbol_table,
+            symbol_table: resolve_context.symbol_table,
+            sources: resolve_context.sources,
+            diag: resolve_context.diag,
             output,
             ..Default::default()
         }
@@ -70,8 +72,7 @@ impl Context {
         let root = SourceFile::load(root)?;
         let context =
             ResolveContext::load_and_resolve(root, search_paths, builtin, DiagHandler::default())?;
-
-        Ok(Self::new(context.symbols, Box::new(Stdout)))
+        Ok(Self::new(context, Box::new(Stdout)))
     }
 
     /// Access captured output.
@@ -104,12 +105,7 @@ impl Context {
 
     /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Model> {
-        let root = self.lookup(&self.sources.root().name)?;
-        let source_file = root.with_def(|def| match def {
-            SymbolDefinition::SourceFile(source_file) => source_file.clone(),
-            _ => todo!(),
-        });
-        source_file.eval(self)
+        self.sources.root().eval(self)
     }
 
     /// Run the closure `f` within the given `stack_frame`.
@@ -282,7 +278,7 @@ impl Context {
         )
     }
 }
-/*
+
 impl UseSymbol for Context {
     fn use_symbol(
         &mut self,
@@ -298,15 +294,11 @@ impl UseSymbol for Context {
             let id = id.clone().unwrap_or(symbol.id());
             let symbol = symbol.clone_with_visibility(visibility);
             if within.is_empty() {
-                self.symbols.insert(id, symbol);
+                self.symbol_table.insert_symbol(id, symbol);
             } else {
-                self.symbols
-                    .search(within)?
-                    .borrow_mut()
-                    .children
-                    .insert(id, symbol);
+                self.symbol_table.lookup(within)?.insert(id, symbol);
             }
-            log::trace!("Symbol Table:\n{}", self.symbols);
+            log::trace!("Symbol Table:\n{}", self.symbol_table);
         }
 
         if self.is_code() {
@@ -330,32 +322,29 @@ impl UseSymbol for Context {
             Err(EvalError::NoSymbolsToUse(symbol.full_name()))
         } else {
             if self.is_module() {
-                for (id, symbol) in symbol.borrow().children.iter() {
+                symbol.with_children(|(id, symbol)| {
                     let symbol = symbol.clone_with_visibility(visibility);
                     if within.is_empty() {
-                        self.symbols.insert(id.clone(), symbol);
+                        self.symbol_table.insert_symbol(id.clone(), symbol);
                     } else {
-                        self.symbols
-                            .search(within)?
-                            .borrow_mut()
-                            .children
-                            .insert(id.clone(), symbol);
+                        self.symbol_table.lookup(within)?.insert(id.clone(), symbol);
                     }
-                }
-                log::trace!("Symbol Table:\n{}", self.symbols);
+                    Ok::<_, EvalError>(())
+                });
+                log::trace!("Symbol Table:\n{}", self.symbol_table);
             }
 
             if self.is_code() {
-                for (id, symbol) in symbol.borrow().children.iter() {
-                    self.stack.put_local(Some(id.clone()), symbol.clone())?;
-                }
+                symbol.with_children(|(id, symbol)| {
+                    self.stack.put_local(Some(id.clone()), symbol.clone())
+                });
                 log::trace!("Local Stack:\n{}", self.stack);
             }
             Ok(symbol)
         }
     }
 }
-*/
+
 impl Locals for Context {
     fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
         self.stack.set_local_value(id, value)
@@ -527,50 +516,6 @@ impl Lookup<EvalError> for Context {
     }
 }
 
-/*
-impl Lookup for Context {
-    fn lookup(&self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::debug!("Lookup symbol or property '{name}'");
-        let symbol = self.symbol_table.lookup(name);
-        let property = self.lookup_property(name);
-
-        match (&symbol, &property) {
-            (Ok(_), Err(_)) => {
-                log::debug!(
-                    "{found} symbol '{name:?}'",
-                    found = crate::mark!(FOUND_FINAL)
-                );
-                symbol
-            }
-            (Err(_), Ok(_)) => {
-                log::debug!(
-                    "{found} property '{name:?}'",
-                    found = crate::mark!(FOUND_FINAL)
-                );
-                property
-            }
-            (Ok(symbol), Ok(property)) => {
-                log::debug!(
-                    "{ambiguous} symbol '{name:?}' in {symbol} and {property}:\n{self}",
-                    ambiguous = crate::mark!(AMBIGUOUS),
-                );
-                Err(EvalError::AmbiguousProperty(
-                    symbol.full_name(),
-                    property.id(),
-                ))
-            }
-            // throw error from lookup on any error
-            (Err(_), Err(_)) => {
-                log::debug!(
-                    "{not_found} symbol or property '{name:?}'",
-                    not_found = crate::mark!(NOT_FOUND)
-                );
-                symbol
-            }
-        }
-    }
-}
-*/
 impl Diag for Context {
     fn fmt_diagnosis(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result {
         self.diag.pretty_print(f, self)
@@ -588,28 +533,7 @@ impl Diag for Context {
         self.diag.warning_lines()
     }
 }
-/*
-impl Context {
-    /// use symbol in context
-    pub fn use_symbol(
-        &mut self,
-        visibility: Visibility,
-        name: &QualifiedName,
-        id: Option<Identifier>,
-    ) -> EvalResult<Symbol> {
-        self.use_symbol(visibility, name, id, &self.current_name())
-    }
 
-    /// use all symbols of given module in context
-    pub fn use_symbols_of(
-        &mut self,
-        visibility: Visibility,
-        name: &QualifiedName,
-    ) -> EvalResult<Symbol> {
-        self.use_symbols_of(visibility, name, &self.current_name())
-    }
-}
-*/
 impl PushDiag for Context {
     fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         let result = self.diag.push_diag(diag);
@@ -636,6 +560,7 @@ impl std::fmt::Display for Context {
         writeln!(f, "\nCall Stack:")?;
         self.stack.pretty_print_call_trace(f, &self.sources)?;
 
+        writeln!(f, "\nSymbol Table:")?;
         if self.has_errors() {
             writeln!(f, "{}\nErrors:", self.symbol_table)?;
             self.fmt_diagnosis(f)?;
