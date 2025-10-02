@@ -98,11 +98,23 @@ impl SymbolTable {
         self.symbols.values().cloned().collect()
     }
 
+    /// Return a list of unchecked symbols
+    ///
+    /// Symbols only get *checked* if [check()] was called before!
     pub fn unchecked(&self) -> Vec<Symbol> {
         let mut unchecked = Vec::new();
         self.symbols
             .values()
             .for_each(|symbol| symbol.unchecked(&mut unchecked));
+        unchecked
+    }
+
+    /// Return a list of unused symbols
+    pub fn unused(&self) -> Vec<Symbol> {
+        let mut unchecked = Vec::new();
+        self.symbols
+            .values()
+            .for_each(|symbol| symbol.unused(&mut unchecked));
         unchecked
     }
 }
