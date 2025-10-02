@@ -72,7 +72,7 @@ impl ResolveContext {
     }
 
     /// check names in all symbols
-    pub fn check(&mut self) -> ResolveResult<()> {
+    pub fn check(&mut self) -> ResolveResult<Vec<Symbol>> {
         log::trace!("Checking symbol table");
         self.symbols
             .values()
@@ -81,17 +81,18 @@ impl ResolveContext {
 
         log::debug!("Symbol table OK!");
 
+        let unchecked = self.symbols.unchecked();
+
         log::trace!(
-            "Unused symbols:\n{}",
-            self.symbols
-                .unchecked()
+            "Symbols never used in ANY code:\n{}",
+            unchecked
                 .iter()
                 .map(|s| format!("{:?}", s))
                 .collect::<Vec<_>>()
                 .join("\n")
         );
 
-        Ok(())
+        Ok(unchecked)
     }
 
     /// Load file into source cache and symbolize it into a symbol.

@@ -39,13 +39,16 @@ impl RunCommand for Resolve {
             Ok(symbol_table) => symbol_table,
             Err(err) => todo!(),
         };
-        context.check()?;
+        let unchecked = context.check()?;
 
         if context.has_errors() {
             print!("{}", context.diagnosis());
         }
         match &self.output {
-            Some(filename) => context.write_to_file(&filename)?,
+            Some(filename) => {
+                context.write_to_file(&filename)?;
+                todo!("write unchecked into file");
+            }
             None => println!("{context}"),
         }
 
