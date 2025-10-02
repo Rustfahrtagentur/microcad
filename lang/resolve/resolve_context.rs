@@ -3,18 +3,87 @@
 
 //! Resolve Context
 
-use crate::{diag::*, resolve::*, syntax::*};
+use crate::{diag::*, rc::*, resolve::*, syntax::*};
 
 /// Resolve Context
 pub struct ResolveContext {
-    diag: DiagHandler,
+    /// Symbol table.
+    pub symbols: SymbolTable,
     sources: Sources,
+    diag: DiagHandler,
 }
 
 impl ResolveContext {
-    /// Create new resolve context
-    pub fn new(diag: DiagHandler, sources: Sources) -> Self {
-        Self { diag, sources }
+    /// Create new resolve context.
+    pub(super) fn new(sources: Sources, diag: DiagHandler) -> Self {
+        Self {
+            symbols: SymbolTable::default(),
+            sources,
+            diag,
+        }
+    }
+
+    /// Load and resolve a source file
+    pub fn load_and_resolve(
+        root: Rc<SourceFile>,
+        search_paths: &[impl AsRef<std::path::Path>],
+        builtin: Option<Symbol>,
+        diag: DiagHandler,
+    ) -> ResolveResult<ResolveContext> {
+        let mut context = Self::load(root, search_paths, diag)?;
+        if let Some(builtin) = builtin {
+            context.add_symbol(builtin)?;
+        }
+        context.resolve()?;
+        Ok(context)
+    }
+
+    pub(crate) fn load(
+        root: Rc<SourceFile>,
+        search_paths: &[impl AsRef<std::path::Path>],
+        diag: DiagHandler,
+    ) -> ResolveResult<ResolveContext> {
+        let sources = Sources::load(root.clone(), search_paths)?;
+        let mut context = Self::new(sources, diag);
+        context.symbolize()?;
+        Ok(context)
+    }
+
+    pub(super) fn add_symbol(&mut self, symbol: Symbol) -> ResolveResult<()> {
+        self.symbols.add_symbol(symbol.clone())?;
+        symbol.resolve(self)?;
+        Ok(())
+    }
+
+    pub(super) fn resolve(&mut self) -> ResolveResult<()> {
+        self.symbols
+            .values()
+            .iter()
+            .filter(|child| child.resolvable())
+            .try_for_each(|child| {
+                child.resolve(self)?;
+                Ok::<_, ResolveError>(())
+            })?;
+
+        log::debug!("Resolve OK!");
+        log::trace!("Resolved symbol table:\n{self:?}");
+
+        Ok(())
+    }
+
+    /// check names in all symbols
+    pub fn check(&mut self) -> ResolveResult<()> {
+        log::trace!("Checking symbol table");
+        self.symbols
+            .values()
+            .iter_mut()
+            .try_for_each(|symbol| symbol.check(self))?;
+
+        log::debug!("Symbol table OK!");
+
+        log::trace!("{:?}", self.symbols);
+
+        Ok(())
     }
 
     /// Load file into source cache and symbolize it into a symbol.
@@ -30,7 +99,7 @@ impl ResolveContext {
     }
 
     /// Create a symbol out of all sources (without resolving them).
-    pub(crate) fn symbolize(mut self) -> ResolveResult<SymbolTable> {
+    pub(crate) fn symbolize(&mut self) -> ResolveResult<()> {
         let named_symbols = self
             .sources
             .clone()
@@ -38,7 +107,7 @@ impl ResolveContext {
             .map(|source| {
                 match (
                     self.sources.generate_name_from_path(&source.filename()),
-                    source.symbolize(Visibility::Public, &mut self),
+                    source.symbolize(Visibility::Public, self),
                 ) {
                     (Ok(name), Ok(symbol)) => Ok((name, symbol)),
                     (_, Err(err)) | (Err(err), _) => Err(err),
@@ -46,15 +115,24 @@ impl ResolveContext {
             })
             .collect::<ResolveResult<Vec<_>>>()?;
 
-        let mut symbols = SymbolMap::default();
         for (name, symbol) in named_symbols {
             if let Some(id) = name.single_identifier() {
-                symbols.insert(id.clone(), symbol);
+                self.symbols.insert_symbol(id.clone(), symbol)?;
             } else {
                 todo!()
             }
         }
-        SymbolTable::new(symbols, self.sources)
+        Ok(())
+    }
+}
+
+impl WriteToFile for ResolveContext {}
+
+impl Lookup for ResolveContext {
+    fn lookup(&self, name: &QualifiedName) -> Result<Symbol, ResolveError> {
+        let symbol = self.symbols.lookup(name)?;
+        symbol.set_check();
+        Ok(symbol)
     }
 }
 
@@ -85,5 +163,29 @@ impl Diag for ResolveContext {
 impl GetSourceByHash for ResolveContext {
     fn get_by_hash(&self, hash: u64) -> ResolveResult<std::rc::Rc<SourceFile>> {
         self.sources.get_by_hash(hash)
+    }
+}
+
+impl std::fmt::Debug for ResolveContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "Sources:\n")?;
+        write!(f, "{:?}", &self.sources)?;
+        writeln!(f, "\nSymbols:\n")?;
+        write!(f, "{:?}", &self.symbols)?;
+        let err_count = self.diag.error_count();
+        if err_count == 0 {
+            writeln!(f, "No errors.")
+        } else {
+            writeln!(f, "\n{err_count} error(s):\n")?;
+            self.diag.pretty_print(f, &self.sources)
+        }
+    }
+}
+
+impl std::fmt::Display for ResolveContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "{}", &self.sources)?;
+        writeln!(f, "{}", &self.symbols)?;
+        self.diag.pretty_print(f, &self.sources)
     }
 }

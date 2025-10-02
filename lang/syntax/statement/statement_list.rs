@@ -3,7 +3,7 @@
 
 //! Statement list syntax element.
 
-use crate::syntax::*;
+use crate::{src_ref::*, syntax::*};
 use derive_more::Deref;
 
 /// A list of statements.
@@ -16,5 +16,15 @@ impl std::fmt::Display for StatementList {
             writeln!(f, "{statement}")?;
         }
         Ok(())
+    }
+}
+
+impl SrcReferrer for StatementList {
+    fn src_ref(&self) -> SrcRef {
+        if let (Some(first), Some(last)) = (self.first(), self.last()) {
+            SrcRef::merge(first, last)
+        } else {
+            SrcRef(None)
+        }
     }
 }

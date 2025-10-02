@@ -30,13 +30,14 @@ impl ContextBuilder {
         root: Rc<SourceFile>,
         search_paths: &[impl AsRef<std::path::Path>],
     ) -> ResolveResult<Self> {
-        let symbol_table = SymbolTable::load_and_resolve(
+        let context = ResolveContext::load_and_resolve(
             root,
             search_paths,
-            crate::builtin_module(),
+            Some(crate::builtin_module()),
             DiagHandler::default(),
         )?;
-        Ok(Self::new(symbol_table, Box::new(Capture::new()))
+        let context = Self::new(context.symbols, Box::new(Capture::new()));
+        Ok(context
             .importers(crate::builtin_importers())
             .exporters(crate::builtin_exporters()))
     }

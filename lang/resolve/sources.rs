@@ -262,6 +262,20 @@ impl std::fmt::Display for Sources {
                 .name_from_index(index)
                 .unwrap_or(QualifiedName::no_ref(vec![]));
             let hash = source_file.hash;
+            writeln!(f, "[{index}] {name} {hash:#x} {filename}")?;
+        }
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for Sources {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for (index, source_file) in self.source_files.iter().enumerate() {
+            let filename = source_file.filename_as_str();
+            let name = self
+                .name_from_index(index)
+                .unwrap_or(QualifiedName::no_ref(vec![]));
+            let hash = source_file.hash;
             writeln!(f, "[{index}] {name:?} {hash:#x} {filename}")?;
         }
         Ok(())

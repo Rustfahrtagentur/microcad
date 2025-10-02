@@ -7,26 +7,29 @@ use crate::{resolve::*, syntax::*};
 
 pub(super) trait Grant {
     /// Checks if definition is allowed to occur within the given parent symbol.
-    fn grant(&self, _parent: &Symbol) -> ResolveResult<&Self> {
+    fn grant(&self, _parent: &Symbol, _context: &mut ResolveContext) -> ResolveResult<&Self> {
         Ok(self)
     }
 }
 
 impl Grant for ModuleDefinition {
-    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
-        parent.with_def(|def| match def {
-            SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => Ok(self),
+    fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<&Self> {
+        if let Err(err) = parent.with_def(|def| match def {
+            SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => Ok(()),
             _ => Err(ResolveError::StatementNotSupported(
                 self.to_string(),
                 parent.to_string(),
             )),
-        })
+        }) {
+            context.error(self, err)?;
+        }
+        Ok(self)
     }
 }
 
 impl Grant for StatementList {
-    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
-        parent.with_def(|def| match def {
+    fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<&Self> {
+        if let Err(err) = parent.with_def(|def| match def {
             SymbolDefinition::SourceFile(..)
             | SymbolDefinition::Module(..)
             | SymbolDefinition::Workbench(..)
@@ -35,13 +38,16 @@ impl Grant for StatementList {
                 self.to_string(),
                 parent.to_string(),
             )),
-        })
+        }) {
+            context.error(self, err)?;
+        }
+        Ok(self)
     }
 }
 
 impl Grant for Statement {
-    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
-        parent.with_def(|def| match (def, &self) {
+    fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<&Self> {
+        if let Err(err) = parent.with_def(|def| match (def, &self) {
             (
                 SymbolDefinition::SourceFile(..),
                 Statement::Assignment(..)
@@ -81,25 +87,31 @@ impl Grant for Statement {
                 self.to_string(),
                 parent.to_string(),
             )),
-        })
+        }) {
+            context.error(self, err)?;
+        }
+        Ok(self)
     }
 }
 
 impl Grant for WorkbenchDefinition {
-    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
-        parent.with_def(|def| match def {
+    fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<&Self> {
+        if let Err(err) = parent.with_def(|def| match def {
             SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => Ok(self),
             _ => Err(ResolveError::StatementNotSupported(
                 self.to_string(),
                 parent.to_string(),
             )),
-        })
+        }) {
+            context.error(self, err)?;
+        }
+        Ok(self)
     }
 }
 
 impl Grant for FunctionDefinition {
-    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
-        parent.with_def(|def| match def {
+    fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<&Self> {
+        if let Err(err) = parent.with_def(|def| match def {
             SymbolDefinition::SourceFile(..)
             | SymbolDefinition::Module(..)
             | SymbolDefinition::Workbench(..) => Ok(self),
@@ -107,37 +119,46 @@ impl Grant for FunctionDefinition {
                 self.to_string(),
                 parent.to_string(),
             )),
-        })
+        }) {
+            context.error(self, err)?;
+        }
+        Ok(self)
     }
 }
 
 impl Grant for InitDefinition {
-    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
-        parent.with_def(|def| match def {
+    fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<&Self> {
+        if let Err(err) = parent.with_def(|def| match def {
             SymbolDefinition::Workbench(..) => Ok(self),
             _ => Err(ResolveError::StatementNotSupported(
                 self.to_string(),
                 parent.to_string(),
             )),
-        })
+        }) {
+            context.error(self, err)?;
+        }
+        Ok(self)
     }
 }
 
 impl Grant for ReturnStatement {
-    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
-        parent.with_def(|def| match def {
+    fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<&Self> {
+        if let Err(err) = parent.with_def(|def| match def {
             SymbolDefinition::Function(..) => Ok(self),
             _ => Err(ResolveError::StatementNotSupported(
                 self.to_string(),
                 parent.to_string(),
             )),
-        })
+        }) {
+            context.error(self, err)?;
+        }
+        Ok(self)
     }
 }
 
 impl Grant for IfStatement {
-    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
-        parent.with_def(|def| match def {
+    fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<&Self> {
+        if let Err(err) = parent.with_def(|def| match def {
             SymbolDefinition::SourceFile(..)
             | SymbolDefinition::Module(..)
             | SymbolDefinition::Workbench(..)
@@ -146,13 +167,16 @@ impl Grant for IfStatement {
                 self.to_string(),
                 parent.to_string(),
             )),
-        })
+        }) {
+            context.error(self, err)?;
+        }
+        Ok(self)
     }
 }
 
 impl Grant for AssignmentStatement {
-    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
-        parent.with_def(|def| match def {
+    fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<&Self> {
+        if let Err(err) = parent.with_def(|def| match def {
             SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => Ok(self),
             SymbolDefinition::Workbench(..) | SymbolDefinition::Function(..) => {
                 match self.assignment.visibility {
@@ -167,13 +191,16 @@ impl Grant for AssignmentStatement {
                 self.to_string(),
                 parent.to_string(),
             )),
-        })
+        }) {
+            context.error(self, err)?;
+        }
+        Ok(self)
     }
 }
 
 impl Grant for Body {
-    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
-        parent.with_def(|def| match def {
+    fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<&Self> {
+        if let Err(err) = parent.with_def(|def| match def {
             SymbolDefinition::SourceFile(..)
             | SymbolDefinition::Module(..)
             | SymbolDefinition::Workbench(..)
@@ -182,12 +209,15 @@ impl Grant for Body {
                 self.to_string(),
                 parent.to_string(),
             )),
-        })
+        }) {
+            context.error(self, err)?;
+        }
+        Ok(self)
     }
 }
 impl Grant for UseStatement {
-    fn grant(&self, parent: &Symbol) -> ResolveResult<&Self> {
-        parent.with_def(|def| -> Result<&UseStatement, ResolveError> {
+    fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<&Self> {
+        if let Err(err) = parent.with_def(|def| -> Result<&UseStatement, ResolveError> {
             match def {
                 SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => Ok(self),
                 SymbolDefinition::Workbench(..) | SymbolDefinition::Function(..) => {
@@ -204,6 +234,9 @@ impl Grant for UseStatement {
                     parent.to_string(),
                 )),
             }
-        })
+        }) {
+            context.error(self, err)?;
+        }
+        Ok(self)
     }
 }

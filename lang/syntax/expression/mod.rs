@@ -215,3 +215,9 @@ impl Expression {
         }
     }
 }
+
+impl AsRef<Self> for Expression {
+    fn as_ref(&self) -> &Self {
+        self
+    }
+}

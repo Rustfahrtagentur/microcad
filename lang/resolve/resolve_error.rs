@@ -97,6 +97,14 @@ pub enum ResolveError {
     /// Given symbol has not children which can be used.
     #[error("No symbols found to use in {0}")]
     NoSymbolsToUse(QualifiedName),
+
+    /// Stack underflow.
+    #[error("Stack underflow")]
+    StackUnderflow,
+
+    /// Stack is unexpectedly empty.
+    #[error("Stack is empty")]
+    StackEmpty,
 }
 
 /// Result type of any resolve.
