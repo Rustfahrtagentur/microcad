@@ -3,7 +3,7 @@
 
 //! µcad CLI resolve command.
 
-use microcad_lang::{diag::*, rc::*, resolve::*, syntax::*};
+use microcad_lang::{diag::*, resolve::*};
 
 use crate::*;
 
@@ -25,17 +25,14 @@ impl Resolve {
         }
         .parse()?;
 
-        let mut context = match ResolveContext::load_and_resolve(
+        let mut context = ResolveContext::load_and_resolve(
             root,
             search_paths,
             Some(microcad_builtin::builtin_module()),
             DiagHandler::default(),
-        ) {
-            Ok(symbol_table) => symbol_table,
-            Err(err) => todo!(),
-        };
+        )?;
 
-        let unchecked = context.check()?;
+        context.check()?;
 
         if context.has_errors() {
             print!("{}", context.diagnosis());

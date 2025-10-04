@@ -9,8 +9,14 @@ use crate::{diag::*, rc::*, resolve::*, syntax::*};
 pub struct ResolveContext {
     /// Symbol table.
     pub symbol_table: SymbolTable,
+    /// Source file cache.
     pub sources: Sources,
+    /// Diagnostic handler.
     pub diag: DiagHandler,
+    /// Unchecked symbols.
+    ///
+    /// Filled by [check()] with symbols which are not in use in ANY checked code.
+    pub unchecked: Option<Symbols>,
 }
 
 impl ResolveContext {
@@ -20,6 +26,7 @@ impl ResolveContext {
             symbol_table: SymbolTable::default(),
             sources,
             diag,
+            unchecked: Default::default(),
         }
     }
 
@@ -72,7 +79,7 @@ impl ResolveContext {
     }
 
     /// check names in all symbols
-    pub fn check(&mut self) -> ResolveResult<Vec<Symbol>> {
+    pub fn check(&mut self) -> ResolveResult<()> {
         log::trace!("Checking symbol table");
         self.symbol_table
             .values()
@@ -82,17 +89,17 @@ impl ResolveContext {
         log::debug!("Symbol table OK!");
 
         let unchecked = self.symbol_table.unchecked();
-
         log::trace!(
             "Symbols never used in ANY code:\n{}",
             unchecked
                 .iter()
-                .map(|s| format!("{:?}", s))
+                .map(|symbol| format!("{:?}", symbol))
                 .collect::<Vec<_>>()
                 .join("\n")
         );
+        self.unchecked = Some(unchecked);
 
-        Ok(unchecked)
+        Ok(())
     }
 
     /// Load file into source cache and symbolize it into a symbol.
@@ -183,18 +190,24 @@ impl std::fmt::Debug for ResolveContext {
         write!(f, "{:?}", &self.symbol_table)?;
         let err_count = self.diag.error_count();
         if err_count == 0 {
-            writeln!(f, "No errors.")
+            writeln!(f, "No errors.")?;
         } else {
             writeln!(f, "\n{err_count} error(s):\n")?;
-            self.diag.pretty_print(f, &self.sources)
+            self.diag.pretty_print(f, &self.sources)?;
         }
+        if let Some(unchecked) = &self.unchecked {
+            writeln!(f, "\nUnchecked:\n{unchecked}")?;
+        }
+        Ok(())
     }
 }
 
 impl std::fmt::Display for ResolveContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{}", &self.sources)?;
-        writeln!(f, "{}", &self.symbol_table)?;
-        self.diag.pretty_print(f, &self.sources)
+        if let Some(unchecked) = &self.unchecked {
+            writeln!(f, "{}", unchecked)?;
+        }
+        self.diag.pretty_print(f, &self.sources)?;
+        writeln!(f, "{}", &self.symbol_table)
     }
 }

@@ -567,7 +567,7 @@ impl Symbol {
         }
     }
 
-    pub(super) fn unchecked(&self, unchecked: &mut Vec<Symbol>) {
+    pub(super) fn unchecked(&self, unchecked: &mut Symbols) {
         let inner = self.inner.borrow();
         if !inner.checked {
             unchecked.push(self.clone())
@@ -578,7 +578,7 @@ impl Symbol {
             .for_each(|(_, child)| child.unchecked(unchecked));
     }
 
-    pub(super) fn unused(&self, unused: &mut Vec<Symbol>) {
+    pub(super) fn unused(&self, unused: &mut Symbols) {
         let inner = self.inner.borrow();
         if !inner.used {
             unused.push(self.clone())
