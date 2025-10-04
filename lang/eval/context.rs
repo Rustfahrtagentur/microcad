@@ -260,11 +260,16 @@ impl Context {
                         });
                     }
                 }
+                log::trace!(
+                    "{found} symbol within {within}:` {alias}",
+                    found = crate::mark!(FOUND),
+                );
                 return Ok(alias);
             }
         }
         Err(EvalError::SymbolNotFound(what.clone()))
     }
+
     /// Check if current stack frame is code
     pub fn is_code(&self) -> bool {
         !matches!(self.stack.current_frame(), Some(StackFrame::Module(..)))
@@ -294,7 +299,7 @@ impl UseSymbol for Context {
             let id = id.clone().unwrap_or(symbol.id());
             let symbol = symbol.clone_with_visibility(visibility);
             if within.is_empty() {
-                self.symbol_table.insert_symbol(id, symbol);
+                self.symbol_table.insert_symbol(id, symbol)?;
             } else {
                 self.symbol_table.lookup(within)?.insert(id, symbol);
             }
@@ -325,19 +330,19 @@ impl UseSymbol for Context {
                 symbol.with_children(|(id, symbol)| {
                     let symbol = symbol.clone_with_visibility(visibility);
                     if within.is_empty() {
-                        self.symbol_table.insert_symbol(id.clone(), symbol);
+                        self.symbol_table.insert_symbol(id.clone(), symbol)?;
                     } else {
                         self.symbol_table.lookup(within)?.insert(id.clone(), symbol);
                     }
                     Ok::<_, EvalError>(())
-                });
+                })?;
                 log::trace!("Symbol Table:\n{}", self.symbol_table);
             }
 
             if self.is_code() {
                 symbol.with_children(|(id, symbol)| {
                     self.stack.put_local(Some(id.clone()), symbol.clone())
-                });
+                })?;
                 log::trace!("Local Stack:\n{}", self.stack);
             }
             Ok(symbol)
