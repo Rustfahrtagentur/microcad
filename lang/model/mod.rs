@@ -37,7 +37,7 @@ use crate::{
 };
 
 /// A reference counted, mutable [`Model`].
-#[derive(Debug, Clone, Deref, DerefMut)]
+#[derive(Clone, Deref, DerefMut)]
 pub struct Model(RcMut<ModelInner>);
 
 impl Model {
@@ -168,7 +168,7 @@ impl Model {
     }
 
     /// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
-    pub fn signature(&self) -> String {
+    pub fn signature_display(&self) -> String {
         format!(
             "{id}{element}{is_root} ->",
             id = match &self.borrow().id {
@@ -182,6 +182,23 @@ impl Model {
                 " (root)"
             }
         )
+    }
+
+    /// Print signature in debug mode
+    pub fn signature_debug(&self) -> String {
+        crate::shorten!(format!(
+            "{id}{element}{is_root} ->",
+            id = match &self.borrow().id {
+                Some(id) => format!("{id:?}: "),
+                None => String::new(),
+            },
+            element = *self.borrow().element,
+            is_root = if self.parents().next().is_some() {
+                ""
+            } else {
+                " (root)"
+            }
+        ))
     }
 }
 
@@ -245,22 +262,22 @@ impl SrcReferrer for Model {
     }
 }
 
-/// Prints a [`Model`].
-///
-/// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
-/// The exemplary output will look like this:
-///
-/// ```custom
-/// id: Object:
-///     Object = std::geo2d::Circle(radius = 3.0mm) -> Geometry2D:
-///         Primitive = __builtin::geo2d::Circle(radius = 3.0) -> Geometry2D`
-/// ```
 impl std::fmt::Display for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "{signature}",
-            signature = crate::shorten!(self.signature())
+            signature = crate::shorten!(self.signature_display())
+        )
+    }
+}
+
+impl std::fmt::Debug for Model {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{signature}",
+            signature = crate::shorten!(self.signature_display())
         )
     }
 }
@@ -271,7 +288,11 @@ impl TreeDisplay for Model {
         f: &mut std::fmt::Formatter,
         mut tree_state: TreeState,
     ) -> std::fmt::Result {
-        let signature = crate::shorten!(self.signature(), tree_state.shorten);
+        let signature = if tree_state.debug {
+            self.signature_debug()
+        } else {
+            self.signature_display()
+        };
         let self_ = self.borrow();
         if let Some(output) = &self_.output {
             writeln!(f, "{:tree_state$}{signature} {output}", "",)?;

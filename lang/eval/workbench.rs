@@ -131,7 +131,7 @@ impl WorkbenchDefinition {
         context: &mut Context,
     ) -> EvalResult<Model> {
         log::debug!(
-            "Workbench {call} {kind} {id:?}({arguments})",
+            "Workbench {call} {kind} {id:?}({arguments:?})",
             call = crate::mark!(CALL),
             id = self.id,
             kind = self.kind
@@ -149,7 +149,7 @@ impl WorkbenchDefinition {
                     "Building plan matches: {}",
                     matches
                         .iter()
-                        .map(|m| m.to_string())
+                        .map(|m| format!("{m:?}"))
                         .collect::<Vec<_>>()
                         .join("\n")
                 );
@@ -178,7 +178,7 @@ impl WorkbenchDefinition {
                             "Initializer matches: {}",
                             matches
                                 .iter()
-                                .map(|m| m.to_string())
+                                .map(|m| format!("{m:?}"))
                                 .collect::<Vec<_>>()
                                 .join("\n")
                         );

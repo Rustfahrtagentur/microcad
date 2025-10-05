@@ -10,7 +10,7 @@ use crate::{src_ref::*, ty::*, value::*};
 /// Tuple with named values
 ///
 /// Names are optional, which means Identifiers can be empty.
-#[derive(Clone, Default, Debug, PartialEq)]
+#[derive(Clone, Default, PartialEq)]
 pub struct Tuple {
     pub(crate) named: std::collections::HashMap<Identifier, Value>,
     pub(crate) unnamed: std::collections::HashMap<Type, Value>,
@@ -491,6 +491,25 @@ impl std::fmt::Display for Tuple {
                     .iter()
                     .map(|(id, v)| format!("{id}={v}"))
                     .chain(self.unnamed.values().map(|v| format!("{v}")))
+                    .collect::<Vec<String>>();
+                items.sort();
+                items.join(", ")
+            }
+        )
+    }
+}
+
+impl std::fmt::Debug for Tuple {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "({items})",
+            items = {
+                let mut items = self
+                    .named
+                    .iter()
+                    .map(|(id, v)| format!("{id:?}={v:?}"))
+                    .chain(self.unnamed.values().map(|v| format!("{v:?}")))
                     .collect::<Vec<String>>();
                 items.sort();
                 items.join(", ")

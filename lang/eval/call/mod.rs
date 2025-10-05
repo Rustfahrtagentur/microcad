@@ -73,7 +73,7 @@ impl Eval for Call {
         };
 
         log::debug!(
-            "{call} {name}({args})",
+            "{call} {name:?}({args:?})",
             name = self.name,
             call = crate::mark!(CALL),
         );

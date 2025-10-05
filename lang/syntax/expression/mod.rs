@@ -19,7 +19,7 @@ use crate::{src_ref::*, syntax::*, value::*};
 pub type ListExpression = Vec<Expression>;
 
 /// Any expression.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
@@ -134,6 +134,38 @@ impl std::fmt::Display for Expression {
             Self::Body(body) => write!(f, "{body}"),
             Self::QualifiedName(qualified_name) => write!(f, "{qualified_name}"),
             Self::Marker(marker) => write!(f, "{marker}"),
+            _ => unimplemented!(),
+        }
+    }
+}
+
+impl std::fmt::Debug for Expression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::Value(value) => write!(f, "{value:?}"),
+            Self::Literal(literal) => write!(f, "{literal:?}"),
+            Self::FormatString(format_string) => write!(f, "{format_string:?}"),
+            Self::ArrayExpression(array_expression) => write!(f, "{array_expression:?}"),
+            Self::TupleExpression(tuple_expression) => write!(f, "{tuple_expression:?}"),
+            Self::BinaryOp {
+                lhs,
+                op,
+                rhs,
+                src_ref: _,
+            } => write!(f, "{lhs:?} {op} {rhs:?}"),
+            Self::UnaryOp {
+                op,
+                rhs,
+                src_ref: _,
+            } => write!(f, "{op}{rhs:?}"),
+            Self::ArrayElementAccess(lhs, rhs, _) => write!(f, "{lhs:?}[{rhs:?}]"),
+            Self::PropertyAccess(lhs, rhs, _) => write!(f, "{lhs:?}.{rhs:?}"),
+            Self::AttributeAccess(lhs, rhs, _) => write!(f, "{lhs:?}#{rhs:?}"),
+            Self::MethodCall(lhs, method_call, _) => write!(f, "{lhs:?}.{method_call:?}"),
+            Self::Call(call) => write!(f, "{call:?}"),
+            Self::Body(body) => write!(f, "{body:?}"),
+            Self::QualifiedName(qualified_name) => write!(f, "{qualified_name:?}"),
+            Self::Marker(marker) => write!(f, "{marker:?}"),
             _ => unimplemented!(),
         }
     }
