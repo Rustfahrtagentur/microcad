@@ -34,12 +34,12 @@ impl Stack {
                         "Set"
                     };
                     if name.is_qualified() {
-                        log::debug!("{op} {name} as {id:?} to local stack");
+                        log::debug!("{op} {name:?} as {id:?} to local stack");
                     } else {
                         log::debug!("{op} {id:?} to local stack");
                     }
 
-                    log::trace!("Local Stack:\n{self}");
+                    log::trace!("Local Stack:\n{self:?}");
                     return Ok(());
                 }
                 StackFrame::Call {
@@ -274,7 +274,7 @@ impl Locals for Stack {
     }
 }
 
-impl std::fmt::Display for Stack {
+impl std::fmt::Debug for Stack {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.0.is_empty() {
             writeln!(f, crate::invalid!(STACK))
@@ -316,7 +316,7 @@ fn local_stack() {
 
     assert!(stack.put_local(None, make_int("a".into(), 1)).is_ok());
 
-    println!("{stack}");
+    println!("{stack:?}");
 
     assert!(fetch_int(&stack, "a").unwrap() == 1);
     assert!(fetch_int(&stack, "b").is_none());

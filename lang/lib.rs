@@ -185,7 +185,7 @@ macro_rules! found {
 #[macro_export]
 macro_rules! invalid {
     (VALUE) => {
-        color_print::cstr!("<R!,k,s> INVALID VALUE </>")
+        color_print::cstr!("<R!,k,s> NO VALUE </>")
     };
     (TYPE) => {
         color_print::cstr!("<R!,k,s> INVALID TYPE </>")
@@ -229,7 +229,7 @@ macro_rules! invalid {
 #[macro_export]
 macro_rules! invalid_no_ansi {
     (VALUE) => {
-        "<INVALID VALUE>"
+        "<NO VALUE>"
     };
     (TYPE) => {
         "<INVALID TYPE>"

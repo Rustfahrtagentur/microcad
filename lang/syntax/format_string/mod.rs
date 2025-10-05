@@ -30,7 +30,7 @@ impl SrcReferrer for FormatStringInner {
 }
 
 /// Format string.
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone)]
 pub struct FormatString(pub Refer<Vec<FormatStringInner>>);
 
 impl FormatString {
@@ -64,6 +64,20 @@ impl std::fmt::Display for FormatString {
             match elem {
                 FormatStringInner::String(s) => write!(f, "{}", s.value)?,
                 FormatStringInner::FormatExpression(expr) => write!(f, "{expr}")?,
+            }
+        }
+        write!(f, r#"""#)?;
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for FormatString {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, r#"""#)?;
+        for elem in &*self.0 {
+            match elem {
+                FormatStringInner::String(s) => write!(f, "{}", s.value)?,
+                FormatStringInner::FormatExpression(expr) => write!(f, "{expr:?}")?,
             }
         }
         write!(f, r#"""#)?;

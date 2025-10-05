@@ -10,13 +10,40 @@ pub trait TreeDisplay {
     fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result;
 
     /// Display as tree starting at depth `0`.
-    fn print_tree(&self, f: &mut std::fmt::Formatter, shorten: bool) -> std::fmt::Result {
-        self.tree_print(f, TreeState { depth: 0, shorten })
+    fn display_tree(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        self.tree_print(
+            f,
+            TreeState {
+                depth: 0,
+                debug: false,
+            },
+        )
     }
 
-    /// Display as tree starting at depth `0`.
+    /// Display as tree starting at given depth in debug mode
+    fn debug_tree(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        self.tree_print(
+            f,
+            TreeState {
+                depth: 0,
+                debug: true,
+            },
+        )
+    }
+
+    /// Display as tree starting at depth `0` into a file
     fn write_tree(&self, f: &mut impl std::io::Write) -> std::io::Result<()> {
-        write!(f, "{}", WriteFmt(|f| self.print_tree(f, false)))
+        write!(
+            f,
+            "{}",
+            WriteFmt(|f| self.tree_print(
+                f,
+                TreeState {
+                    depth: 0,
+                    debug: false
+                }
+            ))
+        )
     }
 }
 
@@ -42,17 +69,23 @@ const INDENT: usize = 2;
 pub struct TreeState {
     #[deref]
     depth: usize,
-    /// Data shall be shortened to one-line if `true`
-    pub shorten: bool,
+    /// Print in debug mode
+    pub debug: bool,
 }
 
 impl TreeState {
     /// Create new tree state
     /// - `shorten`: If `true` content will be shortened to one line
-    pub fn new(shorten: bool) -> Self {
-        Self { depth: 0, shorten }
+    pub fn new_display() -> Self {
+        Self {
+            depth: 0,
+            debug: false,
+        }
     }
 
+    pub fn new_debug(depth: usize) -> Self {
+        Self { depth, debug: true }
+    }
     /// Change indention one step deeper
     pub fn indent(&mut self) {
         self.depth += INDENT
@@ -62,16 +95,7 @@ impl TreeState {
     pub fn indented(&self) -> Self {
         Self {
             depth: self.depth + INDENT,
-            shorten: self.shorten,
-        }
-    }
-}
-
-impl From<usize> for TreeState {
-    fn from(depth: usize) -> Self {
-        TreeState {
-            depth,
-            shorten: true,
+            debug: self.debug,
         }
     }
 }
@@ -81,6 +105,24 @@ pub struct FormatTree<'a, T: TreeDisplay>(pub &'a T);
 
 impl<T: TreeDisplay> std::fmt::Display for FormatTree<'_, T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.tree_print(f, 2.into())
+        self.0.tree_print(
+            f,
+            TreeState {
+                depth: 2,
+                debug: false,
+            },
+        )
+    }
+}
+
+impl<T: TreeDisplay> std::fmt::Debug for FormatTree<'_, T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.tree_print(
+            f,
+            TreeState {
+                depth: 2,
+                debug: true,
+            },
+        )
     }
 }

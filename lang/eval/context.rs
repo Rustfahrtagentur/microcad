@@ -308,7 +308,7 @@ impl UseSymbol for Context {
 
         if self.is_code() {
             self.stack.put_local(id, symbol.clone())?;
-            log::trace!("Local Stack:\n{}", self.stack);
+            log::trace!("Local Stack:\n{:?}", self.stack);
         }
 
         Ok(symbol)
@@ -343,7 +343,7 @@ impl UseSymbol for Context {
                 symbol.with_children(|(id, symbol)| {
                     self.stack.put_local(Some(id.clone()), symbol.clone())
                 })?;
-                log::trace!("Local Stack:\n{}", self.stack);
+                log::trace!("Local Stack:\n{:?}", self.stack);
             }
             Ok(symbol)
         }
@@ -448,7 +448,7 @@ impl Lookup<EvalError> for Context {
 
         // log any unexpected errors and return early
         if !errors.is_empty() {
-            log::debug!("Unexpected errors while lookup symbol '{name:?}':");
+            log::error!("Unexpected errors while lookup symbol '{name:?}':");
             errors
                 .iter()
                 .for_each(|(origin, err)| log::error!("Lookup ({origin}) error: {err}"));
@@ -457,17 +457,17 @@ impl Lookup<EvalError> for Context {
         }
 
         // early emit any ambiguity error
-        if !ambiguous.is_empty() {
+        if !ambiguities.is_empty() {
             log::debug!(
                 "{ambiguous} Symbol '{name:?}':\n{}",
-                ambiguous
+                ambiguities
                     .iter()
                     .map(|(origin, err)| format!("{origin}: {err}"))
                     .collect::<Vec<_>>()
                     .join("\n"),
                 ambiguous = crate::mark!(AMBIGUOUS)
             );
-            return Err(ambiguous.remove(0).1);
+            return Err(ambiguities.remove(0).1);
         }
 
         // follow aliases
@@ -488,7 +488,7 @@ impl Lookup<EvalError> for Context {
                 // check if all findings point to the same symbol
                 if !found.iter().all(|(_, x)| x == symbol) {
                     log::debug!(
-                        "{ambiguous} symbol '{name:?}' in {origin}:\n{self}",
+                        "{ambiguous} symbol '{name:?}' in {origin}:\n{self:?}",
                         ambiguous = crate::mark!(AMBIGUOUS),
                         origin = found
                             .iter()
@@ -542,7 +542,7 @@ impl Diag for Context {
 impl PushDiag for Context {
     fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         let result = self.diag.push_diag(diag);
-        log::trace!("Error Context:\n{self}");
+        log::trace!("Error Context:\n{self:?}");
         result
     }
 }
@@ -553,15 +553,15 @@ impl GetSourceByHash for Context {
     }
 }
 
-impl std::fmt::Display for Context {
+impl std::fmt::Debug for Context {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Ok(model) = self.get_model() {
             write!(f, "\nModel:\n")?;
-            model.tree_print(f, 4.into())?;
+            model.tree_print(f, TreeState::new_debug(4))?;
         }
-        writeln!(f, "\nCurrent: {}", self.stack.current_name())?;
-        writeln!(f, "\nModule: {}", self.stack.current_module_name())?;
-        write!(f, "\nLocals Stack:\n{}", self.stack)?;
+        writeln!(f, "\nCurrent: {:?}", self.stack.current_name())?;
+        writeln!(f, "\nModule: {:?}", self.stack.current_module_name())?;
+        write!(f, "\nLocals Stack:\n{:?}", self.stack)?;
         writeln!(f, "\nCall Stack:")?;
         self.stack.pretty_print_call_trace(f, &self.sources)?;
 

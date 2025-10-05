@@ -10,7 +10,7 @@ use derive_more::Deref;
 ///
 /// Also provides methods to find a matching call
 /// between it and a given *parameter list*.
-#[derive(Clone, Debug, Default, Deref)]
+#[derive(Clone, Default, Deref)]
 pub struct ArgumentValueList {
     #[deref]
     map: Vec<(Identifier, ArgumentValue)>,
@@ -72,7 +72,21 @@ impl std::fmt::Display for ArgumentValueList {
             let mut v = self
                 .map
                 .iter()
-                .map(|(id, p)| format!("{id:?}: {p}"))
+                .map(|(id, p)| format!("{id}: {p}"))
+                .collect::<Vec<_>>();
+            v.sort();
+            v.join(", ")
+        })
+    }
+}
+
+impl std::fmt::Debug for ArgumentValueList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", {
+            let mut v = self
+                .map
+                .iter()
+                .map(|(id, p)| format!("{id:?}: {p:?}"))
                 .collect::<Vec<_>>();
             v.sort();
             v.join(", ")

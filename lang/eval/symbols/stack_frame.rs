@@ -112,7 +112,7 @@ impl StackFrame {
             } => {
                 return writeln!(
                     f,
-                    "{:depth$}[{idx}] Call: {name:?}({args})",
+                    "{:depth$}[{idx}] Call: {name:?}({args:?})",
                     "",
                     args = args,
                     name = symbol.full_name()
@@ -125,18 +125,18 @@ impl StackFrame {
         for (id, symbol) in locals.iter() {
             let full_name = symbol.full_name();
             let full_name = if full_name != id.into() {
-                format!(" [{full_name}]")
+                format!(" [{full_name:?}]")
             } else {
                 String::new()
             };
             symbol.with_def(|def| match def {
                 SymbolDefinition::Constant(visibility, id, value) => writeln!(
                     f,
-                    "{:depth$}- {visibility}{id:?} = {value}{full_name} (constant)",
+                    "{:depth$}- {visibility}{id:?} = {value:?}{full_name} (constant)",
                     ""
                 ),
                 SymbolDefinition::Argument(id, value) => {
-                    writeln!(f, "{:depth$}- {id:?} = {value}{full_name} (argument)", "")
+                    writeln!(f, "{:depth$}- {id:?} = {value:?}{full_name} (argument)", "")
                 }
                 SymbolDefinition::SourceFile(source) => {
                     writeln!(f, "{:depth$}- {:?} (source)", "", source.filename())
@@ -155,14 +155,18 @@ impl StackFrame {
                 }
                 SymbolDefinition::Alias(visibility, id, name) => writeln!(
                     f,
-                    "{:depth$}- {visibility}{id:?}{full_name} -> {name} (alias)",
+                    "{:depth$}- {visibility}{id:?}{full_name} -> {name:?} (alias)",
                     ""
                 ),
                 SymbolDefinition::UseAll(visibility, name) => {
-                    writeln!(f, "{:depth$}- {visibility}{name}{full_name} (use all)", "")
+                    writeln!(
+                        f,
+                        "{:depth$}- {visibility}{name:?}{full_name} (use all)",
+                        ""
+                    )
                 }
                 #[cfg(test)]
-                SymbolDefinition::Tester(id) => writeln!(f, "{:depth$}- {id} (tester)", ""),
+                SymbolDefinition::Tester(id) => writeln!(f, "{:depth$}- {id:?} (tester)", ""),
             })?
         }
 
@@ -188,7 +192,12 @@ impl StackFrame {
                 args,
                 src_ref,
             } => {
-                writeln!(f, "{:>4}: {name}({args})", idx, name = symbol.full_name())?;
+                writeln!(
+                    f,
+                    "{:>4}: {name:?}({args:?})",
+                    idx,
+                    name = symbol.full_name()
+                )?;
 
                 if let Some(line_col) = src_ref.at() {
                     let source_file = source_by_hash.get_by_hash(src_ref.source_hash());
