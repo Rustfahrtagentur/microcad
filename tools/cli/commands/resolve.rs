@@ -13,15 +13,13 @@ pub struct Resolve {
     pub input: std::path::PathBuf,
     /// Output symbol table.
     pub output: Option<std::path::PathBuf>,
-    /// Skip checking all symbols after resolve.
-    #[clap(short, long)]
-    pub skip_check: bool,
 }
 
 impl Resolve {
     pub fn load(
         &self,
         search_paths: &[impl AsRef<std::path::Path>],
+        check: bool,
     ) -> ResolveResult<ResolveContext> {
         //  parse root file
         let root = crate::commands::parse::Parse {
@@ -37,7 +35,7 @@ impl Resolve {
             DiagHandler::default(),
         )?;
 
-        if !self.skip_check {
+        if check {
             context.check()?;
         }
 
@@ -60,7 +58,7 @@ impl Resolve {
 
 impl RunCommand for Resolve {
     fn run(&self, cli: &Cli) -> anyhow::Result<()> {
-        self.load(&cli.search_paths)?;
+        self.load(&cli.search_paths, cli.check)?;
         Ok(())
     }
 }
