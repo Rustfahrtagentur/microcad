@@ -8,8 +8,10 @@ use crate::{diag::*, resolve::*};
 pub struct DiagHandler {
     /// The list of diagnostics per source file.
     diag_list: DiagList,
-    /// The current number of overall errors in the evaluation process.
+    /// The number of overall errors in the evaluation process.
     error_count: u32,
+    /// The number of overall errors in the evaluation process.
+    warning_count: u32,
     /// The maximum number of collected errors until abort
     /// (`0` means unlimited number of errors).
     error_limit: Option<u32>,
@@ -37,6 +39,11 @@ impl DiagHandler {
         source_by_hash: &impl GetSourceByHash,
     ) -> std::fmt::Result {
         self.diag_list.pretty_print(f, source_by_hash)
+    }
+
+    /// Return overall number of occurred errors.
+    pub fn warning_count(&self) -> u32 {
+        self.warning_count
     }
 
     /// Return overall number of occurred errors.
@@ -93,6 +100,8 @@ impl PushDiag for DiagHandler {
             Diagnostic::Warning(_) => {
                 if self.warnings_as_errors {
                     self.error_count += 1;
+                } else {
+                    self.warning_count += 1;
                 }
             }
             _ => (),

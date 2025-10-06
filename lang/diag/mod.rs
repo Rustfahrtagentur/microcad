@@ -76,6 +76,14 @@ pub trait Diag {
         str
     }
 
+    /// Returns true if there are warnings.
+    fn has_warnings(&self) -> bool {
+        self.warning_count() > 0
+    }
+
+    /// Return number of occurred warnings.
+    fn warning_count(&self) -> u32;
+
     /// Returns true if there are errors.
     fn has_errors(&self) -> bool {
         self.error_count() > 0

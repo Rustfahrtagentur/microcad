@@ -47,7 +47,7 @@ impl Resolve {
                 context.write_to_file(&filename)?;
                 todo!("write unchecked into file");
             }
-            None => println!("{context}"),
+            None => print!("{context}"),
         }
 
         log::info!("Resolved successfully!");
