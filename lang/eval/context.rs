@@ -551,6 +551,10 @@ impl Diag for Context {
         self.diag.pretty_print(f, self)
     }
 
+    fn warning_count(&self) -> u32 {
+        self.diag.warning_count()
+    }
+
     fn error_count(&self) -> u32 {
         self.diag.error_count()
     }

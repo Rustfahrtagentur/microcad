@@ -163,6 +163,10 @@ impl Diag for ResolveContext {
         self.diag.pretty_print(f, self)
     }
 
+    fn warning_count(&self) -> u32 {
+        self.diag.error_count()
+    }
+
     fn error_count(&self) -> u32 {
         self.diag.error_count()
     }
@@ -205,9 +209,34 @@ impl std::fmt::Debug for ResolveContext {
 impl std::fmt::Display for ResolveContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(unchecked) = &self.unchecked {
-            writeln!(f, "{}", unchecked)?;
+            writeln!(f, "Resolved & checked symbols:\n{}", self.symbol_table)?;
+            if unchecked.is_empty() {
+                writeln!(f, "All symbols are referenced.\n{}", self.symbol_table)?;
+            } else {
+                writeln!(
+                    f,
+                    "Unreferenced symbols:\n{}\n",
+                    unchecked
+                        .iter()
+                        .map(|symbol| symbol.full_name().to_string())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                )?;
+            }
+        } else {
+            writeln!(f, "Resolved symbols:\n{}", self.symbol_table)?;
         }
-        self.diag.pretty_print(f, &self.sources)?;
-        writeln!(f, "{}", &self.symbol_table)
+        if self.has_errors() {
+            writeln!(
+                f,
+                "There were {err} error(s) and {warn} warning(s) so far:\n{diag}",
+                err = self.error_count(),
+                warn = self.warning_count(),
+                diag = self.diagnosis()
+            )?;
+        } else {
+            writeln!(f, "No errors so far.")?;
+        }
+        Ok(())
     }
 }

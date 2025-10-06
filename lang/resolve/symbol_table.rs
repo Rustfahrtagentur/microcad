@@ -140,7 +140,15 @@ impl Lookup for SymbolTable {
 
 impl std::fmt::Display for SymbolTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{}", self.symbols)
+        writeln!(
+            f,
+            "{}",
+            self.symbols
+                .iter()
+                .map(|symbol| symbol.1.full_name().to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
     }
 }
 
