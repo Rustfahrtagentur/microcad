@@ -51,7 +51,7 @@ impl TupleType {
 
     /// Test if the named tuple has exactly all the given keys
     fn matches(&self, keys: &[&str]) -> bool {
-        if !self.unnamed.is_empty() && self.named.len() != keys.len() {
+        if !self.unnamed.is_empty() || self.named.len() != keys.len() {
             return false;
         }
         keys.iter()
