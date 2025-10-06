@@ -30,7 +30,7 @@ impl ContextBuilder {
         root: Rc<SourceFile>,
         search_paths: &[impl AsRef<std::path::Path>],
     ) -> ResolveResult<Self> {
-        let context = ResolveContext::load_and_resolve(
+        let context = ResolveContext::create(
             root,
             search_paths,
             Some(crate::builtin_module()),

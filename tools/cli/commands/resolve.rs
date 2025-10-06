@@ -23,12 +23,14 @@ impl Resolve {
         &self,
         search_paths: &[impl AsRef<std::path::Path>],
     ) -> ResolveResult<ResolveContext> {
+        //  parse root file
         let root = crate::commands::parse::Parse {
             input: self.input.clone(),
         }
         .parse()?;
 
-        let mut context = ResolveContext::load_and_resolve(
+        // resolve the file
+        let mut context = ResolveContext::create(
             root,
             search_paths,
             Some(microcad_builtin::builtin_module()),
@@ -40,8 +42,9 @@ impl Resolve {
         }
 
         if context.has_errors() {
-            print!("{}", context.diagnosis());
+            eprint!("{}", context.diagnosis());
         }
+
         match &self.output {
             Some(filename) => {
                 context.write_to_file(&filename)?;
