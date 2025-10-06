@@ -13,6 +13,9 @@ pub struct Resolve {
     pub input: std::path::PathBuf,
     /// Output symbol table.
     pub output: Option<std::path::PathBuf>,
+    /// Skip checking all symbols after resolve.
+    #[clap(short, long)]
+    pub skip_check: bool,
 }
 
 impl Resolve {
@@ -32,7 +35,9 @@ impl Resolve {
             DiagHandler::default(),
         )?;
 
-        context.check()?;
+        if !self.skip_check {
+            context.check()?;
+        }
 
         if context.has_errors() {
             print!("{}", context.diagnosis());

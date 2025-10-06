@@ -40,24 +40,28 @@ pub trait UseSymbol {
 impl Eval<()> for UseStatement {
     fn eval(&self, context: &mut Context) -> EvalResult<()> {
         context.grant(self)?;
-        log::trace!("Evaluating use statement: {self}");
-        let current = &context.current_name();
-        let visibility = self.visibility;
-        match &self.decl {
-            UseDeclaration::Use(name) => {
-                if let Err(err) = context.use_symbol(visibility, name, None, current) {
-                    context.error(name, err)?;
+
+        if !context.is_module() {
+            log::trace!("Evaluating use statement: {self}");
+            let current = &context.current_name();
+            let visibility = self.visibility;
+            match &self.decl {
+                UseDeclaration::Use(name) => {
+                    if let Err(err) = context.use_symbol(visibility, name, None, current) {
+                        context.error(name, err)?;
+                    }
                 }
-            }
-            UseDeclaration::UseAll(name) => {
-                if let Err(err) = context.use_symbols_of(visibility, name, current) {
-                    context.error(name, err)?
+                UseDeclaration::UseAll(name) => {
+                    if let Err(err) = context.use_symbols_of(visibility, name, current) {
+                        context.error(name, err)?
+                    }
                 }
-            }
-            UseDeclaration::UseAlias(name, alias) => {
-                if let Err(err) = context.use_symbol(visibility, name, Some(alias.clone()), current)
-                {
-                    context.error(name, err)?;
+                UseDeclaration::UseAlias(name, alias) => {
+                    if let Err(err) =
+                        context.use_symbol(visibility, name, Some(alias.clone()), current)
+                    {
+                        context.error(name, err)?;
+                    }
                 }
             }
         }

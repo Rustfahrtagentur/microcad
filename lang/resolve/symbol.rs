@@ -320,11 +320,11 @@ impl Symbol {
         log::trace!("Searching {name} in {:?}", self.full_name());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first) {
-                let name = &name.remove_first();
-                if name.is_empty() {
+                if name.is_single_identifier() {
                     log::trace!("Found {name:?} in {:?}", self.full_name());
                     Some(child.clone())
                 } else {
+                    let name = &name.remove_first();
                     child.search(name)
                 }
             } else {

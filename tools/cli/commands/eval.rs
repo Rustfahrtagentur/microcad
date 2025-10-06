@@ -16,6 +16,9 @@ pub struct Eval {
     pub input: std::path::PathBuf,
     /// Output models.
     pub output: Option<std::path::PathBuf>,
+    /// Skip checking all symbols after resolve.
+    #[clap(short, long)]
+    pub skip_check: bool,
 }
 
 impl RunCommand for Eval {

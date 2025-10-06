@@ -105,6 +105,18 @@ impl Context {
 
     /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Model> {
+        let source_files: Vec<_> = self
+            .sources
+            .source_files
+            .iter()
+            // skip root
+            .filter(|source| source.hash != self.sources.root().hash)
+            .collect();
+
+        //for source_file in source_files {
+        //    Eval::<Value>::eval(source_file, self)?;
+        // }
+
         self.sources.root().eval(self)
     }
 
@@ -222,7 +234,7 @@ impl Context {
                 Ok(symbol) => {
                     if symbol.full_name() == *name {
                         log::trace!(
-                            "{found} symbol in current module: {symbol}",
+                            "{found} symbol in current module: {symbol:?}",
                             found = crate::mark!(FOUND),
                         );
                         return self.symbol_table.follow_alias(&symbol);
@@ -261,7 +273,7 @@ impl Context {
                     }
                 }
                 log::trace!(
-                    "{found} symbol within {within}:` {alias}",
+                    "{found} symbol within {within:?}:` {alias:?}",
                     found = crate::mark!(FOUND),
                 );
                 return Ok(alias);
@@ -416,8 +428,14 @@ impl Lookup<EvalError> for Context {
                 self.lookup_within(name, self.stack.current_module_name()),
             ),
             ("property", self.lookup_property(name)),
-            ("workbench", Ok(self.lookup_workbench(name)?)),
-            ("global", Ok(self.symbol_table.lookup(name)?)),
+            (
+                "workbench",
+                self.lookup_workbench(name).map_err(|err| err.into()),
+            ),
+            (
+                "global",
+                self.symbol_table.lookup(name).map_err(|err| err.into()),
+            ),
         ]
         .into_iter();
 
@@ -425,24 +443,31 @@ impl Lookup<EvalError> for Context {
         let mut errors = Vec::new();
 
         // collect ok-results and ambiguity errors
-        let (found, mut ambiguous) = result.fold(
-            (Vec::new(), Vec::new()),
-            |(mut oks, mut ambiguity), (origin, r)| {
+        let (found, mut ambiguities) = result.fold(
+            (vec![], vec![]),
+            |(mut oks, mut ambiguities), (origin, r)| {
                 match r {
                     Ok(symbol) => oks.push((origin, symbol)),
                     Err(EvalError::AmbiguousSymbol { ambiguous, others }) => {
-                        ambiguity.push((origin, EvalError::AmbiguousSymbol { ambiguous, others }))
+                        ambiguities.push((origin, EvalError::AmbiguousSymbol { ambiguous, others }))
                     }
                     Err(
+                        // ignore all kinds of "not found" errors
                         EvalError::SymbolNotFound(_)
-                        | EvalError::ResolveError(ResolveError::SymbolNotFound(_))
+                        // for locals
                         | EvalError::LocalNotFound(_)
+                        // for model proper
+                        | EvalError::NoModelInWorkbench
+                        | EvalError::PropertyNotFound(_)
+                        | EvalError::NoPropertyId(_)
+                        // for symbol table
+                        | EvalError::ResolveError(ResolveError::SymbolNotFound(_))
                         | EvalError::ResolveError(ResolveError::ExternalPathNotFound(_))
                         | EvalError::ResolveError(ResolveError::NulHash),
                     ) => (),
                     Err(err) => errors.push((origin, err)),
                 }
-                (oks, ambiguity)
+                (oks, ambiguities)
             },
         );
 
@@ -543,6 +568,8 @@ impl PushDiag for Context {
     fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         let result = self.diag.push_diag(diag);
         log::trace!("Error Context:\n{self:?}");
+        panic!();
+
         result
     }
 }
