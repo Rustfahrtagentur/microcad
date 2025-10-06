@@ -74,8 +74,7 @@ pub struct TreeState {
 }
 
 impl TreeState {
-    /// Create new tree state
-    /// - `shorten`: If `true` content will be shortened to one line
+    /// Create new tree state for std::fmt::Display
     pub fn new_display() -> Self {
         Self {
             depth: 0,
@@ -83,6 +82,7 @@ impl TreeState {
         }
     }
 
+    /// Create new tree state for std::fmt::Debug
     pub fn new_debug(depth: usize) -> Self {
         Self { depth, debug: true }
     }

@@ -24,6 +24,10 @@ pub struct Cli {
     #[arg(short = 'P', long = "search-path", action = clap::ArgAction::Append, global = true)]
     pub search_paths: Vec<std::path::PathBuf>,
 
+    /// Check all symbols after resolve.
+    #[clap(short, long, default_value = "true")]
+    pub check: bool,
+
     /// Load config from file.
     #[arg(short = 'C', long = "config")]
     config: Option<std::path::PathBuf>,
@@ -105,9 +109,8 @@ impl Cli {
             crate::commands::Resolve {
                 input: input.as_ref().to_path_buf(),
                 output: None,
-                skip_check: false,
             }
-            .load(&self.search_paths)?,
+            .load(&self.search_paths, self.check)?,
         )?)
     }
 

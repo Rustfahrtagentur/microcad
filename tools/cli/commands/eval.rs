@@ -3,10 +3,7 @@
 
 //! µcad CLI eval commands
 
-use microcad_lang::{
-    diag::{Diag, WriteToFile},
-    tree_display::FormatTree,
-};
+use microcad_lang::{diag::*, tree_display::*};
 
 use crate::commands::RunCommand;
 
