@@ -6,7 +6,7 @@
 use crate::{ord_map::*, src_ref::*, syntax::*};
 
 /// Argument in a [`Call`].
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Argument {
     /// Name of the argument
     pub id: Option<Identifier>,
@@ -41,8 +41,17 @@ impl OrdMapValue<Identifier> for Argument {
 impl std::fmt::Display for Argument {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self.id {
-            Some(ref id) => write!(f, "{id:?} = {}", self.value),
+            Some(ref id) => write!(f, "{id} = {}", self.value),
             None => write!(f, "{}", self.value),
+        }
+    }
+}
+
+impl std::fmt::Debug for Argument {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self.id {
+            Some(ref id) => write!(f, "{id:?} = {:?}", self.value),
+            None => write!(f, "{:?}", self.value),
         }
     }
 }

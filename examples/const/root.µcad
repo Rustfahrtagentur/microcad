@@ -1,0 +1,8 @@
+mod my;
+
+const x =1;
+z = 1;
+
+const MY = my::X + x;
+
+const MY = my::X + z; // error

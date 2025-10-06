@@ -1,7 +1,7 @@
 use std::geo2d::*;
 use std::ops::*;
 
-const SPACING = 8mm;
+pub const SPACING = 8mm;
 
 op grid(columns: Integer, rows: Integer) {
     @input

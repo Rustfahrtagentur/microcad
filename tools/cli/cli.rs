@@ -105,6 +105,7 @@ impl Cli {
             crate::commands::Resolve {
                 input: input.as_ref().to_path_buf(),
                 output: None,
+                skip_check: false,
             }
             .load(&self.search_paths)?,
         )?)

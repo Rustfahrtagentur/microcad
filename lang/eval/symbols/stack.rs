@@ -161,7 +161,7 @@ impl Stack {
         match symbol {
             Ok(symbol) => {
                 log::trace!(
-                    "{found} local symbol: {symbol}",
+                    "{found} local symbol: {symbol:?}",
                     found = crate::mark!(FOUND),
                 );
                 Ok(SymbolOrName::Symbol(symbol))

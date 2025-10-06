@@ -131,7 +131,7 @@ impl Lookup for SymbolTable {
             Err(err) => return Err(err)?,
         };
         log::trace!(
-            "{found} global symbol: {symbol}",
+            "{found} global symbol: {symbol:?}",
             found = crate::mark!(FOUND),
         );
         Ok(symbol)

@@ -29,7 +29,7 @@ pub struct Sources {
 
     /// External source files.
     #[deref]
-    source_files: Vec<Rc<SourceFile>>,
+    pub source_files: Vec<Rc<SourceFile>>,
 
     /// Search paths.
     search_paths: Vec<std::path::PathBuf>,
