@@ -66,43 +66,6 @@ fn resolve_test() {
         SourceFile::load("../examples/my_brick.µcad").expect("loading of root source file failed");
     log::trace!("Root source file:\n{root}");
 
-    let mut context = ResolveContext::load(root, &["../lib"], DiagHandler::default())
+    ResolveContext::create(root, &["../lib"], None, DiagHandler::default())
         .expect("loading of symbol table failed");
-
-    context.resolve().expect("resolve failed");
-    context.check().expect("symbol check failed");
-}
-
-#[test]
-fn resolve_source_file() {
-    todo!()
-    /*  let source_file =
-        SourceFile::load_from_str(r#"part A() { part B() {} } "#).expect("Valid source");
-
-    let symbol = source_file.resolve().expect("expecting resolve success");
-
-    // file <no file>
-    //  part a
-    //   part b
-    assert!(symbol.get(&"A".into()).is_some());
-    assert!(symbol.get(&"c".into()).is_none());
-
-    assert!(symbol.search(&"A".into()).is_some());
-    assert!(symbol.search(&"A::B".into()).is_some());
-    assert!(symbol.search(&"A::B::C".into()).is_none());
-
-    // use std::print; // Add symbol "print" to current symbol symbol
-    // part M() {
-    //      print("test"); // Use symbol symbol from parent
-    // }
-
-    log::trace!("Symbol symbol:\n{symbol}");
-
-    let b = symbol.search(&"A::B".into()).expect("cant find symbol");
-    assert!(b.search(&"A".into()).is_none());
-
-    //assert!(symbol_node.search_top_down(&["<no file>".into()]).is_some());
-
-    log::trace!("{symbol}");
-    */
 }

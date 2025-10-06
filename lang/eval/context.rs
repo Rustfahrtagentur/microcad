@@ -70,8 +70,7 @@ impl Context {
         search_paths: &[impl AsRef<std::path::Path>],
     ) -> EvalResult<Self> {
         let root = SourceFile::load(root)?;
-        let context =
-            ResolveContext::load_and_resolve(root, search_paths, builtin, DiagHandler::default())?;
+        let context = ResolveContext::create(root, search_paths, builtin, DiagHandler::default())?;
         Ok(Self::new(context, Box::new(Stdout)))
     }
 
@@ -111,11 +110,12 @@ impl Context {
             .iter()
             // skip root
             .filter(|source| source.hash != self.sources.root().hash)
+            .cloned()
             .collect();
 
-        //for source_file in source_files {
-        //    Eval::<Value>::eval(source_file, self)?;
-        // }
+        for source_file in &source_files {
+            Eval::<Value>::eval(source_file, self)?;
+        }
 
         self.sources.root().eval(self)
     }
@@ -572,8 +572,6 @@ impl PushDiag for Context {
     fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         let result = self.diag.push_diag(diag);
         log::trace!("Error Context:\n{self:?}");
-        panic!();
-
         result
     }
 }

@@ -6,6 +6,7 @@
 use crate::{diag::*, rc::*, resolve::*, syntax::*};
 
 /// Resolve Context
+#[derive(Default)]
 pub struct ResolveContext {
     /// Symbol table.
     pub symbol_table: SymbolTable,
@@ -20,39 +21,33 @@ pub struct ResolveContext {
 }
 
 impl ResolveContext {
-    /// Create new resolve context.
-    pub(super) fn new(sources: Sources, diag: DiagHandler) -> Self {
-        Self {
-            symbol_table: SymbolTable::default(),
-            sources,
+    /// Create new context from source file.
+    pub fn new(
+        root: Rc<SourceFile>,
+        search_paths: &[impl AsRef<std::path::Path>],
+        diag: DiagHandler,
+    ) -> ResolveResult<Self> {
+        Ok(Self {
+            sources: Sources::load(root.clone(), search_paths)?,
             diag,
-            unchecked: Default::default(),
-        }
+            ..Default::default()
+        })
     }
 
-    /// Load and resolve a source file
-    pub fn load_and_resolve(
+    /// Load resolve and check a source file and referenced files.
+    pub fn create(
         root: Rc<SourceFile>,
         search_paths: &[impl AsRef<std::path::Path>],
         builtin: Option<Symbol>,
         diag: DiagHandler,
     ) -> ResolveResult<ResolveContext> {
-        let mut context = Self::load(root, search_paths, diag)?;
+        let mut context = Self::new(root, search_paths, diag)?;
+        context.symbolize()?;
         if let Some(builtin) = builtin {
             context.add_symbol(builtin)?;
         }
         context.resolve()?;
-        Ok(context)
-    }
-
-    pub(crate) fn load(
-        root: Rc<SourceFile>,
-        search_paths: &[impl AsRef<std::path::Path>],
-        diag: DiagHandler,
-    ) -> ResolveResult<ResolveContext> {
-        let sources = Sources::load(root.clone(), search_paths)?;
-        let mut context = Self::new(sources, diag);
-        context.symbolize()?;
+        context.check()?;
         Ok(context)
     }
 
