@@ -108,7 +108,7 @@ impl ResolveContext {
             .iter_mut()
             .try_for_each(|symbol| symbol.check(self))?;
 
-        log::debug!("Symbol table OK!");
+        log::info!("Symbol table OK!");
 
         let unchecked = self.symbol_table.unchecked();
         log::trace!(

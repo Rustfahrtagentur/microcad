@@ -106,6 +106,8 @@ pub fn run_test(
                     Some(microcad_builtin::builtin_module()),
                     &["../lib", "../doc/assets"],
                     Capture::new(),
+                    microcad_builtin::builtin_exporters(),
+                    microcad_builtin::builtin_importers(),
                 )
                 .expect("resolve error");
                 let eval = context.eval();
@@ -210,6 +212,8 @@ pub fn run_test(
                     Some(microcad_builtin::builtin_module()),
                     &["../lib", "../doc/assets"],
                     Capture::new(),
+                    microcad_builtin::builtin_exporters(),
+                    microcad_builtin::builtin_importers(),
                 )
                 .expect("resolve error");
                 let eval = context.eval();

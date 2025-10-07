@@ -40,7 +40,12 @@ pub struct EvalContext {
 
 impl EvalContext {
     /// Create a new context from a resolved symbol table.
-    pub fn new(resolve_context: ResolveContext, output: Box<dyn Output>) -> Self {
+    pub fn new(
+        resolve_context: ResolveContext,
+        output: Box<dyn Output>,
+        exporters: ExporterRegistry,
+        importers: ImporterRegistry,
+    ) -> Self {
         log::debug!("Creating Context");
 
         assert!(resolve_context.is_resolved());
@@ -51,6 +56,8 @@ impl EvalContext {
             sources: resolve_context.sources,
             diag: resolve_context.diag,
             output,
+            exporters,
+            importers,
             ..Default::default()
         }
     }
@@ -66,6 +73,8 @@ impl EvalContext {
         builtin: Option<Symbol>,
         search_paths: &[impl AsRef<std::path::Path>],
         output: Box<dyn Output>,
+        exporters: ExporterRegistry,
+        importers: ImporterRegistry,
     ) -> EvalResult<Self> {
         Ok(Self::new(
             ResolveContext::create(
@@ -76,6 +85,8 @@ impl EvalContext {
                 ResolveMode::Resolved,
             )?,
             output,
+            exporters,
+            importers,
         ))
     }
 
@@ -137,19 +148,9 @@ impl EvalContext {
         result
     }
 
-    /// Set importers.
-    pub fn set_importers(&mut self, importers: ImporterRegistry) {
-        self.importers = importers;
-    }
-
     /// All registered exporters.
     pub fn exporters(&self) -> &ExporterRegistry {
         &self.exporters
-    }
-
-    /// Set exporters.
-    pub fn set_exporters(&mut self, exporters: ExporterRegistry) {
-        self.exporters = exporters;
     }
 
     /// Return search paths of this context.

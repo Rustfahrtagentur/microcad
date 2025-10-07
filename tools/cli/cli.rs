@@ -23,7 +23,11 @@ pub struct Cli {
     pub search_paths: Vec<std::path::PathBuf>,
 
     /// Load config from file.
-    #[arg(short = 'C', long = "config")]
+    #[arg(short, long)]
+    omit_default_libs: bool,
+
+    /// Load config from file.
+    #[arg(short = 'C', long)]
     config: Option<std::path::PathBuf>,
 
     #[command(subcommand)]
@@ -34,7 +38,9 @@ impl Cli {
     /// Create a new CLI with default search paths.
     pub fn new() -> Self {
         let mut cli: Self = Self::parse();
-        cli.search_paths.append(&mut Self::default_search_paths());
+        if !cli.omit_default_libs {
+            cli.search_paths.append(&mut Self::default_search_paths());
+        }
         cli
     }
 
