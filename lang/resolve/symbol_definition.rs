@@ -69,6 +69,23 @@ impl SymbolDefinition {
             SymbolDefinition::Tester(..) => Visibility::Public,
         }
     }
+
+    pub(crate) fn kind(&self) -> String {
+        match self {
+            Self::Workbench(w) => format!("{}", w.kind),
+            Self::Module(..) => "module".to_string(),
+            Self::Function(..) => "function".to_string(),
+            Self::SourceFile(..) => "file".to_string(),
+            Self::Builtin(..) => "builtin".to_string(),
+            Self::Constant(..) => "constant".to_string(),
+            Self::ConstExpression(..) => "const expression".to_string(),
+            Self::Argument(..) => "call argument".to_string(),
+            Self::Alias(..) => "alias".to_string(),
+            Self::UseAll(..) => "use all".to_string(),
+            #[cfg(test)]
+            Self::Tester(..) => "tester".to_string(),
+        }
+    }
 }
 
 impl std::fmt::Display for SymbolDefinition {
@@ -80,8 +97,8 @@ impl std::fmt::Display for SymbolDefinition {
             Self::SourceFile(..) => write!(f, "(file)"),
             Self::Builtin(..) => write!(f, "(builtin)"),
             Self::Constant(.., value) => write!(f, "(constant) = {value}"),
-            Self::ConstExpression(.., value) => write!(f, "(constant) = {value}"),
-            Self::Argument(.., value) => write!(f, "(call_argument) = {value}"),
+            Self::ConstExpression(.., value) => write!(f, "(const expression) = {value}"),
+            Self::Argument(.., value) => write!(f, "(call argument) = {value}"),
             Self::Alias(.., name) => write!(f, "(alias) => {name}"),
             Self::UseAll(.., name) => write!(f, "(use all) => {name}"),
             #[cfg(test)]
