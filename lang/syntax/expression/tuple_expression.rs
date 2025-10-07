@@ -28,7 +28,7 @@ impl std::fmt::Display for TupleExpression {
             self.args
                 .iter()
                 .map(|arg| if let Some(name) = &arg.id {
-                    format!("{} = {}", &name, arg.value)
+                    format!("{} = {}", &name, arg.expression)
                 } else {
                     arg.to_string()
                 })
@@ -44,5 +44,11 @@ impl TreeDisplay for TupleExpression {
         writeln!(f, "{:depth$}TupleExpression:", "")?;
         depth.indent();
         self.args.tree_print(f, depth)
+    }
+}
+
+impl Const for TupleExpression {
+    fn is_const(&self) -> bool {
+        self.args.iter().any(|arg| !arg.expression.is_const())
     }
 }

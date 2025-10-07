@@ -55,13 +55,13 @@ impl Parse for Argument {
 
                 Ok(Argument {
                     id: Some(Identifier::parse(first)?),
-                    value: Expression::parse(second)?,
+                    expression: Expression::parse(second)?,
                     src_ref: pair.src_ref(),
                 })
             }
             Rule::expression => Ok(Argument {
                 id: None,
-                value: Expression::parse(pair.clone())?,
+                expression: Expression::parse(pair.clone())?,
                 src_ref: pair.into(),
             }),
             rule => unreachable!("Argument::parse expected argument, found {rule:?}"),

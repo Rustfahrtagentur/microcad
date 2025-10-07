@@ -11,7 +11,7 @@ pub struct Argument {
     /// Name of the argument
     pub id: Option<Identifier>,
     /// Value of the argument
-    pub value: Expression,
+    pub expression: Expression,
     /// Source code reference
     pub src_ref: SrcRef,
 }
@@ -21,7 +21,7 @@ impl Argument {
     pub fn derived_name(&self) -> Option<Identifier> {
         match &self.id {
             Some(name) => Some(name.clone()),
-            None => self.value.single_identifier().cloned(),
+            None => self.expression.single_identifier().cloned(),
         }
     }
 }
@@ -41,8 +41,8 @@ impl OrdMapValue<Identifier> for Argument {
 impl std::fmt::Display for Argument {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self.id {
-            Some(ref id) => write!(f, "{id} = {}", self.value),
-            None => write!(f, "{}", self.value),
+            Some(ref id) => write!(f, "{id} = {}", self.expression),
+            None => write!(f, "{}", self.expression),
         }
     }
 }
@@ -50,8 +50,8 @@ impl std::fmt::Display for Argument {
 impl std::fmt::Debug for Argument {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self.id {
-            Some(ref id) => write!(f, "{id:?} = {:?}", self.value),
-            None => write!(f, "{:?}", self.value),
+            Some(ref id) => write!(f, "{id:?} = {:?}", self.expression),
+            None => write!(f, "{:?}", self.expression),
         }
     }
 }
@@ -63,6 +63,6 @@ impl TreeDisplay for Argument {
             None => writeln!(f, "{:depth$}Argument:", "")?,
         };
         depth.indent();
-        self.value.tree_print(f, depth)
+        self.expression.tree_print(f, depth)
     }
 }
