@@ -3,10 +3,12 @@
 
 //! Range expression
 
+use derive_more::Deref;
+
 use crate::{src_ref::*, syntax::*};
 
 /// Range start.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Deref)]
 pub struct RangeFirst(pub Box<Expression>);
 
 impl SrcReferrer for RangeFirst {
@@ -30,7 +32,7 @@ impl TreeDisplay for RangeFirst {
 }
 
 /// Range end.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Deref)]
 pub struct RangeLast(pub Box<Expression>);
 
 impl SrcReferrer for RangeLast {
@@ -80,5 +82,11 @@ impl TreeDisplay for RangeExpression {
         depth.indent();
         self.first.tree_print(f, depth)?;
         self.last.tree_print(f, depth)
+    }
+}
+
+impl Const for RangeExpression {
+    fn is_const(&self) -> bool {
+        self.first.is_const() && self.last.is_const()
     }
 }

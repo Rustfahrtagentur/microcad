@@ -237,7 +237,7 @@ impl Names for ArgumentList {
         NameList::default().merge_many(
             self.iter()
                 // get expressions out of arguments
-                .map(|arg| arg.value.as_ref())
+                .map(|arg| arg.expression.as_ref())
                 .map(|expr| expr.names()),
         )
     }

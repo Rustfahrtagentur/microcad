@@ -54,7 +54,7 @@ impl Eval for Call {
                 if symbol.with_def(|def| matches!(def, SymbolDefinition::Builtin(..))) {
                     self.argument_list
                         .iter()
-                        .map(|arg| match context.source_code(&arg.value) {
+                        .map(|arg| match context.source_code(&arg.expression) {
                             Ok(code) => Ok((
                                 arg.id.clone().unwrap_or(Identifier::none()),
                                 ArgumentValue::new(

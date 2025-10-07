@@ -120,19 +120,6 @@ impl EvalContext {
 
     /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Model> {
-        let source_files: Vec<_> = self
-            .sources
-            .source_files
-            .iter()
-            // skip root
-            .filter(|source| source.hash != self.sources.root().hash)
-            .cloned()
-            .collect();
-
-        for source_file in &source_files {
-            Eval::<Value>::eval(source_file, self)?;
-        }
-
         self.sources.root().eval(self)
     }
 

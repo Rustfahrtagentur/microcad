@@ -107,3 +107,14 @@ impl TreeDisplay for ArrayExpression {
         self.unit.tree_print(f, depth)
     }
 }
+
+impl Const for ArrayExpression {
+    fn is_const(&self) -> bool {
+        match &self.inner {
+            ArrayExpressionInner::List(expressions) => {
+                expressions.iter().any(|expression| !expression.is_const())
+            }
+            ArrayExpressionInner::Range(range_expression) => range_expression.is_const(),
+        }
+    }
+}
