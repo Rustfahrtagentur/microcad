@@ -12,7 +12,7 @@ pub use format_spec::*;
 use crate::{src_ref::*, syntax::*};
 
 /// Format string item.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum FormatStringInner {
     /// String literal.
     String(Refer<String>),

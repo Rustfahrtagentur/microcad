@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Return statement.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct ReturnStatement {
     /// Return value.
     pub result: Option<Expression>,
@@ -24,6 +24,16 @@ impl std::fmt::Display for ReturnStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if let Some(result) = &self.result {
             write!(f, "{result}")
+        } else {
+            write!(f, crate::invalid_no_ansi!(RESULT))
+        }
+    }
+}
+
+impl std::fmt::Debug for ReturnStatement {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if let Some(result) = &self.result {
+            write!(f, "{result:?}")
         } else {
             write!(f, crate::invalid!(RESULT))
         }

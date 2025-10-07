@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// µcad source file
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct SourceFile {
     /// Qualified name of the file if loaded from externals
     pub name: QualifiedName,
@@ -76,6 +76,14 @@ impl SourceFile {
 impl std::fmt::Display for SourceFile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.statements.iter().try_for_each(|s| writeln!(f, "{s}"))
+    }
+}
+
+impl std::fmt::Debug for SourceFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.statements
+            .iter()
+            .try_for_each(|s| writeln!(f, "{s:?}"))
     }
 }
 

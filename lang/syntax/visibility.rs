@@ -7,7 +7,7 @@
 ///
 /// This is used to determine if an entity is public or private.
 /// By default, entities are private.
-#[derive(Copy, Clone, Debug, Default, PartialEq)]
+#[derive(Copy, Clone, Default, PartialEq)]
 pub enum Visibility {
     /// Private visibility
     #[default]

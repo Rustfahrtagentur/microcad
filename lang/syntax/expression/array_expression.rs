@@ -10,7 +10,7 @@ use crate::{
 use derive_more::{Deref, DerefMut};
 
 /// Inner of an [`ArrayExpression`].
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum ArrayExpressionInner {
     /// List: `a,b,c`.
     List(ListExpression),
@@ -33,7 +33,24 @@ impl std::fmt::Display for ArrayExpressionInner {
                 ArrayExpressionInner::List(expressions) => expressions
                     .iter()
                     .map(|c| c.to_string())
-                    .collect::<Vec<String>>()
+                    .collect::<Vec<_>>()
+                    .join(", "),
+                ArrayExpressionInner::Range(range_expression) => range_expression.to_string(),
+            }
+        )
+    }
+}
+
+impl std::fmt::Debug for ArrayExpressionInner {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match &self {
+                ArrayExpressionInner::List(expressions) => expressions
+                    .iter()
+                    .map(|c| format!("{c:?}"))
+                    .collect::<Vec<_>>()
                     .join(", "),
                 ArrayExpressionInner::Range(range_expression) => range_expression.to_string(),
             }
@@ -75,7 +92,7 @@ impl TreeDisplay for ArrayExpressionInner {
 }
 
 /// Array of expressions with common result unit, e.g. `[1+2,4,9]`.
-#[derive(Default, Clone, Debug, Deref, DerefMut, PartialEq)]
+#[derive(Default, Clone, Deref, DerefMut, PartialEq)]
 pub struct ArrayExpression {
     /// Expression list.
     #[deref]
@@ -96,6 +113,12 @@ impl SrcReferrer for ArrayExpression {
 impl std::fmt::Display for ArrayExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "[{}]{}", self.inner, self.unit)
+    }
+}
+
+impl std::fmt::Debug for ArrayExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "[{:?}]{}", self.inner, self.unit)
     }
 }
 

@@ -10,7 +10,7 @@ use derive_more::{Deref, DerefMut};
 pub struct QualifiedName(Refer<Vec<Identifier>>);
 
 /// List of *qualified names* which can be displayed.
-#[derive(Debug, Deref)]
+#[derive(Deref)]
 pub struct QualifiedNames(Vec<QualifiedName>);
 
 impl std::fmt::Display for QualifiedNames {

@@ -7,13 +7,22 @@ use crate::{src_ref::*, syntax::*};
 use derive_more::Deref;
 
 /// A list of statements.
-#[derive(Clone, Default, Debug, Deref)]
+#[derive(Clone, Default, Deref)]
 pub struct StatementList(pub Vec<Statement>);
 
 impl std::fmt::Display for StatementList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for statement in self.iter() {
             writeln!(f, "{statement}")?;
+        }
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for StatementList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for statement in self.iter() {
+            writeln!(f, "{statement:?}")?;
         }
         Ok(())
     }

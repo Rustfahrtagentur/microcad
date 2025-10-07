@@ -6,7 +6,7 @@
 use crate::{rc::*, src_ref::*, syntax::*, ty::*};
 
 /// Assignment specifying an identifier, type and value
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Assignment {
     /// Value's visibility
     pub visibility: Visibility,
@@ -43,6 +43,23 @@ impl std::fmt::Display for Assignment {
                     Qualifier::Const => "const ",
                     Qualifier::Prop => "prop ",
                 },
+                id = self.id,
+                ty = t.ty(),
+                expr = self.expression
+            ),
+            None => write!(f, "{} = {}", self.id, self.expression),
+        }
+    }
+}
+
+impl std::fmt::Debug for Assignment {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match &self.specified_type {
+            Some(t) => write!(
+                f,
+                "{vis}{qual}{id:?}: {ty:?} = {expr:?}",
+                vis = self.visibility,
+                qual = self.qualifier,
                 id = self.id,
                 ty = t.ty(),
                 expr = self.expression
