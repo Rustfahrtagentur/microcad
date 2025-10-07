@@ -16,7 +16,7 @@
 //! To "run" the source file (and get the expected output) it must now be evaluated (see [`crate::eval`])  .
 
 mod externals;
-mod grant;
+
 mod names;
 mod resolve_context;
 mod resolve_error;
@@ -37,7 +37,6 @@ pub use symbol_definition::*;
 pub use symbol_map::*;
 pub use symbol_table::*;
 
-use grant::*;
 use names::*;
 
 /// Trait to handle symbol table.
