@@ -257,8 +257,12 @@ impl Symbol {
 
     /// Create a vector of cloned children.
     pub fn public_children(&self, overwrite_visibility: Option<Visibility>) -> Symbols {
-        self.inner
-            .borrow()
+        let inner = self.inner.borrow();
+
+        // Aliases do not have any children and must be de-aliased before.
+        assert!(!matches!(inner.def, SymbolDefinition::Alias(..)));
+
+        inner
             .children
             .values()
             .filter(|symbol| symbol.is_public())
@@ -481,6 +485,7 @@ impl Symbol {
             } else {
                 Symbols::default()
             };
+            log::trace!("from children/from self:\n  {from_children}\n  {from_self}");
             (from_children, from_self)
         };
 

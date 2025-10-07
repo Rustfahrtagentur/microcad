@@ -181,10 +181,12 @@ impl EvalContext {
 
     /// Lookup a property by qualified name.
     fn lookup_property(&self, name: &QualifiedName) -> EvalResult<Symbol> {
+        log::trace!("looking for property {name:?}");
+
         match name.single_identifier() {
             Some(id) => match self.get_property(id) {
                 Ok(value) => {
-                    log::debug!(
+                    log::trace!(
                         "{found} property '{name:?}'",
                         found = crate::mark!(FOUND_INTERIM)
                     );
@@ -194,7 +196,7 @@ impl EvalContext {
                     ))
                 }
                 Err(err) => {
-                    log::warn!(
+                    log::trace!(
                         "{not_found} Property '{name:?}'",
                         not_found = crate::mark!(NOT_FOUND_INTERIM)
                     );
@@ -202,7 +204,7 @@ impl EvalContext {
                 }
             },
             None => {
-                log::debug!(
+                log::trace!(
                     "{not_found} Property '{name:?}'",
                     not_found = crate::mark!(NOT_FOUND_INTERIM)
                 );
@@ -228,11 +230,16 @@ impl EvalContext {
                             "{found} symbol in current module: {symbol:?}",
                             found = crate::mark!(FOUND),
                         );
-                        return self.symbol_table.follow_alias(&symbol);
+                        return Ok(symbol);
                     }
                 }
                 Err(err) => return Err(err)?,
             };
+        } else {
+            log::trace!(
+                "{not_found} No current workbench",
+                not_found = crate::mark!(NOT_FOUND_INTERIM)
+            );
         }
         Err(ResolveError::SymbolNotFound(name.clone()))
     }
@@ -245,17 +252,25 @@ impl EvalContext {
 
         let parents = self.symbol_table.path_to(&within)?;
         for (n, parent) in parents.iter().rev().enumerate() {
-            log::trace!("  Looking in: {:?} for {:?}", parent.full_name(), what);
+            log::trace!("Looking in: {:?} for {:?}", parent.full_name(), what);
             if let Some(symbol) = parent.search(&what) {
                 let alias = self.symbol_table.follow_alias(&symbol)?;
                 if n > 0 {
                     if symbol.is_private() {
+                        log::trace!(
+                            "{not_found} symbol {what:?} within {within:?} is private",
+                            not_found = crate::mark!(NOT_FOUND_INTERIM),
+                        );
                         return Err(EvalError::SymbolIsPrivate {
                             what: what.clone(),
                             within,
                         });
                     }
                     if alias != symbol && alias.is_private() {
+                        log::trace!(
+                            "{not_found} within {within:?} symbol: {what:?}",
+                            not_found = crate::mark!(NOT_FOUND_INTERIM),
+                        );
                         return Err(EvalError::SymbolBehindAliasIsPrivate {
                             what: what.clone(),
                             alias: alias.full_name(),
@@ -270,6 +285,10 @@ impl EvalContext {
                 return Ok(alias);
             }
         }
+        log::trace!(
+            "{not_found} within {within:?} symbol: {what:?}",
+            not_found = crate::mark!(NOT_FOUND_INTERIM),
+        );
         Err(EvalError::SymbolNotFound(what.clone()))
     }
 
@@ -401,36 +420,30 @@ impl Lookup<EvalError> for EvalContext {
     fn lookup(&self, name: &QualifiedName) -> EvalResult<Symbol> {
         log::debug!("Lookup symbol '{name:?}' (at line {:?}):", name.src_ref());
 
-        let name = &self.symbol_table.de_alias(name);
-
         log::trace!("- lookups -------------------------------------------------------");
         // collect all symbols that can be found and remember origin
         let result = [
-            (
-                "local",
+            ("local", {
                 match self.stack.lookup(name) {
                     Ok(SymbolOrName::Name(name)) => Ok(self.symbol_table.lookup(&name)?),
                     Ok(SymbolOrName::Symbol(symbol)) => Ok(symbol),
                     Err(err) => Err(err),
-                },
-            ),
-            (
-                "module",
-                self.lookup_within(name, self.stack.current_module_name()),
-            ),
-            ("property", self.lookup_property(name)),
-            (
-                "workbench",
-                self.lookup_workbench(name).map_err(|err| err.into()),
-            ),
-            (
-                "global",
-                self.symbol_table.lookup(name).map_err(|err| err.into()),
-            ),
+                }
+            }),
+            ("module", {
+                self.lookup_within(name, self.stack.current_module_name())
+            }),
+            ("property", { self.lookup_property(name) }),
+            ("workbench", {
+                self.lookup_workbench(name).map_err(|err| err.into())
+            }),
+            ("global", {
+                self.symbol_table.lookup(name).map_err(|err| err.into())
+            }),
         ]
         .into_iter();
 
-        log::trace!("- result --------------------------------------------------------");
+        log::trace!("- lookup result -------------------------------------------------");
         let mut errors = Vec::new();
 
         // collect ok-results and ambiguity errors
@@ -524,7 +537,7 @@ impl Lookup<EvalError> for EvalContext {
                 } else {
                     log::debug!(
                         "{found} symbol '{name:?}' in {origin}",
-                        found = crate::mark!(FOUND_INTERIM)
+                        found = crate::mark!(FOUND)
                     );
                     symbol.set_use();
                     Ok(symbol.clone())
@@ -533,7 +546,7 @@ impl Lookup<EvalError> for EvalContext {
             None => {
                 log::debug!(
                     "{not_found} Symbol '{name:?}'",
-                    not_found = crate::mark!(NOT_FOUND_INTERIM)
+                    not_found = crate::mark!(NOT_FOUND)
                 );
 
                 Err(EvalError::SymbolNotFound(name.clone()))

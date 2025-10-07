@@ -33,7 +33,10 @@ impl SymbolTable {
         (1..name.len())
             .rev()
             .filter_map(|p| {
-                if let Ok(symbol) = self.lookup(&QualifiedName::no_ref(name[0..p].to_vec())) {
+                if let Ok(symbol) = self
+                    .symbols
+                    .search(&QualifiedName::no_ref(name[0..p].to_vec()))
+                {
                     Some((p, symbol))
                 } else {
                     None
@@ -47,6 +50,7 @@ impl SymbolTable {
                         log::trace!("De-aliased name: {name:?} into {new_name:?}");
                         Some(new_name)
                     } else {
+                        log::trace!("No alias: {name:?}");
                         None
                     }
                 })
@@ -60,7 +64,7 @@ impl SymbolTable {
         symbol.with_def(|def| {
             if let SymbolDefinition::Alias(.., name) = def {
                 log::trace!("{found} alias => {name:?}", found = crate::mark!(FOUND));
-                Ok(self.lookup(name)?)
+                Ok(self.follow_alias(&self.lookup(name)?)?)
             } else {
                 Ok(symbol.clone())
             }
@@ -125,10 +129,17 @@ impl Lookup for SymbolTable {
     /// Lookup a symbol from global symbols.
     fn lookup(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         log::trace!("Looking for global symbol '{name:?}'");
+
         let name = self.de_alias(name);
         let symbol = match self.symbols.search(&name) {
-            Ok(symbol) => symbol.clone(),
-            Err(err) => return Err(err)?,
+            Ok(symbol) => self.follow_alias(&symbol)?,
+            Err(err) => {
+                log::trace!(
+                    "{not_found} global symbol: {name:?}",
+                    not_found = crate::mark!(NOT_FOUND_INTERIM),
+                );
+                return Err(err)?;
+            }
         };
         log::trace!(
             "{found} global symbol: {symbol:?}",
