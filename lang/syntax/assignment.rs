@@ -3,7 +3,7 @@
 
 //! µcad assignment syntax element
 
-use crate::{src_ref::*, syntax::*, ty::*};
+use crate::{rc::*, src_ref::*, syntax::*, ty::*};
 
 /// Assignment specifying an identifier, type and value
 #[derive(Clone, Debug)]
@@ -17,7 +17,7 @@ pub struct Assignment {
     /// Type of the assignee
     pub specified_type: Option<TypeAnnotation>,
     /// Value to assign
-    pub expression: Expression,
+    pub expression: Rc<Expression>,
     /// Source code reference
     pub src_ref: SrcRef,
 }

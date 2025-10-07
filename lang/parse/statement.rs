@@ -10,7 +10,7 @@ impl Parse for Assignment {
             qualifier: crate::find_rule!(pair, qualifier)?,
             id: crate::find_rule!(pair, identifier)?,
             specified_type: crate::find_rule_opt!(pair, r#type),
-            expression: crate::find_rule!(pair, expression)?,
+            expression: crate::find_rule_exact!(pair, expression)?,
             src_ref: pair.into(),
         })
     }
