@@ -152,7 +152,16 @@ impl Stack {
             self.fetch(id)
         } else {
             let (id, mut tail) = name.split_first();
-            let local = self.fetch(&id)?;
+            let local = match self.fetch(&id) {
+                Ok(local) => local,
+                Err(err) => {
+                    log::trace!(
+                        "{not_found} local symbol: {name:?}",
+                        not_found = crate::mark!(NOT_FOUND_INTERIM),
+                    );
+                    return Err(err);
+                }
+            };
             let mut alias = local.full_name();
             alias.append(&mut tail);
             return Ok(SymbolOrName::Name(alias));
@@ -166,7 +175,13 @@ impl Stack {
                 );
                 Ok(SymbolOrName::Symbol(symbol))
             }
-            Err(err) => Err(err),
+            Err(err) => {
+                log::trace!(
+                    "{not_found} local symbol: {name:?}",
+                    not_found = crate::mark!(NOT_FOUND_INTERIM),
+                );
+                Err(err)
+            }
         }
     }
 }

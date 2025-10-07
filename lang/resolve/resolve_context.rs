@@ -60,6 +60,7 @@ impl ResolveContext {
     ) -> ResolveResult<ResolveContext> {
         let mut context = Self::new(root, search_paths, diag)?;
         context.symbolize()?;
+        log::trace!("Symbolized Context:\n{context:?}");
         if let Some(builtin) = builtin {
             context.add_symbol(builtin)?;
         }
