@@ -110,6 +110,7 @@ impl Eval for QualifiedName {
             SymbolDefinition::Constant(.., value) | SymbolDefinition::Argument(_, value) => {
                 Ok(value.clone())
             }
+            SymbolDefinition::ConstExpression(.., expr) => expr.eval(context),
             SymbolDefinition::Module(ns) => Err(EvalError::UnexpectedNested("mod", ns.id.clone())),
             SymbolDefinition::Workbench(w) => {
                 Err(EvalError::UnexpectedNested(w.kind.as_str(), w.id.clone()))

@@ -130,9 +130,16 @@ impl StackFrame {
                 String::new()
             };
             symbol.with_def(|def| match def {
-                SymbolDefinition::Constant(visibility, id, value) => writeln!(
+                SymbolDefinition::Constant(visibility, id, value) => {
+                    writeln!(
+                        f,
+                        "{:depth$}- {visibility}{id:?} = {value:?}{full_name} (constant)",
+                        ""
+                    )
+                }
+                SymbolDefinition::ConstExpression(visibility, id, expression) => writeln!(
                     f,
-                    "{:depth$}- {visibility}{id:?} = {value:?}{full_name} (constant)",
+                    "{:depth$}- {visibility}{id:?} = {expression:?}{full_name} (const expression)",
                     ""
                 ),
                 SymbolDefinition::Argument(id, value) => {

@@ -274,3 +274,45 @@ impl Const for Expression {
         }
     }
 }
+
+impl PartialEq for Expression {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Literal(l0), Self::Literal(r0)) => l0 == r0,
+            (Self::FormatString(l0), Self::FormatString(r0)) => l0 == r0,
+            (Self::ArrayExpression(l0), Self::ArrayExpression(r0)) => l0 == r0,
+            (Self::TupleExpression(l0), Self::TupleExpression(r0)) => l0 == r0,
+            (Self::QualifiedName(l0), Self::QualifiedName(r0)) => l0 == r0,
+            (
+                Self::BinaryOp {
+                    lhs: l_lhs,
+                    op: l_op,
+                    rhs: l_rhs,
+                    src_ref: l_src_ref,
+                },
+                Self::BinaryOp {
+                    lhs: r_lhs,
+                    op: r_op,
+                    rhs: r_rhs,
+                    src_ref: r_src_ref,
+                },
+            ) => l_lhs == r_lhs && l_op == r_op && l_rhs == r_rhs && l_src_ref == r_src_ref,
+            (
+                Self::UnaryOp {
+                    op: l_op,
+                    rhs: l_rhs,
+                    src_ref: l_src_ref,
+                },
+                Self::UnaryOp {
+                    op: r_op,
+                    rhs: r_rhs,
+                    src_ref: r_src_ref,
+                },
+            ) => l_op == r_op && l_rhs == r_rhs && l_src_ref == r_src_ref,
+            (Self::ArrayElementAccess(l0, l1, l2), Self::ArrayElementAccess(r0, r1, r2)) => {
+                l0 == r0 && l1 == r1 && l2 == r2
+            }
+            _ => unreachable!("PartialEq implemented for const expressions only"),
+        }
+    }
+}

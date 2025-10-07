@@ -30,7 +30,7 @@ pub use value_access::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{model::*, syntax::*, ty::*, *};
+use crate::{model::*, rc::*, syntax::*, ty::*, *};
 use microcad_core::*;
 
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
@@ -59,6 +59,8 @@ pub enum Value {
     Model(Model),
     /// Return value
     Return(Box<Value>),
+    /// Unevaluated const expression.
+    ConstExpression(Rc<Expression>),
 }
 
 impl Value {
@@ -164,7 +166,7 @@ impl PartialOrd for Value {
 impl crate::ty::Ty for Value {
     fn ty(&self) -> Type {
         match self {
-            Value::None => Type::Invalid,
+            Value::None | Value::ConstExpression(_) => Type::Invalid,
             Value::Integer(_) => Type::Integer,
             Value::Quantity(q) => q.ty(),
             Value::Bool(_) => Type::Bool,
@@ -368,6 +370,7 @@ impl std::fmt::Display for Value {
             Value::Matrix(m) => write!(f, "{m}"),
             Value::Model(n) => write!(f, "{n}"),
             Value::Return(r) => write!(f, "{r}"),
+            Value::ConstExpression(e) => write!(f, "{e}"),
         }
     }
 }
@@ -385,6 +388,7 @@ impl std::fmt::Debug for Value {
             Value::Matrix(m) => write!(f, "{m}"),
             Value::Model(n) => write!(f, "Models:\n {n}"),
             Value::Return(r) => write!(f, "Return: {r}"),
+            Value::ConstExpression(e) => write!(f, "{e}"),
         }
     }
 }

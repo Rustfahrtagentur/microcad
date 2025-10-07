@@ -7,7 +7,7 @@ use crate::{ord_map::*, src_ref::*, syntax::*};
 use derive_more::{Deref, DerefMut};
 
 /// *Ordered map* of arguments in a [`Call`].
-#[derive(Clone, Default, Deref, DerefMut)]
+#[derive(Clone, Default, Deref, DerefMut, PartialEq)]
 pub struct ArgumentList(pub Refer<OrdMap<Identifier, Argument>>);
 
 impl SrcReferrer for ArgumentList {

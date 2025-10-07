@@ -18,6 +18,8 @@ pub enum SymbolDefinition {
     Builtin(Rc<Builtin>),
     /// Constant.
     Constant(Visibility, Identifier, Value),
+    /// Constant.
+    ConstExpression(Visibility, Identifier, Rc<Expression>),
     /// Argument value.
     Argument(Identifier, Value),
     /// Alias of a pub use statement.
@@ -38,7 +40,10 @@ impl SymbolDefinition {
             Self::Function(f) => f.id.clone(),
             Self::SourceFile(s) => s.id(),
             Self::Builtin(m) => m.id(),
-            Self::Constant(_, id, _) | Self::Argument(id, _) | Self::Alias(_, id, _) => id.clone(),
+            Self::Constant(_, id, _)
+            | Self::ConstExpression(_, id, _)
+            | Self::Argument(id, _)
+            | Self::Alias(_, id, _) => id.clone(),
             Self::UseAll(..) => Identifier::none(),
             #[cfg(test)]
             Self::Tester(id) => id.clone(),
@@ -48,15 +53,15 @@ impl SymbolDefinition {
     /// Return visibility of this symbol.
     pub fn visibility(&self) -> Visibility {
         match &self {
-            SymbolDefinition::SourceFile(..) => Visibility::Public,
-            SymbolDefinition::Builtin(..) => Visibility::Public,
-            SymbolDefinition::Argument(..) => Visibility::Private,
+            SymbolDefinition::SourceFile(..) | SymbolDefinition::Builtin(..) => Visibility::Public,
+
+            SymbolDefinition::Argument(..) | SymbolDefinition::Constant(..) => Visibility::Private,
 
             SymbolDefinition::Module(md) => md.visibility,
             SymbolDefinition::Workbench(wd) => wd.visibility,
             SymbolDefinition::Function(fd) => fd.visibility,
 
-            SymbolDefinition::Constant(visibility, ..)
+            SymbolDefinition::ConstExpression(visibility, ..)
             | SymbolDefinition::Alias(visibility, ..)
             | SymbolDefinition::UseAll(visibility, ..) => *visibility,
 
@@ -75,6 +80,7 @@ impl std::fmt::Display for SymbolDefinition {
             Self::SourceFile(..) => write!(f, "(file)"),
             Self::Builtin(..) => write!(f, "(builtin)"),
             Self::Constant(.., value) => write!(f, "(constant) = {value}"),
+            Self::ConstExpression(.., value) => write!(f, "(constant) = {value}"),
             Self::Argument(.., value) => write!(f, "(call_argument) = {value}"),
             Self::Alias(.., name) => write!(f, "(alias) => {name}"),
             Self::UseAll(.., name) => write!(f, "(use all) => {name}"),
