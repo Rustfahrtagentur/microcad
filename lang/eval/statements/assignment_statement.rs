@@ -59,20 +59,30 @@ impl Eval<()> for AssignmentStatement {
         // lookup if we find any existing symbol
         if let Ok(symbol) = context.lookup(&QualifiedName::from_id(assignment.id.clone())) {
             let err = symbol.with_def_mut(|def| match def {
-                SymbolDefinition::Constant(_, identifier, value) => {
+                SymbolDefinition::Constant(_, id, value) => {
                     if value.is_invalid() {
                         *value = new_value.clone();
                         None
                     } else {
                         Some((
                             assignment.id.clone(),
-                            EvalError::ValueAlreadyInitialized(
-                                identifier.clone(),
+                            EvalError::ValueAlreadyDefined(
+                                id.clone(),
                                 value.to_string(),
-                                identifier.src_ref(),
+                                id.src_ref(),
                             ),
                         ))
                     }
+                }
+                SymbolDefinition::ConstExpression(visibility, id, expr) => {
+                    match expr.eval(context) {
+                        Ok(value) => {
+                            *def = SymbolDefinition::Constant(*visibility, id.clone(), value);
+                            None
+                        }
+                        Err(err) => Some((assignment.id.clone(), err)),
+                    };
+                    None
                 }
                 _ => Some((
                     assignment.id.clone(),

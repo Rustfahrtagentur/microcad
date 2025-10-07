@@ -8,7 +8,7 @@ use derive_more::Deref;
 use crate::{src_ref::*, syntax::*};
 
 /// Range start.
-#[derive(Clone, Debug, Default, Deref)]
+#[derive(Clone, Debug, Default, Deref, PartialEq)]
 pub struct RangeFirst(pub Box<Expression>);
 
 impl SrcReferrer for RangeFirst {
@@ -32,7 +32,7 @@ impl TreeDisplay for RangeFirst {
 }
 
 /// Range end.
-#[derive(Clone, Debug, Default, Deref)]
+#[derive(Clone, Debug, Default, Deref, PartialEq)]
 pub struct RangeLast(pub Box<Expression>);
 
 impl SrcReferrer for RangeLast {
@@ -55,7 +55,7 @@ impl TreeDisplay for RangeLast {
 }
 
 /// Range expression, e.g. `a..b`.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct RangeExpression {
     /// First value in the range.
     pub first: RangeFirst,

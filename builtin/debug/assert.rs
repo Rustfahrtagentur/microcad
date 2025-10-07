@@ -114,13 +114,11 @@ pub fn assert_valid() -> Symbol {
             if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
                 match context.lookup(&name) {
                     Ok(symbol) => {
-                        if let Ok(value) = symbol.get_value() {
-                            if value.is_invalid() {
-                                context.error(
-                                    &arg,
-                                    EvalError::AssertionFailed(format!("invalid value: {value}")),
-                                )?;
-                            }
+                        if !symbol.is_valid_value() {
+                            context.error(
+                                &arg,
+                                EvalError::AssertionFailed(format!("Invalid value: {arg}")),
+                            )?;
                         }
                     }
                     Err(err) => context.error(&arg, err)?,
@@ -137,10 +135,14 @@ pub fn assert_invalid() -> Symbol {
         if let Ok((_, arg)) = args.get_single() {
             if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
                 if let Ok(symbol) = context.lookup(&name) {
-                    if let Ok(value) = symbol.get_value() {
-                        if !value.is_invalid() {
-                            context.error(&arg, EvalError::SymbolFound(symbol.full_name()))?
-                        }
+                    if symbol.is_valid_value() {
+                        context.error(
+                            &arg,
+                            EvalError::AssertionFailed(format!(
+                                "Found valid symbol: {}",
+                                symbol.full_name()
+                            )),
+                        )?
                     }
                 }
             }

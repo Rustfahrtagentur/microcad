@@ -3,7 +3,7 @@
 
 //! Symbolizing of syntax definitions.
 
-use crate::{diag::*, resolve::*, syntax::*, value::*};
+use crate::{diag::*, resolve::*, syntax::*};
 
 pub(super) trait Symbolize<T: Default = Option<Symbol>>: Grant {
     /// Create symbol from definition.
@@ -166,10 +166,10 @@ impl Symbolize for AssignmentStatement {
                 } else {
                     log::trace!("Declare private value {}", self.assignment.id);
                     Ok(Some(Symbol::new(
-                        SymbolDefinition::Constant(
+                        SymbolDefinition::ConstExpression(
                             self.assignment.visibility,
                             self.assignment.id.clone(),
-                            Value::None,
+                            self.assignment.expression.clone(),
                         ),
                         Some(parent.clone()),
                     )))

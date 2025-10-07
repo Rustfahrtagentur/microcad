@@ -368,7 +368,7 @@ impl Symbol {
     /// Overwrite any value in this symbol
     pub fn set_value(&self, new_value: Value) -> ResolveResult<()> {
         match &mut self.inner.borrow_mut().def {
-            SymbolDefinition::Constant(_, _, value) => {
+            SymbolDefinition::Constant(.., value) => {
                 *value = new_value;
                 Ok(())
             }
@@ -376,11 +376,12 @@ impl Symbol {
         }
     }
 
-    /// Get any value of this symbol
-    pub fn get_value(&self) -> ResolveResult<Value> {
+    /// Check if symbol has a valid value
+    pub fn is_valid_value(&self) -> bool {
         match &self.inner.borrow().def {
-            SymbolDefinition::Constant(_, _, value) => Ok(value.clone()),
-            _ => Err(ResolveError::NotAValue(self.full_name())),
+            SymbolDefinition::Constant(.., value) => !value.is_invalid(),
+            SymbolDefinition::ConstExpression(_, _, expr) => expr.is_const(),
+            _ => false,
         }
     }
 
@@ -655,6 +656,7 @@ impl SrcReferrer for SymbolInner {
                 unreachable!("builtin has no source code reference")
             }
             SymbolDefinition::Constant(_, identifier, _)
+            | SymbolDefinition::ConstExpression(_, identifier, _)
             | SymbolDefinition::Argument(identifier, _) => identifier.src_ref(),
             SymbolDefinition::Alias(_, identifier, _) => identifier.src_ref(),
             SymbolDefinition::UseAll(_, name) => name.src_ref(),

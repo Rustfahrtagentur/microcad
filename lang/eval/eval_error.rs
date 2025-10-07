@@ -230,9 +230,9 @@ pub enum EvalError {
     #[error("Found a symbol and a property with names {0} and {1}")]
     AmbiguousProperty(QualifiedName, Identifier),
 
-    /// Assignment failed because value already has been initialized
-    #[error("Value {0} already has been initialized with {1} (at line {2})")]
-    ValueAlreadyInitialized(Identifier, String, SrcRef),
+    /// Assignment failed because value already has been defined before.
+    #[error("Value {0} already in defined: {1} (at line {2})")]
+    ValueAlreadyDefined(Identifier, String, SrcRef),
 
     /// Assignment failed because left side is not an l-value
     #[error("Assignment failed because {0} is not an l-value")]
