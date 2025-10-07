@@ -9,25 +9,22 @@ use crate::*;
 
 #[derive(clap::Parser)]
 pub struct Resolve {
-    /// Input µcad file.
-    pub input: std::path::PathBuf,
+    #[clap(flatten)]
+    pub parse: Parse,
 
     /// Check all symbols after resolve.
-    #[clap(short, long, default_value = "true")]
+    #[clap(short, long)]
     pub check: bool,
 
-    /// Write resolve context to stdout
-    #[clap(short, long, default_value = "true")]
-    pub verbose: bool,
+    /// Print resolve context.
+    #[clap(long)]
+    pub resolve: bool,
 }
 
 impl RunCommand<ResolveContext> for Resolve {
     fn run(&self, cli: &Cli) -> anyhow::Result<ResolveContext> {
         // run prior parse step
-        let root = Parse {
-            input: self.input.clone(),
-        }
-        .run(cli)?;
+        let root = self.parse.run(cli)?;
 
         // resolve the file
         let mut context = ResolveContext::create(
@@ -46,7 +43,7 @@ impl RunCommand<ResolveContext> for Resolve {
             eprint!("{}", context.diagnosis());
         }
 
-        if self.verbose {
+        if self.resolve {
             print!("{context}");
         }
 

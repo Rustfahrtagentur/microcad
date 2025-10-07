@@ -10,12 +10,12 @@ use anyhow::*;
 
 #[derive(clap::Parser)]
 pub struct Eval {
-    /// Input µcad file.
-    pub input: std::path::PathBuf,
+    #[clap(flatten)]
+    pub resolve: Resolve,
 
-    /// Write resolve context to stdout
-    #[clap(short, long, default_value = "true")]
-    pub verbose: bool,
+    /// Print model tree.
+    #[clap(long)]
+    pub model: bool,
 }
 
 impl RunCommand<(EvalContext, Model)> for Eval {
@@ -26,14 +26,14 @@ impl RunCommand<(EvalContext, Model)> for Eval {
             ));
         }
         // run prior parse step
-        let resolve_context = Resolve {
-            input: self.input.clone(),
-            verbose: false,
-            check: false,
-        }
-        .run(cli)?;
+        let resolve_context = self.resolve.run(cli)?;
 
-        let mut context = EvalContext::new(resolve_context, Stdout::new());
+        let mut context = EvalContext::new(
+            resolve_context,
+            Stdout::new(),
+            microcad_builtin::builtin_exporters(),
+            microcad_builtin::builtin_importers(),
+        );
 
         let model = context.eval().expect("Valid model");
 
@@ -46,7 +46,7 @@ impl RunCommand<(EvalContext, Model)> for Eval {
             false => log::info!("Evaluated successfully!"),
         }
 
-        if self.verbose {
+        if self.model {
             println!("{}", FormatTree(&model))
         }
 

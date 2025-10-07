@@ -11,6 +11,10 @@ use microcad_lang::{rc::*, syntax::*, tree_display::*};
 pub struct Parse {
     /// Input µcad file.
     pub input: std::path::PathBuf,
+
+    /// Print syntax tree.
+    #[clap(long)]
+    pub syntax: bool,
 }
 
 impl RunCommand<Rc<SourceFile>> for Parse {

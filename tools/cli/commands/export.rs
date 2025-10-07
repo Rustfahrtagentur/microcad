@@ -12,25 +12,50 @@ use crate::{config::Config, *};
 
 /// Parse and evaluate and export a µcad file.
 #[derive(clap::Parser)]
-pub struct ExportArgs {
-    /// Input µcad file.
-    pub input: std::path::PathBuf,
+pub struct Export {
+    #[clap(flatten)]
+    pub eval: Eval,
 
     /// Output file (e.g. an SVG or STL).
     pub output: Option<std::path::PathBuf>,
 
     /// List all export target files.
-    #[arg(short = 'l', long = "list", action = clap::ArgAction::SetTrue)]
-    pub list: bool,
+    #[arg(short, long)]
+    pub targets: bool,
+
+    /// Omit export.
+    #[arg(short, long)]
+    pub dry_run: bool,
 
     /// The resolution of this export.
     ///
     /// The resolution can changed relatively `200%` or to an absolute value `0.05mm`.
-    #[arg(short = 'r', long = "resolution", default_value = "0.1mm")]
+    #[arg(short, long, default_value = "0.1mm")]
     pub resolution: String,
 }
 
-impl ExportArgs {
+impl RunCommand<Vec<(Model, ExportCommand)>> for Export {
+    fn run(&self, cli: &Cli) -> anyhow::Result<Vec<(Model, ExportCommand)>> {
+        // run prior parse step
+        let (context, model) = self.eval.run(cli)?;
+
+        let config = cli.fetch_config()?;
+
+        let target_models = self.target_models(&model, &config, context.exporters())?;
+
+        if self.targets {
+            self.list_targets(&target_models)?;
+        }
+
+        if !self.dry_run {
+            self.export_targets(&target_models)?;
+        }
+
+        Ok(target_models)
+    }
+}
+
+impl Export {
     /// Get default exporter.
     fn default_exporter(
         output_type: &OutputType,
@@ -95,7 +120,7 @@ impl ExportArgs {
                     .or(default_exporter)?,
             }),
             None => {
-                let mut filename = self.input.clone();
+                let mut filename = self.eval.resolve.parse.input.clone();
                 let exporter = default_exporter?;
 
                 let ext = exporter
@@ -171,35 +196,5 @@ impl ExportArgs {
             log::info!("{model} => {attr}", model = model.signature_debug());
         }
         Ok(())
-    }
-}
-
-/// Parse and evaluate and export a µcad file.
-#[derive(clap::Parser)]
-pub struct Export {
-    /// Input µcad file.
-    #[clap(flatten)]
-    args: ExportArgs,
-}
-
-impl RunCommand for Export {
-    fn run(&self, cli: &Cli) -> anyhow::Result<()> {
-        // run prior parse step
-        let (context, model) = Eval {
-            input: self.args.input.clone(),
-            verbose: false,
-        }
-        .run(cli)?;
-
-        let config = cli.fetch_config()?;
-
-        let target_models = &self
-            .args
-            .target_models(&model, &config, context.exporters())?;
-        if self.args.list {
-            self.args.list_targets(target_models)
-        } else {
-            self.args.export_targets(target_models)
-        }
     }
 }
