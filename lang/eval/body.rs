@@ -5,7 +5,7 @@ use crate::{eval::*, model::*};
 
 /// Evaluate the body into a value.
 impl Eval<Value> for Body {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         context.scope(StackFrame::Body(SymbolMap::default()), |context| {
             self.statements.eval(context)
         })
@@ -14,7 +14,7 @@ impl Eval<Value> for Body {
 
 /// Evaluate the body into a single group: `{}`.
 impl Eval<Model> for Body {
-    fn eval(&self, context: &mut Context) -> EvalResult<Model> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Model> {
         context.scope(StackFrame::Body(SymbolMap::default()), |context| {
             Ok(ModelBuilder::new(Element::Group, self.src_ref())
                 .add_children(self.statements.eval(context)?)?

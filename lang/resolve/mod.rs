@@ -66,6 +66,12 @@ fn resolve_test() {
         SourceFile::load("../examples/my_brick.µcad").expect("loading of root source file failed");
     log::trace!("Root source file:\n{root}");
 
-    ResolveContext::create(root, &["../lib"], None, DiagHandler::default())
-        .expect("loading of symbol table failed");
+    ResolveContext::create(
+        root,
+        &["../lib"],
+        None,
+        DiagHandler::default(),
+        ResolveMode::Resolved,
+    )
+    .expect("loading of symbol table failed");
 }

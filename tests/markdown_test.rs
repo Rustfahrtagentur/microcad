@@ -5,7 +5,10 @@ use std::rc::Rc;
 
 use microcad_core::RenderResolution;
 use microcad_export::{stl::StlExporter, svg::SvgExporter};
-use microcad_lang::tree_display::FormatTree;
+use microcad_lang::{
+    eval::{Capture, EvalContext},
+    tree_display::FormatTree,
+};
 
 fn lines_with(code: &str, marker: &str) -> std::collections::HashSet<usize> {
     code.lines()
@@ -43,7 +46,6 @@ pub fn run_test(
     use std::io;
     use std::io::Write;
 
-    use microcad_builtin::*;
     use microcad_lang::diag::*;
     use microcad_lang::syntax::*;
 
@@ -99,12 +101,13 @@ pub fn run_test(
             // test expected to fail succeeded at parsing?
             Ok(source) => {
                 // evaluate the code including µcad std library
-                let mut context = ContextBuilder::from_source_captured(
+                let mut context = EvalContext::from_source(
                     source.clone(),
+                    Some(microcad_builtin::builtin_module()),
                     &["../lib", "../doc/assets"],
+                    Capture::new(),
                 )
-                .expect("resolve error")
-                .build();
+                .expect("resolve error");
                 let eval = context.eval();
 
                 // get print output
@@ -202,12 +205,13 @@ pub fn run_test(
             // test awaited to succeed and parsing succeeds?
             Ok(source) => {
                 // evaluate the code including µcad std library
-                let mut context = ContextBuilder::from_source_captured(
+                let mut context = EvalContext::from_source(
                     source.clone(),
+                    Some(microcad_builtin::builtin_module()),
                     &["../lib", "../doc/assets"],
+                    Capture::new(),
                 )
-                .expect("resolve error")
-                .build();
+                .expect("resolve error");
                 let eval = context.eval();
 
                 // get print output

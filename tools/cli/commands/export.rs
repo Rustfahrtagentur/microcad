@@ -4,9 +4,9 @@
 //! µcad CLI export command
 
 use anyhow::anyhow;
-use microcad_builtin::{Exporter, ExporterAccess, ExporterRegistry};
+use microcad_builtin::*;
 use microcad_core::RenderResolution;
-use microcad_lang::{model::*, ty::QuantityType, value::*};
+use microcad_lang::{model::*, ty::*, value::*};
 
 use crate::{config::Config, *};
 
@@ -28,10 +28,6 @@ pub struct ExportArgs {
     /// The resolution can changed relatively `200%` or to an absolute value `0.05mm`.
     #[arg(short = 'r', long = "resolution", default_value = "0.1mm")]
     pub resolution: String,
-
-    /// Layers to export (or all layers).
-    #[arg(long = "layer", action = clap::ArgAction::Append, default_value = "./lib", global = true)]
-    pub layers: Vec<String>,
 }
 
 impl ExportArgs {
@@ -188,8 +184,13 @@ pub struct Export {
 
 impl RunCommand for Export {
     fn run(&self, cli: &Cli) -> anyhow::Result<()> {
-        let mut context = cli.make_context(&self.args.input)?;
-        let model = context.eval().expect("Valid model");
+        // run prior parse step
+        let (context, model) = Eval {
+            input: self.args.input.clone(),
+            verbose: false,
+        }
+        .run(cli)?;
+
         let config = cli.fetch_config()?;
 
         let target_models = &self

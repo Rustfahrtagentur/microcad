@@ -50,7 +50,7 @@ impl TryFrom<Value> for ResolutionAttribute {
                 quantity_type: QuantityType::Length,
             }) => Ok(ResolutionAttribute::Linear(value)),
             _ => Err(ValueError::CannotConvert(
-                value,
+                value.to_string(),
                 "ResolutionAttribute".to_string(),
             )),
         }

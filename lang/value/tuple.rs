@@ -391,7 +391,7 @@ impl<'a> TryFrom<&'a Value> for &'a Tuple {
         match value {
             Value::Tuple(tuple) => Ok(tuple),
             _ => Err(ValueError::CannotConvert(
-                value.clone(),
+                value.to_string(),
                 "Tuple".to_string(),
             )),
         }
@@ -431,7 +431,7 @@ impl TryFrom<&Tuple> for Color {
                     quantity_type: QuantityType::Scalar,
                 }),
             ) => Ok(Color::new(*r as f32, *g as f32, *b as f32, a as f32)),
-            _ => Err(ValueError::CannotConvertToColor(Box::new(tuple.clone()))),
+            _ => Err(ValueError::CannotConvertToColor(tuple.to_string())),
         }
     }
 }
@@ -472,10 +472,7 @@ impl TryFrom<&Tuple> for Size2 {
                 width: *width,
                 height: *height,
             }),
-            _ => Err(ValueError::CannotConvert(
-                tuple.clone().into(),
-                "Size2".into(),
-            )),
+            _ => Err(ValueError::CannotConvert(tuple.to_string(), "Size2".into())),
         }
     }
 }

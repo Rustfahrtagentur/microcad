@@ -38,7 +38,7 @@ pub trait UseSymbol {
 }
 
 impl Eval<()> for UseStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<()> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<()> {
         context.grant(self)?;
 
         if !context.is_module() {

@@ -17,7 +17,7 @@ use thiserror::Error;
 
 impl Eval<ArgumentValueList> for ArgumentList {
     /// Evaluate into a [`ArgumentValueList`].
-    fn eval(&self, context: &mut Context) -> EvalResult<ArgumentValueList> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<ArgumentValueList> {
         self.iter()
             .map(|arg| {
                 (
@@ -34,7 +34,7 @@ impl Eval<ArgumentValueList> for ArgumentList {
 }
 
 impl Eval for Call {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         // find self in symbol table by own name
         let symbol = match context.lookup(&self.name) {
             Ok(symbol) => symbol,
@@ -101,14 +101,8 @@ impl Eval for Call {
                         }
                     }
                     SymbolDefinition::Function(f) => f.call(&args, context),
-                    def => {
-                        context.error(
-                            self,
-                            EvalError::SymbolCannotBeCalled(
-                                symbol.full_name(),
-                                Box::new(def.clone()),
-                            ),
-                        )?;
+                    _ => {
+                        context.error(self, EvalError::SymbolCannotBeCalled(symbol.full_name()))?;
                         Ok(Value::None)
                     }
                 })

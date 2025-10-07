@@ -113,7 +113,7 @@ impl Value {
         match self {
             Value::Bool(b) => Ok(*b),
             Value::None => Ok(false),
-            value => Err(ValueError::CannotConvertToBool(value.clone())),
+            value => Err(ValueError::CannotConvertToBool(value.to_string())),
         }
     }
 
@@ -125,7 +125,7 @@ impl Value {
             _ => {}
         }
 
-        Err(ValueError::CannotConvert(self.clone(), "String".into()))
+        Err(ValueError::CannotConvert(self.to_string(), "String".into()))
     }
 
     /// Try to convert to [`Scalar`].
@@ -136,7 +136,7 @@ impl Value {
             _ => {}
         }
 
-        Err(ValueError::CannotConvert(self.clone(), "Scalar".into()))
+        Err(ValueError::CannotConvert(self.to_string(), "Scalar".into()))
     }
 }
 
@@ -300,7 +300,7 @@ impl std::ops::Mul<Unit> for Value {
             (Value::Array(array), Type::Quantity(quantity_type)) => {
                 Ok((array * Value::Quantity(Quantity::new(unit.normalize(1.0), quantity_type)))?)
             }
-            (value, _) => Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
+            (value, _) => Err(ValueError::CannotAddUnitToValueWithUnit(value.to_string())),
         }
     }
 }
@@ -397,7 +397,7 @@ macro_rules! impl_try_from {
             fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
                 match value {
                     $(Value::$variant(v) => Ok(v),)*
-                    value => Err(ValueError::CannotConvert(value, stringify!($ty).into())),
+                    value => Err(ValueError::CannotConvert(value.to_string(), stringify!($ty).into())),
                 }
             }
         }
@@ -408,7 +408,7 @@ macro_rules! impl_try_from {
             fn try_from(value: &Value) -> std::result::Result<Self, Self::Error> {
                 match value {
                     $(Value::$variant(v) => Ok(v.clone().into()),)*
-                    value => Err(ValueError::CannotConvert(value.clone(), stringify!($ty).into())),
+                    value => Err(ValueError::CannotConvert(value.to_string(), stringify!($ty).into())),
                 }
             }
         }
@@ -429,7 +429,10 @@ impl TryFrom<&Value> for Scalar {
                 value,
                 quantity_type: QuantityType::Scalar,
             }) => Ok(*value),
-            _ => Err(ValueError::CannotConvert(value.clone(), "Scalar".into())),
+            _ => Err(ValueError::CannotConvert(
+                value.to_string(),
+                "Scalar".into(),
+            )),
         }
     }
 }
@@ -444,7 +447,10 @@ impl TryFrom<Value> for Scalar {
                 value,
                 quantity_type: QuantityType::Scalar,
             }) => Ok(value),
-            _ => Err(ValueError::CannotConvert(value.clone(), "Scalar".into())),
+            _ => Err(ValueError::CannotConvert(
+                value.to_string(),
+                "Scalar".into(),
+            )),
         }
     }
 }
@@ -455,7 +461,7 @@ impl TryFrom<&Value> for Size2 {
     fn try_from(value: &Value) -> Result<Self, Self::Error> {
         match value {
             Value::Tuple(tuple) => Ok(tuple.as_ref().try_into()?),
-            _ => Err(ValueError::CannotConvert(value.clone(), "Size2".into())),
+            _ => Err(ValueError::CannotConvert(value.to_string(), "Size2".into())),
         }
     }
 }
@@ -470,7 +476,10 @@ impl TryFrom<&Value> for Mat3 {
             }
         }
 
-        Err(ValueError::CannotConvert(value.clone(), "Matrix3".into()))
+        Err(ValueError::CannotConvert(
+            value.to_string(),
+            "Matrix3".into(),
+        ))
     }
 }
 

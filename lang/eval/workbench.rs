@@ -16,7 +16,7 @@ impl WorkbenchDefinition {
         call_src_ref: SrcRef,
         creator: Creator,
         init: Option<&'a InitDefinition>,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Model> {
         log::debug!(
             "Evaluating model of `{id:?}` {kind}",
@@ -128,7 +128,7 @@ impl WorkbenchDefinition {
         call_src_ref: SrcRef,
         symbol: Symbol,
         arguments: &ArgumentValueList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Model> {
         log::debug!(
             "Workbench {call} {kind} {id:?}({arguments:?})",

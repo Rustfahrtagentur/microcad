@@ -6,7 +6,7 @@
 use crate::{eval::*, resolve::*};
 
 impl Eval for Sources {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         self.source_files
             .iter()
             // skip root

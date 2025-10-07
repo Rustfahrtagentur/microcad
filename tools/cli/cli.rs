@@ -3,9 +3,7 @@
 
 //! µcad CLI.
 
-use anyhow::anyhow;
 use clap::Parser;
-use microcad_lang::eval::Context;
 
 use crate::commands::*;
 use crate::config::Config;
@@ -23,10 +21,6 @@ pub struct Cli {
     /// By default, `./lib` (if it exists) and `~/.microcad/lib` are used.
     #[arg(short = 'P', long = "search-path", action = clap::ArgAction::Append, global = true)]
     pub search_paths: Vec<std::path::PathBuf>,
-
-    /// Check all symbols after resolve.
-    #[clap(short, long, default_value = "true")]
-    pub check: bool,
 
     /// Load config from file.
     #[arg(short = 'C', long = "config")]
@@ -80,38 +74,33 @@ impl Cli {
         let start = std::time::Instant::now();
 
         match &self.command {
-            Commands::Parse(parse) => parse.run(self)?,
-            Commands::Resolve(resolve) => resolve.run(self)?,
-            Commands::Eval(eval) => eval.run(self)?,
-            Commands::Export(export) => export.run(self)?,
-            Commands::Create(create) => create.run(self)?,
-            Commands::Watch(watch) => watch.run(self)?,
-            Commands::Install(install) => install.run(self)?,
+            Commands::Parse(parse) => {
+                parse.run(self)?;
+            }
+            Commands::Resolve(resolve) => {
+                resolve.run(self)?;
+            }
+            Commands::Eval(eval) => {
+                eval.run(self)?;
+            }
+            Commands::Export(export) => {
+                export.run(self)?;
+            }
+            Commands::Create(create) => {
+                create.run(self)?;
+            }
+            Commands::Watch(watch) => {
+                watch.run(self)?;
+            }
+            Commands::Install(install) => {
+                install.run(self)?;
+            }
         }
 
         if self.time {
             log::info!("Processing Time: {:?}", start.elapsed());
         }
         Ok(())
-    }
-
-    /// Make a new context from an input file.
-    ///
-    /// Also checks if there is a µcad std library installed and returns an error in case the library has not been found.
-    pub fn make_context(&self, input: impl AsRef<std::path::Path>) -> anyhow::Result<Context> {
-        if !self.has_std_lib() {
-            return Err(anyhow!(
-                "No std library was found. Use `microcad install std` to install the std library."
-            ));
-        }
-
-        Ok(microcad_builtin::builtin_context(
-            crate::commands::Resolve {
-                input: input.as_ref().to_path_buf(),
-                output: None,
-            }
-            .load(&self.search_paths, self.check)?,
-        )?)
     }
 
     /// Fetch a config from file or default config.

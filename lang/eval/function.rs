@@ -6,7 +6,7 @@
 use crate::{eval::*, syntax::*, value::*};
 
 impl Eval for FunctionDefinition {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         context.grant(self)?;
         context.scope(StackFrame::Function(Default::default()), |_context| {
             /*
@@ -35,7 +35,7 @@ impl Eval for FunctionDefinition {
 }
 
 impl CallTrait for FunctionDefinition {
-    fn call(&self, args: &ArgumentValueList, context: &mut Context) -> EvalResult<Value> {
+    fn call(&self, args: &ArgumentValueList, context: &mut EvalContext) -> EvalResult<Value> {
         match ArgumentMatch::find_multi_match(args, &self.signature.parameters.eval(context)?) {
             Ok(matches) => {
                 let mut result: Vec<Value> = Vec::new();

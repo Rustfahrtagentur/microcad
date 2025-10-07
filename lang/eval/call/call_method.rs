@@ -16,7 +16,7 @@ pub trait CallMethod<T = Value> {
         &self,
         id: &QualifiedName,
         args: &ArgumentValueList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<T>;
 }
 
@@ -25,7 +25,7 @@ impl CallMethod for Array {
         &self,
         id: &QualifiedName,
         _: &ArgumentValueList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Value> {
         match id.single_identifier().expect("Single id").id().as_str() {
             "count" => Ok(Value::Integer(self.len() as i64)),
@@ -57,7 +57,7 @@ impl CallMethod<Option<Model>> for Model {
         &self,
         name: &QualifiedName,
         args: &ArgumentValueList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Option<Model>> {
         if let Some(symbol) = name.eval(context)? {
             context.scope(
@@ -85,14 +85,8 @@ impl CallMethod<Option<Model>> for Model {
                             }
                             value => panic!("Builtin call returned {value} but no models."),
                         },
-                        def => {
-                            context.error(
-                                name,
-                                EvalError::SymbolCannotBeCalled(
-                                    name.clone(),
-                                    Box::new(def.clone()),
-                                ),
-                            )?;
+                        _ => {
+                            context.error(name, EvalError::SymbolCannotBeCalled(name.clone()))?;
                             Ok(None)
                         }
                     })
@@ -109,7 +103,7 @@ impl CallMethod for Value {
         &self,
         id: &QualifiedName,
         args: &ArgumentValueList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Value> {
         match self {
             Value::Integer(_) => eval_todo!(context, id, "call_method for Integer"),
@@ -146,7 +140,7 @@ fn call_list_method() {
         .call_method(
             &"all_equal".into(),
             &ArgumentValueList::default(),
-            &mut Context::default(),
+            &mut EvalContext::default(),
         )
         .expect("test error")
     {

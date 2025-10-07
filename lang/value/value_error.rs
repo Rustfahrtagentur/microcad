@@ -19,19 +19,19 @@ pub enum ValueError {
 
     /// Cannot convert to color.
     #[error("Cannot convert named tuple to color: {0}")]
-    CannotConvertToColor(Box<Tuple>),
+    CannotConvertToColor(String),
 
     /// Cannot add unit to a value that has already a unit
     #[error("Cannot add unit to a value that has already a unit: {0}")]
-    CannotAddUnitToValueWithUnit(Value),
+    CannotAddUnitToValueWithUnit(String),
 
     /// Cannot convert value
     #[error("Cannot convert value {0} to {1}")]
-    CannotConvert(Value, String),
+    CannotConvert(String, String),
 
     /// Cannot convert value into boolean
     #[error("Cannot convert value into boolean: {0}")]
-    CannotConvertToBool(Value),
+    CannotConvertToBool(String),
 
     /// Cannot concat two vec with different types
     #[error("Cannot concat two vec with different types {0} and {1}")]
