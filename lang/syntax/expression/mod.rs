@@ -24,8 +24,6 @@ pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
     Invalid,
-    /// A processed value.
-    Value(Value),
     /// An integer, float, color or bool literal: 1, 1.0, #00FF00, false
     Literal(Literal),
     /// A string that contains format expressions: "value = {a}"
@@ -79,7 +77,6 @@ impl SrcReferrer for Expression {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         match self {
             Self::Invalid => SrcRef(None),
-            Self::Value(_) => SrcRef(None),
             Self::Literal(l) => l.src_ref(),
             Self::FormatString(fs) => fs.src_ref(),
             Self::ArrayExpression(le) => le.src_ref(),
@@ -110,7 +107,6 @@ impl SrcReferrer for Expression {
 impl std::fmt::Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Value(value) => write!(f, "{value}"),
             Self::Literal(literal) => write!(f, "{literal}"),
             Self::FormatString(format_string) => write!(f, "{format_string}"),
             Self::ArrayExpression(array_expression) => write!(f, "{array_expression}"),
@@ -142,7 +138,6 @@ impl std::fmt::Display for Expression {
 impl std::fmt::Debug for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Value(value) => write!(f, "{value:?}"),
             Self::Literal(literal) => write!(f, "{literal:?}"),
             Self::FormatString(format_string) => write!(f, "{format_string:?}"),
             Self::ArrayExpression(array_expression) => write!(f, "{array_expression:?}"),
@@ -180,7 +175,6 @@ impl TreeDisplay for Value {
 impl TreeDisplay for Expression {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         match self {
-            Expression::Value(value) => value.tree_print(f, depth),
             Expression::Literal(literal) => literal.tree_print(f, depth),
             Expression::FormatString(format_string) => format_string.tree_print(f, depth),
             Expression::ArrayExpression(array_expression) => array_expression.tree_print(f, depth),

@@ -137,10 +137,9 @@ impl Names for ExpressionStatement {
 impl Names for Expression {
     fn names(&self) -> NameList {
         match self {
-            Expression::Invalid
-            | Expression::Value(_)
-            | Expression::Literal(_)
-            | Expression::Marker(_) => NameList::default(),
+            Expression::Invalid | Expression::Literal(_) | Expression::Marker(_) => {
+                NameList::default()
+            }
 
             Expression::FormatString(fs) => fs.names(),
             Expression::ArrayExpression(ae) => ae.names(),
