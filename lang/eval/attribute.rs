@@ -24,11 +24,7 @@ pub enum AttributeError {
 
     /// Attribute cannot be assigned to an expression.
     #[error("Cannot assign attribute to expression `{0}`")]
-    CannotAssignAttribute(Box<Expression>),
-
-    /// Warning when an attribute has already been set.
-    #[error("The attribute is already set: {0} = {1}")]
-    AttributeAlreadySet(Identifier, Value),
+    CannotAssignAttribute(String),
 
     /// The attribute was not found.
     #[error("Not found: {0}")]
@@ -40,7 +36,7 @@ pub enum AttributeError {
 }
 
 impl Eval<Option<ExportCommand>> for syntax::AttributeCommand {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<ExportCommand>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<ExportCommand>> {
         match self {
             AttributeCommand::Call(_, Some(argument_list)) => {
                 match ArgumentMatch::find_match(
@@ -116,7 +112,7 @@ impl Eval<Option<ExportCommand>> for syntax::AttributeCommand {
 }
 
 impl Eval<Vec<ExportCommand>> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Vec<ExportCommand>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Vec<ExportCommand>> {
         assert_eq!(self.id.id().as_str(), "export");
 
         self.commands
@@ -131,7 +127,7 @@ impl Eval<Vec<ExportCommand>> for syntax::Attribute {
 }
 
 impl Eval<Vec<MeasureCommand>> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Vec<MeasureCommand>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Vec<MeasureCommand>> {
         let mut commands = Vec::new();
 
         for command in &self.commands {
@@ -151,7 +147,7 @@ impl Eval<Vec<MeasureCommand>> for syntax::Attribute {
 }
 
 impl Eval<Vec<CustomCommand>> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Vec<CustomCommand>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Vec<CustomCommand>> {
         match context.exporters().exporter_by_id(self.id.id()) {
             Ok(exporter) => {
                 let mut commands = Vec::new();
@@ -186,7 +182,7 @@ impl Eval<Vec<CustomCommand>> for syntax::Attribute {
 }
 
 impl Eval<Option<Color>> for syntax::AttributeCommand {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<Color>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<Color>> {
         match self {
             AttributeCommand::Call(_, _) => todo!(),
             // Get color from a tuple or string.
@@ -223,7 +219,7 @@ impl Eval<Option<Color>> for syntax::AttributeCommand {
 }
 
 impl Eval<Option<ResolutionAttribute>> for syntax::AttributeCommand {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<ResolutionAttribute>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<ResolutionAttribute>> {
         match self {
             AttributeCommand::Expression(expression) => {
                 let value: Value = expression.eval(context)?;
@@ -248,7 +244,7 @@ impl Eval<Option<ResolutionAttribute>> for syntax::AttributeCommand {
 }
 
 impl Eval<Option<std::rc::Rc<Theme>>> for syntax::AttributeCommand {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<std::rc::Rc<Theme>>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<std::rc::Rc<Theme>>> {
         match self {
             AttributeCommand::Expression(_) => todo!(),
             AttributeCommand::Call(_, _) => {
@@ -263,7 +259,7 @@ impl Eval<Option<std::rc::Rc<Theme>>> for syntax::AttributeCommand {
 }
 
 impl Eval<Option<Size2>> for syntax::AttributeCommand {
-    fn eval(&self, _: &mut Context) -> EvalResult<Option<Size2>> {
+    fn eval(&self, _: &mut EvalContext) -> EvalResult<Option<Size2>> {
         todo!("Get Size2, e.g. `size = (width = 10mm, height = 10mm) from AttributeCommand")
     }
 }
@@ -271,7 +267,7 @@ impl Eval<Option<Size2>> for syntax::AttributeCommand {
 macro_rules! eval_to_attribute {
     ($id:ident: $ty:ty) => {
         impl Eval<Option<$ty>> for syntax::Attribute {
-            fn eval(&self, context: &mut Context) -> EvalResult<Option<$ty>> {
+            fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<$ty>> {
                 assert_eq!(self.id.id().as_str(), stringify!($id));
                 match self.single_command() {
                     Some(command) => Ok(command.eval(context)?),
@@ -291,7 +287,7 @@ eval_to_attribute!(theme: std::rc::Rc<Theme>);
 eval_to_attribute!(size: Size2);
 
 impl Eval<Vec<crate::model::Attribute>> for syntax::Attribute {
-    fn eval(&self, context: &mut Context) -> EvalResult<Vec<crate::model::Attribute>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Vec<crate::model::Attribute>> {
         let id = self.id.id().as_str();
         use crate::model::Attribute as Attr;
         Ok(match id {
@@ -328,7 +324,7 @@ impl Eval<Vec<crate::model::Attribute>> for syntax::Attribute {
 }
 
 impl Eval<crate::model::Attributes> for AttributeList {
-    fn eval(&self, context: &mut Context) -> EvalResult<crate::model::Attributes> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<crate::model::Attributes> {
         Ok(Attributes(self.iter().try_fold(
             Vec::new(),
             |mut attributes, attribute| -> EvalResult<_> {

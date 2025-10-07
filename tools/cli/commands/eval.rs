@@ -3,24 +3,38 @@
 
 //! µcad CLI eval commands
 
-use microcad_lang::{diag::*, tree_display::*};
+use microcad_lang::{diag::*, eval::*, model::Model, tree_display::*};
 
-use crate::commands::RunCommand;
+use crate::commands::{Resolve, RunCommand};
+use anyhow::*;
 
 #[derive(clap::Parser)]
 pub struct Eval {
     /// Input µcad file.
     pub input: std::path::PathBuf,
-    /// Output models.
-    pub output: Option<std::path::PathBuf>,
-    /// Skip checking all symbols after resolve.
-    #[clap(short, long)]
-    pub skip_check: bool,
+
+    /// Write resolve context to stdout
+    #[clap(short, long, default_value = "true")]
+    pub verbose: bool,
 }
 
-impl RunCommand for Eval {
-    fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<()> {
-        let mut context = cli.make_context(&self.input)?;
+impl RunCommand<(EvalContext, Model)> for Eval {
+    fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<(EvalContext, Model)> {
+        if !cli.has_std_lib() {
+            return Err(anyhow!(
+                "No std library was found. Use `microcad install std` to install the std library."
+            ));
+        }
+        // run prior parse step
+        let resolve_context = Resolve {
+            input: self.input.clone(),
+            verbose: false,
+            check: false,
+        }
+        .run(cli)?;
+
+        let mut context = EvalContext::new(resolve_context, Stdout::new());
+
         let model = context.eval().expect("Valid model");
 
         log::info!("Result:");
@@ -32,11 +46,10 @@ impl RunCommand for Eval {
             false => log::info!("Evaluated successfully!"),
         }
 
-        match &self.output {
-            Some(filename) => model.write_to_file(&filename)?,
-            None => println!("{}", FormatTree(&model)),
+        if self.verbose {
+            println!("{}", FormatTree(&model))
         }
 
-        Ok(())
+        Ok((context, model))
     }
 }

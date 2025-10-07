@@ -49,7 +49,7 @@ fn sqrt() -> Symbol {
 fn trigonometric(
     name: &str,
     args: &ArgumentValueList,
-    ctx: &mut Context,
+    ctx: &mut EvalContext,
     f: impl FnOnce(f64) -> f64,
 ) -> EvalResult<Value> {
     let (_, arg) = args.get_single()?;

@@ -4,7 +4,7 @@
 use crate::{eval::*, model::*};
 
 impl Eval<Option<Model>> for Marker {
-    fn eval(&self, _: &mut Context) -> EvalResult<Option<Model>> {
+    fn eval(&self, _: &mut EvalContext) -> EvalResult<Option<Model>> {
         if self.is_input_placeholder() {
             Ok(Some(
                 ModelBuilder::new(Element::InputPlaceholder, self.src_ref()).build(),

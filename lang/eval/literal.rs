@@ -4,13 +4,13 @@
 use crate::eval::*;
 
 impl Eval for NumberLiteral {
-    fn eval(&self, _: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, _: &mut EvalContext) -> EvalResult<Value> {
         Ok(self.value())
     }
 }
 
 impl Eval for Literal {
-    fn eval(&self, _: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, _: &mut EvalContext) -> EvalResult<Value> {
         Ok(self.value())
     }
 }

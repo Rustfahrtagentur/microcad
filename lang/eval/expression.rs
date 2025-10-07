@@ -4,7 +4,7 @@
 use crate::{eval::*, model::*};
 
 impl Eval for RangeFirst {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         let value: Value = self.0.eval(context)?;
         Ok(match value {
             Value::Integer(_) => value,
@@ -24,7 +24,7 @@ impl Eval for RangeFirst {
 }
 
 impl Eval for RangeLast {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         let value: Value = self.0.eval(context)?;
         Ok(match value {
             Value::Integer(_) => value,
@@ -44,7 +44,7 @@ impl Eval for RangeLast {
 }
 
 impl Eval for RangeExpression {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         Ok(
             match (self.first.eval(context)?, self.last.eval(context)?) {
                 (Value::Integer(first), Value::Integer(last)) => Value::Array(Array::new(
@@ -58,7 +58,7 @@ impl Eval for RangeExpression {
 }
 
 impl Eval for ArrayExpression {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match &self.inner {
             ArrayExpressionInner::Range(range_expression) => range_expression.eval(context),
             ArrayExpressionInner::List(expressions) => {
@@ -93,7 +93,7 @@ impl Eval for ArrayExpression {
 }
 
 impl Eval<Option<Symbol>> for QualifiedName {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<Symbol>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<Symbol>> {
         match context.lookup(self) {
             Ok(symbol) => Ok(Some(symbol.clone())),
             Err(error) => {
@@ -105,7 +105,7 @@ impl Eval<Option<Symbol>> for QualifiedName {
 }
 
 impl Eval for QualifiedName {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         context.lookup(self)?.with_def(|def| match def {
             SymbolDefinition::Constant(.., value) | SymbolDefinition::Argument(_, value) => {
                 Ok(value.clone())
@@ -148,7 +148,7 @@ impl Expression {
     pub fn eval_with_attribute_list(
         &self,
         attribute_list: &AttributeList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Value> {
         let value = self.eval(context)?;
         match value {
@@ -162,7 +162,7 @@ impl Expression {
                 if !attribute_list.is_empty() {
                     context.error(
                         attribute_list,
-                        AttributeError::CannotAssignAttribute(self.clone().into()),
+                        AttributeError::CannotAssignAttribute(self.to_string()),
                     )?;
                 }
                 Ok(value)
@@ -172,7 +172,7 @@ impl Expression {
 }
 
 impl Eval for Expression {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         log::trace!("Evaluating expression:\n{self}");
         let result = match self {
             Self::Literal(literal) => literal.eval(context),
@@ -283,7 +283,7 @@ impl Eval for Expression {
 }
 
 impl Eval<Option<Model>> for Expression {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<Model>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<Model>> {
         Ok(match self.eval(context)? {
             Value::Model(model) => Some(model),
             _ => None,

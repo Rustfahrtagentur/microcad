@@ -11,31 +11,34 @@ use crate::*;
 pub struct Resolve {
     /// Input µcad file.
     pub input: std::path::PathBuf,
-    /// Output symbol table.
-    pub output: Option<std::path::PathBuf>,
+
+    /// Check all symbols after resolve.
+    #[clap(short, long, default_value = "true")]
+    pub check: bool,
+
+    /// Write resolve context to stdout
+    #[clap(short, long, default_value = "true")]
+    pub verbose: bool,
 }
 
-impl Resolve {
-    pub fn load(
-        &self,
-        search_paths: &[impl AsRef<std::path::Path>],
-        check: bool,
-    ) -> ResolveResult<ResolveContext> {
-        //  parse root file
-        let root = crate::commands::parse::Parse {
+impl RunCommand<ResolveContext> for Resolve {
+    fn run(&self, cli: &Cli) -> anyhow::Result<ResolveContext> {
+        // run prior parse step
+        let root = Parse {
             input: self.input.clone(),
         }
-        .parse()?;
+        .run(cli)?;
 
         // resolve the file
         let mut context = ResolveContext::create(
             root,
-            search_paths,
+            &cli.search_paths,
             Some(microcad_builtin::builtin_module()),
             DiagHandler::default(),
+            ResolveMode::Resolved,
         )?;
 
-        if check {
+        if self.check {
             context.check()?;
         }
 
@@ -43,22 +46,11 @@ impl Resolve {
             eprint!("{}", context.diagnosis());
         }
 
-        match &self.output {
-            Some(filename) => {
-                context.write_to_file(&filename)?;
-                todo!("write unchecked into file");
-            }
-            None => print!("{context}"),
+        if self.verbose {
+            print!("{context}");
         }
 
         log::info!("Resolved successfully!");
         Ok(context)
-    }
-}
-
-impl RunCommand for Resolve {
-    fn run(&self, cli: &Cli) -> anyhow::Result<()> {
-        self.load(&cli.search_paths, cli.check)?;
-        Ok(())
     }
 }

@@ -18,6 +18,22 @@ pub struct ResolveContext {
     ///
     /// Filled by [check()] with symbols which are not in use in ANY checked code.
     pub unchecked: Option<Symbols>,
+
+    mode: ResolveMode,
+}
+
+/// Select what {ResolveContext::create()] automatically does.
+#[derive(Default)]
+pub enum ResolveMode {
+    /// Only load the sources
+    #[default]
+    Loaded,
+    /// Create symbol table.
+    Symbolized,
+    /// Resolve symbol table
+    Resolved,
+    /// Check symbol table
+    Checked,
 }
 
 impl ResolveContext {
@@ -40,14 +56,19 @@ impl ResolveContext {
         search_paths: &[impl AsRef<std::path::Path>],
         builtin: Option<Symbol>,
         diag: DiagHandler,
+        mode: ResolveMode,
     ) -> ResolveResult<ResolveContext> {
         let mut context = Self::new(root, search_paths, diag)?;
         context.symbolize()?;
         if let Some(builtin) = builtin {
             context.add_symbol(builtin)?;
         }
-        context.resolve()?;
-        context.check()?;
+        if matches!(mode, ResolveMode::Resolved | ResolveMode::Checked) {
+            context.resolve()?;
+            if matches!(mode, ResolveMode::Checked) {
+                context.check()?;
+            }
+        }
         Ok(context)
     }
 
@@ -58,6 +79,8 @@ impl ResolveContext {
     }
 
     pub(super) fn resolve(&mut self) -> ResolveResult<()> {
+        assert!(matches!(self.mode, ResolveMode::Symbolized));
+
         self.symbol_table
             .values()
             .iter()
@@ -70,11 +93,15 @@ impl ResolveContext {
         log::debug!("Resolve OK!");
         log::trace!("Resolved symbol table:\n{self:?}");
 
+        self.mode = ResolveMode::Resolved;
+
         Ok(())
     }
 
     /// check names in all symbols
     pub fn check(&mut self) -> ResolveResult<()> {
+        assert!(matches!(self.mode, ResolveMode::Resolved));
+
         log::trace!("Checking symbol table");
         self.symbol_table
             .values()
@@ -94,6 +121,8 @@ impl ResolveContext {
         );
         self.unchecked = Some(unchecked);
 
+        self.mode = ResolveMode::Checked;
+
         Ok(())
     }
 
@@ -111,6 +140,8 @@ impl ResolveContext {
 
     /// Create a symbol out of all sources (without resolving them).
     pub(crate) fn symbolize(&mut self) -> ResolveResult<()> {
+        assert!(matches!(self.mode, ResolveMode::Loaded));
+
         let named_symbols = self
             .sources
             .clone()
@@ -133,7 +164,15 @@ impl ResolveContext {
                 todo!()
             }
         }
+
+        self.mode = ResolveMode::Symbolized;
+
         Ok(())
+    }
+
+    /// Return `true` if context has been resolved (or checked as well)
+    pub fn is_resolved(&self) -> bool {
+        matches!(self.mode, ResolveMode::Resolved | ResolveMode::Checked)
     }
 }
 

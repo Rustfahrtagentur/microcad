@@ -34,7 +34,7 @@ impl ArgumentValueList {
         }
 
         Err(EvalError::ArgumentCountMismatch {
-            args: self.clone(),
+            args: self.to_string(),
             expected: 1,
             found: self.map.len(),
         })

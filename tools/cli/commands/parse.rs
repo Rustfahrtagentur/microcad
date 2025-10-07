@@ -3,11 +3,9 @@
 
 //! µcad CLI parse command.
 
-use std::rc::Rc;
-
 use crate::*;
 
-use microcad_lang::{parse::*, syntax::*, tree_display::*};
+use microcad_lang::{rc::*, syntax::*, tree_display::*};
 
 #[derive(clap::Parser)]
 pub struct Parse {
@@ -15,18 +13,11 @@ pub struct Parse {
     pub input: std::path::PathBuf,
 }
 
-impl Parse {
-    pub fn parse(&self) -> ParseResult<Rc<SourceFile>> {
+impl RunCommand<Rc<SourceFile>> for Parse {
+    fn run(&self, _cli: &Cli) -> anyhow::Result<Rc<SourceFile>> {
         let source_file = SourceFile::load(self.input.clone())?;
         log::info!("Parsed successfully!");
-        Ok(source_file)
-    }
-}
-
-impl RunCommand for Parse {
-    fn run(&self, _cli: &Cli) -> anyhow::Result<()> {
-        let source_file = self.parse()?;
         println!("{}", FormatTree(source_file.as_ref()));
-        Ok(())
+        Ok(source_file)
     }
 }

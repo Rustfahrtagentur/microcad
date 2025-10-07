@@ -3,7 +3,6 @@
 
 //! µcad builtin library
 
-pub mod context_builder;
 mod debug;
 mod geo2d;
 mod geo3d;
@@ -23,9 +22,7 @@ fn init() {
 use std::str::FromStr;
 
 pub use microcad_lang::builtin::*;
-use microcad_lang::{diag::*, eval::*, resolve::*, ty::Ty, value::*};
-
-pub use context_builder::*;
+use microcad_lang::{diag::*, eval::*, ty::Ty, value::*};
 
 /// Return type of argument.
 fn type_of() -> Symbol {
@@ -81,14 +78,4 @@ pub fn builtin_exporters() -> ExporterRegistry {
         .insert(microcad_export::svg::SvgExporter)
         .insert(microcad_export::stl::StlExporter)
         .insert(microcad_export::json::JsonExporter)
-}
-
-/// Built-in context.
-pub fn builtin_context(
-    resolve_context: ResolveContext,
-) -> ResolveResult<microcad_lang::eval::Context> {
-    Ok(ContextBuilder::new(resolve_context, Box::new(Stdout))
-        .importers(crate::builtin_importers())
-        .exporters(crate::builtin_exporters())
-        .build())
 }

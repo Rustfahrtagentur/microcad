@@ -4,7 +4,7 @@
 use crate::eval::*;
 
 impl Eval for TupleExpression {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         let (unnamed, named): (Vec<_>, _) = self
             .args
             .eval(context)?

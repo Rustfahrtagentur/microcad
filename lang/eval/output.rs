@@ -12,6 +12,13 @@ pub trait Output {
 /// Output what `__builtin::print` is printing to stdout.
 pub struct Stdout;
 
+impl Stdout {
+    /// Create new stdout output.
+    pub fn new() -> Box<Self> {
+        Box::new(Self)
+    }
+}
+
 impl Output for Stdout {
     /// Print into output buffer.
     fn print(&mut self, what: String) -> std::io::Result<()> {
@@ -30,16 +37,10 @@ pub struct Capture {
 
 impl Capture {
     /// Create new capture buffer.
-    pub fn new() -> Self {
-        Self {
+    pub fn new() -> Box<Self> {
+        Box::new(Self {
             buf: std::io::BufWriter::new(Vec::new()),
-        }
-    }
-}
-
-impl Default for Capture {
-    fn default() -> Self {
-        Self::new()
+        })
     }
 }
 

@@ -21,7 +21,7 @@ pub trait Grant<T> {
 /// - One *output channel* ([`Output`]) where `__builtin::print` writes it's output to while evaluation.
 ///
 /// All these internal structures can be accessed by several implemented traits.
-pub struct Context {
+pub struct EvalContext {
     /// Symbol table
     symbol_table: SymbolTable,
     /// Source cache
@@ -38,10 +38,12 @@ pub struct Context {
     diag: DiagHandler,
 }
 
-impl Context {
+impl EvalContext {
     /// Create a new context from a resolved symbol table.
     pub fn new(resolve_context: ResolveContext, output: Box<dyn Output>) -> Self {
         log::debug!("Creating Context");
+
+        assert!(resolve_context.is_resolved());
 
         // put all together
         Self {
@@ -59,19 +61,22 @@ impl Context {
     }
 
     /// Create a new context from a source file.
-    ///
-    /// # Arguments
-    /// - `root`: Path to the root file to load.
-    /// - `builtin`: The builtin library.
-    /// - `search_paths`: Paths to search for external libraries (e.g. the standard library).
     pub fn from_source(
-        root: impl AsRef<std::path::Path> + std::fmt::Debug,
+        root: Rc<SourceFile>,
         builtin: Option<Symbol>,
         search_paths: &[impl AsRef<std::path::Path>],
+        output: Box<dyn Output>,
     ) -> EvalResult<Self> {
-        let root = SourceFile::load(root)?;
-        let context = ResolveContext::create(root, search_paths, builtin, DiagHandler::default())?;
-        Ok(Self::new(context, Box::new(Stdout)))
+        Ok(Self::new(
+            ResolveContext::create(
+                root,
+                search_paths,
+                builtin,
+                DiagHandler::default(),
+                ResolveMode::Resolved,
+            )?,
+            output,
+        ))
     }
 
     /// Access captured output.
@@ -121,7 +126,11 @@ impl Context {
     }
 
     /// Run the closure `f` within the given `stack_frame`.
-    pub fn scope<T>(&mut self, stack_frame: StackFrame, f: impl FnOnce(&mut Context) -> T) -> T {
+    pub fn scope<T>(
+        &mut self,
+        stack_frame: StackFrame,
+        f: impl FnOnce(&mut EvalContext) -> T,
+    ) -> T {
         self.open(stack_frame);
         let result = f(self);
         self.close();
@@ -172,7 +181,7 @@ impl Context {
                     if !previous_value.is_invalid() {
                         return Err(EvalError::ValueAlreadyInitialized(
                             id.clone(),
-                            previous_value,
+                            previous_value.to_string(),
                             id.src_ref(),
                         ));
                     }
@@ -296,7 +305,7 @@ impl Context {
     }
 }
 
-impl UseSymbol for Context {
+impl UseSymbol for EvalContext {
     fn use_symbol(
         &mut self,
         visibility: Visibility,
@@ -362,7 +371,7 @@ impl UseSymbol for Context {
     }
 }
 
-impl Locals for Context {
+impl Locals for EvalContext {
     fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()> {
         self.stack.set_local_value(id, value)
     }
@@ -392,13 +401,13 @@ impl Locals for Context {
     }
 }
 
-impl Default for Context {
+impl Default for EvalContext {
     fn default() -> Self {
         Self {
             symbol_table: Default::default(),
             sources: Default::default(),
             stack: Default::default(),
-            output: Box::new(Stdout),
+            output: Stdout::new(),
             exporters: Default::default(),
             importers: Default::default(),
             diag: Default::default(),
@@ -406,7 +415,7 @@ impl Default for Context {
     }
 }
 
-impl Lookup<EvalError> for Context {
+impl Lookup<EvalError> for EvalContext {
     fn lookup(&self, name: &QualifiedName) -> EvalResult<Symbol> {
         log::debug!("Lookup symbol '{name:?}' (at line {:?}):", name.src_ref());
 
@@ -512,6 +521,11 @@ impl Lookup<EvalError> for Context {
             Some((origin, symbol)) => {
                 // check if all findings point to the same symbol
                 if !found.iter().all(|(_, x)| x == symbol) {
+                    let origin = found
+                        .iter()
+                        .map(|(id, _)| *id)
+                        .collect::<Vec<_>>()
+                        .join(", ");
                     log::debug!(
                         "{ambiguous} symbol '{name:?}' in {origin}:\n{self:?}",
                         ambiguous = crate::mark!(AMBIGUOUS),
@@ -523,7 +537,7 @@ impl Lookup<EvalError> for Context {
                     );
                     Err(EvalError::AmbiguousSymbol {
                         ambiguous: name.clone(),
-                        others: found.iter().map(|(_, x)| x.clone()).collect(),
+                        others: origin,
                     })
                 } else {
                     log::debug!(
@@ -546,7 +560,7 @@ impl Lookup<EvalError> for Context {
     }
 }
 
-impl Diag for Context {
+impl Diag for EvalContext {
     fn fmt_diagnosis(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result {
         self.diag.pretty_print(f, self)
     }
@@ -568,7 +582,7 @@ impl Diag for Context {
     }
 }
 
-impl PushDiag for Context {
+impl PushDiag for EvalContext {
     fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         let result = self.diag.push_diag(diag);
         log::trace!("Error Context:\n{self:?}");
@@ -576,13 +590,13 @@ impl PushDiag for Context {
     }
 }
 
-impl GetSourceByHash for Context {
+impl GetSourceByHash for EvalContext {
     fn get_by_hash(&self, hash: u64) -> ResolveResult<Rc<SourceFile>> {
         self.sources.get_by_hash(hash)
     }
 }
 
-impl std::fmt::Debug for Context {
+impl std::fmt::Debug for EvalContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Ok(model) = self.get_model() {
             write!(f, "\nModel:\n")?;
@@ -605,7 +619,7 @@ impl std::fmt::Debug for Context {
     }
 }
 
-impl ImporterRegistryAccess for Context {
+impl ImporterRegistryAccess for EvalContext {
     type Error = EvalError;
 
     fn import(
@@ -623,7 +637,7 @@ impl ImporterRegistryAccess for Context {
     }
 }
 
-impl ExporterAccess for Context {
+impl ExporterAccess for EvalContext {
     fn exporter_by_id(&self, id: &crate::Id) -> Result<Rc<dyn Exporter>, ExportError> {
         self.exporters.exporter_by_id(id)
     }
@@ -636,7 +650,7 @@ impl ExporterAccess for Context {
     }
 }
 
-impl Grant<WorkbenchDefinition> for Context {
+impl Grant<WorkbenchDefinition> for EvalContext {
     fn grant(&mut self, statement: &WorkbenchDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(
@@ -656,7 +670,7 @@ impl Grant<WorkbenchDefinition> for Context {
     }
 }
 
-impl Grant<ModuleDefinition> for Context {
+impl Grant<ModuleDefinition> for EvalContext {
     fn grant(&mut self, statement: &ModuleDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(
@@ -673,7 +687,7 @@ impl Grant<ModuleDefinition> for Context {
     }
 }
 
-impl Grant<FunctionDefinition> for Context {
+impl Grant<FunctionDefinition> for EvalContext {
     fn grant(&mut self, statement: &FunctionDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             match stack_frame {
@@ -691,7 +705,7 @@ impl Grant<FunctionDefinition> for Context {
         Ok(())
     }
 }
-impl Grant<InitDefinition> for Context {
+impl Grant<InitDefinition> for EvalContext {
     fn grant(&mut self, statement: &InitDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(stack_frame, StackFrame::Workbench(..))
@@ -705,7 +719,7 @@ impl Grant<InitDefinition> for Context {
     }
 }
 
-impl Grant<UseStatement> for Context {
+impl Grant<UseStatement> for EvalContext {
     fn grant(&mut self, statement: &UseStatement) -> EvalResult<()> {
         match (&statement.visibility, self.stack.current_frame()) {
             (Visibility::Private, _)
@@ -716,7 +730,7 @@ impl Grant<UseStatement> for Context {
     }
 }
 
-impl Grant<ReturnStatement> for Context {
+impl Grant<ReturnStatement> for EvalContext {
     fn grant(&mut self, statement: &ReturnStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(stack_frame, StackFrame::Function(_))
@@ -730,7 +744,7 @@ impl Grant<ReturnStatement> for Context {
     }
 }
 
-impl Grant<IfStatement> for Context {
+impl Grant<IfStatement> for EvalContext {
     fn grant(&mut self, statement: &IfStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(
@@ -750,7 +764,7 @@ impl Grant<IfStatement> for Context {
     }
 }
 
-impl Grant<AssignmentStatement> for Context {
+impl Grant<AssignmentStatement> for EvalContext {
     fn grant(&mut self, statement: &AssignmentStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             match statement.assignment.qualifier {
@@ -780,7 +794,7 @@ impl Grant<AssignmentStatement> for Context {
     }
 }
 
-impl Grant<ExpressionStatement> for Context {
+impl Grant<ExpressionStatement> for EvalContext {
     fn grant(&mut self, statement: &ExpressionStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(
@@ -800,7 +814,7 @@ impl Grant<ExpressionStatement> for Context {
     }
 }
 
-impl Grant<Marker> for Context {
+impl Grant<Marker> for EvalContext {
     fn grant(&mut self, statement: &Marker) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(stack_frame, StackFrame::Workbench(_, _, _))
@@ -814,7 +828,7 @@ impl Grant<Marker> for Context {
     }
 }
 
-impl Grant<crate::syntax::Attribute> for Context {
+impl Grant<crate::syntax::Attribute> for EvalContext {
     fn grant(&mut self, statement: &crate::syntax::Attribute) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(

@@ -50,16 +50,16 @@ pub enum EvalError {
     SymbolFound(QualifiedName),
 
     /// The symbol cannot be called, e.g. when it is a source file or a module.
-    #[error("Symbol `{0}` cannot be called {1}.")]
-    SymbolCannotBeCalled(QualifiedName, Box<SymbolDefinition>),
+    #[error("Symbol `{0}` cannot be called.")]
+    SymbolCannotBeCalled(QualifiedName),
 
     /// Found ambiguous symbols.
-    #[error("Ambiguous symbol {ambiguous} might be one of the following:\n{others}")]
+    #[error("Ambiguous symbol {ambiguous} might be one of the following: {others}")]
     AmbiguousSymbol {
         /// Searched name
         ambiguous: QualifiedName,
         /// Symbols which matches the name
-        others: Symbols,
+        others: String,
     },
 
     /// Local Symbol not found.
@@ -78,16 +78,12 @@ pub enum EvalError {
     #[error("Argument count mismatch: expected {expected}, got {found} in {args}")]
     ArgumentCountMismatch {
         /// Argument list including the error
-        args: ArgumentValueList,
+        args: String,
         /// Expected number of arguments
         expected: usize,
         /// Found number of arguments
         found: usize,
     },
-
-    /// Called assertion
-    #[error("assert called with wrong number of arguments.")]
-    AssertWrongSignature(ArgumentValueList),
 
     /// Invalid argument type.
     #[error("Invalid argument type: {0}")]
@@ -180,7 +176,7 @@ pub enum EvalError {
 
     /// A condition of an if statement is not a boolean
     #[error("If condition is not a boolean: {0}")]
-    IfConditionIsNotBool(Value),
+    IfConditionIsNotBool(String),
 
     /// Workbench didn't find a initialization routine matching the given arguments
     #[error("Workbench {0} cannot find initialization for those arguments")]
@@ -236,7 +232,7 @@ pub enum EvalError {
 
     /// Assignment failed because value already has been initialized
     #[error("Value {0} already has been initialized with {1} (at line {2})")]
-    ValueAlreadyInitialized(Identifier, Value, SrcRef),
+    ValueAlreadyInitialized(Identifier, String, SrcRef),
 
     /// Assignment failed because left side is not an l-value
     #[error("Assignment failed because {0} is not an l-value")]
@@ -267,8 +263,8 @@ pub enum EvalError {
 pub type EvalResult<T> = std::result::Result<T, EvalError>;
 
 impl From<ResolveError> for EvalError {
-    fn from(value: ResolveError) -> Self {
-        match value {
+    fn from(err: ResolveError) -> Self {
+        match err {
             ResolveError::SymbolNotFound(name) => EvalError::SymbolNotFound(name),
             other => EvalError::ResolveError(other),
         }

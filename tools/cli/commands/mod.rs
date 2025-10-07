@@ -46,6 +46,6 @@ pub enum Commands {
 }
 
 /// Run this command for a CLI.
-pub trait RunCommand {
-    fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<()>;
+pub trait RunCommand<T = ()> {
+    fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<T>;
 }

@@ -22,7 +22,7 @@ impl Assignment {
 }
 
 impl Eval<()> for AssignmentStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<()> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<()> {
         log::debug!("Evaluating assignment statement:\n{self}");
         context.grant(self)?;
 
@@ -48,7 +48,7 @@ impl Eval<()> for AssignmentStatement {
                     context.error(
                         &self.attribute_list,
                         AttributeError::CannotAssignAttribute(
-                            self.assignment.expression.clone().into(),
+                            self.assignment.expression.to_string(),
                         ),
                     )?;
                 }
@@ -68,7 +68,7 @@ impl Eval<()> for AssignmentStatement {
                             assignment.id.clone(),
                             EvalError::ValueAlreadyInitialized(
                                 identifier.clone(),
-                                value.clone(),
+                                value.to_string(),
                                 identifier.src_ref(),
                             ),
                         ))

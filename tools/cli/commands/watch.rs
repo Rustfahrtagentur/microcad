@@ -20,20 +20,28 @@ impl RunCommand for Watch {
         let export = &self.export_args;
 
         if export.list {
-            let mut context = cli.make_context(&self.export_args.input)?;
-            let model = context.eval().expect("Valid model");
+            // run prior parse step
+            let (context, model) = Eval {
+                input: self.export_args.input.clone(),
+                verbose: false,
+            }
+            .run(cli)?;
             export.list_targets(&export.target_models(&model, &config, context.exporters())?)
         } else {
             // Recompile whenever something relevant happens.
             loop {
-                match cli.make_context(&self.export_args.input) {
-                    Ok(mut context) => {
-                        // Re-evaluate context.
-                        if let Ok(model) = context.eval() {
-                            match export.target_models(&model, &config, context.exporters()) {
-                                Ok(target_models) => export.export_targets(&target_models)?,
-                                Err(err) => log::error!("{err}"),
-                            }
+                // run prior parse step
+                let result = Eval {
+                    input: self.export_args.input.clone(),
+                    verbose: false,
+                }
+                .run(cli);
+
+                match result {
+                    Ok((context, model)) => {
+                        match export.target_models(&model, &config, context.exporters()) {
+                            Ok(target_models) => export.export_targets(&target_models)?,
+                            Err(err) => log::error!("{err}"),
                         }
                     }
                     Err(err) => {
