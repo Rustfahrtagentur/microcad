@@ -1,7 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{parse::*, parser::*, syntax::*};
+use crate::{parse::*, parser::*, rc::*, syntax::*};
 
 impl Parse for RangeFirst {
     fn parse(pair: Pair) -> ParseResult<Self> {
@@ -236,6 +236,12 @@ impl Parse for Expression {
                     .into_inner()
                     .filter(|pair| pair.as_rule() != Rule::COMMENT), // Filter comments
             )
+    }
+}
+
+impl Parse for Rc<Expression> {
+    fn parse(pair: Pair) -> ParseResult<Self> {
+        Ok(Rc::new(Expression::parse(pair)?))
     }
 }
 
