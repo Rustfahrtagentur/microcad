@@ -5,7 +5,7 @@
 
 use crate::{diag::*, resolve::*, syntax::*};
 
-pub(super) trait Symbolize<T: Default = Option<Symbol>>: Grant {
+pub(super) trait Symbolize<T: Default = Option<Symbol>> {
     /// Create symbol from definition.
     fn symbolize(&self, _parent: &Symbol, _context: &mut ResolveContext) -> ResolveResult<T> {
         Ok(T::default())
@@ -24,11 +24,7 @@ impl SourceFile {
             SymbolDefinition::SourceFile(self.clone().into()),
             None,
         );
-        symbol.set_children(
-            self.statements
-                .grant(&symbol, context)?
-                .symbolize(&symbol, context)?,
-        );
+        symbol.set_children(self.statements.symbolize(&symbol, context)?);
         Ok(symbol)
     }
 }
@@ -40,7 +36,7 @@ impl Symbolize<Symbol> for ModuleDefinition {
                 SymbolDefinition::Module(self.clone().into()),
                 Some(parent.clone()),
             );
-            symbol.set_children(body.grant(&symbol, context)?.symbolize(&symbol, context)?);
+            symbol.set_children(body.symbolize(&symbol, context)?);
             symbol
         } else if let Some(parent_path) = parent.source_path() {
             let mut symbol = context.symbolize_file(self.visibility, parent_path, &self.id)?;
@@ -59,10 +55,7 @@ impl Symbolize<SymbolMap> for StatementList {
 
         // Iterate over all statement fetch definitions
         for statement in &self.0 {
-            if let Some((id, symbol)) = statement
-                .grant(parent, context)?
-                .symbolize(parent, context)?
-            {
+            if let Some((id, symbol)) = statement.symbolize(parent, context)? {
                 symbols.insert(id, symbol);
             }
         }
@@ -78,21 +71,11 @@ impl Symbolize<Option<(Identifier, Symbol)>> for Statement {
         context: &mut ResolveContext,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
         match self {
-            Statement::Workbench(wd) => Ok(Some((
-                wd.id.clone(),
-                wd.grant(parent, context)?.symbolize(parent, context)?,
-            ))),
-            Statement::Module(md) => Ok(Some((
-                md.id.clone(),
-                md.grant(parent, context)?.symbolize(parent, context)?,
-            ))),
-            Statement::Function(fd) => Ok(Some((
-                fd.id.clone(),
-                fd.grant(parent, context)?.symbolize(parent, context)?,
-            ))),
-            Statement::Use(us) => us.grant(parent, context)?.symbolize(parent, context),
+            Statement::Workbench(wd) => Ok(Some((wd.id.clone(), wd.symbolize(parent, context)?))),
+            Statement::Module(md) => Ok(Some((md.id.clone(), md.symbolize(parent, context)?))),
+            Statement::Function(fd) => Ok(Some((fd.id.clone(), fd.symbolize(parent, context)?))),
+            Statement::Use(us) => us.symbolize(parent, context),
             Statement::Assignment(a) => Ok(a
-                .grant(parent, context)?
                 .symbolize(parent, context)?
                 .map(|symbol| (a.assignment.id.clone(), symbol))),
             // Not producing any symbols
@@ -111,11 +94,7 @@ impl Symbolize<Symbol> for WorkbenchDefinition {
             SymbolDefinition::Workbench(self.clone().into()),
             Some(parent.clone()),
         );
-        symbol.set_children(
-            self.body
-                .grant(&symbol, context)?
-                .symbolize(&symbol, context)?,
-        );
+        symbol.set_children(self.body.symbolize(&symbol, context)?);
         Ok(symbol)
     }
 }
@@ -126,11 +105,7 @@ impl Symbolize<Symbol> for FunctionDefinition {
             SymbolDefinition::Function((*self).clone().into()),
             Some(parent.clone()),
         );
-        symbol.set_children(
-            self.body
-                .grant(&symbol, context)?
-                .symbolize(&symbol, context)?,
-        );
+        symbol.set_children(self.body.symbolize(&symbol, context)?);
 
         Ok(symbol)
     }
@@ -192,9 +167,7 @@ impl Symbolize for AssignmentStatement {
 
 impl Symbolize<SymbolMap> for Body {
     fn symbolize(&self, parent: &Symbol, context: &mut ResolveContext) -> ResolveResult<SymbolMap> {
-        self.statements
-            .grant(parent, context)?
-            .symbolize(parent, context)
+        self.statements.symbolize(parent, context)
     }
 }
 

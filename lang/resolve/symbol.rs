@@ -596,10 +596,6 @@ impl Symbol {
     ) -> Result<(), E> {
         self.inner.borrow().children.iter().try_for_each(f)
     }
-
-    pub(crate) fn kind(&self) -> String {
-        self.inner.borrow().def.kind()
-    }
 }
 
 impl FullyQualify for Symbol {
