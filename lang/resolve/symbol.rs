@@ -485,7 +485,6 @@ impl Symbol {
             } else {
                 Symbols::default()
             };
-            log::trace!("from children/from self:\n  {from_children}\n  {from_self}");
             (from_children, from_self)
         };
 
