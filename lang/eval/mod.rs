@@ -36,6 +36,7 @@ mod eval_error;
 mod expression;
 mod format_string;
 mod function;
+mod grant;
 mod init;
 mod literal;
 mod module_definition;
@@ -54,8 +55,10 @@ pub use call::*;
 pub use eval_context::*;
 pub use eval_error::*;
 pub use output::*;
-pub use statements::*;
-pub use symbols::*;
+
+use grant::*;
+use statements::*;
+use symbols::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 

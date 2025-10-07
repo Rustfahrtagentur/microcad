@@ -91,7 +91,7 @@ pub enum ResolveError {
     DiagError(#[from] DiagError),
 
     /// Statement is not supported in this context.
-    #[error("{0} statement not available in {0}")]
+    #[error("{0} is not available within {1}")]
     StatementNotSupported(String, String),
 
     /// Given symbol has not children which can be used.

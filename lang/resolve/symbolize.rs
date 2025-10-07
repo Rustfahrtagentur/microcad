@@ -142,30 +142,22 @@ impl Symbolize for AssignmentStatement {
         parent: &Symbol,
         context: &mut ResolveContext,
     ) -> ResolveResult<Option<Symbol>> {
-        match (self.assignment.visibility, self.assignment.qualifier) {
+        let symbol = match (self.assignment.visibility, self.assignment.qualifier) {
             // properties do not have a visibility
             (_, Qualifier::Prop) => {
                 if !parent.can_prop() {
-                    context.error(
-                        self,
-                        ResolveError::DeclNotAllowed(
-                            self.assignment.id.clone(),
-                            parent.full_name(),
-                        ),
-                    )?;
+                    None
+                } else {
+                    Some(None)
                 }
-                Ok(None)
             }
             // constants will be symbols (`pub` shall equal `pub const`)
             (_, Qualifier::Const) | (Visibility::Public, Qualifier::Value) => {
                 if !parent.can_const() {
-                    Err(ResolveError::DeclNotAllowed(
-                        self.assignment.id.clone(),
-                        parent.full_name(),
-                    ))
+                    None
                 } else {
                     log::trace!("Declare private value {}", self.assignment.id);
-                    Ok(Some(Symbol::new(
+                    Some(Some(Symbol::new(
                         SymbolDefinition::ConstExpression(
                             self.assignment.visibility,
                             self.assignment.id.clone(),
@@ -178,13 +170,21 @@ impl Symbolize for AssignmentStatement {
             // value go on stack
             (Visibility::Private, Qualifier::Value) => {
                 if self.assignment.visibility == Visibility::Private && !parent.can_value() {
-                    Err(ResolveError::DeclNotAllowed(
-                        self.assignment.id.clone(),
-                        parent.full_name(),
-                    ))
+                    None
                 } else {
-                    Ok(None)
+                    Some(None)
                 }
+            }
+        };
+
+        match symbol {
+            Some(symbol) => Ok(symbol),
+            None => {
+                context.error(
+                    self,
+                    ResolveError::DeclNotAllowed(self.assignment.id.clone(), parent.full_name()),
+                )?;
+                Ok(None)
             }
         }
     }
