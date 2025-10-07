@@ -10,7 +10,7 @@ use crate::{diag::*, eval::*, ord_map::*, src_ref::*, syntax::*, ty::*, value::*
 pub use parameter_list::*;
 
 /// A parameter of a parameter list.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct Parameter {
     /// Name of the parameter
     pub id: Identifier,
@@ -96,6 +96,17 @@ impl std::fmt::Display for Parameter {
             (Some(t), Some(v)) => write!(f, "{}: {t} = {v}", self.id),
             (Some(t), None) => write!(f, "{}: {t}", self.id),
             (None, Some(v)) => write!(f, "{} = {v}", self.id),
+            _ => Ok(()),
+        }
+    }
+}
+
+impl std::fmt::Debug for Parameter {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match (&self.specified_type, &self.default_value) {
+            (Some(t), Some(v)) => write!(f, "{:?}: {t:?} = {v:?}", self.id),
+            (Some(t), None) => write!(f, "{:?}: {t:?}", self.id),
+            (None, Some(v)) => write!(f, "{:?} = {v:?}", self.id),
             _ => Ok(()),
         }
     }

@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// An assignment statement, e.g. `#[aux] s = Sphere(3.0mm);`.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct ExpressionStatement {
     /// Optional attributes.
     pub attribute_list: AttributeList,
@@ -34,5 +34,14 @@ impl std::fmt::Display for ExpressionStatement {
             write!(f, "{} ", self.attribute_list)?;
         }
         write!(f, "{};", self.expression)
+    }
+}
+
+impl std::fmt::Debug for ExpressionStatement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if !self.attribute_list.is_empty() {
+            write!(f, "{:?} ", self.attribute_list)?;
+        }
+        write!(f, "{:?};", self.expression)
     }
 }

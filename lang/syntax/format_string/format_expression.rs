@@ -7,7 +7,7 @@ use crate::{src_ref::*, syntax::*};
 
 /// Format expression including format specification.
 #[allow(dead_code)]
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct FormatExpression {
     /// Format specifier
     pub spec: Option<FormatSpec>,
@@ -34,6 +34,16 @@ impl std::fmt::Display for FormatExpression {
             write!(f, "{{{}:{}}}", spec, self.expression)
         } else {
             write!(f, "{{{}}}", self.expression)
+        }
+    }
+}
+
+impl std::fmt::Debug for FormatExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if let Some(spec) = &self.spec {
+            write!(f, "{{{:?}:{:?}}}", spec, self.expression)
+        } else {
+            write!(f, "{{{:?}}}", self.expression)
         }
     }
 }

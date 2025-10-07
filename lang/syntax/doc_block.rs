@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Block of documentation comments, starting with `/// `.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct DocBlock {
     /// Doc comment lines.
     pub lines: Vec<String>,

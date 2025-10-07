@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Format specification.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Default, PartialEq)]
 pub struct FormatSpec {
     /// Precision for number formatting.
     pub precision: Option<u32>,
@@ -30,6 +30,12 @@ impl std::fmt::Display for FormatSpec {
             (Some(width), None) => write!(f, "0{width}"),
             _ => Ok(()),
         }
+    }
+}
+
+impl std::fmt::Debug for FormatSpec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self)
     }
 }
 

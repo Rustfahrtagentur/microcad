@@ -4,7 +4,7 @@
 use crate::{builtin::*, rc::*, syntax::*, value::*};
 
 /// Symbol definition
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum SymbolDefinition {
     /// Source file symbol.
     SourceFile(Rc<SourceFile>),
@@ -86,6 +86,25 @@ impl std::fmt::Display for SymbolDefinition {
             Self::UseAll(.., name) => write!(f, "(use all) => {name}"),
             #[cfg(test)]
             Self::Tester(id) => write!(f, "(tester) => {id}"),
+        }
+    }
+}
+
+impl std::fmt::Debug for SymbolDefinition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Workbench(w) => write!(f, "({})", w.kind),
+            Self::Module(..) => write!(f, "(module)"),
+            Self::Function(..) => write!(f, "(function)"),
+            Self::SourceFile(..) => write!(f, "(file)"),
+            Self::Builtin(..) => write!(f, "(builtin)"),
+            Self::Constant(.., value) => write!(f, "(constant) = {value}"),
+            Self::ConstExpression(.., value) => write!(f, "(const expression) = {value:?}"),
+            Self::Argument(.., value) => write!(f, "(call argument) = {value}"),
+            Self::Alias(.., name) => write!(f, "(alias) => {name:?}"),
+            Self::UseAll(.., name) => write!(f, "(use all) => {name:?}"),
+            #[cfg(test)]
+            Self::Tester(id) => write!(f, "(tester) => {id:?}"),
         }
     }
 }

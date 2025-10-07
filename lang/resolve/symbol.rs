@@ -164,7 +164,7 @@ impl Symbol {
         if debug && cfg!(feature = "ansi-color") && !self.inner.borrow().used {
             color_print::cwrite!(
                 f,
-                "{:depth$}<#606060>{visibility}{id:?} {def} [{full_name:?}]</>{checked}",
+                "{:depth$}<#606060>{visibility}{id:?} {def:?} [{full_name:?}]</>{checked}",
                 "",
                 visibility = self.visibility(),
                 def = self.inner.borrow().def,
@@ -178,10 +178,10 @@ impl Symbol {
         } else {
             write!(
                 f,
-                "{:depth$}{id} {} [{}]",
+                "{:depth$}{id} {def} [{full_name}]",
                 "",
-                self.inner.borrow().def,
-                self.full_name(),
+                def = self.inner.borrow().def,
+                full_name = self.full_name(),
             )?;
         }
         if children {

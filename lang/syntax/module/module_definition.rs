@@ -6,7 +6,7 @@
 use crate::{rc::*, src_ref::*, syntax::*};
 
 /// Module definition.
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Default)]
 pub struct ModuleDefinition {
     /// Visibility of the module.
     pub visibility: Visibility,
@@ -50,5 +50,11 @@ impl TreeDisplay for ModuleDefinition {
 impl std::fmt::Display for ModuleDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "mod {}", self.id)
+    }
+}
+
+impl std::fmt::Debug for ModuleDefinition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "mod {:?}", self.id)
     }
 }

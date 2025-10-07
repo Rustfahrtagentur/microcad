@@ -152,7 +152,7 @@ impl std::fmt::Display for Expression {
 impl std::fmt::Debug for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Literal(literal) => write!(f, "{literal:?}"),
+            Self::Literal(literal) => write!(f, "{literal}"),
             Self::FormatString(format_string) => write!(f, "{format_string:?}"),
             Self::ArrayExpression(array_expression) => write!(f, "{array_expression:?}"),
             Self::TupleExpression(tuple_expression) => write!(f, "{tuple_expression:?}"),

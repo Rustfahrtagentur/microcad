@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Method call syntax entity.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct MethodCall {
     /// Name of the method.
     pub name: QualifiedName,
@@ -25,6 +25,12 @@ impl SrcReferrer for MethodCall {
 impl std::fmt::Display for MethodCall {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}({})", self.name, self.argument_list)
+    }
+}
+
+impl std::fmt::Debug for MethodCall {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}({:?})", self.name, self.argument_list)
     }
 }
 
