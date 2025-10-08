@@ -5,10 +5,10 @@
 
 use crate::{diag::*, resolve::*, syntax::*};
 
-pub(super) trait Symbolize<T: Default = Option<Symbol>> {
+pub(super) trait Symbolize<T = Option<Symbol>> {
     /// Create symbol from definition.
     fn symbolize(&self, _parent: &Symbol, _context: &mut ResolveContext) -> ResolveResult<T> {
-        Ok(T::default())
+        unreachable!()
     }
 }
 

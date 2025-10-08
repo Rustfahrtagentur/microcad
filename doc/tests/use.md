@@ -19,9 +19,9 @@ use std::geo3d::*;
 assert_valid(Sphere);
 assert_valid(Cube);
 
-// alias `bar` in `std/text/foo.µcad` into `baz`
-use std::test::foo::Bar as baz;
-assert_valid(baz);
+// alias `Circle` in `std/geo2d/mod.µcad` into `foo`
+use std::geo2d::Circle as foo;
+assert_valid(foo);
 
 // use print from `std/module.µcad`
 use std::print;
