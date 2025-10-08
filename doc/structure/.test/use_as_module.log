@@ -4,18 +4,16 @@
 
 -- Code --
 
- 1: geo2d = 1;
+ 1: use std::geo2d as geo;
  2: 
- 3: use std::geo2d as geo;
- 4: 
- 5: geo::Circle(r = 4mm);
+ 3: geo::Circle(r = 4mm);
 
 -- Output --
 -- Errors --
 error: Symbol geo::Circle not found.
-  ---> <FROM STR>:5:1
+  ---> <FROM STR>:3:1
      |
-   5 | geo::Circle(r = 4mm);
+   3 | geo::Circle(r = 4mm);
      | ^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --

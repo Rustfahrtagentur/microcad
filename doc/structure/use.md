@@ -71,8 +71,6 @@ Or you may use `use as` with a *module*:
 [![test](.test/use_as_module.svg)](.test/use_as_module.log)
 
 ```µcad,use_as_module
-geo2d = 1;
-
 use std::geo2d as geo;
 
 geo::Circle(r = 4mm);
