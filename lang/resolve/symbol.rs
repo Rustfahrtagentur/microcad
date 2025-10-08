@@ -151,7 +151,7 @@ impl Symbol {
     /// - `f`: Output formatter
     /// - `id`: Overwrite symbol's internal `id` with this one if given (e.g. when using in a map).
     /// - `depth`: Indention depth to use
-    pub fn print_symbol(
+    pub(super) fn print_symbol(
         &self,
         f: &mut impl std::fmt::Write,
         id: Option<&Identifier>,
@@ -227,13 +227,13 @@ impl Symbol {
     /// Initially set children.
     ///
     /// Panics if children already exist.
-    pub fn set_children(&self, new_children: SymbolMap) {
+    pub(super) fn set_children(&self, new_children: SymbolMap) {
         assert!(self.inner.borrow().children.is_empty());
         self.inner.borrow_mut().children = new_children;
     }
 
     /// Set new parent.
-    pub fn set_parent(&mut self, parent: Symbol) {
+    pub(super) fn set_parent(&mut self, parent: Symbol) {
         self.inner.borrow_mut().parent = Some(parent);
     }
 
@@ -242,26 +242,8 @@ impl Symbol {
         self.inner.borrow_mut().parent.clone()
     }
 
-    /// Move all children from another symbol into this one.
-    /// # Arguments
-    /// - `from`: Append this symbol's children
-    ///
-    /// Technically, nothing will be moved here because of the `Rc<RefCell<>>`,
-    /// but by resetting the parent of all moved  children, those will see
-    /// themselves as child of `self` (e.g when providing fully qualified name).
-    pub fn move_children(&self, from: &Symbol) {
-        // copy children
-        from.inner.borrow().children.iter().for_each(|(id, child)| {
-            child.inner.borrow_mut().parent = Some(self.clone());
-            self.inner
-                .borrow_mut()
-                .children
-                .insert(id.clone(), child.clone());
-        });
-    }
-
     /// Create a vector of cloned children.
-    pub fn public_children(&self, overwrite_visibility: Option<Visibility>) -> Symbols {
+    fn public_children(&self, overwrite_visibility: Option<Visibility>) -> Symbols {
         let inner = self.inner.borrow();
 
         // Aliases do not have any children and must be de-aliased before.
@@ -284,48 +266,48 @@ impl Symbol {
     }
 
     /// Clone this symbol but give the clone another visibility.
-    pub fn clone_with_visibility(&self, visibility: Visibility) -> Self {
+    pub(crate) fn clone_with_visibility(&self, visibility: Visibility) -> Self {
         let mut cloned = self.clone();
         cloned.visibility = visibility;
         cloned
     }
 
     /// Return the internal *id* of this symbol.
-    pub fn id(&self) -> Identifier {
+    pub(crate) fn id(&self) -> Identifier {
         self.inner.borrow().def.id()
     }
 
     /// Get any child with the given `id`.
     /// # Arguments
     /// - `id`: Anticipated *id* of the possible child.
-    pub fn get(&self, id: &Identifier) -> Option<Symbol> {
+    fn get(&self, id: &Identifier) -> Option<Symbol> {
         self.inner.borrow().children.get(id).cloned()
     }
 
     /// True if symbol has any children
-    pub fn is_empty(&self) -> bool {
+    pub(crate) fn is_empty(&self) -> bool {
         self.inner.borrow().children.is_empty()
     }
 
     /// Return `true` if symbol's visibility is private
-    pub fn visibility(&self) -> Visibility {
+    fn visibility(&self) -> Visibility {
         self.visibility
     }
 
     /// Return `true` if symbol's visibility set to is public.
-    pub fn is_public(&self) -> bool {
+    fn is_public(&self) -> bool {
         matches!(self.visibility(), Visibility::Public)
     }
 
     /// Return `true` if symbol's visibility set to is non-public.
-    pub fn is_private(&self) -> bool {
+    pub(crate) fn is_private(&self) -> bool {
         !self.is_public()
     }
 
     /// Search down the symbol tree for a qualified name.
     /// # Arguments
     /// - `name`: Name to search for.
-    pub fn search(&self, name: &QualifiedName) -> Option<Symbol> {
+    pub(crate) fn search(&self, name: &QualifiedName) -> Option<Symbol> {
         log::trace!("Searching {name} in {:?}", self.full_name());
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first) {
@@ -347,7 +329,7 @@ impl Symbol {
     }
 
     /// check if a private symbol may be declared within this symbol
-    pub fn can_const(&self) -> bool {
+    pub(super) fn can_const(&self) -> bool {
         matches!(
             self.inner.borrow().def,
             SymbolDefinition::Module(..) | SymbolDefinition::SourceFile(..)
@@ -355,7 +337,7 @@ impl Symbol {
     }
 
     /// check if a value on the stack may be declared within this symbol
-    pub fn can_value(&self) -> bool {
+    pub(super) fn can_value(&self) -> bool {
         matches!(
             self.inner.borrow().def,
             SymbolDefinition::Function(..)
@@ -365,17 +347,12 @@ impl Symbol {
     }
 
     /// check if a property may be declared within this symbol
-    pub fn can_prop(&self) -> bool {
+    pub(super) fn can_prop(&self) -> bool {
         matches!(self.inner.borrow().def, SymbolDefinition::Workbench(..))
     }
 
-    /// check if a public symbol may be declared within this symbol
-    pub fn can_pub(&self) -> bool {
-        self.can_const()
-    }
-
     /// Overwrite any value in this symbol
-    pub fn set_value(&self, new_value: Value) -> ResolveResult<()> {
+    pub(crate) fn set_value(&self, new_value: Value) -> ResolveResult<()> {
         match &mut self.inner.borrow_mut().def {
             SymbolDefinition::Constant(.., value) => {
                 *value = new_value;
@@ -395,7 +372,7 @@ impl Symbol {
     }
 
     /// Return file path of top level parent source file.
-    pub fn source_path(&self) -> Option<std::path::PathBuf> {
+    pub(super) fn source_path(&self) -> Option<std::path::PathBuf> {
         if let SymbolDefinition::SourceFile(source_file) = &self.inner.borrow().def {
             return source_file
                 .filename()
@@ -410,32 +387,22 @@ impl Symbol {
     }
 
     /// Mark this symbol as *checked*.
-    pub fn set_check(&self) {
+    pub(super) fn set_check(&self) {
         self.inner.borrow_mut().checked = true;
     }
 
     /// Mark this symbol as *used*.
-    pub fn set_use(&self) {
+    pub(crate) fn set_use(&self) {
         self.inner.borrow_mut().used = true;
     }
 
-    /// Detach from parent.
-    pub fn detach(&self) {
-        self.inner.borrow_mut().parent = None;
-    }
-
-    /// Get a clone of the symbol definition.
-    pub fn get_def(&self) -> SymbolDefinition {
-        self.inner.borrow().def.clone()
-    }
-
     /// Work with the symbol definition.
-    pub fn with_def<T>(&self, mut f: impl FnMut(&SymbolDefinition) -> T) -> T {
+    pub(crate) fn with_def<T>(&self, mut f: impl FnMut(&SymbolDefinition) -> T) -> T {
         f(&self.inner.borrow().def)
     }
 
     /// Work with the mutable symbol definition.
-    pub fn with_def_mut<T>(&self, mut f: impl FnMut(&mut SymbolDefinition) -> T) -> T {
+    pub(crate) fn with_def_mut<T>(&self, mut f: impl FnMut(&mut SymbolDefinition) -> T) -> T {
         f(&mut self.inner.borrow_mut().def)
     }
 
@@ -511,7 +478,7 @@ impl Symbol {
     }
 
     /// check names in symbol definition
-    pub fn check(&self, context: &mut ResolveContext) -> ResolveResult<()> {
+    pub(super) fn check(&self, context: &mut ResolveContext) -> ResolveResult<()> {
         let names = match &self.inner.borrow().def {
             SymbolDefinition::SourceFile(sf) => sf.names(),
             SymbolDefinition::Module(m) => m.names(),
