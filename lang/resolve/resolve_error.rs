@@ -105,6 +105,10 @@ pub enum ResolveError {
     /// Stack is unexpectedly empty.
     #[error("Stack is empty")]
     StackEmpty,
+
+    /// Alias leads to itself.
+    #[error("Alias leads to itself: {0}")]
+    CircularAlias(String),
 }
 
 /// Result type of any resolve.

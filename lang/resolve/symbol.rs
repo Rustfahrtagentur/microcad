@@ -237,6 +237,11 @@ impl Symbol {
         self.inner.borrow_mut().parent = Some(parent);
     }
 
+    /// Get parent.
+    pub(super) fn get_parent(&self) -> Option<Symbol> {
+        self.inner.borrow_mut().parent.clone()
+    }
+
     /// Move all children from another symbol into this one.
     /// # Arguments
     /// - `from`: Append this symbol's children
@@ -599,6 +604,16 @@ impl Symbol {
         f: impl FnMut((&Identifier, &Symbol)) -> Result<(), E>,
     ) -> Result<(), E> {
         self.inner.borrow().children.iter().try_for_each(f)
+    }
+
+    pub(super) fn get_alias(&self) -> Option<QualifiedName> {
+        self.with_def(|def| {
+            if let SymbolDefinition::Alias(.., name) = def {
+                Some(name.clone())
+            } else {
+                None
+            }
+        })
     }
 }
 
