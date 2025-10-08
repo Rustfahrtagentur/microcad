@@ -33,10 +33,10 @@ impl Eval<Option<Model>> for IfStatement {
         context.grant(self)?;
         let cond = self.cond.eval(context)?;
         match cond {
-            Value::Bool(true) => Ok(Some(self.body.eval(context)?)),
+            Value::Bool(true) => Ok(self.body.eval(context)?),
             Value::Bool(false) => {
                 if let Some(body) = &self.body_else {
-                    Ok(Some(body.eval(context)?))
+                    Ok(body.eval(context)?)
                 } else {
                     Ok(None)
                 }

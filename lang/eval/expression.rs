@@ -240,8 +240,11 @@ impl Eval for Expression {
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Call(call) => call.eval(context),
             Self::Body(body) => {
-                let model: Model = body.eval(context)?;
-                Ok(model.into())
+                if let Some(model) = body.eval(context)? {
+                    Ok(model.into())
+                } else {
+                    Ok(Value::None)
+                }
             }
             Self::QualifiedName(qualified_name) => qualified_name.eval(context),
             Self::Marker(marker) => {
