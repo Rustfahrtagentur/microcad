@@ -105,6 +105,32 @@ impl Stack {
         }
     }
 
+    /// Check if current stack frame it within a function.
+    pub fn is_within_function(&self) -> bool {
+        for (n, frame) in self.0.iter().rev().enumerate() {
+            match frame {
+                StackFrame::Function(..) => {
+                    return true;
+                }
+
+                StackFrame::Source(..)
+                | StackFrame::Module(..)
+                | StackFrame::Init(..)
+                | StackFrame::Workbench(..) => break,
+
+                StackFrame::Call { .. } => {
+                    if n > 0 {
+                        break;
+                    }
+                }
+
+                StackFrame::Body(..) => (),
+            }
+        }
+
+        false
+    }
+
     /// Return the current *stack frame* if there is any.
     pub fn current_frame(&self) -> Option<&StackFrame> {
         self.0.last()

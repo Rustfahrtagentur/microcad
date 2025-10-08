@@ -91,12 +91,7 @@ impl Grant<UseStatement> for EvalContext {
 
 impl Grant<ReturnStatement> for EvalContext {
     fn grant(&mut self, statement: &ReturnStatement) -> EvalResult<()> {
-        let granted = if let Some(stack_frame) = self.stack.current_frame() {
-            matches!(stack_frame, StackFrame::Function(_))
-        } else {
-            false
-        };
-        if !granted {
+        if !self.is_within_function() {
             self.error(statement, EvalError::StatementNotSupported("Return"))?;
         }
         Ok(())
