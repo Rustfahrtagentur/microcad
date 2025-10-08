@@ -18,7 +18,7 @@ pub(super) struct SymbolInner {
     /// Flag if this symbol has been checked after resolving
     pub checked: bool,
     /// Flag if this symbol was in use
-    pub used: bool,
+    used: std::cell::OnceCell<()>,
 }
 
 impl Default for SymbolInner {
@@ -28,7 +28,7 @@ impl Default for SymbolInner {
             parent: Default::default(),
             children: Default::default(),
             checked: false,
-            used: false,
+            used: Default::default(),
         }
     }
 }
@@ -161,7 +161,7 @@ impl Symbol {
     ) -> std::fmt::Result {
         let self_id = &self.id();
         let id = id.unwrap_or(self_id);
-        if debug && cfg!(feature = "ansi-color") && !self.inner.borrow().used {
+        if debug && cfg!(feature = "ansi-color") && self.inner.borrow().used.get().is_none() {
             color_print::cwrite!(
                 f,
                 "{:depth$}<#606060>{visibility}{id:?} {def:?} [{full_name:?}]</>{checked}",
@@ -393,7 +393,7 @@ impl Symbol {
 
     /// Mark this symbol as *used*.
     pub(crate) fn set_use(&self) {
-        self.inner.borrow_mut().used = true;
+        let _ = self.inner.borrow().used.set(());
     }
 
     /// Work with the symbol definition.
@@ -557,7 +557,7 @@ impl Symbol {
 
     pub(super) fn unused(&self, unused: &mut Symbols) {
         let inner = self.inner.borrow();
-        if !inner.used {
+        if inner.used.get().is_none() {
             unused.push(self.clone())
         }
         inner
