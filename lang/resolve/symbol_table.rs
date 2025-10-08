@@ -60,21 +60,31 @@ impl SymbolTable {
 
     /// If given symbol is an alias returns the target or the symbol itself if not.
     pub fn follow_alias(&self, symbol: &Symbol) -> ResolveResult<Symbol> {
+        self.follow_alias_intern(symbol, &mut Symbols::default())
+    }
+    fn follow_alias_intern(&self, symbol: &Symbol, prev: &mut Symbols) -> ResolveResult<Symbol> {
+        prev.push(symbol.clone());
         // execute alias from any use statement
-        symbol.with_def(|def| {
-            if let SymbolDefinition::Alias(.., name) = def {
-                log::trace!("Following alias => {name:?}");
-                match self.lookup(name) {
-                    Ok(symbol) => Ok(self.follow_alias(&symbol)?),
-                    Err(err) => {
-                        log::warn!("Alias {name:?} leads to nowhere");
-                        Err(err)
+        if let Some(name) = symbol.get_alias() {
+            log::trace!("Following alias => {name:?}");
+            if let Some(parent) = symbol.get_parent() {
+                if let Some(symbol) = parent.search(&name) {
+                    if prev.contains(&symbol) {
+                        return Err(ResolveError::CircularAlias(prev.to_string()));
                     }
+                    return self.follow_alias(&symbol);
                 }
-            } else {
-                Ok(symbol.clone())
             }
-        })
+            match self.lookup(&name) {
+                Ok(symbol) => Ok(self.follow_alias(&symbol)?),
+                Err(err) => {
+                    log::warn!("Alias {name:?} leads to nowhere");
+                    Err(err)
+                }
+            }
+        } else {
+            Ok(symbol.clone())
+        }
     }
 
     /// Collect all symbols engaged in that name.

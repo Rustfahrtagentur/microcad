@@ -256,7 +256,7 @@ impl EvalContext {
             if let Some(symbol) = parent.search(&what) {
                 let alias = self.symbol_table.follow_alias(&symbol)?;
                 if n > 0 {
-                    if symbol.is_private() {
+                    if alias.is_private() {
                         log::trace!(
                             "{not_found} symbol {what:?} within {within:?} is private",
                             not_found = crate::mark!(NOT_FOUND_INTERIM),
