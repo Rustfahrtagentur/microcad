@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**274** tests from markdown.
+**272** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -68,7 +68,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/ops/.test/difference_operator.svg)](../doc/libs/std/ops/.test/difference_operator.log) | [difference_operator](../doc/libs/std/ops/subtract.md) |
 | [![test](../doc/tests/.test/empty_op.svg)](../doc/tests/.test/empty_op.log) | [empty_op](../doc/tests/semicolon.md) |
 | [![test](../doc/structure/.test/example.svg)](../doc/structure/.test/example.log) | [example](../doc/structure/functions.md) |
-| [![test](../books/tutorials/src/lego_brick/.test/export.svg)](../books/tutorials/src/lego_brick/.test/export.log) | [export](../books/tutorials/src/lego_brick/export.md) |
 | [![test](../doc/.test/export_attributes.svg)](../doc/.test/export_attributes.log) | [export_attributes](../doc/export.md) |
 | [![test](../doc/libs/std/ops/.test/extrude.svg)](../doc/libs/std/ops/.test/extrude.log) | [extrude](../doc/libs/std/ops/extrude.md) |
 | [![test](../books/tutorials/src/lego_brick/part/.test/extrude_cap.svg)](../books/tutorials/src/lego_brick/part/.test/extrude_cap.log) | [extrude_cap](../books/tutorials/src/lego_brick/part/extrude.md) |
@@ -125,7 +124,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../books/tutorials/src/lego_brick/.test/knobs.svg)](../books/tutorials/src/lego_brick/.test/knobs.log) | [knobs](../books/tutorials/src/lego_brick/caps_knobs.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/knobs_align.svg)](../books/tutorials/src/lego_brick/.test/knobs_align.log) | [knobs_align](../books/tutorials/src/lego_brick/caps_knobs.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/knobs_multiplicity.svg)](../books/tutorials/src/lego_brick/.test/knobs_multiplicity.log) | [knobs_multiplicity](../books/tutorials/src/lego_brick/caps_knobs.md) |
-| [![test](../books/tutorials/src/lego_brick/.test/library.svg)](../books/tutorials/src/lego_brick/.test/library.log) | [library](../books/tutorials/src/lego_brick/external.md) |
 | [![test](../doc/tests/.test/logo.svg)](../doc/tests/.test/logo.log) | [logo](../doc/tests/logo.md) |
 | [![test](../doc/libs/std/math/.test/math_abs.svg)](../doc/libs/std/math/.test/math_abs.log) | [math_abs](../doc/libs/std/math/README.md) |
 | [![test](../doc/libs/std/math/.test/math_trigonometric.svg)](../doc/libs/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/libs/std/math/README.md) |
