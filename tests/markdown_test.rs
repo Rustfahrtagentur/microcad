@@ -77,7 +77,7 @@ pub fn run_test(
     writeln!(log_out).expect("output error");
 
     // load and handle µcad source file
-    let source_file_result = SourceFile::load_from_str(code);
+    let source_file_result = SourceFile::load_from_str(name, code);
 
     match mode {
         // test is expected to fail?
