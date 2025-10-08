@@ -47,7 +47,9 @@ impl Eval<()> for UseStatement {
             let visibility = self.visibility;
             match &self.decl {
                 UseDeclaration::Use(name) => {
-                    if let Err(err) = context.use_symbol(visibility, name, None, current) {
+                    let mut symbol = context.lookup(name)?;
+                    symbol.set_visibility(visibility);
+                    if let Err(err) = context.add_symbol(symbol.id(), symbol) {
                         context.error(name, err)?;
                     }
                 }
