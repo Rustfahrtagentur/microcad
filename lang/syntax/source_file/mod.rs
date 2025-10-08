@@ -71,6 +71,11 @@ impl SourceFile {
     pub fn num_lines(&self) -> usize {
         self.source.lines().count()
     }
+
+    /// Set file name.
+    pub fn set_name(&mut self, name: QualifiedName) {
+        self.name = name
+    }
 }
 
 impl std::fmt::Display for SourceFile {
