@@ -55,8 +55,9 @@ impl SymbolDefinition {
         match &self {
             SymbolDefinition::SourceFile(..) | SymbolDefinition::Builtin(..) => Visibility::Public,
 
-            SymbolDefinition::Argument(..) | SymbolDefinition::Constant(..) => Visibility::Private,
+            SymbolDefinition::Argument(..) => Visibility::Private,
 
+            SymbolDefinition::Constant(visibility, ..) => *visibility,
             SymbolDefinition::Module(md) => md.visibility,
             SymbolDefinition::Workbench(wd) => wd.visibility,
             SymbolDefinition::Function(fd) => fd.visibility,
@@ -99,7 +100,7 @@ impl std::fmt::Debug for SymbolDefinition {
             Self::SourceFile(..) => write!(f, "(file)"),
             Self::Builtin(..) => write!(f, "(builtin)"),
             Self::Constant(.., value) => write!(f, "(constant) = {value}"),
-            Self::ConstExpression(.., value) => write!(f, "(const expression) = {value:?}"),
+            Self::ConstExpression(.., expr) => write!(f, "(const expression) = {expr:?}"),
             Self::Argument(.., value) => write!(f, "(call argument) = {value}"),
             Self::Alias(.., name) => write!(f, "(alias) => {name:?}"),
             Self::UseAll(.., name) => write!(f, "(use all) => {name:?}"),
