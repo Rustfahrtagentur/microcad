@@ -255,38 +255,14 @@ impl EvalContext {
         let (what, within) = what.dissolve_super(within);
 
         let parents = self.symbol_table.path_to(&within)?;
-        for (n, parent) in parents.iter().rev().enumerate() {
+        for parent in parents.iter().rev() {
             log::trace!("Looking in: {:?} for {:?}", parent.full_name(), what);
-            if let Some(symbol) = parent.search(&what) {
-                let alias = self.symbol_table.follow_alias(&symbol)?;
-                if n > 0 {
-                    if alias.is_private() {
-                        log::trace!(
-                            "{not_found} symbol {what:?} within {within:?} is private",
-                            not_found = crate::mark!(NOT_FOUND_INTERIM),
-                        );
-                        return Err(EvalError::SymbolIsPrivate {
-                            what: what.clone(),
-                            within,
-                        });
-                    }
-                    if alias != symbol && alias.is_private() {
-                        log::trace!(
-                            "{not_found} within {within:?} symbol: {what:?}",
-                            not_found = crate::mark!(NOT_FOUND_INTERIM),
-                        );
-                        return Err(EvalError::SymbolBehindAliasIsPrivate {
-                            what: what.clone(),
-                            alias: alias.full_name(),
-                            within,
-                        });
-                    }
-                }
+            if let Ok(symbol) = parent.search(&what) {
                 log::trace!(
-                    "{found} symbol within {within:?}:` {alias:?}",
+                    "{found} symbol within {within:?}:` {symbol:?}",
                     found = crate::mark!(FOUND),
                 );
-                return Ok(alias);
+                return Ok(symbol);
             }
         }
         log::trace!(
@@ -383,6 +359,10 @@ impl Locals for EvalContext {
 
     fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {
         self.stack.get_local_value(id)
+    }
+
+    fn add_symbol(&mut self, id: Identifier, symbol: Symbol) -> EvalResult<()> {
+        self.stack.add_symbol(id, symbol)
     }
 
     fn open(&mut self, frame: StackFrame) {
@@ -503,18 +483,6 @@ impl Lookup<EvalError> for EvalContext {
             return Err(ambiguities.remove(0).1);
         }
 
-        // follow aliases
-        let found: Vec<_> = found
-            .into_iter()
-            .filter_map(|(origin, symbol)| {
-                if let Ok(symbol) = self.symbol_table.follow_alias(&symbol) {
-                    Some((origin, symbol))
-                } else {
-                    None
-                }
-            })
-            .collect();
-
         // check for ambiguity in what's left
         match found.first() {
             Some((origin, symbol)) => {
@@ -607,12 +575,10 @@ impl std::fmt::Debug for EvalContext {
         writeln!(f, "\nCall Stack:")?;
         self.stack.pretty_print_call_trace(f, &self.sources)?;
 
-        writeln!(f, "\nSymbol Table:")?;
+        write!(f, "\nSymbol Table:\n{:?}", self.symbol_table)?;
         if self.has_errors() {
-            writeln!(f, "{}\nErrors:", self.symbol_table)?;
+            writeln!(f, "Errors:")?;
             self.fmt_diagnosis(f)?;
-        } else {
-            write!(f, "{}", self.symbol_table)?;
         }
         Ok(())
     }

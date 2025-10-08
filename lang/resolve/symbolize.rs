@@ -156,7 +156,7 @@ impl Symbolize for AssignmentStatement {
                 if !parent.can_const() {
                     None
                 } else {
-                    log::trace!("Declare private value {}", self.assignment.id);
+                    log::trace!("Declaring private const expression: {}", self.assignment.id);
                     Some(Some(Symbol::new(
                         SymbolDefinition::ConstExpression(
                             self.assignment.visibility,
@@ -204,6 +204,9 @@ impl Symbolize<Option<(Identifier, Symbol)>> for UseStatement {
         parent: &Symbol,
         _: &mut ResolveContext,
     ) -> ResolveResult<Option<(Identifier, Symbol)>> {
+        if !parent.is_module() {
+            return Ok(None);
+        }
         match &self.decl {
             UseDeclaration::Use(name) => {
                 let identifier = name.last().expect("Identifier");

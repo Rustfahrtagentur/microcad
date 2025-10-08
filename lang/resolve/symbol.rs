@@ -243,7 +243,7 @@ impl Symbol {
     }
 
     /// Create a vector of cloned children.
-    fn public_children(&self, overwrite_visibility: Option<Visibility>) -> Symbols {
+    fn public_children(&self, overwrite_visibility: Option<Visibility>) -> SymbolMap {
         let inner = self.inner.borrow();
 
         // Aliases do not have any children and must be de-aliased before.
@@ -262,6 +262,7 @@ impl Symbol {
                     symbol.clone()
                 }
             })
+            .map(|symbol| (symbol.id(), symbol))
             .collect()
     }
 
@@ -294,37 +295,54 @@ impl Symbol {
         self.visibility
     }
 
+    /// Set symbol's visibility.
+    pub(crate) fn set_visibility(&mut self, visibility: Visibility) {
+        self.visibility = visibility
+    }
+
     /// Return `true` if symbol's visibility set to is public.
     fn is_public(&self) -> bool {
         matches!(self.visibility(), Visibility::Public)
     }
 
-    /// Return `true` if symbol's visibility set to is non-public.
-    pub(crate) fn is_private(&self) -> bool {
-        !self.is_public()
+    /// Search down the symbol tree for a qualified name.
+    /// # Arguments
+    /// - `name`: Name to search for.
+    pub(crate) fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
+        self.search_intern(name, Default::default())
     }
 
     /// Search down the symbol tree for a qualified name.
     /// # Arguments
     /// - `name`: Name to search for.
-    pub(crate) fn search(&self, name: &QualifiedName) -> Option<Symbol> {
+    fn search_intern(&self, name: &QualifiedName, mut prev: Symbols) -> ResolveResult<Symbol> {
         log::trace!("Searching {name} in {:?}", self.full_name());
+
+        // prevent circular aliases
+        if prev.contains(self) {
+            return Err(ResolveError::CircularAlias(self.to_string()));
+        }
+        prev.push(self.clone());
+
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first) {
-                if name.is_single_identifier() {
+                if let Some(alias) = child.get_alias() {
+                    log::trace!("Found alias {:?} => {alias:?}", child.full_name());
+                    self.search_intern(&alias, prev)
+                } else if name.is_single_identifier() {
                     log::trace!("Found {name:?} in {:?}", self.full_name());
-                    Some(child.clone())
+                    Ok(child.clone())
                 } else {
                     let name = &name.remove_first();
                     child.search(name)
                 }
             } else {
                 log::trace!("No child in {:?} while searching for {name:?}", self.id());
-                None
+                Err(ResolveError::SymbolNotFound(name.clone()))
             }
         } else {
             log::warn!("Cannot search for an anonymous name");
-            None
+            Err(ResolveError::SymbolNotFound(name.clone()))
         }
     }
 
@@ -349,6 +367,13 @@ impl Symbol {
     /// check if a property may be declared within this symbol
     pub(super) fn can_prop(&self) -> bool {
         matches!(self.inner.borrow().def, SymbolDefinition::Workbench(..))
+    }
+
+    pub(super) fn is_module(&self) -> bool {
+        matches!(
+            self.inner.borrow().def,
+            SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..)
+        )
     }
 
     /// Overwrite any value in this symbol
@@ -406,72 +431,106 @@ impl Symbol {
         f(&mut self.inner.borrow_mut().def)
     }
 
-    pub(super) fn resolvable(&self) -> bool {
+    fn follow_alias(self: Symbol, context: &mut ResolveContext) -> ResolveResult<Symbol> {
+        if let Some(alias) = self.get_alias() {
+            context.lookup(&alias)?.follow_alias(context)
+        } else {
+            Ok(self)
+        }
+    }
+
+    pub(super) fn is_resolvable(&self) -> bool {
         matches!(
             self.inner.borrow().def,
             SymbolDefinition::SourceFile(..)
                 | SymbolDefinition::Module(..)
                 | SymbolDefinition::UseAll(..)
+                | SymbolDefinition::Alias(..)
+        )
+    }
+
+    pub(super) fn is_link(&self) -> bool {
+        matches!(
+            self.inner.borrow().def,
+            SymbolDefinition::UseAll(..) | SymbolDefinition::Alias(..)
         )
     }
 
     /// Resolve use statements.
-    pub(super) fn resolve(&self, context: &mut ResolveContext) -> ResolveResult<Symbols> {
+    pub(super) fn resolve(&self, context: &mut ResolveContext) -> ResolveResult<SymbolMap> {
+        log::trace!("resolving: {self}");
         // collect used symbols from children and from self
-        let (from_children, from_self): (Symbols, Symbols) = {
+        let (from_children, from_self): (SymbolMap, SymbolMap) = {
             let inner = self.inner.borrow();
 
             // check if we resolve recursive and collect symbols resolved from self
-            let (resolve_children, from_self) = match &inner.def {
+            let from_self = match &inner.def {
                 SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => {
-                    (true, Symbols::default())
+                    SymbolMap::default()
                 }
-                SymbolDefinition::UseAll(visibility, name) => (
-                    false,
+                SymbolDefinition::Alias(visibility, id, name) => {
+                    log::trace!("resolving alias {self} => {visibility}{id} ({name})");
+                    let symbol = context
+                        .lookup(name)?
+                        .follow_alias(context)?
+                        .clone_with_visibility(*visibility);
+
+                    [(id.clone(), symbol)].into_iter().collect()
+                }
+                SymbolDefinition::UseAll(visibility, name) => {
+                    log::trace!("resolving use all {self} => {visibility}{name}");
+
                     match context.lookup(name) {
                         Ok(symbol) => symbol.public_children(Some(*visibility)),
                         Err(err) => {
                             if let Some(parent) = &inner.parent {
-                                match context.lookup(&name.with_prefix(&parent.full_name())) {
-                                    Ok(symbol) => symbol.public_children(Some(*visibility)),
-                                    Err(err) => panic!("{err}"),
-                                }
+                                context
+                                    .lookup(&name.with_prefix(&parent.full_name()))?
+                                    .public_children(Some(*visibility))
                             } else {
                                 panic!("{err}")
                             }
                         }
-                    },
-                ),
+                    }
+                }
                 // skip non-modules
-                _ => (false, Symbols::default()),
+                _ => SymbolMap::default(),
             };
 
+            fn merge_all<I>(iter: I) -> SymbolMap
+            where
+                I: IntoIterator<Item = SymbolMap>,
+            {
+                let mut merged = SymbolMap::new();
+                for map in iter {
+                    merged.extend(map.iter().map(|(k, v)| (k.clone(), v.clone())));
+                }
+                merged
+            }
+
             // collect symbols resolved from children
-            let from_children: Symbols = if resolve_children {
+            let from_children: SymbolMap = merge_all(
                 inner
                     .children
                     .values()
-                    .filter(|child| child.resolvable())
-                    .flat_map(|child| child.resolve(context))
-                    .collect()
-            } else {
-                Symbols::default()
-            };
+                    .filter(|child| child.is_resolvable())
+                    .flat_map(|child| child.resolve(context)),
+            );
+
             (from_children, from_self)
         };
 
-        // add symbols collected from children to self
-        self.inner.borrow_mut().children.extend(
-            from_children
-                .iter()
-                .map(|symbol| (symbol.id(), symbol.clone())),
-        );
+        let mut inner_mut = self.inner.borrow_mut();
 
-        // remove all `UseAll` symbols
-        self.inner
-            .borrow_mut()
+        // remove all `UseAll` and Alias symbols
+        inner_mut.children.retain(|_, symbol| !symbol.is_link());
+
+        log::trace!("from_children:\n{from_children:?}");
+
+        // add symbols collected from children to self
+        inner_mut
             .children
-            .retain(|_, symbol| !matches!(symbol.inner.borrow().def, SymbolDefinition::UseAll(..)));
+            .extend(from_children.iter().map(|(k, v)| (k.clone(), v.clone())));
 
         // return symbols collected from self
         Ok(from_self)
@@ -654,4 +713,33 @@ impl SrcReferrer for SymbolInner {
             SymbolDefinition::Tester(id) => id.src_ref(),
         }
     }
+}
+
+#[test]
+fn test_symbol_resolve() {
+    let root = SourceFile::load_from_str(
+        "root",
+        "
+        use my; 
+        x = my::target;
+
+        use my::target; 
+        x = target;
+        ",
+    )
+    .expect("parse error");
+
+    let my = SourceFile::load_from_str(
+        "my",
+        "
+        pub const target = 1;
+        ",
+    )
+    .expect("parse error");
+
+    let mut context =
+        ResolveContext::test_create(root, ResolveMode::Symbolized).expect("resolve error");
+    context.test_add_file(my);
+    log::trace!("{:?}", context);
+    context.resolve().expect("resolve error");
 }

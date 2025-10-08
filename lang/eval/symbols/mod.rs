@@ -36,6 +36,9 @@ pub trait Locals {
     /// Get a named local value from locals.
     fn get_local_value(&self, id: &Identifier) -> EvalResult<Value>;
 
+    /// Add a symbol to current locals.
+    fn add_symbol(&mut self, id: Identifier, symbol: Symbol) -> EvalResult<()>;
+
     /// Get a property value from current model.
     fn get_model(&self) -> EvalResult<Model>;
 

@@ -246,6 +246,10 @@ impl Locals for Stack {
         )
     }
 
+    fn add_symbol(&mut self, id: Identifier, symbol: Symbol) -> EvalResult<()> {
+        self.put_local(Some(id.clone()), symbol)
+    }
+
     fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {
         match self.fetch(id) {
             Ok(symbol) => symbol.with_def(|def| match def {

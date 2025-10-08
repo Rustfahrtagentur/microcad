@@ -35,6 +35,16 @@ impl FromIterator<(Identifier, Value)> for SymbolMap {
     }
 }
 
+impl FromIterator<(Identifier, Symbol)> for SymbolMap {
+    fn from_iter<T: IntoIterator<Item = (Identifier, Symbol)>>(iter: T) -> Self {
+        let mut symbol_map = SymbolMap::default();
+        for (id, symbol) in iter {
+            symbol_map.insert(id, symbol);
+        }
+        symbol_map
+    }
+}
+
 impl WriteToFile for SymbolMap {}
 
 impl SymbolMap {
@@ -61,8 +71,8 @@ impl SymbolMap {
                 if leftover.is_empty() {
                     log::trace!("Fetched {name:?} from globals (symbol map)");
                     return Ok(symbol.clone());
-                } else if let Some(symbol) = symbol.search(&leftover) {
-                    return Ok(symbol);
+                } else {
+                    return symbol.search(&leftover);
                 }
             }
         }

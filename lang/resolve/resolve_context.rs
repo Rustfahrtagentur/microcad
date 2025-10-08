@@ -57,7 +57,7 @@ impl ResolveContext {
         builtin: Option<Symbol>,
         diag: DiagHandler,
         mode: ResolveMode,
-    ) -> ResolveResult<ResolveContext> {
+    ) -> ResolveResult<Self> {
         let mut context = Self::new(root, search_paths, diag)?;
         context.symbolize()?;
         log::trace!("Symbolized Context:\n{context:?}");
@@ -73,23 +73,78 @@ impl ResolveContext {
         Ok(context)
     }
 
+    #[cfg(test)]
+    pub(super) fn test_create(root: Rc<SourceFile>, mode: ResolveMode) -> ResolveResult<Self> {
+        Self::create(
+            root,
+            &[] as &[std::path::PathBuf],
+            None,
+            Default::default(),
+            mode,
+        )
+    }
+
+    #[cfg(test)]
+    pub(super) fn test_add_file(&mut self, file: Rc<SourceFile>) {
+        let symbol = file
+            .symbolize(Visibility::Private, self)
+            .expect("symbolize");
+        self.add_symbol(symbol).expect("symbolize error");
+    }
+
     pub(super) fn add_symbol(&mut self, symbol: Symbol) -> ResolveResult<()> {
-        self.symbol_table.add_symbol(symbol.clone())?;
-        symbol.resolve(self)?;
+        self.symbol_table.add_symbol(symbol.clone())
+    }
+
+    pub(crate) fn symbolize(&mut self) -> ResolveResult<()> {
+        assert!(matches!(self.mode, ResolveMode::Loaded));
+
+        let named_symbols = self
+            .sources
+            .clone()
+            .iter()
+            .map(|source| {
+                match (
+                    self.sources.generate_name_from_path(&source.filename()),
+                    source.symbolize(Visibility::Public, self),
+                ) {
+                    (Ok(name), Ok(symbol)) => Ok((name, symbol)),
+                    (_, Err(err)) | (Err(err), _) => Err(err),
+                }
+            })
+            .collect::<ResolveResult<Vec<_>>>()?;
+
+        for (name, symbol) in named_symbols {
+            if let Some(id) = name.single_identifier() {
+                self.symbol_table.insert_symbol(id.clone(), symbol)?;
+            } else {
+                todo!()
+            }
+        }
+
+        self.mode = ResolveMode::Symbolized;
+
         Ok(())
     }
 
     pub(super) fn resolve(&mut self) -> ResolveResult<()> {
         assert!(matches!(self.mode, ResolveMode::Symbolized));
 
-        self.symbol_table
+        let new_children: Vec<_> = self
+            .symbol_table
             .values()
             .iter()
-            .filter(|child| child.resolvable())
-            .try_for_each(|child| {
-                child.resolve(self)?;
-                Ok::<_, ResolveError>(())
-            })?;
+            .filter(|child| child.is_resolvable())
+            .map(|child| child.resolve(self))
+            .collect::<Result<_, _>>()?;
+
+        // remove all `UseAll` and Alias symbols
+        self.symbol_table.retain(|_, symbol| !symbol.is_link());
+
+        new_children
+            .iter()
+            .map(|children| self.symbol_table.add_symbol_map(children))
+            .collect::<Result<Vec<_>, _>>()?;
 
         log::debug!("Resolve OK!");
         log::trace!("Resolved symbol table:\n{self:?}");
@@ -139,38 +194,7 @@ impl ResolveContext {
             .symbolize(visibility, self)
     }
 
-    /// Create a symbol out of all sources (without resolving them).
-    pub(crate) fn symbolize(&mut self) -> ResolveResult<()> {
-        assert!(matches!(self.mode, ResolveMode::Loaded));
-
-        let named_symbols = self
-            .sources
-            .clone()
-            .iter()
-            .map(|source| {
-                match (
-                    self.sources.generate_name_from_path(&source.filename()),
-                    source.symbolize(Visibility::Public, self),
-                ) {
-                    (Ok(name), Ok(symbol)) => Ok((name, symbol)),
-                    (_, Err(err)) | (Err(err), _) => Err(err),
-                }
-            })
-            .collect::<ResolveResult<Vec<_>>>()?;
-
-        for (name, symbol) in named_symbols {
-            if let Some(id) = name.single_identifier() {
-                self.symbol_table.insert_symbol(id.clone(), symbol)?;
-            } else {
-                todo!()
-            }
-        }
-
-        self.mode = ResolveMode::Symbolized;
-
-        Ok(())
-    }
-
+    /// Create a symbol out of all sources (without resolving them)
     /// Return `true` if context has been resolved (or checked as well)
     pub fn is_resolved(&self) -> bool {
         matches!(self.mode, ResolveMode::Resolved | ResolveMode::Checked)

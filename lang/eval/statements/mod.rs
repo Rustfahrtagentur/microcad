@@ -57,8 +57,6 @@ impl Eval<Option<Model>> for Statement {
             }
             Self::Module(m) => {
                 m.eval(context)?;
-
-                context.grant(m.as_ref())?;
                 None
             }
             Self::Function(f) => {
@@ -85,7 +83,7 @@ impl Eval<Option<Model>> for Statement {
             Self::Expression(e) => e.eval(context)?,
             Self::InnerAttribute(a) => {
                 context.grant(a)?;
-                Default::default()
+                None
             }
         };
 

@@ -1,6 +1,8 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use derive_more::{Deref, DerefMut};
+
 use crate::{resolve::*, syntax::*};
 
 /// *Symbol table* holding global and local symbols.
@@ -13,80 +15,13 @@ use crate::{resolve::*, syntax::*};
 /// - A [`SymbolMap`] of all *global symbols*.
 ///
 /// All these internal structures can be accessed by several implemented traits.
-#[derive(Default)]
+#[derive(Default, Deref, DerefMut)]
 pub struct SymbolTable {
     /// Global symbols (including root).
     symbols: SymbolMap,
 }
 
 impl SymbolTable {
-    /// Solve any alias within the given qualified name.
-    ///
-    /// # Example
-    /// ```µcad
-    /// mod my {
-    ///   use std::geo2d;
-    /// }
-    /// my::geo2d::rect(1mm);
-    /// ```
-    pub fn de_alias(&self, name: &QualifiedName) -> QualifiedName {
-        (1..name.len())
-            .rev()
-            .filter_map(|p| {
-                if let Ok(symbol) = self
-                    .symbols
-                    .search(&QualifiedName::no_ref(name[0..p].to_vec()))
-                {
-                    Some((p, symbol))
-                } else {
-                    None
-                }
-            })
-            .find_map(|(p, symbol)| {
-                symbol.with_def(|def| {
-                    if let SymbolDefinition::Alias(.., alias) = def {
-                        let suffix: QualifiedName = name[p..].iter().cloned().collect();
-                        let new_name = suffix.with_prefix(alias);
-                        log::trace!("De-aliased name: {name:?} into {new_name:?}");
-                        Some(new_name)
-                    } else {
-                        log::trace!("No alias: {name:?}");
-                        None
-                    }
-                })
-            })
-            .unwrap_or(name.clone())
-    }
-
-    /// If given symbol is an alias returns the target or the symbol itself if not.
-    pub fn follow_alias(&self, symbol: &Symbol) -> ResolveResult<Symbol> {
-        self.follow_alias_intern(symbol, &mut Symbols::default())
-    }
-    fn follow_alias_intern(&self, symbol: &Symbol, prev: &mut Symbols) -> ResolveResult<Symbol> {
-        prev.push(symbol.clone());
-        // execute alias from any use statement
-        if let Some(name) = symbol.get_alias() {
-            log::trace!("Following alias => {name:?}");
-            if let Some(parent) = symbol.get_parent() {
-                if let Some(symbol) = parent.search(&name) {
-                    if prev.contains(&symbol) {
-                        return Err(ResolveError::CircularAlias(prev.to_string()));
-                    }
-                    return self.follow_alias(&symbol);
-                }
-            }
-            match self.lookup(&name) {
-                Ok(symbol) => Ok(self.follow_alias(&symbol)?),
-                Err(err) => {
-                    log::warn!("Alias {name:?} leads to nowhere");
-                    Err(err)
-                }
-            }
-        } else {
-            Ok(symbol.clone())
-        }
-    }
-
     /// Collect all symbols engaged in that name.
     ///
     /// Example: `what`=`a::b::c` will return the symbols: `a`,`a::b` and `a::b::c`
@@ -96,12 +31,18 @@ impl SymbolTable {
 
     /// Add a new symbol to the table
     pub fn add_symbol(&mut self, symbol: Symbol) -> ResolveResult<()> {
-        log::trace!("add symbol: {}", symbol.id());
-        if let Some(symbol) = self.symbols.insert(symbol.id(), symbol.clone()) {
-            Err(ResolveError::AmbiguousSymbol(symbol.id()))
-        } else {
-            Ok(())
-        }
+        self.insert_symbol(symbol.id(), symbol.clone())
+    }
+
+    /// Add another symbol map to the table
+    pub fn add_symbol_map(&mut self, symbol_map: &SymbolMap) -> ResolveResult<()> {
+        symbol_map
+            .iter()
+            .map(|(id, symbol)| (id.clone(), symbol.clone()))
+            .try_for_each(|(id, symbol)| {
+                assert!(!symbol.is_link());
+                self.insert_symbol(id, symbol)
+            })
     }
 
     /// Add a new symbol to the table
@@ -145,10 +86,8 @@ impl Lookup for SymbolTable {
     /// Lookup a symbol from global symbols.
     fn lookup(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         log::trace!("Looking for global symbol '{name:?}'");
-
-        let name = self.de_alias(name);
-        let symbol = match self.symbols.search(&name) {
-            Ok(symbol) => self.follow_alias(&symbol)?,
+        let symbol = match self.symbols.search(name) {
+            Ok(symbol) => symbol,
             Err(err) => {
                 log::trace!(
                     "{not_found} global symbol: {name:?}",

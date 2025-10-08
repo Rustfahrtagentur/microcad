@@ -83,7 +83,7 @@ impl Grant<UseStatement> for EvalContext {
         match (&statement.visibility, self.stack.current_frame()) {
             (Visibility::Private, _)
             | (Visibility::Public, Some(StackFrame::Source(..) | StackFrame::Module(..))) => (),
-            _ => self.error(statement, EvalError::StatementNotSupported("Use"))?,
+            _ => self.error(statement, EvalError::StatementNotSupported("Public use"))?,
         }
         Ok(())
     }
@@ -182,7 +182,7 @@ impl Grant<Marker> for EvalContext {
     }
 }
 
-impl Grant<crate::syntax::Attribute> for EvalContext {
+impl Grant<Attribute> for EvalContext {
     fn grant(&mut self, statement: &crate::syntax::Attribute) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(
@@ -197,6 +197,23 @@ impl Grant<crate::syntax::Attribute> for EvalContext {
                 statement,
                 EvalError::StatementNotSupported("InnerAttribute"),
             )?;
+        }
+        Ok(())
+    }
+}
+
+impl Grant<Body> for EvalContext {
+    fn grant(&mut self, body: &Body) -> EvalResult<()> {
+        let granted = if let Some(stack_frame) = self.stack.current_frame() {
+            matches!(
+                stack_frame,
+                StackFrame::Source(_, _) | StackFrame::Body(_) | StackFrame::Workbench(_, _, _)
+            )
+        } else {
+            false
+        };
+        if !granted {
+            self.error(body, EvalError::StatementNotSupported("Body"))?;
         }
         Ok(())
     }
