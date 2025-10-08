@@ -111,6 +111,8 @@ impl Eval for QualifiedName {
                 Ok(value.clone())
             }
             SymbolDefinition::ConstExpression(.., expr) => expr.eval(context),
+            SymbolDefinition::SourceFile(_) => Ok(Value::None),
+
             SymbolDefinition::Module(ns) => Err(EvalError::UnexpectedNested("mod", ns.id.clone())),
             SymbolDefinition::Workbench(w) => {
                 Err(EvalError::UnexpectedNested(w.kind.as_str(), w.id.clone()))
@@ -122,16 +124,14 @@ impl Eval for QualifiedName {
                 Err(EvalError::UnexpectedNested("builtin", bm.id.clone()))
             }
             SymbolDefinition::Alias(_, id, _) => {
-                unreachable!("Unexpected alias {id} in expression")
-            }
-            SymbolDefinition::SourceFile(sf) => {
+                // Alias should have been resolved within previous lookup()
                 unreachable!(
-                    "Unexpected source file {} in expression",
-                    sf.filename_as_str()
+                    "Unexpected alias {id} in value expression at {}",
+                    self.src_ref()
                 )
             }
             SymbolDefinition::UseAll(_, name) => {
-                unreachable!("Unexpected use {name} in expression")
+                unreachable!("Unexpected use {name} in value expression")
             }
             #[cfg(test)]
             SymbolDefinition::Tester(..) => {

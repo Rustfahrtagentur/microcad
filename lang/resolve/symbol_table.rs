@@ -63,8 +63,14 @@ impl SymbolTable {
         // execute alias from any use statement
         symbol.with_def(|def| {
             if let SymbolDefinition::Alias(.., name) = def {
-                log::trace!("{found} alias => {name:?}", found = crate::mark!(FOUND));
-                Ok(self.follow_alias(&self.lookup(name)?)?)
+                log::trace!("Following alias => {name:?}");
+                match self.lookup(name) {
+                    Ok(symbol) => Ok(self.follow_alias(&symbol)?),
+                    Err(err) => {
+                        log::warn!("Alias {name:?} leads to nowhere");
+                        Err(err)
+                    }
+                }
             } else {
                 Ok(symbol.clone())
             }

@@ -381,11 +381,11 @@ impl Symbol {
     }
 
     /// Check if symbol has a valid value
-    pub fn is_valid_value(&self) -> bool {
+    pub fn is_valid_symbol(&self) -> bool {
         match &self.inner.borrow().def {
             SymbolDefinition::Constant(.., value) => !value.is_invalid(),
             SymbolDefinition::ConstExpression(_, _, expr) => expr.is_const(),
-            _ => false,
+            _ => true,
         }
     }
 

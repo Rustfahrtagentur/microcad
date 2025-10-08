@@ -114,7 +114,7 @@ pub fn assert_valid() -> Symbol {
             if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
                 match context.lookup(&name) {
                     Ok(symbol) => {
-                        if !symbol.is_valid_value() {
+                        if !symbol.is_valid_symbol() {
                             context.error(
                                 &arg,
                                 EvalError::AssertionFailed(format!("Invalid value: {arg}")),
@@ -135,7 +135,7 @@ pub fn assert_invalid() -> Symbol {
         if let Ok((_, arg)) = args.get_single() {
             if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
                 if let Ok(symbol) = context.lookup(&name) {
-                    if symbol.is_valid_value() {
+                    if symbol.is_valid_symbol() {
                         context.error(
                             &arg,
                             EvalError::AssertionFailed(format!(
