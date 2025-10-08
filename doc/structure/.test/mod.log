@@ -26,3 +26,15 @@
 20: math::square(2.0);
 21: math::pow(2.0, 5);  // error: pow is private
 
+-- Output --
+-- Errors --
+error: Missing arguments: n
+  ---> <FROM STR>:15:13
+     |
+  15 |         pow(x, 2.0)
+     |             ^^^^^^
+     |
+-- Test Result --
+FAIL(TODO)
+-- Test Result --
+FAILED AS EXPECTED BUT IS TODO
