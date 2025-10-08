@@ -175,8 +175,12 @@ impl EvalContext {
     }
 
     /// Return if the current frame is an init frame.
-    pub fn is_init(&mut self) -> bool {
+    pub(super) fn is_init(&mut self) -> bool {
         matches!(self.stack.current_frame(), Some(StackFrame::Init(_)))
+    }
+
+    pub(super) fn is_within_function(&self) -> bool {
+        self.stack.is_within_function()
     }
 
     /// Lookup a property by qualified name.

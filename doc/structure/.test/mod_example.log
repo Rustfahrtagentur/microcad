@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: mod std {
+ 1: mod my {
  2:     mod math {
  3:         // define PI as property
  4:         const PI = 3.14159;
@@ -17,15 +17,14 @@
 11: }
 12: 
 13: // call both
-14: x = std::math::abs(-1) * std::math::PI;
+14: x = my::math::abs(-1.0) * my::math::PI;
 
 -- Output --
 -- Errors --
-error: Ambiguous symbol std::math::abs might be one of the following: module, global
-  ---> <FROM STR>:14:5
-     |
-  14 | x = std::math::abs(-1) * std::math::PI;
-     |     ^^^^^^^^^^^^^^^^^^
-     |
-Ambiguous symbol std::math::PI might be one of the following: module, global-- Test Result --
-FAIL
+-- Model --
+  Group (root) ->
+
+-- Test Result --
+OK
+Could not determine output type.
+Nothing will be exported.
