@@ -23,7 +23,7 @@ error: Array elements have different types: [<INVALID TYPE>, (x: Length, y: Leng
    4 | std::debug::assert_eq([c, (x = 4.0mm, y = 6.0mm)]); // error: Array elements have different types: [<INVALID TYPE>, (x: Length, y: Length)]
      |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Assertion failed: Invalid: <INVALID VALUE>
+error: Assertion failed: Invalid: <NO VALUE>
   ---> <FROM STR>:4:23
      |
    4 | std::debug::assert_eq([c, (x = 4.0mm, y = 6.0mm)]); // error: Array elements have different types: [<INVALID TYPE>, (x: Length, y: Length)]

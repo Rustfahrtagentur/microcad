@@ -19,13 +19,15 @@
   Group (root) ->
     Workpiece(op) std::ops::extrude(height=1mm) ->
       - height = 1mm
-      Operation __builtin::ops::extrude(height=1, n_divisions=0, scale_top_x=1, scale_top_y=1, twist_degrees=0)⏎ ->
+      Operation __builtin::ops::extrude(height=1, n_divisions=0, scale_top_x=1, scale_top_y=1, twist_degrees=0)
+ ->
         Workpiece(sketch) std::geo2d::Rect(height=31.8mm, width=15.8mm) (root) ->
           - height = 31.8mm
           - width = 15.8mm
           - x = -7.9mm
           - y = -15.9mm
-          Primitive2D __builtin::geo2d::Rect(height=31.8, width=15.8, x=-7.9, y=-15.9)⏎ ->
+          Primitive2D __builtin::geo2d::Rect(height=31.8, width=15.8, x=-7.9, y=-15.9)
+ ->
 
 -- Test Result --
 OK

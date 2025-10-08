@@ -10,10 +10,11 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group (root) ->
-    Workpiece(sketch) <NO ID>::K() ->
-
+error: Resolve error Alias leads to itself: std (alias) => std [<NO ID>::K::std]
+  ---> <FROM STR>:2:7
+     |
+   2 |   use std;
+     |       ^^^
+     |
 -- Test Result --
-OK
-Export error: Render error: Nothing to render
+FAIL

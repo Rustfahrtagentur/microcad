@@ -15,10 +15,13 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Operation __builtin::ops::subtract()⏎ ->
+    Operation __builtin::ops::subtract()
+ ->
       Group ->
-        Primitive3D __builtin::geo3d::Sphere(radius=3)⏎ ->
-        Primitive3D __builtin::geo3d::Cube(size_x=3, size_y=3, size_z=3)⏎ ->
+        Primitive3D __builtin::geo3d::Sphere(radius=3)
+ ->
+        Primitive3D __builtin::geo3d::Cube(size_x=3, size_y=3, size_z=3)
+ ->
 
 -- Test Result --
 OK

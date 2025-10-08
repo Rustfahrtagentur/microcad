@@ -24,12 +24,3 @@
 18: double_2x2.translate(y = -40mm);
 19: third_3x2.translate(y = 40mm);
 
--- Parse Error --
-Parser error:  --> 1:15
-  |
-1 | mod lego_brick;
-  |               ^---
-  |
-  = expected single_line_comment or body
--- Test Result --
-FAIL

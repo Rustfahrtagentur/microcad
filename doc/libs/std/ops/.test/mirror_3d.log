@@ -25,26 +25,33 @@
         - x = 30mm
         - y = 30mm
         - z = 30mm
-        Transform __builtin::ops::translate(x=30, y=30, z=30)⏎ ->
-          Operation subtract()⏎ (root) ->
+        Transform __builtin::ops::translate(x=30, y=30, z=30)
+ ->
+          Operation subtract()
+ (root) ->
             Group ->
               Workpiece(part) std::geo3d::Cube(size=50mm) ->
                 - size_x = 50mm
                 - size_y = 50mm
                 - size_z = 50mm
-                Transform __builtin::ops::translate(x=-25, y=-25, z=-25)⏎ ->
-                  Primitive3D __builtin::geo3d::Cube(size_x=50, size_y=50, size_z=50)⏎ ->
+                Transform __builtin::ops::translate(x=-25, y=-25, z=-25)
+ ->
+                  Primitive3D __builtin::geo3d::Cube(size_x=50, size_y=50, size_z=50)
+ ->
               Workpiece(op) std::ops::translate(x=12.5mm, y=12.5mm, z=12.5mm) ->
                 - x = 12.5mm
                 - y = 12.5mm
                 - z = 12.5mm
-                Transform __builtin::ops::translate(x=12.5, y=12.5, z=12.5)⏎ ->
+                Transform __builtin::ops::translate(x=12.5, y=12.5, z=12.5)
+ ->
                   Workpiece(part) std::geo3d::Cube(size=25mm) (root) ->
                     - size_x = 25mm
                     - size_y = 25mm
                     - size_z = 25mm
-                    Transform __builtin::ops::translate(x=-12.5, y=-12.5, z=-12.5)⏎ ->
-                      Primitive3D __builtin::geo3d::Cube(size_x=25, size_y=25, size_z=25)⏎ ->
+                    Transform __builtin::ops::translate(x=-12.5, y=-12.5, z=-12.5)
+ ->
+                      Primitive3D __builtin::geo3d::Cube(size_x=25, size_y=25, size_z=25)
+ ->
 
 -- Test Result --
 OK

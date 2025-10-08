@@ -100,10 +100,11 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group (root) ->
-
+error: Assertion failed: Found valid symbol: <NO ID>::module::sub_module::PrivateWorkbench
+  ---> <FROM STR>:92:16
+     |
+  92 | assert_invalid(module::sub_module::PrivateWorkbench);
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK
-Could not determine output type.
-Nothing will be exported.
+FAIL

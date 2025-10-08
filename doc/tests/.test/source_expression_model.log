@@ -10,7 +10,8 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=1)⏎ ->
+    Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=1)
+ ->
 
 -- Test Result --
 OK

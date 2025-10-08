@@ -16,5 +16,11 @@ error: Use statement not available here
    2 |   pub use std; // error
      |   ^^^^^^^^^^^^
      |
+error: Resolve error Alias leads to itself: std (alias) => std [<NO ID>::K::std]
+  ---> <FROM STR>:2:11
+     |
+   2 |   pub use std; // error
+     |           ^^^
+     |
 -- Test Result --
 FAILED AS EXPECTED

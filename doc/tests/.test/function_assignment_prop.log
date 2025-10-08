@@ -8,3 +8,25 @@
  2:   prop a = 1; // error
  3: } f();
 
+-- Output --
+-- Errors --
+error: Declaration of a not allowed within <NO ID>::f
+  ---> <FROM STR>:2:3
+     |
+   2 |   prop a = 1; // error
+     |   ^^^^^^^^^^^
+     |
+error: Assignment statement not available here
+  ---> <FROM STR>:2:3
+     |
+   2 |   prop a = 1; // error
+     |   ^^^^^^^^^^^
+     |
+error: Missing model in workbench
+  ---> <FROM STR>:2:3
+     |
+   2 |   prop a = 1; // error
+     |   ^^^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

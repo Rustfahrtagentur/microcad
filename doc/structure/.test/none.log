@@ -13,13 +13,16 @@
   Group (root) ->
     Workpiece(part) std::geo3d::Sphere(radius=40mm) ->
       - radius = 40mm
-      Primitive3D __builtin::geo3d::Sphere(radius=40)⏎ ->
+      Primitive3D __builtin::geo3d::Sphere(radius=40)
+ ->
     Workpiece(part) std::geo3d::Cube(size=40mm) ->
       - size_x = 40mm
       - size_y = 40mm
       - size_z = 40mm
-      Transform __builtin::ops::translate(x=-20, y=-20, z=-20)⏎ ->
-        Primitive3D __builtin::geo3d::Cube(size_x=40, size_y=40, size_z=40)⏎ ->
+      Transform __builtin::ops::translate(x=-20, y=-20, z=-20)
+ ->
+        Primitive3D __builtin::geo3d::Cube(size_x=40, size_y=40, size_z=40)
+ ->
 
 -- Test Result --
 OK

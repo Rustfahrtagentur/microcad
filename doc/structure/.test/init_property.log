@@ -31,29 +31,35 @@
     Workpiece(sketch) <NO ID>::Wheel(radius=50mm, thickness=10mm) ->
       - radius = 50mm
       - thickness = 10mm
-      Operation subtract()⏎ ->
+      Operation subtract()
+ ->
         Group ->
           Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=50mm) ->
             - center = (x=0mm, y=0mm)
             - radius = 50mm
-            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=50)⏎ ->
+            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=50)
+ ->
           Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=40mm) ->
             - center = (x=0mm, y=0mm)
             - radius = 40mm
-            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=40)⏎ ->
+            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=40)
+ ->
     Workpiece(sketch) <NO ID>::Wheel(diameter=100mm, thickness=10mm) ->
       - radius = 50mm
       - thickness = 10mm
-      Operation subtract()⏎ ->
+      Operation subtract()
+ ->
         Group ->
           Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=50mm) ->
             - center = (x=0mm, y=0mm)
             - radius = 50mm
-            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=50)⏎ ->
+            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=50)
+ ->
           Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=40mm) ->
             - center = (x=0mm, y=0mm)
             - radius = 40mm
-            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=40)⏎ ->
+            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=40)
+ ->
 
 -- Test Result --
 OK

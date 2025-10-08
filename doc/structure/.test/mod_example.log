@@ -21,10 +21,11 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group (root) ->
-
--- Test Result --
-OK
-Could not determine output type.
-Nothing will be exported.
+error: Ambiguous symbol std::math::abs might be one of the following: module, global
+  ---> <FROM STR>:14:5
+     |
+  14 | x = std::math::abs(-1) * std::math::PI;
+     |     ^^^^^^^^^^^^^^^^^^
+     |
+Ambiguous symbol std::math::PI might be one of the following: module, global-- Test Result --
+FAIL

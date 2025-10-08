@@ -31,29 +31,37 @@
       - y = 0mm
       - z = 0mm
       #[color = rgba(1, 0, 0, 1)]
-      Transform __builtin::ops::translate(x=0, y=0, z=0)⏎ ->
-        Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)⏎ (root) ->
+      Transform __builtin::ops::translate(x=0, y=0, z=0)
+ ->
+        Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)
+ (root) ->
     Workpiece(op) <NO ID>::translate(x=4mm, y=0mm, z=0mm) ->
       - x = 4mm
       - y = 0mm
       - z = 0mm
       #[color = rgba(0, 0, 1, 1)]
-      Transform __builtin::ops::translate(x=4, y=0, z=0)⏎ ->
-        Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)⏎ (root) ->
+      Transform __builtin::ops::translate(x=4, y=0, z=0)
+ ->
+        Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)
+ (root) ->
     Workpiece(op) <NO ID>::translate(x=0mm, y=4mm, z=0mm) ->
       - x = 0mm
       - y = 4mm
       - z = 0mm
       #[color = rgba(0, 1, 0, 1)]
-      Transform __builtin::ops::translate(x=0, y=4, z=0)⏎ ->
-        Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)⏎ (root) ->
+      Transform __builtin::ops::translate(x=0, y=4, z=0)
+ ->
+        Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)
+ (root) ->
     Workpiece(op) <NO ID>::translate(x=4mm, y=4mm, z=0mm) ->
       - x = 4mm
       - y = 4mm
       - z = 0mm
       #[color = rgba(0.5, 0.5, 0.5, 1)]
-      Transform __builtin::ops::translate(x=4, y=4, z=0)⏎ ->
-        Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)⏎ (root) ->
+      Transform __builtin::ops::translate(x=4, y=4, z=0)
+ ->
+        Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)
+ (root) ->
 
 -- Test Result --
 OK
