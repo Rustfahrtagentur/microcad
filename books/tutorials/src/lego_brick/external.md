@@ -21,7 +21,7 @@ create a few bricks with different parameters:
 
 [![test](.test/library.svg)](.test/library.log)
 
-```µcad,library
+```µcad
 mod lego_brick;
 
 use lego_brick::*;

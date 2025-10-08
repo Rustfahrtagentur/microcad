@@ -11,7 +11,7 @@ But we also can use the `#[export]` attribute to export each brick to a differen
 
 [![test](.test/export.svg)](.test/export.log)
 
-```µcad,export
+```µcad
 mod lego_brick;
 
 use lego_brick::*;
