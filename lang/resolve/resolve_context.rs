@@ -130,20 +130,11 @@ impl ResolveContext {
     pub(super) fn resolve(&mut self) -> ResolveResult<()> {
         assert!(matches!(self.mode, ResolveMode::Symbolized));
 
-        let new_children: Vec<_> = self
-            .symbol_table
+        self.symbol_table
             .values()
             .iter()
             .filter(|child| child.is_resolvable())
             .map(|child| child.resolve(self))
-            .collect::<Result<_, _>>()?;
-
-        // remove all `UseAll` and Alias symbols
-        self.symbol_table.retain(|_, symbol| !symbol.is_link());
-
-        new_children
-            .iter()
-            .map(|children| self.symbol_table.add_symbol_map(children))
             .collect::<Result<Vec<_>, _>>()?;
 
         log::debug!("Resolve OK!");

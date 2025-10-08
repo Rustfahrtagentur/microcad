@@ -237,11 +237,6 @@ impl Symbol {
         self.inner.borrow_mut().parent = Some(parent);
     }
 
-    /// Get parent.
-    pub(super) fn get_parent(&self) -> Option<Symbol> {
-        self.inner.borrow_mut().parent.clone()
-    }
-
     /// Create a vector of cloned children.
     fn public_children(&self, overwrite_visibility: Option<Visibility>) -> SymbolMap {
         let inner = self.inner.borrow();
@@ -431,14 +426,6 @@ impl Symbol {
         f(&mut self.inner.borrow_mut().def)
     }
 
-    fn follow_alias(self: Symbol, context: &mut ResolveContext) -> ResolveResult<Symbol> {
-        if let Some(alias) = self.get_alias() {
-            context.lookup(&alias)?.follow_alias(context)
-        } else {
-            Ok(self)
-        }
-    }
-
     pub(super) fn is_resolvable(&self) -> bool {
         matches!(
             self.inner.borrow().def,
@@ -470,10 +457,7 @@ impl Symbol {
                 }
                 SymbolDefinition::Alias(visibility, id, name) => {
                     log::trace!("resolving alias {self} => {visibility}{id} ({name})");
-                    let symbol = context
-                        .lookup(name)?
-                        .follow_alias(context)?
-                        .clone_with_visibility(*visibility);
+                    let symbol = context.lookup(name)?.clone_with_visibility(*visibility);
 
                     [(id.clone(), symbol)].into_iter().collect()
                 }
@@ -516,7 +500,6 @@ impl Symbol {
                     .filter(|child| child.is_resolvable())
                     .flat_map(|child| child.resolve(context)),
             );
-
             (from_children, from_self)
         };
 
@@ -525,13 +508,21 @@ impl Symbol {
         // remove all `UseAll` and Alias symbols
         inner_mut.children.retain(|_, symbol| !symbol.is_link());
 
-        log::trace!("from_children:\n{from_children:?}");
-
         // add symbols collected from children to self
         inner_mut
             .children
             .extend(from_children.iter().map(|(k, v)| (k.clone(), v.clone())));
 
+        let from_self = from_self
+            .iter()
+            .map(|(id, symbol)| {
+                let alias = match context.symbol_table.follow_alias(symbol.clone()) {
+                    Ok(alias) => alias,
+                    Err(err) => return Err(err),
+                };
+                Ok::<_, ResolveError>((id.clone(), alias))
+            })
+            .collect::<Result<_, _>>()?;
         // return symbols collected from self
         Ok(from_self)
     }

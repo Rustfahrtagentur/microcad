@@ -78,6 +78,14 @@ impl SymbolTable {
             .for_each(|symbol| symbol.unused(&mut unchecked));
         unchecked
     }
+
+    pub(super) fn follow_alias(&self, symbol: Symbol) -> ResolveResult<Symbol> {
+        if let Some(alias) = symbol.get_alias() {
+            self.follow_alias(self.lookup(&alias)?)
+        } else {
+            Ok(symbol)
+        }
+    }
 }
 
 impl WriteToFile for SymbolTable {}
@@ -86,7 +94,7 @@ impl Lookup for SymbolTable {
     /// Lookup a symbol from global symbols.
     fn lookup(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         log::trace!("Looking for global symbol '{name:?}'");
-        let symbol = match self.symbols.search(name) {
+        let symbol = match self.follow_alias(self.symbols.search(name)?) {
             Ok(symbol) => symbol,
             Err(err) => {
                 log::trace!(
