@@ -23,7 +23,7 @@
 
 -- Output --
 outer: 10mm
-inner: <INVALID VALUE>
+inner: <NO VALUE>
 -- Errors --
 error: Property not found: inner
   ---> <FROM STR>:16:21

@@ -17,14 +17,22 @@
       - center = (x=[-12mm, -4mm, 4mm, 12mm], y=[-4mm, 4mm])
       - radius = 2.4mm
       Multiplicity ->
-        Primitive2D __builtin::geo2d::Circle(cx=-12, cy=-4, radius=2.4)⏎ ->
-        Primitive2D __builtin::geo2d::Circle(cx=-4, cy=-4, radius=2.4)⏎ ->
-        Primitive2D __builtin::geo2d::Circle(cx=4, cy=-4, radius=2.4)⏎ ->
-        Primitive2D __builtin::geo2d::Circle(cx=12, cy=-4, radius=2.4)⏎ ->
-        Primitive2D __builtin::geo2d::Circle(cx=-12, cy=4, radius=2.4)⏎ ->
-        Primitive2D __builtin::geo2d::Circle(cx=-4, cy=4, radius=2.4)⏎ ->
-        Primitive2D __builtin::geo2d::Circle(cx=4, cy=4, radius=2.4)⏎ ->
-        Primitive2D __builtin::geo2d::Circle(cx=12, cy=4, radius=2.4)⏎ ->
+        Primitive2D __builtin::geo2d::Circle(cx=-12, cy=-4, radius=2.4)
+ ->
+        Primitive2D __builtin::geo2d::Circle(cx=-4, cy=-4, radius=2.4)
+ ->
+        Primitive2D __builtin::geo2d::Circle(cx=4, cy=-4, radius=2.4)
+ ->
+        Primitive2D __builtin::geo2d::Circle(cx=12, cy=-4, radius=2.4)
+ ->
+        Primitive2D __builtin::geo2d::Circle(cx=-12, cy=4, radius=2.4)
+ ->
+        Primitive2D __builtin::geo2d::Circle(cx=-4, cy=4, radius=2.4)
+ ->
+        Primitive2D __builtin::geo2d::Circle(cx=4, cy=4, radius=2.4)
+ ->
+        Primitive2D __builtin::geo2d::Circle(cx=12, cy=4, radius=2.4)
+ ->
 
 -- Test Result --
 OK

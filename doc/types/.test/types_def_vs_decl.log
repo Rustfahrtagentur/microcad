@@ -9,7 +9,7 @@
 
 -- Output --
 -- Errors --
-error: Value x already has been initialized with 4mm (at line 1:1)
+error: Value x already in defined: 4mm (at line 1:1)
   ---> <FROM STR>:2:1
      |
    2 | x = 4mm;           // implicit type declaration via units.

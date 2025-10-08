@@ -8,3 +8,25 @@
  2:   const B = 1;
  3: } K();
 
+-- Output --
+-- Errors --
+error: Declaration of B not allowed within <NO ID>::K
+  ---> <FROM STR>:2:3
+     |
+   2 |   const B = 1;
+     |   ^^^^^^^^^^^^
+     |
+error: Assignment statement not available here
+  ---> <FROM STR>:2:3
+     |
+   2 |   const B = 1;
+     |   ^^^^^^^^^^^^
+     |
+error: Symbol B not found.
+  ---> <FROM STR>:2:3
+     |
+   2 |   const B = 1;
+     |   ^^^^^^^^^^^^
+     |
+-- Test Result --
+FAIL

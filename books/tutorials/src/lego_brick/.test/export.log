@@ -17,12 +17,3 @@
 11: #[export = "third_3x2.stl"]
 12: third_3x2 = LegoBrick(rows = 5, columns = 1, base_height = 3.2mm);
 
--- Parse Error --
-Parser error:  --> 1:15
-  |
-1 | mod lego_brick;
-  |               ^---
-  |
-  = expected single_line_comment or body
--- Test Result --
-FAIL

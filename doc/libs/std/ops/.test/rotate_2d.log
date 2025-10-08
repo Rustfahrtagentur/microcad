@@ -12,13 +12,15 @@
   Group (root) ->
     Workpiece(op) std::ops::rotate(angle=0.78539816339745rad, axis=(x=0, y=0, z=1)) ->
       - matrix = Matrix3 [[0.7071067811865476, 0.7071067811865475, 0.0], [-0.7071067811865475, 0.7071067811865476, 0.0], [0.0, 0.0, 1.0]]
-      Transform __builtin::ops::rotate(matrix=Matrix3 [[0.7071067811865476, 0.7071067811865475, 0.0], [-0.7071067811865475, 0.7071067811865476, 0.…
+      Transform __builtin::ops::rotate(matrix=Matrix3 [[0.7071067811865476, 0.7071067811865475, 0.0], [-0.7071067811865475, 0.7071067811865476, 0.0], [0.0, 0.0, 1.0]])
+ ->
         Workpiece(sketch) std::geo2d::Rect(size=30mm) (root) ->
           - height = 30mm
           - width = 30mm
           - x = -15mm
           - y = -15mm
-          Primitive2D __builtin::geo2d::Rect(height=30, width=30, x=-15, y=-15)⏎ ->
+          Primitive2D __builtin::geo2d::Rect(height=30, width=30, x=-15, y=-15)
+ ->
 
 -- Test Result --
 OK
