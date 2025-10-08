@@ -582,6 +582,10 @@ impl Symbol {
             }
         })
     }
+
+    pub(crate) fn kind(&self) -> String {
+        self.inner.borrow().def.kind()
+    }
 }
 
 impl FullyQualify for Symbol {
