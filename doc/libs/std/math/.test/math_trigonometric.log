@@ -15,23 +15,10 @@
 
 -- Output --
 -- Errors --
-error: Builtin error: Cannot calculate cos(PI)
-  ---> <FROM STR>:4:16
-     |
-   4 | assert_eq([cos(PI), -1.]);
-     |                ^^
-     |
-error: Array elements have different types: [<INVALID TYPE>, Scalar]
-  ---> <FROM STR>:4:11
-     |
-   4 | assert_eq([cos(PI), -1.]);
-     |           ^^^^^^^^^^^^^^
-     |
-error: Assertion failed: Invalid: <NO VALUE>
-  ---> <FROM STR>:4:11
-     |
-   4 | assert_eq([cos(PI), -1.]);
-     |           ^^^^^^^^^^^^^^
-     |
+-- Model --
+  Group (root) ->
+
 -- Test Result --
-FAIL
+OK
+Could not determine output type.
+Nothing will be exported.
