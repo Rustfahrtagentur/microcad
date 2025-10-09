@@ -25,7 +25,7 @@
       - z = 0mm
       Transform __builtin::ops::translate(x=10, y=0, z=0)
  ->
-        Workpiece(sketch) <NO ID>::Square(size=20mm) (root) ->
+        Workpiece(sketch) call_workbench::Square(size=20mm) (root) ->
           - size = 20mm
           Workpiece(sketch) std::geo2d::Rect(size=20mm) ->
             - height = 20mm

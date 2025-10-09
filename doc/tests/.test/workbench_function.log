@@ -10,10 +10,11 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group (root) ->
-    Workpiece(sketch) <NO ID>::K() ->
-
+error: Symbol f not found.
+  ---> <FROM STR>:2:13
+     |
+   2 |   fn f() {} f();
+     |             ^
+     |
 -- Test Result --
-OK
-Export error: Render error: Nothing to render
+FAIL

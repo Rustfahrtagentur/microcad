@@ -17,7 +17,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::YourSketch() ->
+    Workpiece(sketch) create::YourSketch() ->
 
 -- Test Result --
 OK

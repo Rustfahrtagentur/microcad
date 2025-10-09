@@ -10,6 +10,12 @@
 
 -- Output --
 -- Errors --
+error: Statement is not available within sketch
+  ---> <FROM STR>:2:3
+     |
+   2 |   return 1; // error
+     |   ^^^^^^^^^
+     |
 error: Return statement not available here
   ---> <FROM STR>:2:3
      |

@@ -8,7 +8,13 @@
 
 -- Output --
 -- Errors --
-error: Declaration of a not allowed within <NO ID>
+error: Assignment statement is not available within file
+  ---> <FROM STR>:1:1
+     |
+   1 | prop a = 1;  // error
+     | ^^^^^^^^^^^
+     |
+error: Declaration of a not allowed within source_assignment_prop
   ---> <FROM STR>:1:1
      |
    1 | prop a = 1;  // error

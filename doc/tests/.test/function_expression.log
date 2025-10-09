@@ -10,10 +10,11 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group (root) ->
-
+error: Statement is not available within function
+  ---> <FROM STR>:2:3
+     |
+   2 |   1 + 2;
+     |   ^^^^^^
+     |
 -- Test Result --
-OK
-Could not determine output type.
-Nothing will be exported.
+FAIL

@@ -20,7 +20,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(part) <NO ID>::CsgCube(size=50mm) ->
+    Workpiece(part) first_example::CsgCube(size=50mm) ->
       - size = 50mm
       Operation subtract()
  ->

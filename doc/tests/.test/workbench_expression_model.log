@@ -12,7 +12,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::K() ->
+    Workpiece(sketch) workbench_expression_model::K() ->
       Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=1)
  ->
 

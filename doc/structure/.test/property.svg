@@ -4,7 +4,7 @@
    height="20"
    version="1.1"
    id="svg8"
-   sodipodi:docname="not_todo.svg"
+   sodipodi:docname="todo.svg"
    inkscape:version="1.4.2 (ebf0e94, 2025-05-08)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -19,9 +19,10 @@
      inkscape:pageopacity="0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="5.0995782"
-     inkscape:cx="25.982541"
-     inkscape:cy="15.981714"
+     showgrid="false"
+     inkscape:zoom="13.114019"
+     inkscape:cx="43.655571"
+     inkscape:cy="10.027437"
      inkscape:window-width="1888"
      inkscape:window-height="1127"
      inkscape:window-x="16"
@@ -71,7 +72,7 @@
        fill="#dfb317"
        id="rect9"
        y="0"
-       style="display:inline;fill:#88aa00;stroke-width:0.984505"
+       style="display:inline;fill:#c49500;stroke-width:0.984505;fill-opacity:1"
        ry="3" />
     <rect
        width="46.68108"
@@ -160,8 +161,4 @@
        d="m 224.74248,257.85814 v 11.27032 h 11.27413 a 11.270559,11.270559 0 0 0 11.20165,11.26978 h 0.0654 v -11.26978 -11.26924 -10e-4 z"
        id="path13" />
   </g>
-  <path
-     style="fill:#ff0000;stroke:#ff0000;stroke-width:3.202;stroke-dasharray:none;paint-order:markers fill stroke;stroke-opacity:0.5"
-     d="M 51.015475,16.868915 84.280557,4.131085"
-     id="path11" />
 </svg>

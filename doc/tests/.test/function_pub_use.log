@@ -10,7 +10,13 @@
 
 -- Output --
 -- Errors --
-error: Use statement not available here
+error: Use statement is not available within function
+  ---> <FROM STR>:2:3
+     |
+   2 |   pub use std; // error
+     |   ^^^^^^^^^^^^
+     |
+error: Public use statement not available here
   ---> <FROM STR>:2:3
      |
    2 |   pub use std; // error

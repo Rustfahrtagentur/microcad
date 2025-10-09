@@ -10,7 +10,7 @@
 
 -- Output --
 -- Errors --
-error: Declaration of a not allowed within <NO ID>::k
+error: Declaration of a not allowed within module_assignment_var::k
   ---> <FROM STR>:2:3
      |
    2 |   a = 1; // error

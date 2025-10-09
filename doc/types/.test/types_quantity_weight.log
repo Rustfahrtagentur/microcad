@@ -12,10 +12,11 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group (root) ->
-
+error: Symbol all_equal not found.
+  ---> <FROM STR>:5:37
+     |
+   5 | std::debug::assert([gram, kilogram].all_equal());
+     |                                     ^^^^^^^^^
+     |
 -- Test Result --
-OK
-Could not determine output type.
-Nothing will be exported.
+FAIL

@@ -100,7 +100,151 @@
 
 -- Output --
 -- Errors --
-error: Assertion failed: Found valid symbol: <NO ID>::module::sub_module::PrivateWorkbench
+error: Assignment statement is not available within module
+  ---> <FROM STR>:10:5
+     |
+  10 |     pub pub_value = 2;
+     |     ^^^^^^^^^^^^^^^^^^
+     |
+error: Assignment statement is not available within module
+  ---> <FROM STR>:19:9
+     |
+  19 |         pub pub_value = 4;
+     |         ^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:61:13
+     |
+  61 |             assert_invalid(super::value);
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:62:13
+     |
+  62 |             assert_eq([super::pub_value, 2]);
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:63:13
+     |
+  63 |             assert_eq([value, 3]);
+     |             ^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:64:13
+     |
+  64 |             assert_eq([pub_value, 4]);
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:65:13
+     |
+  65 |             assert_invalid(param);
+     |             ^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:67:13
+     |
+  67 |             assert_eq([fn_param, 10]);
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:74:9
+     |
+  74 |         assert_invalid(value);
+     |         ^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:75:9
+     |
+  75 |         assert_eq([pub_value, 2]);
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:76:9
+     |
+  76 |         assert_invalid(sub_module::value);
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:77:9
+     |
+  77 |         assert_eq([sub_module::pub_value, 4]);
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:78:9
+     |
+  78 |         assert_invalid(Workbench);
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:79:9
+     |
+  79 |         assert_invalid(PrivateWorkbench);
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Statement is not available within function
+  ---> <FROM STR>:80:9
+     |
+  80 |         assert_eq([fn_param, 11]);
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Symbol Workbench not found.
+  ---> <FROM STR>:78:24
+     |
+  78 |         assert_invalid(Workbench);
+     |                        ^^^^^^^^^
+     |
+error: Symbol PrivateWorkbench not found.
+  ---> <FROM STR>:79:24
+     |
+  79 |         assert_invalid(PrivateWorkbench);
+     |                        ^^^^^^^^^^^^^^^^
+     |
+error: Symbol super::pub_value not found.
+  ---> <FROM STR>:32:28
+     |
+  32 |                 assert_eq([super::pub_value, 2]);
+     |                            ^^^^^^^^^^^^^^^^
+     |
+error: Symbol alt_param not found.
+  ---> <FROM STR>:53:28
+     |
+  53 |             assert_invalid(alt_param);
+     |                            ^^^^^^^^^
+     |
+error: Symbol init_local not found.
+  ---> <FROM STR>:54:28
+     |
+  54 |             assert_invalid(init_local);
+     |                            ^^^^^^^^^^
+     |
+error: Symbol super::value not found.
+  ---> <FROM STR>:31:28
+     |
+  31 |                 assert_eq([super::value, 1]);
+     |                            ^^^^^^^^^^^^
+     |
+error: Symbol param not found.
+  ---> <FROM STR>:65:28
+     |
+  65 |             assert_invalid(param);
+     |                            ^^^^^
+     |
+error: Symbol super::value not found.
+  ---> <FROM STR>:61:28
+     |
+  61 |             assert_invalid(super::value);
+     |                            ^^^^^^^^^^^^
+     |
+error: Symbol super::pub_value not found.
+  ---> <FROM STR>:62:24
+     |
+  62 |             assert_eq([super::pub_value, 2]);
+     |                        ^^^^^^^^^^^^^^^^
+     |
+error: Assertion failed: Found valid symbol: value_declarations::module::sub_module::PrivateWorkbench
   ---> <FROM STR>:92:16
      |
   92 | assert_invalid(module::sub_module::PrivateWorkbench);

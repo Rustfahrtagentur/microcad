@@ -14,7 +14,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(op) <NO ID>::nop() ->
+    Workpiece(op) op_example::nop() ->
       Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) (root) ->
         - center = (x=0mm, y=0mm)
         - radius = 10mm
