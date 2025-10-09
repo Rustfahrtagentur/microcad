@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**274** tests from markdown.
+**276** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -163,6 +163,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/parameters.svg)](../doc/structure/.test/parameters.log) | [parameters](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/part_basic.svg)](../doc/structure/.test/part_basic.log) | [part_basic](../doc/structure/part.md) |
 | [![test](../doc/structure/.test/part_declaration.svg)](../doc/structure/.test/part_declaration.log) | [part_declaration](../doc/structure/workbench.md) |
+| [![test](../doc/libs/builtin/.test/pie.svg)](../doc/libs/builtin/.test/pie.log) | [pie](../doc/libs/builtin/geo2d.md) |
 | [![test](../doc/tests/.test/pre_init_assignment_const.svg)](../doc/tests/.test/pre_init_assignment_const.log) | [pre_init_assignment_const](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/pre_init_assignment_prop.svg)](../doc/tests/.test/pre_init_assignment_prop.log) | [pre_init_assignment_prop](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/pre_init_assignment_var.svg)](../doc/tests/.test/pre_init_assignment_var.log) | [pre_init_assignment_var](../doc/tests/statement_usage.md) |
@@ -209,6 +210,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/source_return.svg)](../doc/tests/.test/source_return.log) | [source_return](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_use.svg)](../doc/tests/.test/source_use.log) | [source_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_workbench.svg)](../doc/tests/.test/source_workbench.log) | [source_workbench](../doc/tests/statement_usage.md) |
+| [![test](../doc/libs/std/geo2d/.test/std_geo2d_pie.svg)](../doc/libs/std/geo2d/.test/std_geo2d_pie.log) | [std_geo2d_pie](../doc/libs/std/geo2d/README.md) |
 | [![test](../books/tutorials/src/lego_brick/base/frame/.test/subtract.svg)](../books/tutorials/src/lego_brick/base/frame/.test/subtract.log) | [subtract](../books/tutorials/src/lego_brick/base/frame/subtract.md) |
 | [![test](../doc/.test/toml_import.svg)](../doc/.test/toml_import.log) | [toml_import](../doc/import.md) |
 | [![test](../doc/libs/std/ops/.test/translate_2d.svg)](../doc/libs/std/ops/.test/translate_2d.log) | [translate_2d](../doc/libs/std/ops/translate.md) |
