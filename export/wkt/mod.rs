@@ -48,7 +48,6 @@ impl WriteWkt for Geometry2D {
             Geometry2D::Rect(rect) => {
                 writeln!(writer, "{}", rect.wkt_string())
             }
-            Geometry2D::Circle(_) => unimplemented!(),
             Geometry2D::Line(line) => {
                 writeln!(
                     writer,

@@ -4,7 +4,7 @@
 //! 2D Geometry collection
 
 use derive_more::{Deref, DerefMut};
-use geo::{CoordsIter, HasDimensions, LineString, Polygon};
+use geo::{CoordsIter, HasDimensions};
 use std::rc::Rc;
 
 use crate::{
@@ -28,13 +28,13 @@ impl Geometries2D {
     }
 
     /// Apply boolean operation to render into MultiPolygon.
-    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> geo2d::MultiPolygon {
+    pub fn boolean_op(&self, op: &BooleanOp) -> geo2d::MultiPolygon {
         let multi_polygon_list: Vec<_> = self
             .0
             .iter()
             // Render each geometry into a multipolygon and filter out empty ones
             .filter_map(|geo| {
-                let multi_polygon = geo.render_to_multi_polygon(resolution);
+                let multi_polygon = geo.to_multi_polygon();
                 if multi_polygon.is_empty() {
                     None
                 } else {
@@ -55,8 +55,18 @@ impl Geometries2D {
             })
     }
 
+    /// Generate multipolygon.
+    pub fn to_multi_polygon(&self) -> MultiPolygon {
+        let mut polygons = Vec::new();
+        self.iter().for_each(|geo| {
+            polygons.append(&mut (**geo).clone().to_multi_polygon().0);
+        });
+
+        MultiPolygon::new(polygons)
+    }
+
     /// Apply contex hull operation to geometries.
-    pub fn hull(&self, resolution: &RenderResolution) -> geo2d::Polygon {
+    pub fn hull(&self) -> geo2d::Polygon {
         let mut coords = self.iter().fold(Vec::new(), |mut coords, geo| {
             match geo.as_ref() {
                 Geometry2D::LineString(line_string) => {
@@ -75,20 +85,12 @@ impl Geometries2D {
                     let mut rect_corners: Vec<_> = rect.coords_iter().collect();
                     coords.append(&mut rect_corners)
                 }
-                Geometry2D::Circle(circle) => coords.append(
-                    &mut circle
-                        .clone()
-                        .render_to_polygon(resolution)
-                        .unwrap_or(Polygon::new(LineString(vec![]), vec![]))
-                        .exterior_coords_iter()
-                        .collect(),
-                ),
                 Geometry2D::Line(line) => {
                     coords.push(line.0.into());
                     coords.push(line.1.into());
                 }
                 Geometry2D::Collection(collection) => {
-                    coords.append(&mut collection.hull(resolution).exterior_coords_iter().collect())
+                    coords.append(&mut collection.hull().exterior_coords_iter().collect())
                 }
             }
             coords

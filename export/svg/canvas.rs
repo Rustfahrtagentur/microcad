@@ -198,7 +198,6 @@ impl MapToCanvas for Geometry2D {
                 Geometry2D::MultiPolygon(multi_polygon.map_to_canvas(canvas))
             }
             Geometry2D::Rect(rect) => Geometry2D::Rect(rect.map_to_canvas(canvas)),
-            Geometry2D::Circle(circle) => Geometry2D::Circle(circle.map_to_canvas(canvas)),
             Geometry2D::Line(edge) => Geometry2D::Line(edge.map_to_canvas(canvas)),
             Geometry2D::Collection(collection) => {
                 Geometry2D::Collection(collection.map_to_canvas(canvas))

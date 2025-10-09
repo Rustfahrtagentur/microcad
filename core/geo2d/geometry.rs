@@ -5,10 +5,10 @@ use crate::traits::Align;
 
 use super::*;
 
-use geo::ConvexHull;
+use geo::{ConvexHull, MultiPolygon};
 use strum::IntoStaticStr;
 
-/// Geometry
+/// A 2D Geometry which independent from resolution.
 #[derive(IntoStaticStr, Clone, Debug)]
 pub enum Geometry2D {
     /// Line string.
@@ -21,8 +21,6 @@ pub enum Geometry2D {
     MultiPolygon(MultiPolygon),
     /// Rectangle.
     Rect(Rect),
-    /// Circle.
-    Circle(Circle),
     /// Line.
     Line(Line),
     /// Collection,
@@ -36,19 +34,27 @@ impl Geometry2D {
     }
 
     /// Apply boolean operation.
-    pub fn boolean_op(
-        &self,
-        resolution: &RenderResolution,
-        other: &Self,
-        op: &BooleanOp,
-    ) -> geo2d::MultiPolygon {
+    pub fn boolean_op(self, other: Self, op: &BooleanOp) -> geo2d::MultiPolygon {
         use geo::BooleanOps;
-        self.render_to_multi_polygon(resolution)
-            .boolean_op(&other.render_to_multi_polygon(resolution), op.into())
+        self.to_multi_polygon()
+            .boolean_op(&other.to_multi_polygon(), op.into())
+    }
+
+    /// Convert geometry to a multi_polygon.
+    pub fn to_multi_polygon(&self) -> MultiPolygon {
+        match self {
+            Geometry2D::Line(_) | Geometry2D::LineString(_) | Geometry2D::MultiLineString(_) => {
+                MultiPolygon::empty()
+            }
+            Geometry2D::Polygon(polygon) => MultiPolygon(vec![polygon.clone()]),
+            Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.clone(),
+            Geometry2D::Rect(rect) => MultiPolygon(vec![rect.to_polygon()]),
+            Geometry2D::Collection(collection) => collection.to_multi_polygon(),
+        }
     }
 
     /// Apply hull operation.
-    pub fn hull(&self, resolution: &RenderResolution) -> Self {
+    pub fn hull(&self) -> Self {
         match self {
             Geometry2D::LineString(line_string) => Geometry2D::Polygon(line_string.convex_hull()),
             Geometry2D::MultiLineString(multi_line_string) => {
@@ -59,11 +65,10 @@ impl Geometry2D {
                 Geometry2D::Polygon(multi_polygon.convex_hull())
             }
             Geometry2D::Rect(rect) => Geometry2D::Rect(*rect),
-            Geometry2D::Circle(circle) => Geometry2D::Circle(circle.clone()),
             Geometry2D::Line(line) => Geometry2D::Polygon(
                 LineString::new(vec![line.0.into(), line.1.into()]).convex_hull(),
             ),
-            Geometry2D::Collection(collection) => Geometry2D::Polygon(collection.hull(resolution)),
+            Geometry2D::Collection(collection) => Geometry2D::Polygon(collection.hull()),
         }
     }
 
@@ -98,7 +103,6 @@ impl FetchBounds2D for Geometry2D {
             Geometry2D::Polygon(polygon) => polygon.bounding_rect().into(),
             Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.fetch_bounds_2d(),
             Geometry2D::Rect(rect) => Some(*rect).into(),
-            Geometry2D::Circle(circle) => circle.fetch_bounds_2d(),
             Geometry2D::Line(line) => line.fetch_bounds_2d(),
             Geometry2D::Collection(collection) => collection.fetch_bounds_2d(),
         }
@@ -155,9 +159,6 @@ impl RenderToMultiPolygon for Geometry2D {
             Geometry2D::Rect(rect) => polygons
                 .0
                 .push(rect.render_to_polygon(resolution).expect("Polygon")),
-            Geometry2D::Circle(circle) => polygons
-                .0
-                .push(circle.render_to_polygon(resolution).expect("Polygon")),
             Geometry2D::Collection(geometries) => {
                 geometries.render_to_existing_multi_polygon(resolution, polygons);
             }
