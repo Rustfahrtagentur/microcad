@@ -42,8 +42,7 @@ impl RenderToMultiPolygon for Circle {
     fn render_to_polygon(&self, resolution: &RenderResolution) -> Option<Polygon> {
         use std::f64::consts::PI;
 
-        let n = (self.radius / resolution.linear * PI * 0.5).max(3.0);
-        let n = 2_u32.pow(n.log2().ceil() as u32).min(1024);
+        let n = resolution.circular_segments(self.radius);
 
         let points = (0..n)
             .map(|i| {

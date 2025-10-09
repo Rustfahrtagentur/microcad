@@ -292,7 +292,9 @@ impl Render<Geometry3DOutput> for Models {
 impl Render<Geometry2DOutput> for BuiltinWorkpiece {
     fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         Ok(match self.call()? {
-            BuiltinWorkpieceOutput::Primitive2D(geo2d) => Some(Rc::new(geo2d)),
+            BuiltinWorkpieceOutput::Primitive2D(renderable) => {
+                Some(renderable.render_to_geometry(&context.current_resolution()))
+            }
             BuiltinWorkpieceOutput::Transform(transform) => {
                 let model = context.model();
                 let model_ = model.borrow();

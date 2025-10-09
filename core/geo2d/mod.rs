@@ -8,8 +8,8 @@ mod circle;
 mod collection;
 mod geometry;
 mod line;
+mod pie;
 mod primitives;
-mod renderable;
 mod size;
 
 use crate::*;
@@ -21,7 +21,6 @@ use geo::AffineTransform;
 pub use geometry::*;
 pub use line::*;
 pub use primitives::*;
-pub use renderable::*;
 pub use size::*;
 
 /// Trait to render a [`Geometry2D`] into a multi polygon.

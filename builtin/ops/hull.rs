@@ -12,10 +12,10 @@ pub struct Hull;
 
 impl Operation for Hull {
     fn process_2d(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
-        context.update_2d(|context, model, resolution| {
+        context.update_2d(|context, model| {
             let model_ = model.borrow();
             let geometry: Geometry2DOutput = model_.children.render(context)?;
-            Ok(geometry.map(|geometry| Rc::new(geometry.hull(&resolution))))
+            Ok(geometry.map(|geometry| Rc::new(geometry.hull())))
         })
     }
 
