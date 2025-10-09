@@ -6,15 +6,6 @@ use derive_more::{Deref, DerefMut};
 use crate::{resolve::*, syntax::*};
 
 /// *Symbol table* holding global and local symbols.
-///
-/// The symbol table consists of the following members:
-///
-/// - One *root [`Symbol`]* resolved from the *initial source file*.
-/// - A [`SourceCache`] of all *loaded source files* (accessible by *qualified name*, *file path* and *source hash*).
-/// - A [`Stack`] of [`StackFrame`]s.
-/// - A [`SymbolMap`] of all *global symbols*.
-///
-/// All these internal structures can be accessed by several implemented traits.
 #[derive(Default, Deref, DerefMut)]
 pub struct SymbolTable {
     /// Global symbols (including root).
