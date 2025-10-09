@@ -7,7 +7,6 @@ pub use __builtin::ops::align;
 
 pub op revolve(angle = 360°) {
     @input.__builtin::ops::revolve(
-        circular_segments = 64, // TODO: Make this adaptive to resolution 
         revolve_degrees = angle / 1°
     );
 }
