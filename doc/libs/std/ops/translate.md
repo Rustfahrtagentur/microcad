@@ -1,6 +1,6 @@
 # Translate `std::ops::translation`
 
-We can translate objects in 2D and 3D using `std::ops::transate`:
+We can translate objects in 2D and 3D using `std::ops::translate`:
 
 [![test](.test/translate_2d.svg)](.test/translate_2d.log)
 

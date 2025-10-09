@@ -2,8 +2,14 @@
 
 ## `geo2d`
 
-### `circle`
+### `Circle`
 
-### `rect`
+### `Line`
 
-### `line`
+### `Pie`
+
+```µcad,pie
+__builtin::geo2d::Pie(radius = 20mm / 1mm, start_angle = 45°, end_angle = 135°);
+```
+
+### `Rect`
