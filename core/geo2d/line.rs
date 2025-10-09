@@ -1,14 +1,14 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! 2D edge geometry.
+//! 2D line geometry.
 
 use cgmath::{Angle, InnerSpace, Rad};
 use geo::AffineOps;
 
 use crate::*;
 
-/// A 2D edge type.
+/// A 2D line type.
 #[derive(Debug, Clone)]
 pub struct Line(pub geo2d::Point, pub geo2d::Point);
 
