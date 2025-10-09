@@ -15,7 +15,7 @@
   Group (root) ->
     Workpiece(op) std::ops::revolve(angle=3.14159265358979rad) ->
       - angle = 3.14159265358979rad
-      Operation __builtin::ops::revolve(circular_segments=64, revolve_degrees=180)
+      Operation __builtin::ops::revolve(revolve_degrees=180)
  ->
         Workpiece(op) std::ops::translate(x=40mm, y=0mm, z=0mm) (root) ->
           - x = 40mm
