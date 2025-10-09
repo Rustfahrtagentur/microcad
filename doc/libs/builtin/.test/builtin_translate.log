@@ -26,7 +26,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(op) <NO ID>::translate(x=0mm, y=0mm, z=0mm) ->
+    Workpiece(op) builtin_translate::translate(x=0mm, y=0mm, z=0mm) ->
       - x = 0mm
       - y = 0mm
       - z = 0mm
@@ -35,7 +35,7 @@
  ->
         Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)
  (root) ->
-    Workpiece(op) <NO ID>::translate(x=4mm, y=0mm, z=0mm) ->
+    Workpiece(op) builtin_translate::translate(x=4mm, y=0mm, z=0mm) ->
       - x = 4mm
       - y = 0mm
       - z = 0mm
@@ -44,7 +44,7 @@
  ->
         Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)
  (root) ->
-    Workpiece(op) <NO ID>::translate(x=0mm, y=4mm, z=0mm) ->
+    Workpiece(op) builtin_translate::translate(x=0mm, y=4mm, z=0mm) ->
       - x = 0mm
       - y = 4mm
       - z = 0mm
@@ -53,7 +53,7 @@
  ->
         Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)
  (root) ->
-    Workpiece(op) <NO ID>::translate(x=4mm, y=4mm, z=0mm) ->
+    Workpiece(op) builtin_translate::translate(x=4mm, y=4mm, z=0mm) ->
       - x = 4mm
       - y = 4mm
       - z = 0mm

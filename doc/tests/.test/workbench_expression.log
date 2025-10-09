@@ -12,7 +12,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::K() ->
+    Workpiece(sketch) workbench_expression::K() ->
 
 -- Test Result --
 OK

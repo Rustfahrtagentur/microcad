@@ -10,11 +10,14 @@
 
 -- Output --
 -- Errors --
-error: Symbol geo::Circle not found.
-  ---> <FROM STR>:3:1
-     |
-   3 | geo::Circle(r = 4mm);
-     | ^^^^^^^^^^^^^^^^^^^^
-     |
+-- Model --
+  Group (root) ->
+    Workpiece(sketch) std::geo2d::Circle(c=(x=0mm, y=0mm), r=4mm) ->
+      - center = (x=0mm, y=0mm)
+      - radius = 4mm
+      Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=4)
+ ->
+
 -- Test Result --
-FAIL
+OK
+Export successful.

@@ -14,10 +14,17 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group (root) ->
-
+error: Symbol align not found.
+  ---> <FROM STR>:6:10
+     |
+   6 |         .align()
+     |          ^^^^^
+     |
+error: Symbol translate not found.
+  ---> <FROM STR>:5:10
+     |
+   5 |         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
+     |          ^^^^^^^^^
+     |
 -- Test Result --
-OK
-Could not determine output type.
-Nothing will be exported.
+FAIL

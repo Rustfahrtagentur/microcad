@@ -10,17 +10,17 @@
 
 -- Output --
 -- Errors --
-error: Use statement not available here
+error: Use statement is not available within sketch
   ---> <FROM STR>:2:3
      |
    2 |   pub use std; // error
      |   ^^^^^^^^^^^^
      |
-error: Resolve error Alias leads to itself: std (alias) => std [<NO ID>::K::std]
-  ---> <FROM STR>:2:11
+error: Public use statement not available here
+  ---> <FROM STR>:2:3
      |
    2 |   pub use std; // error
-     |           ^^^
+     |   ^^^^^^^^^^^^
      |
 -- Test Result --
 FAILED AS EXPECTED

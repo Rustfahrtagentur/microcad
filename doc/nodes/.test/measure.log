@@ -20,6 +20,12 @@ error: Symbol area not found.
    3 |     std::geo2d::Circle(radius=10mm).area(),
      |                                     ^^^^
      |
+error: Symbol area not found.
+  ---> <FROM STR>:3:37
+     |
+   3 |     std::geo2d::Circle(radius=10mm).area(),
+     |                                     ^^^^
+     |
 error: Array elements have different types: [<INVALID TYPE>, Area]
   ---> <FROM STR>:1:29
      |

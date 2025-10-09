@@ -15,7 +15,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::Knobs(diameter=4.8mm) ->
+    Workpiece(sketch) knobs::Knobs(diameter=4.8mm) ->
       - diameter = 4.8mm
       Operation __builtin::ops::align()
  ->

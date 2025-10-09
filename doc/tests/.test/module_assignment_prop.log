@@ -10,7 +10,13 @@
 
 -- Output --
 -- Errors --
-error: Declaration of a not allowed within <NO ID>::k
+error: Assignment statement is not available within module
+  ---> <FROM STR>:2:3
+     |
+   2 |   prop a = 1;  // error
+     |   ^^^^^^^^^^^
+     |
+error: Declaration of a not allowed within module_assignment_prop::k
   ---> <FROM STR>:2:3
      |
    2 |   prop a = 1;  // error

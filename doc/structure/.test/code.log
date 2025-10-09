@@ -15,7 +15,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::Wheel(radius=1mm) ->
+    Workpiece(sketch) code::Wheel(radius=1mm) ->
       - radius = 1mm
       Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=1mm) ->
         - center = (x=0mm, y=0mm)

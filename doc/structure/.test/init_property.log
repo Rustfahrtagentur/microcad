@@ -28,7 +28,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::Wheel(radius=50mm, thickness=10mm) ->
+    Workpiece(sketch) init_property::Wheel(radius=50mm, thickness=10mm) ->
       - radius = 50mm
       - thickness = 10mm
       Operation subtract()
@@ -44,7 +44,7 @@
             - radius = 40mm
             Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=40)
  ->
-    Workpiece(sketch) <NO ID>::Wheel(diameter=100mm, thickness=10mm) ->
+    Workpiece(sketch) init_property::Wheel(diameter=100mm, thickness=10mm) ->
       - radius = 50mm
       - thickness = 10mm
       Operation subtract()

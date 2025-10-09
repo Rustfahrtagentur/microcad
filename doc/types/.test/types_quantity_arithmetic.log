@@ -19,10 +19,11 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group (root) ->
-
+error: Symbol all_equal not found.
+  ---> <FROM STR>:4:24
+     |
+   4 | assert([a, 2mm, 2.0mm].all_equal());
+     |                        ^^^^^^^^^
+     |
 -- Test Result --
-OK
-Could not determine output type.
-Nothing will be exported.
+FAIL

@@ -12,7 +12,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::K() ->
+    Workpiece(sketch) pre_init_init::K() ->
 
 -- Test Result --
 OK

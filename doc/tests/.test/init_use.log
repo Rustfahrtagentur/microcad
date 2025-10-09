@@ -12,7 +12,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::K(l=10mm) ->
+    Workpiece(sketch) init_use::K(l=10mm) ->
 
 -- Test Result --
 OK

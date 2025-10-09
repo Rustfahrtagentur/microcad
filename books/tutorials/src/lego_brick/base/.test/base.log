@@ -20,7 +20,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::Base(height=15.8mm, thickness=1.2mm, width=31.8mm) ->
+    Workpiece(sketch) base::Base(height=15.8mm, thickness=1.2mm, width=31.8mm) ->
       - height = 15.8mm
       - thickness = 1.2mm
       - width = 31.8mm
