@@ -22,8 +22,6 @@ mod resolve_context;
 mod resolve_error;
 mod sources;
 mod symbol;
-mod symbol_definition;
-mod symbol_map;
 mod symbol_table;
 mod symbolize;
 
@@ -33,8 +31,6 @@ pub use resolve_context::*;
 pub use resolve_error::*;
 pub use sources::*;
 pub use symbol::*;
-pub use symbol_definition::*;
-pub use symbol_map::*;
 pub use symbol_table::*;
 
 use grant::*;

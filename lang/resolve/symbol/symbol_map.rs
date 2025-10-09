@@ -60,7 +60,7 @@ impl SymbolMap {
     }
 
     /// Search for a symbol in symbol map.
-    pub(super) fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
+    pub(crate) fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         if name.is_empty() {
             if let Some(symbol) = self.get(&Identifier::none()) {
                 return Ok(symbol.clone());
