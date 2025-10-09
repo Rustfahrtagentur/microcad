@@ -32,7 +32,6 @@ impl RunCommand<ResolveContext> for Resolve {
             &cli.search_paths,
             Some(microcad_builtin::builtin_module()),
             DiagHandler::default(),
-            ResolveMode::Resolved,
         )?;
 
         if self.check {

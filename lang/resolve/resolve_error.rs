@@ -109,6 +109,10 @@ pub enum ResolveError {
     /// Alias leads to itself.
     #[error("Alias leads to itself: {0}")]
     CircularAlias(String),
+
+    /// Resolve check failed
+    #[error("Resolve failed")]
+    ResolveCheckFailed,
 }
 
 /// Result type of any resolve.

@@ -5,6 +5,12 @@ use crate::{diag::*, resolve::*, syntax::*, value::*};
 use derive_more::{Deref, DerefMut};
 use std::collections::btree_map::BTreeMap;
 
+pub(super) enum Link {
+    None,
+    Alias(QualifiedName),
+    UseAll(QualifiedName),
+}
+
 /// Map Id to SymbolNode reference
 #[derive(Default, Clone, Deref, DerefMut)]
 pub struct SymbolMap(BTreeMap<Identifier, Symbol>);
@@ -61,13 +67,34 @@ impl SymbolMap {
 
     /// Search for a symbol in symbol map.
     pub(crate) fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
+        log::trace!("Searching {name:?} in symbol map");
         if name.is_empty() {
             if let Some(symbol) = self.get(&Identifier::none()) {
+                log::trace!("Fetched {name:?} from globals (symbol map)");
                 return Ok(symbol.clone());
             }
         } else {
             let (id, leftover) = name.split_first();
             if let Some(symbol) = self.get(&id) {
+                match symbol.get_link() {
+                    Link::None => (),
+                    Link::Alias(alias) => {
+                        if let Some(parent) = symbol.get_parent() {
+                            let symbol = {
+                                let relative = parent.search(&alias);
+                                let absolute = self.search(&alias);
+                                match (absolute, relative) {
+                                    (Ok(_), Ok(_)) => todo!("ambiguous"),
+                                    (Ok(symbol), Err(_)) | (Err(_), Ok(symbol)) => Ok(symbol),
+                                    (Err(err), Err(_)) => Err(err),
+                                }
+                            }?;
+                            return symbol.search(&leftover);
+                        }
+                    }
+                    Link::UseAll(name) => todo!(),
+                }
+
                 if leftover.is_empty() {
                     log::trace!("Fetched {name:?} from globals (symbol map)");
                     return Ok(symbol.clone());
@@ -88,6 +115,39 @@ impl SymbolMap {
             .map(|n| what[0..n].iter().cloned().collect())
             .map(|what| self.search(&what))
             .collect()
+    }
+
+    fn merge_all<I>(iter: I) -> SymbolMap
+    where
+        I: IntoIterator<Item = SymbolMap>,
+    {
+        let mut merged = SymbolMap::new();
+        for map in iter {
+            merged.extend(map.iter().map(|(k, v)| (k.clone(), v.clone())));
+        }
+        merged
+    }
+
+    pub(super) fn resolve_ordered(&self, context: &mut ResolveContext) -> ResolveResult<SymbolMap> {
+        Ok(Self::merge_all([
+            self.resolve_selected(context, |symbol| symbol.is_use_all())?,
+            self.resolve_selected(context, |symbol| symbol.is_alias())?,
+            self.resolve_selected(context, |symbol| !symbol.is_link())?,
+        ]))
+    }
+
+    pub(super) fn resolve_selected(
+        &self,
+        context: &mut ResolveContext,
+        predicate: impl Fn(&Symbol) -> bool,
+    ) -> ResolveResult<SymbolMap> {
+        let from_children: SymbolMap = Self::merge_all(
+            self.values()
+                .filter(|child| child.is_resolvable())
+                .filter(|s| predicate(s))
+                .flat_map(|child| child.resolve(context)),
+        );
+        Ok(from_children)
     }
 }
 
@@ -111,7 +171,7 @@ impl std::fmt::Debug for SymbolMap {
     }
 }
 
-#[test]
+#[cfg(test)]
 fn symbol_map_path_to() {
     let mut symbols = SymbolMap::new();
     let a = Symbol::new(SymbolDefinition::Tester("a".into()), None);

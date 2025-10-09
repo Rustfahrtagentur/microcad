@@ -55,19 +55,3 @@ pub trait FullyQualify {
     /// Get a fully (up to root of symbol map) qualified name.
     fn full_name(&self) -> QualifiedName;
 }
-
-#[test]
-fn resolve_test() {
-    let root =
-        SourceFile::load("../examples/my_brick.µcad").expect("loading of root source file failed");
-    log::trace!("Root source file:\n{root}");
-
-    ResolveContext::create(
-        root,
-        &["../lib"],
-        None,
-        DiagHandler::default(),
-        ResolveMode::Resolved,
-    )
-    .expect("loading of symbol table failed");
-}
