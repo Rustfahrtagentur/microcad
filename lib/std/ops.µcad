@@ -87,7 +87,7 @@ pub op rotate(matrix: Matrix3) {
 /// An operation that scales a part.
 ///
 /// See the `init`s for examples on how to use this operation. 
-op scale(v: Vec3) {
+pub op scale(v: Vec3) {
 	/// Uniform scale.
 	/// 
 	/// * `s` - Scale factor.
