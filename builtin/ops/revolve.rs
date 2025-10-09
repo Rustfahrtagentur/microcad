@@ -9,7 +9,6 @@ use microcad_lang::{builtin::*, model::*, render::*};
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct Revolve {
-    circular_segments: Integer,
     revolve_degrees: Scalar,
 }
 
@@ -22,20 +21,21 @@ impl Operation for Revolve {
         context.update_3d(|context, model, resolution| {
             let model_ = model.borrow();
             let geometries: Geometries2D = model_.children.render(context)?;
-
             let multi_polygon_data =
                 geo2d::multi_polygon_to_vec(&geometries.render_to_multi_polygon(&resolution));
             let multi_polygon_data: Vec<_> = multi_polygon_data
                 .iter()
                 .map(|ring| ring.as_slice())
                 .collect();
+            let radius = geometries
+                .fetch_bounds_2d()
+                .max()
+                .map(|v| v.x.max(v.y))
+                .unwrap_or_default();
+            let circular_segments = resolution.circular_segments(radius);
 
             Ok(Some(Rc::new(Geometry3D::Manifold(Rc::new(
-                Manifold::revolve(
-                    &multi_polygon_data,
-                    self.circular_segments as u32,
-                    self.revolve_degrees,
-                ),
+                Manifold::revolve(&multi_polygon_data, circular_segments, self.revolve_degrees),
             )))))
         })
     }
@@ -57,18 +57,12 @@ impl BuiltinWorkbenchDefinition for Revolve {
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
         &|args| {
             Ok(BuiltinWorkpieceOutput::Operation(Box::new(Revolve {
-                circular_segments: args.get("circular_segments"),
                 revolve_degrees: args.get("revolve_degrees"),
             })))
         }
     }
 
     fn parameters() -> ParameterValueList {
-        [
-            parameter!(circular_segments: Integer),
-            parameter!(revolve_degrees: Scalar),
-        ]
-        .into_iter()
-        .collect()
+        [parameter!(revolve_degrees: Scalar)].into_iter().collect()
     }
 }

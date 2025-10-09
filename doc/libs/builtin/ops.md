@@ -56,7 +56,7 @@ use __builtin::*;
 
 std::geo2d::Circle(10mm)
     .ops::translate(x = 20.0, y = 0.0, z = 0.0)
-    .ops::revolve(circular_segments = 64, revolve_degrees = 360.0);
+    .ops::revolve(revolve_degrees = 360.0);
 ```
 
 ### `rotate`
