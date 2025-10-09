@@ -113,7 +113,16 @@ impl Names for ReturnStatement {
 
 impl Names for IfStatement {
     fn names(&self) -> NameList {
-        todo!()
+        let mut result = NameList::default();
+        result.merge_in_place(self.cond.names());
+        result.merge_in_place(self.body.names());
+        if let Some(next_if) = &self.next_if {
+            result.merge_in_place(next_if.names());
+        }
+        if let Some(body_else) = &self.body_else {
+            result.merge_in_place(body_else.names());
+        }
+        result
     }
 }
 
@@ -169,9 +178,7 @@ impl Names for UseStatement {
     fn names(&self) -> NameList {
         match &self.decl {
             UseDeclaration::Use(name) | UseDeclaration::UseAll(name) => name.into(),
-            UseDeclaration::UseAlias(name, id) => {
-                NameList::default().add_name(name).add_as_name(id)
-            }
+            UseDeclaration::UseAlias(name, _id) => NameList::default().add_name(name),
         }
     }
 }

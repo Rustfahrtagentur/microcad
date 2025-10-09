@@ -71,13 +71,7 @@ impl EvalContext {
         importers: ImporterRegistry,
     ) -> EvalResult<Self> {
         Ok(Self::new(
-            ResolveContext::create(
-                root,
-                search_paths,
-                builtin,
-                DiagHandler::default(),
-                ResolveMode::Resolved,
-            )?,
+            ResolveContext::create(root, search_paths, builtin, DiagHandler::default())?,
             output,
             exporters,
             importers,
@@ -254,19 +248,18 @@ impl EvalContext {
         // process internal supers
         let (what, within) = what.dissolve_super(within);
 
-        let parents = self.symbol_table.path_to(&within)?;
-        for parent in parents.iter().rev() {
-            log::trace!("Looking in: {:?} for {:?}", parent.full_name(), what);
-            if let Ok(symbol) = parent.search(&what) {
-                log::trace!(
-                    "{found} symbol within {within:?}:` {symbol:?}",
-                    found = crate::mark!(FOUND),
-                );
-                return Ok(symbol);
-            }
+        log::trace!("Looking within: {what:?} for {within:?}");
+        let within_symbol = self.symbol_table.lookup(&within)?;
+        if let Ok(symbol) = within_symbol.search(&what) {
+            log::trace!(
+                "{found} Symbol {symbol:?} within {within:?}:",
+                found = crate::mark!(FOUND),
+            );
+            return Ok(symbol);
         }
+
         log::trace!(
-            "{not_found} within {within:?} symbol: {what:?}",
+            "{not_found} Symbol {what:?} within {within:?}",
             not_found = crate::mark!(NOT_FOUND_INTERIM),
         );
         Err(EvalError::SymbolNotFound(what.clone()))

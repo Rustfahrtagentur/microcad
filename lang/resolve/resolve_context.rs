@@ -23,7 +23,7 @@ pub struct ResolveContext {
 }
 
 /// Select what {ResolveContext::create()] automatically does.
-#[derive(Default)]
+#[derive(Default, PartialEq, PartialOrd)]
 pub enum ResolveMode {
     /// Only load the sources
     #[default]
@@ -56,13 +56,24 @@ impl ResolveContext {
         search_paths: &[impl AsRef<std::path::Path>],
         builtin: Option<Symbol>,
         diag: DiagHandler,
+    ) -> ResolveResult<Self> {
+        Self::create_ex(root, search_paths, builtin, diag, ResolveMode::Checked)
+    }
+
+    fn create_ex(
+        root: Rc<SourceFile>,
+        search_paths: &[impl AsRef<std::path::Path>],
+        builtin: Option<Symbol>,
+        diag: DiagHandler,
         mode: ResolveMode,
     ) -> ResolveResult<Self> {
         let mut context = Self::new(root, search_paths, diag)?;
         context.symbolize()?;
         log::trace!("Symbolized Context:\n{context:?}");
         if let Some(builtin) = builtin {
+            let id = builtin.id();
             context.add_symbol(builtin)?;
+            log::trace!("Added builtin library {id} to context:\n{context:?}");
         }
         if matches!(mode, ResolveMode::Resolved | ResolveMode::Checked) {
             context.resolve()?;
@@ -75,7 +86,7 @@ impl ResolveContext {
 
     #[cfg(test)]
     pub(super) fn test_create(root: Rc<SourceFile>, mode: ResolveMode) -> ResolveResult<Self> {
-        Self::create(
+        Self::create_ex(
             root,
             &[] as &[std::path::PathBuf],
             None,
@@ -130,14 +141,26 @@ impl ResolveContext {
     pub(super) fn resolve(&mut self) -> ResolveResult<()> {
         assert!(matches!(self.mode, ResolveMode::Symbolized));
 
-        self.symbol_table
-            .values()
-            .iter()
-            .filter(|child| child.is_resolvable())
-            .map(|child| child.resolve(self))
-            .collect::<Result<Vec<_>, _>>()?;
+        // resolve std as first
+        if let Some(std) = self.symbol_table.get(&Identifier::no_ref("std")).cloned() {
+            std.resolve(self)?;
+        }
 
-        log::debug!("Resolve OK!");
+        let mut passes_needed = 0;
+        for _ in 0..3 {
+            self.symbol_table
+                .values()
+                .iter()
+                .filter(|child| child.is_resolvable())
+                .map(|child| child.resolve(self))
+                .collect::<Result<Vec<_>, _>>()?;
+            passes_needed += 1;
+            if !self.has_links() {
+                break;
+            }
+        }
+
+        log::debug!("Resolve OK ({passes_needed} passes)");
         log::trace!("Resolved symbol table:\n{self:?}");
 
         self.mode = ResolveMode::Resolved;
@@ -145,10 +168,15 @@ impl ResolveContext {
         Ok(())
     }
 
+    fn has_links(&self) -> bool {
+        self.symbol_table
+            .values()
+            .iter_mut()
+            .any(|symbol| symbol.has_links())
+    }
+
     /// check names in all symbols
     pub fn check(&mut self) -> ResolveResult<()> {
-        assert!(matches!(self.mode, ResolveMode::Resolved));
-
         log::trace!("Checking symbol table");
         self.symbol_table
             .values()
@@ -188,7 +216,7 @@ impl ResolveContext {
     /// Create a symbol out of all sources (without resolving them)
     /// Return `true` if context has been resolved (or checked as well)
     pub fn is_resolved(&self) -> bool {
-        matches!(self.mode, ResolveMode::Resolved | ResolveMode::Checked)
+        self.mode >= ResolveMode::Resolved
     }
 }
 
