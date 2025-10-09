@@ -4,7 +4,7 @@
 //! Builtin function evaluation entity
 
 use custom_debug::Debug;
-use microcad_core::{Geometry2D, Geometry3D};
+use microcad_core::{Geometry3D, RenderToGeometry2D};
 use strum::Display;
 
 use crate::{
@@ -67,7 +67,7 @@ pub enum BuiltinWorkbenchKind {
 /// The return value when calling a built-in workpiece.
 pub enum BuiltinWorkpieceOutput {
     /// 2D geometry output.
-    Primitive2D(Geometry2D),
+    Primitive2D(Box<dyn RenderToGeometry2D>),
     /// 3D geometry output.
     Primitive3D(Geometry3D),
     /// Transformation.

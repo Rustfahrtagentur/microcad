@@ -1,6 +1,8 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use std::rc::Rc;
+
 use crate::traits::Align;
 
 use super::*;
@@ -164,5 +166,19 @@ impl RenderToMultiPolygon for Geometry2D {
             }
             _ => {}
         }
+    }
+}
+
+/// Something that can rendered into a 2D geometry with a certain resolution.
+pub trait RenderToGeometry2D {
+    /// Render self into some Geometry with a certain render resolution
+    ///
+    /// Note: We might want to have [`RenderCache`] as argument here, hence we return an `Rc`.
+    fn render_to_geometry(&self, resolution: &RenderResolution) -> Rc<Geometry2D>;
+}
+
+impl RenderToGeometry2D for Rc<Geometry2D> {
+    fn render_to_geometry(&self, _: &RenderResolution) -> Rc<Geometry2D> {
+        self.clone()
     }
 }
