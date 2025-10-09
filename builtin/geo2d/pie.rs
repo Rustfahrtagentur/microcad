@@ -15,14 +15,11 @@ pub struct Pie {
 
     /// End angle.
     pub end_angle: Angle,
-
-    /// Offset.
-    pub offset: Vec2,
 }
 
 impl Pie {
     /// Create a new pie.
-    pub fn new(radius: Scalar, start_angle: Angle, end_angle: Angle, offset: Vec2) -> Self {
+    pub fn new(radius: Scalar, start_angle: Angle, end_angle: Angle) -> Self {
         use cgmath::Angle;
         let mut start_angle = start_angle.normalize();
         let mut end_angle = end_angle.normalize();
@@ -34,13 +31,12 @@ impl Pie {
             radius,
             start_angle,
             end_angle,
-            offset,
         }
     }
 
     /// A pie is a circle when `offset_angle >= 360°`.
     pub fn is_circle(&self) -> bool {
-        self.offset_angle() >= cgmath::Rad(360.0)
+        self.offset_angle() >= cgmath::Deg(360.0).into()
     }
 
     /// Calculate offset angle.
@@ -54,18 +50,28 @@ impl RenderToGeometry2D for Pie {
         use std::f64::consts::PI;
         let offset_angle = self.offset_angle();
         let n =
-            resolution.circular_segments(self.radius) * (offset_angle / cgmath::Rad(360.0)) as u32;
+            (resolution.circular_segments(self.radius) as f64 * (offset_angle.0 / PI / 2.0)) as u32;
 
-        let points = if self.is_circle() {
-            (0..n).map(|i| {
-                let angle = 2.0 * PI * (i as f64) / (n as f64);
-                geo::coord!(x: self.offset.x + self.radius * angle.cos(), y: self.offset.y + self.radius * angle.sin())
-            }).collect()
+        let points = if !self.is_circle() && n > 0 {
+            (0..=n)
+                .map(|i| {
+                    let angle = self.start_angle + offset_angle * (i as f64) / (n as f64);
+                    geo::coord!(x: self.radius * angle.0.cos(), y: self.radius * angle.0.sin())
+                })
+                .chain(
+                    // Add center point.
+                    [geo::coord!(x: 0.0 as Scalar, y: 0.0 as Scalar)]
+                        .iter()
+                        .cloned(),
+                )
+                .collect()
         } else {
-            (0..=n).map(|i| {
-                let angle = self.start_angle + self.offset_angle() * (i as f64) / (n as f64);
-                geo::coord!(x: self.offset.x + self.radius * angle.0.cos(), y: self.offset.y + self.radius * angle.0.sin())
-            }).collect()
+            (0..n)
+                .map(|i| {
+                    let angle = 2.0 * PI * (i as f64) / (n as f64);
+                    geo::coord!(x: self.radius * angle.cos(), y: self.radius * angle.sin())
+                })
+                .collect()
         };
 
         std::rc::Rc::new(Geometry2D::Polygon(Polygon::new(
@@ -81,8 +87,8 @@ impl FetchBounds2D for Pie {
 
         if self.radius > 0.0 {
             let r = Vec2::new(self.radius, self.radius);
-            let min: (Scalar, Scalar) = (self.offset - r).into();
-            let max: (Scalar, Scalar) = (self.offset + r).into();
+            let min: (Scalar, Scalar) = (-r).into();
+            let max: (Scalar, Scalar) = r.into();
 
             Some(Rect::new(Coord::from(min), Coord::from(max)))
         } else {
@@ -107,7 +113,6 @@ impl BuiltinWorkbenchDefinition for Pie {
                 args.get("radius"),
                 args.get("start_angle"),
                 args.get("end_angle"),
-                (args.get("cx"), args.get("cy")).into(),
             ))))
         }
     }
@@ -115,8 +120,6 @@ impl BuiltinWorkbenchDefinition for Pie {
     fn parameters() -> ParameterValueList {
         [
             parameter!(radius: Scalar),
-            parameter!(cx: Scalar = 0.0),
-            parameter!(cy: Scalar = 0.0),
             parameter!(start_angle: Angle = 0.0),
             parameter!(end_angle: Angle = 90.0),
         ]

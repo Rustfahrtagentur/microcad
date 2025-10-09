@@ -8,7 +8,6 @@ mod circle;
 mod collection;
 mod geometry;
 mod line;
-mod pie;
 mod primitives;
 mod size;
 
