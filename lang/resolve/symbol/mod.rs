@@ -2,42 +2,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 mod symbol_definition;
+mod symbol_inner;
 mod symbol_map;
+mod symbols;
 
 pub use symbol_definition::*;
 pub(crate) use symbol_map::*;
+pub(crate) use symbols::*;
+
+use symbol_inner::*;
 
 use crate::{builtin::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
-use custom_debug::Debug;
-use derive_more::{Deref, DerefMut};
-
-/// Symbol content
-#[derive(Debug, Clone)]
-pub(super) struct SymbolInner {
-    /// Symbol definition
-    pub def: SymbolDefinition,
-    /// Symbol's parent
-    #[debug(skip)]
-    pub parent: Option<Symbol>,
-    /// Symbol's children
-    pub children: SymbolMap,
-    /// Flag if this symbol has been checked after resolving
-    pub checked: bool,
-    /// Flag if this symbol was in use
-    used: std::cell::OnceCell<()>,
-}
-
-impl Default for SymbolInner {
-    fn default() -> Self {
-        Self {
-            def: SymbolDefinition::SourceFile(SourceFile::default().into()),
-            parent: Default::default(),
-            children: Default::default(),
-            checked: false,
-            used: Default::default(),
-        }
-    }
-}
 
 /// Symbol
 ///
@@ -50,53 +25,6 @@ impl Default for SymbolInner {
 pub struct Symbol {
     visibility: Visibility,
     inner: RcMut<SymbolInner>,
-}
-
-/// List of qualified names which can pe displayed
-#[derive(Debug, Deref, DerefMut, Default)]
-pub struct Symbols(Vec<Symbol>);
-
-impl Symbols {
-    /// Return all fully qualified names of all symbols.
-    #[cfg(test)]
-    pub(super) fn full_names(&self) -> QualifiedNames {
-        self.iter().map(|symbol| symbol.full_name()).collect()
-    }
-}
-
-impl FromIterator<Symbols> for Symbols {
-    fn from_iter<T: IntoIterator<Item = Symbols>>(iter: T) -> Self {
-        let mut symbols = Self::default();
-        iter.into_iter()
-            .for_each(|mut children| symbols.append(&mut children));
-        symbols
-    }
-}
-
-impl From<Vec<Symbol>> for Symbols {
-    fn from(value: Vec<Symbol>) -> Self {
-        Self(value)
-    }
-}
-
-impl std::fmt::Display for Symbols {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            self.0
-                .iter()
-                .map(|symbol| symbol.to_string())
-                .collect::<Vec<_>>()
-                .join("")
-        )
-    }
-}
-
-impl FromIterator<Symbol> for Symbols {
-    fn from_iter<T: IntoIterator<Item = Symbol>>(iter: T) -> Self {
-        Self(iter.into_iter().collect())
-    }
 }
 
 impl Symbol {
@@ -688,27 +616,6 @@ impl std::fmt::Display for Symbol {
 impl std::fmt::Debug for Symbol {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.print_symbol(f, None, 0, true, false)
-    }
-}
-
-impl SrcReferrer for SymbolInner {
-    fn src_ref(&self) -> SrcRef {
-        match &self.def {
-            SymbolDefinition::SourceFile(source_file) => source_file.src_ref(),
-            SymbolDefinition::Module(module) => module.src_ref(),
-            SymbolDefinition::Workbench(workbench) => workbench.src_ref(),
-            SymbolDefinition::Function(function) => function.src_ref(),
-            SymbolDefinition::Builtin(_) => {
-                unreachable!("builtin has no source code reference")
-            }
-            SymbolDefinition::Constant(_, identifier, _)
-            | SymbolDefinition::ConstExpression(_, identifier, _)
-            | SymbolDefinition::Argument(identifier, _) => identifier.src_ref(),
-            SymbolDefinition::Alias(_, identifier, _) => identifier.src_ref(),
-            SymbolDefinition::UseAll(_, name) => name.src_ref(),
-            #[cfg(test)]
-            SymbolDefinition::Tester(id) => id.src_ref(),
-        }
     }
 }
 
