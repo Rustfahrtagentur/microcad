@@ -466,6 +466,20 @@ impl TryFrom<Value> for Scalar {
     }
 }
 
+impl TryFrom<&Value> for Angle {
+    type Error = ValueError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Quantity(Quantity {
+                value,
+                quantity_type: QuantityType::Angle,
+            }) => Ok(cgmath::Rad(*value)),
+            _ => Err(ValueError::CannotConvert(value.clone(), "Angle".into())),
+        }
+    }
+}
+
 impl TryFrom<&Value> for Size2 {
     type Error = ValueError;
 
