@@ -14,14 +14,14 @@ pub(super) trait Names {
 
 impl Names for SourceFile {
     fn names(&self) -> NameList {
-        self.statements.names().drop_locals()
+        self.statements.names()
     }
 }
 
 impl Names for ModuleDefinition {
     fn names(&self) -> NameList {
         if let Some(body) = &self.body {
-            body.names().drop_locals()
+            body.names()
         } else {
             Default::default()
         }
@@ -44,13 +44,13 @@ impl Names for Statement {
             Statement::Workbench(_) => NameList::default(),
             Statement::Module(_) => NameList::default(),
             Statement::Function(_) => NameList::default(),
-
             Statement::InnerAttribute(_) => NameList::default(),
 
-            Statement::Init(i) => i.names(),
+            Statement::Init(i) => i.names().drop_locals(),
+            Statement::If(i) => i.names().drop_locals(),
+
             Statement::Use(u) => u.names(),
             Statement::Return(r) => r.names(),
-            Statement::If(i) => i.names(),
             Statement::Assignment(a) => a.names(),
             Statement::Expression(e) => e.names(),
         }
@@ -63,7 +63,6 @@ impl Names for WorkbenchDefinition {
             .names()
             .merge(self.body.names())
             .add_as_name(&self.id)
-            .drop_locals()
     }
 }
 
@@ -79,10 +78,7 @@ impl Names for ParameterList {
 
 impl Names for FunctionDefinition {
     fn names(&self) -> NameList {
-        self.signature
-            .names()
-            .merge(self.body.names())
-            .drop_locals()
+        self.signature.names().merge(self.body.names())
     }
 }
 
@@ -94,10 +90,7 @@ impl Names for FunctionSignature {
 
 impl Names for InitDefinition {
     fn names(&self) -> NameList {
-        self.parameters
-            .names()
-            .merge(self.body.names())
-            .drop_locals()
+        self.parameters.names().merge(self.body.names())
     }
 }
 
