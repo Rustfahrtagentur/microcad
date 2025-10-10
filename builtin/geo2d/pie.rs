@@ -56,7 +56,7 @@ impl RenderToGeometry2D for Pie {
             (0..=n)
                 .map(|i| {
                     let angle = self.start_angle + offset_angle * (i as f64) / (n as f64);
-                    geo::coord!(x: self.radius * angle.0.cos(), y: self.radius * angle.0.sin())
+                    geo::coord!(x: angle.0.cos(), y: angle.0.sin()) * self.radius
                 })
                 .chain(
                     // Add center point.
