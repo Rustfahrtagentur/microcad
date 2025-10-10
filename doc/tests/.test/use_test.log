@@ -32,7 +32,7 @@
 26: // public use operation from `std/module.µcad`
 27: pub use std::ops;
 28: assert_valid(ops);
-29: assert_invalid(use_test::ops);
+29: assert_valid(use_test::ops);
 30: 
 31: part MyPart() {
 32:     Circle(radius=1);

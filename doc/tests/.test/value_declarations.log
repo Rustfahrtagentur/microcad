@@ -100,23 +100,53 @@
 
 -- Output --
 -- Errors --
-error: Assignment statement is not available within module
-  ---> <FROM STR>:10:5
+error: Assertion failed: Invalid value: (message=, name=module::value -> value_declarations::module::value)
+  ---> <FROM STR>:87:16
      |
-  10 |     pub pub_value = 2;
-     |     ^^^^^^^^^^^^^^^^^^
+  87 | assert_invalid(module::value);
+     |                ^^^^^^^^^^^^^
      |
-error: Assignment statement is not available within module
-  ---> <FROM STR>:19:9
+error: Assertion failed: Invalid value: (message=, name=module::sub_module::value -> value_declarations::module::sub_module::value)
+  ---> <FROM STR>:89:16
      |
-  19 |         pub pub_value = 4;
-     |         ^^^^^^^^^^^^^^^^^^
+  89 | assert_invalid(module::sub_module::value);
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Assertion failed: Found valid symbol: value_declarations::module::sub_module::PrivateWorkbench
+error: Assertion failed: Invalid value: (message=, name=super::value -> value_declarations::module::value)
+  ---> <FROM STR>:47:28
+     |
+  47 |             assert_invalid(super::value);
+     |                            ^^^^^^^^^^^^
+     |
+error: Assertion failed: Invalid value: (message=, name=super::value -> value_declarations::module::value)
+  ---> <FROM STR>:61:28
+     |
+  61 |             assert_invalid(super::value);
+     |                            ^^^^^^^^^^^^
+     |
+error: Assertion failed: Invalid value: (message=, name=param -> param)
+  ---> <FROM STR>:65:28
+     |
+  65 |             assert_invalid(param);
+     |                            ^^^^^
+     |
+error: Assertion failed: Invalid value: (message=, name=module::sub_module::PrivateWorkbench -> value_declarations::module::sub_module::PrivateWorkbench)
   ---> <FROM STR>:92:16
      |
   92 | assert_invalid(module::sub_module::PrivateWorkbench);
      |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Assertion failed: Invalid value: (message=, name=value -> value_declarations::module::value)
+  ---> <FROM STR>:74:24
+     |
+  74 |         assert_invalid(value);
+     |                        ^^^^^
+     |
+error: Assertion failed: Invalid value: (message=, name=sub_module::value -> value_declarations::module::sub_module::value)
+  ---> <FROM STR>:76:24
+     |
+  76 |         assert_invalid(sub_module::value);
+     |                        ^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAIL
