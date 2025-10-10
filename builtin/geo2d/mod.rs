@@ -5,11 +5,13 @@ mod circle;
 mod line;
 mod pie;
 mod rect;
+mod text;
 
 pub use circle::*;
 pub use line::*;
 pub use pie::*;
 pub use rect::*;
+pub use text::*;
 
 use microcad_lang::builtin::*;
 
@@ -20,5 +22,6 @@ pub fn geo2d() -> Symbol {
         .symbol(Line::symbol())
         .symbol(Pie::symbol())
         .symbol(Rect::symbol())
+        .symbol(Text::symbol())
         .build()
 }

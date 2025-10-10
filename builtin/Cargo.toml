@@ -18,9 +18,11 @@ log = "0.4"
 lazy_static = "1.5"
 cgmath = "0.18"
 geo = "0.31"
+ctor = "0.5"
 anyhow = "1.0"
 env_logger = "0.11"
-ctor = "0.5"
+geo_rusttype = "0.2.0"
+rusttype = "0.9.3"
 
 microcad-core = { workspace = true }
 microcad-lang = { workspace = true }

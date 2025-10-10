@@ -13,3 +13,9 @@ __builtin::geo2d::Pie(radius = 20mm / 1mm, start_angle = 45°, end_angle = 135°
 ```
 
 ### `Rect`
+
+### `Text`
+
+```µcad,text
+__builtin::geo2d::Text(height = 20mm / 1mm, text = "Hello World");
+```
