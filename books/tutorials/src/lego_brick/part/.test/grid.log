@@ -4,27 +4,22 @@
 
 -- Code --
 
- 1: const SPACING = 8mm;
+ 1: use std::ops::*;
  2: 
- 3: op grid(rows: Integer, columns: Integer) {
- 4:     @input
- 5:         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
- 6:         .align()
- 7: }
+ 3: const SPACING = 8mm;
+ 4: 
+ 5: op grid(rows: Integer, columns: Integer) {
+ 6:     @input
+ 7:         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
+ 8:         .align()
+ 9: }
 
 -- Output --
 -- Errors --
-error: Symbol align not found.
-  ---> <FROM STR>:6:10
-     |
-   6 |         .align()
-     |          ^^^^^
-     |
-error: Symbol translate not found.
-  ---> <FROM STR>:5:10
-     |
-   5 |         .translate(x = [0..rows] * SPACING, y = [0..columns] * SPACING)
-     |          ^^^^^^^^^
-     |
+-- Model --
+  Group (root) ->
+
 -- Test Result --
-FAIL
+OK
+Could not determine output type.
+Nothing will be exported.
