@@ -21,12 +21,8 @@ impl Operation for Revolve {
         context.update_3d(|context, model, resolution| {
             let model_ = model.borrow();
             let geometries: Geometries2D = model_.children.render(context)?;
-            let multi_polygon_data =
-                geo2d::multi_polygon_to_vec(&geometries.render_to_multi_polygon(&resolution));
-            let multi_polygon_data: Vec<_> = multi_polygon_data
-                .iter()
-                .map(|ring| ring.as_slice())
-                .collect();
+
+            use microcad_core::Extrude;
             let radius = geometries
                 .fetch_bounds_2d()
                 .max()
@@ -34,8 +30,9 @@ impl Operation for Revolve {
                 .unwrap_or_default();
             let circular_segments = resolution.circular_segments(radius);
 
-            Ok(Some(Rc::new(Geometry3D::Manifold(Rc::new(
-                Manifold::revolve(&multi_polygon_data, circular_segments, self.revolve_degrees),
+            Ok(Some(Rc::new(Geometry3D::Mesh(geometries.revolve_extrude(
+                cgmath::Deg(self.revolve_degrees).into(),
+                circular_segments as usize,
             )))))
         })
     }
