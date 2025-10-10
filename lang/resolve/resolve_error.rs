@@ -63,7 +63,7 @@ pub enum ResolveError {
     AmbiguousSymbol(Identifier),
 
     /// ScanDir Error
-    #[error("ScanDir Error: {0}")]
+    #[error("{0}")]
     ScanDirError(#[from] scan_dir::Error),
 
     /// Invalid path.

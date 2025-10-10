@@ -20,17 +20,19 @@ impl Externals {
     /// # Arguments
     /// - `search_paths`: Paths to search for any external files.
     pub fn new(search_paths: &[impl AsRef<std::path::Path>]) -> ResolveResult<Self> {
-        let no_search_paths = search_paths.is_empty();
-        let new = Self(Self::search_externals(search_paths)?);
-        if no_search_paths {
+        if search_paths.is_empty() {
             log::info!("No external search paths were given");
-        } else if new.is_empty() {
-            log::warn!("Did not find any externals in any search path");
+            Ok(Externals::default())
         } else {
-            log::info!("Found {} external module(s)", new.len());
-            log::trace!("Externals:\n{new}");
+            let new = Self(Self::search_externals(search_paths)?);
+            if new.is_empty() {
+                log::warn!("Did not find any externals in any search path");
+            } else {
+                log::info!("Found {} external module(s)", new.len());
+                log::trace!("Externals:\n{new}");
+            }
+            Ok(new)
         }
-        Ok(new)
     }
 
     /// Search for an external file which may include a given qualified name.

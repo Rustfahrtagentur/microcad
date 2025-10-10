@@ -3,7 +3,7 @@
 
 //! Resolve Context
 
-use crate::{diag::*, rc::*, resolve::*, syntax::*};
+use crate::{diag::*, rc::*, resolve::*, src_ref::*, syntax::*};
 
 /// Resolve Context
 #[derive(Default)]
@@ -57,7 +57,14 @@ impl ResolveContext {
         builtin: Option<Symbol>,
         diag: DiagHandler,
     ) -> ResolveResult<Self> {
-        Self::create_ex(root, search_paths, builtin, diag, ResolveMode::Checked)
+        match Self::create_ex(root, search_paths, builtin, diag, ResolveMode::Checked) {
+            Ok(context) => Ok(context),
+            Err(err) => {
+                let mut context = ResolveContext::default();
+                context.error(&SrcRef(None), err)?;
+                Ok(context)
+            }
+        }
     }
 
     fn create_ex(

@@ -42,7 +42,9 @@ impl EvalContext {
     ) -> Self {
         log::debug!("Creating Context");
 
-        assert!(resolve_context.is_resolved());
+        if !resolve_context.is_resolved() {
+            log::warn!("Evaluating unresolved symbol table!");
+        }
 
         // put all together
         Self {
