@@ -8,7 +8,6 @@ use indexmap::IndexMap;
 pub(super) enum Link {
     None,
     Alias(QualifiedName),
-    UseAll(QualifiedName),
 }
 
 /// Map Id to SymbolNode reference
@@ -107,7 +106,6 @@ impl SymbolMap {
                             return symbol.search(&leftover);
                         }
                     }
-                    Link::UseAll(name) => todo!(),
                 }
 
                 if leftover.is_empty() {
