@@ -89,7 +89,7 @@ impl Lookup for SymbolTable {
         };
         log::trace!(
             "{found} global symbol: {symbol:?}",
-            found = crate::mark!(FOUND),
+            found = crate::mark!(FOUND_INTERIM),
         );
         Ok(symbol)
     }

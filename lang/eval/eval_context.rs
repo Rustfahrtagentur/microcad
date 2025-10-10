@@ -226,7 +226,7 @@ impl EvalContext {
                     if symbol.full_name() == *name {
                         log::trace!(
                             "{found} symbol in current module: {symbol:?}",
-                            found = crate::mark!(FOUND),
+                            found = crate::mark!(FOUND_INTERIM),
                         );
                         return Ok(symbol);
                     }
@@ -253,7 +253,7 @@ impl EvalContext {
         if let Ok(symbol) = within_symbol.search(&what) {
             log::trace!(
                 "{found} Symbol {symbol:?} within {within:?}:",
-                found = crate::mark!(FOUND),
+                found = crate::mark!(FOUND_INTERIM),
             );
             return Ok(symbol);
         }
@@ -399,7 +399,7 @@ impl Lookup<EvalError> for EvalContext {
 
         log::trace!("- lookups -------------------------------------------------------");
         // collect all symbols that can be found and remember origin
-        let result = [
+        let results = [
             ("local", { self.stack.lookup(name) }),
             ("module", {
                 self.lookup_within(name, self.stack.current_module_name())
@@ -414,11 +414,13 @@ impl Lookup<EvalError> for EvalContext {
         ]
         .into_iter();
 
-        log::trace!("- lookup result -------------------------------------------------");
+        log::trace!("- lookup results ------------------------------------------------");
+        let results = results.inspect(|(from, result)| log::trace!("{from}: {:?}", result));
+
         let mut errors = Vec::new();
 
         // collect ok-results and ambiguity errors
-        let (found, mut ambiguities) = result.fold(
+        let (found, mut ambiguities) = results.fold(
             (vec![], vec![]),
             |(mut oks, mut ambiguities), (origin, r)| {
                 match r {
