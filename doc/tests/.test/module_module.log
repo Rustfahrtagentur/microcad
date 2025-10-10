@@ -8,3 +8,12 @@
  2:   mod m {}
  3: }
 
+-- Output --
+-- Errors --
+-- Model --
+  Group (root) ->
+
+-- Test Result --
+OK
+Could not determine output type.
+Nothing will be exported.

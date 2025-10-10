@@ -6,3 +6,12 @@
 
  1: mod m {}
 
+-- Output --
+-- Errors --
+-- Model --
+  Group (root) ->
+
+-- Test Result --
+OK
+Could not determine output type.
+Nothing will be exported.

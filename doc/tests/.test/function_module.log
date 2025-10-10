@@ -8,3 +8,25 @@
  2:   mod m {} // error
  3: } f();
 
+-- Output --
+-- Errors --
+error: Statement is not available within function
+  ---> <FROM STR>:2:3
+     |
+   2 |   mod m {} // error
+     |   ^^^^^^^^
+     |
+error: Module definition is not available within Function
+  ---> <FROM STR>:2:3
+     |
+   2 |   mod m {} // error
+     |   ^^^^^^^^
+     |
+error: Module statement not available here
+  ---> <FROM STR>:2:3
+     |
+   2 |   mod m {} // error
+     |   ^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED
