@@ -1,0 +1,26 @@
+-- Test --
+  visibility
+  ../doc/tests/visibility.md:5
+
+-- Code --
+
+ 1: mod my {
+ 2:     mod mod_private {
+ 3:         pub const_public = 1;
+ 4:         const const_private = 1;
+ 5:     }
+ 6:     pub mod mod_public {
+ 7:         pub const_public = 1;
+ 8:         const const_private = 1;
+ 9:     }
+10: }
+11: 
+12: __builtin::debug::assert_valid(my.mod_public.const_public);
+13: __builtin::debug::assert_invalid(my.mod_public.const_private);
+14: __builtin::debug::assert_invalid(my.mod_private.const_public);
+15: __builtin::debug::assert_invalid(my.mod_private.const_private);
+
+-- Output --
+-- Errors --
+Unexpected mod my within expression-- Test Result --
+FAIL
