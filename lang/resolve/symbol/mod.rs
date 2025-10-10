@@ -378,7 +378,6 @@ impl Symbol {
     fn get_link(&self) -> Link {
         self.with_def(|def| match def {
             SymbolDefinition::Alias(.., name) => Link::Alias(name.clone()),
-            SymbolDefinition::UseAll(.., name) => Link::UseAll(name.clone()),
             _ => Link::None,
         })
     }
