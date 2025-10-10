@@ -143,23 +143,10 @@ impl SymbolMap {
         merged
     }
 
-    pub(super) fn resolve_ordered(&self, context: &mut ResolveContext) -> ResolveResult<SymbolMap> {
-        Ok(Self::merge_all([
-            self.resolve_selected(context, |symbol| symbol.is_use_all())?,
-            self.resolve_selected(context, |symbol| symbol.is_alias())?,
-            self.resolve_selected(context, |symbol| !symbol.is_link())?,
-        ]))
-    }
-
-    pub(super) fn resolve_selected(
-        &self,
-        context: &mut ResolveContext,
-        predicate: impl Fn(&Symbol) -> bool,
-    ) -> ResolveResult<SymbolMap> {
+    pub(super) fn resolve_all(&self, context: &mut ResolveContext) -> ResolveResult<SymbolMap> {
         let from_children: SymbolMap = Self::merge_all(
             self.values()
                 .filter(|child| child.is_resolvable())
-                .filter(|s| predicate(s))
                 .flat_map(|child| child.resolve(context)),
         );
         Ok(from_children)

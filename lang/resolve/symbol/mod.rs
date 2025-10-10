@@ -359,10 +359,6 @@ impl Symbol {
         )
     }
 
-    pub(super) fn is_use_all(&self) -> bool {
-        matches!(self.inner.borrow().def, SymbolDefinition::UseAll(..))
-    }
-
     pub(super) fn is_alias(&self) -> bool {
         matches!(self.inner.borrow().def, SymbolDefinition::Alias(..))
     }
@@ -470,11 +466,11 @@ impl Symbol {
             }
         };
 
-        let resolved = from_self.resolve_ordered(context)?;
+        let resolved = from_self.resolve_all(context)?;
         from_self.extend(resolved.iter().map(|(k, v)| (k.clone(), v.clone())));
 
         // collect symbols resolved from children
-        let from_children = self.inner.borrow().children.resolve_ordered(context)?;
+        let from_children = self.inner.borrow().children.resolve_all(context)?;
 
         self.inner
             .borrow_mut()
