@@ -5,7 +5,7 @@
 
 use thiserror::Error;
 
-use crate::{diag::*, parse::*, src_ref::*, syntax::*};
+use crate::{diag::*, parse::*, syntax::*};
 
 /// Resolve error.
 #[derive(Debug, Error)]
@@ -39,16 +39,12 @@ pub enum ResolveError {
     FileNotFound(std::path::PathBuf),
 
     /// Symbol not found.
-    #[error("Symbol {0} not found.")]
+    #[error("Symbol {0} not found while resolving.")]
     SymbolNotFound(QualifiedName),
 
     /// Symbol not found (retry to load from external).
     #[error("Symbol {0} must be loaded from {1}")]
     SymbolMustBeLoaded(QualifiedName, std::path::PathBuf),
-
-    /// Property is not allowed at this place
-    #[error("Defining a property is not allowed here ({0})")]
-    PropertyNotAllowed(SrcRef),
 
     /// Symbol is not a value
     #[error("Symbol {0} is not a value")]
@@ -57,18 +53,6 @@ pub enum ResolveError {
     /// Declaration of property not allowed here
     #[error("Declaration of {0} not allowed within {1}")]
     DeclNotAllowed(Identifier, QualifiedName),
-
-    /// I/O Error
-    #[error("I/O Error: {0}")]
-    IoError(#[from] std::io::Error),
-
-    /// Sternal module file not found
-    #[error("External module file not found for '{0}'")]
-    ExternalNotFound(Identifier),
-
-    /// Sternal module file not found
-    #[error("Ambiguous external module files found for '{0}': {1:?}")]
-    AmbiguousExternal(Identifier, Vec<std::path::PathBuf>),
 
     /// Sternal module file not found
     #[error("Ambiguous external module files found {0:?}")]
@@ -93,18 +77,6 @@ pub enum ResolveError {
     /// Statement is not supported in this context.
     #[error("{0} is not available within {1}")]
     StatementNotSupported(String, String),
-
-    /// Given symbol has not children which can be used.
-    #[error("No symbols found to use in {0}")]
-    NoSymbolsToUse(QualifiedName),
-
-    /// Stack underflow.
-    #[error("Stack underflow")]
-    StackUnderflow,
-
-    /// Stack is unexpectedly empty.
-    #[error("Stack is empty")]
-    StackEmpty,
 
     /// Alias leads to itself.
     #[error("Alias leads to itself: {0}")]
