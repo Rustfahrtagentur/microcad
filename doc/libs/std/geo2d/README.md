@@ -9,3 +9,18 @@ Constructs a point at origin with a radius and a start and end angle.
 ```µcad,std_geo2d_pie
 std::geo2d::Pie(radius = 20mm, start_angle = 45°, end_angle = 135°);
 ```
+
+## `Text`
+
+We can construct a text element with `std::geo2d::Text`.
+*Dosis* is used as µcad built-in font.
+
+*Note:*
+Currently, system fonts cannot be used, we must load fonts directly from a file by settings the `font_file` parameter.
+**This API might change in the future.**
+
+[![test](.test/std_geo2d_text.svg)](.test/std_geo2d_text.log)
+
+```µcad,std_geo2d_text
+std::geo2d::Text(height = 20mm, text = "Hello µcad!");
+```
