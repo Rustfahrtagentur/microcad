@@ -17,11 +17,10 @@
 ERROR: first
 ERROR: second
 -- Errors --
-error: Statement is not available within function
-  ---> <FROM STR>:4:5
-     |
-   4 |     std::print("ERROR: {text}");
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+-- Model --
+  Group (root) ->
+
 -- Test Result --
-FAIL
+OK
+Could not determine output type.
+Nothing will be exported.

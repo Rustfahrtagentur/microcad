@@ -28,12 +28,6 @@
 
 -- Output --
 -- Errors --
-error: Statement is not available within function
-  ---> <FROM STR>:15:9
-     |
-  15 |         pow(x, 2.0)
-     |         ^^^^^^^^^^^^^^^^
-     |
 error: Missing arguments: n
   ---> <FROM STR>:15:13
      |

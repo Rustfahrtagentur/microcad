@@ -13,11 +13,10 @@
 
 -- Output --
 -- Errors --
-error: Statement is not available within function
-  ---> <FROM STR>:5:5
-     |
-   5 |     x * pow(n-1)  // error: unexpected code
-     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+-- Model --
+  Group (root) ->
+
 -- Test Result --
-FAIL
+OK
+Could not determine output type.
+Nothing will be exported.
