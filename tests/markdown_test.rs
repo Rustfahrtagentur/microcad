@@ -3,11 +3,10 @@
 
 use std::rc::Rc;
 
-use microcad_core::RenderResolution;
-use microcad_export::{stl::StlExporter, svg::SvgExporter};
 use microcad_lang::{
     eval::{Capture, EvalContext},
-    tree_display::FormatTree,
+    model::Model,
+    syntax::SourceFile,
 };
 
 fn lines_with(code: &str, marker: &str) -> std::collections::HashSet<usize> {
@@ -101,45 +100,12 @@ pub fn run_test(
             // test expected to fail succeeded at parsing?
             Ok(source) => {
                 // evaluate the code including µcad std library
-                let mut context = EvalContext::from_source(
-                    source.clone(),
-                    Some(microcad_builtin::builtin_module()),
-                    &["../lib", "../doc/assets"],
-                    Capture::new(),
-                    microcad_builtin::builtin_exporters(),
-                    microcad_builtin::builtin_importers(),
-                )
-                .expect("resolve error");
+                let mut context = create_context(&source);
                 let eval = context.eval();
 
-                // get print output
-                write!(
-                    log_out,
-                    "-- Output --\n{}",
-                    context.output().expect("capture error")
-                )
-                .expect("output error");
-
-                // print any error
-                writeln!(log_out, "-- Errors --").expect("internal error");
-                context.write_diagnosis(log_out).expect("internal error");
-
-                if context.has_errors()
-                    && (lines_with(code, "// error") != context.error_lines()
-                        || lines_with(code, "// warning")
-                            .iter()
-                            .any(|l| !context.warning_lines().contains(l)))
-                {
-                    if todo {
-                        let _ = fs::hard_link("images/todo_fail.svg", banner);
-                        writeln!(log_out, "-- Test Result --\nFAIL(TODO)").expect("output error");
-                    } else {
-                        let _ = fs::hard_link("images/fail_wrong.svg", banner);
-                        writeln!(log_out, "-- Test Result --\nFAILED BUT WITH WRONG ERRORS")
-                            .expect("output error");
-                        panic!("ERROR: test is marked to fail but fails with wrong errors");
-                    }
-                }
+                report_output(log_out, &context);
+                report_errors(log_out, &context);
+                report_test_fail(log_out, &context, code, banner, todo);
 
                 let _ = fs::remove_file(banner);
 
@@ -207,28 +173,11 @@ pub fn run_test(
             // test awaited to succeed and parsing succeeds?
             Ok(source) => {
                 // evaluate the code including µcad std library
-                let mut context = EvalContext::from_source(
-                    source.clone(),
-                    Some(microcad_builtin::builtin_module()),
-                    &["../lib", "../doc/assets"],
-                    Capture::new(),
-                    microcad_builtin::builtin_exporters(),
-                    microcad_builtin::builtin_importers(),
-                )
-                .expect("resolve error");
+                let mut context = create_context(&source);
                 let eval = context.eval();
 
-                // get print output
-                write!(
-                    log_out,
-                    "-- Output --\n{}",
-                    context.output().expect("capture error")
-                )
-                .expect("output error");
-
-                // print any error
-                writeln!(log_out, "-- Errors --").expect("internal error");
-                context.write_diagnosis(log_out).expect("internal error");
+                report_output(log_out, &context);
+                report_errors(log_out, &context);
 
                 let _ = fs::remove_file(banner);
 
@@ -236,46 +185,7 @@ pub fn run_test(
                 match (eval, context.has_errors(), todo) {
                     // test expected to succeed and succeeds with no errors
                     (Ok(model), false, false) => {
-                        use microcad_lang::model::{ExportCommand as Export, OutputType};
-
-                        // get print output
-                        write!(log_out, "-- Model --\n{}\n", FormatTree(&model))
-                            .expect("output error");
-
-                        let _ = fs::hard_link("images/ok.svg", banner);
-                        writeln!(log_out, "-- Test Result --\nOK").expect("no output error");
-
-                        let export = match model.deduce_output_type() {
-                            OutputType::Geometry2D => Some(Export {
-                                filename: format!("{out_filename}.svg").into(),
-                                resolution: RenderResolution::default(),
-                                exporter: Rc::new(SvgExporter),
-                            }),
-                            OutputType::Geometry3D => Some(Export {
-                                filename: format!("{out_filename}.stl").into(),
-                                resolution: if hires {
-                                    RenderResolution::default()
-                                } else {
-                                    RenderResolution::coarse()
-                                },
-                                exporter: Rc::new(StlExporter),
-                            }),
-                            OutputType::NotDetermined => {
-                                writeln!(log_out, "Could not determine output type.")
-                                    .expect("output error");
-                                None
-                            }
-                            _ => panic!("Invalid geometry output"),
-                        };
-
-                        match export {
-                            Some(export) => match export.export(&model) {
-                                Ok(_) => writeln!(log_out, "Export successful."),
-                                Err(error) => writeln!(log_out, "Export error: {error}"),
-                            },
-                            None => writeln!(log_out, "Nothing will be exported."),
-                        }
-                        .expect("output error")
+                        report_model(log_out, model, banner, out_filename, hires);
                     }
                     // test is todo but succeeds with no errors
                     (Ok(_), false, true) => {
@@ -310,4 +220,117 @@ pub fn run_test(
             }
         },
     }
+}
+
+// evaluate the code including µcad std library
+fn create_context(source: &Rc<SourceFile>) -> EvalContext {
+    EvalContext::from_source(
+        source.clone(),
+        Some(microcad_builtin::builtin_module()),
+        &["../lib", "../doc/assets"],
+        Capture::new(),
+        microcad_builtin::builtin_exporters(),
+        microcad_builtin::builtin_importers(),
+    )
+    .expect("resolve error")
+}
+
+fn report_output(log_out: &mut std::io::BufWriter<&mut std::fs::File>, context: &EvalContext) {
+    use std::io::Write;
+
+    write!(
+        log_out,
+        "-- Output --\n{}",
+        context.output().expect("capture error")
+    )
+    .expect("output error");
+}
+
+// print any error
+fn report_errors(log_out: &mut std::io::BufWriter<&mut std::fs::File>, context: &EvalContext) {
+    use microcad_lang::diag::Diag;
+    use std::io::Write;
+
+    writeln!(log_out, "-- Errors --").expect("internal error");
+    context.write_diagnosis(log_out).expect("internal error");
+}
+
+fn report_test_fail(
+    log_out: &mut std::io::BufWriter<&mut std::fs::File>,
+    context: &EvalContext,
+    code: &str,
+    banner: &str,
+    todo: bool,
+) {
+    use microcad_lang::diag::Diag;
+    use std::io::Write;
+
+    if context.has_errors()
+        && (lines_with(code, "// error") != context.error_lines()
+            || lines_with(code, "// warning")
+                .iter()
+                .any(|l| !context.warning_lines().contains(l)))
+    {
+        if todo {
+            let _ = std::fs::hard_link("images/todo_fail.svg", banner);
+            writeln!(log_out, "-- Test Result --\nFAIL(TODO)").expect("output error");
+        } else {
+            let _ = std::fs::hard_link("images/fail_wrong.svg", banner);
+            writeln!(log_out, "-- Test Result --\nFAILED BUT WITH WRONG ERRORS")
+                .expect("output error");
+            panic!("ERROR: test is marked to fail but fails with wrong errors");
+        }
+    }
+}
+
+fn report_model(
+    log_out: &mut std::io::BufWriter<&mut std::fs::File>,
+    model: Model,
+    banner: &str,
+    out_filename: &str,
+    hires: bool,
+) {
+    use microcad_core::RenderResolution;
+    use microcad_export::{stl::StlExporter, svg::SvgExporter};
+    use microcad_lang::{
+        model::{ExportCommand as Export, OutputType},
+        tree_display::FormatTree,
+    };
+    use std::io::Write;
+
+    // get print output
+    write!(log_out, "-- Model --\n{}\n", FormatTree(&model)).expect("output error");
+
+    let _ = std::fs::hard_link("images/ok.svg", banner);
+    writeln!(log_out, "-- Test Result --\nOK").expect("no output error");
+
+    let export = match model.deduce_output_type() {
+        OutputType::Geometry2D => Some(Export {
+            filename: format!("{out_filename}.svg").into(),
+            resolution: RenderResolution::default(),
+            exporter: Rc::new(SvgExporter),
+        }),
+        OutputType::Geometry3D => Some(Export {
+            filename: format!("{out_filename}.stl").into(),
+            resolution: if hires {
+                RenderResolution::default()
+            } else {
+                RenderResolution::coarse()
+            },
+            exporter: Rc::new(StlExporter),
+        }),
+        OutputType::NotDetermined => {
+            writeln!(log_out, "Could not determine output type.").expect("output error");
+            None
+        }
+        _ => panic!("Invalid geometry output"),
+    };
+    match export {
+        Some(export) => match export.export(&model) {
+            Ok(_) => writeln!(log_out, "Export successful."),
+            Err(error) => writeln!(log_out, "Export error: {error}"),
+        },
+        None => writeln!(log_out, "Nothing will be exported."),
+    }
+    .expect("output error")
 }
