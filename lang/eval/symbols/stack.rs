@@ -195,7 +195,7 @@ impl Stack {
             Ok(symbol) => {
                 log::trace!(
                     "{found} local symbol: {symbol:?}",
-                    found = crate::mark!(FOUND),
+                    found = crate::mark!(FOUND_INTERIM),
                 );
                 Ok(symbol)
             }

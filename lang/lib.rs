@@ -114,13 +114,10 @@ macro_rules! shorten {
 #[macro_export]
 macro_rules! mark {
     (FOUND) => {
-        color_print::cformat!("<W!,k,s> FOUND </>")
+        color_print::cformat!("<G!,k,s> FOUND </>")
     };
     (FOUND_INTERIM) => {
-        color_print::cformat!("<Y!,k,s> FOUND </>")
-    };
-    (FOUND_FINAL) => {
-        color_print::cformat!("<G!,k,s> FOUND </>")
+        color_print::cformat!("<W!,k,s> FOUND </>")
     };
     (MATCH) => {
         color_print::cformat!("<Y!,k,s> MATCH </>")
@@ -175,7 +172,7 @@ macro_rules! found {
     (NOT_FOUND) => {
         "Not found"
     };
-    (NOT_FOUND_INTERIMEDIATE) => {
+    (NOT_FOUND_INTERIM) => {
         "Not found"
     };
 }
