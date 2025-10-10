@@ -132,7 +132,7 @@ fn make_symbol_name(relative_path: impl AsRef<std::path::Path>) -> QualifiedName
 fn search_mod_dir_file(
     path: impl AsRef<std::path::Path>,
 ) -> ResolveResult<Option<std::path::PathBuf>> {
-    log::trace!("find_mod_dir_file: {:?}", path.as_ref());
+    log::trace!("search_mod_dir_file: {:?}", path.as_ref());
     let files = scan_dir::ScanDir::files().read(path, |iter| {
         iter.map(|(ref entry, _)| entry.path())
             .filter(is_mod_file)
