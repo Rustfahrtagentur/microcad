@@ -40,7 +40,14 @@ impl std::fmt::Display for Assignment {
                 ty = t.ty(),
                 expr = self.expression
             ),
-            None => write!(f, "{} = {}", self.id, self.expression),
+            None => write!(
+                f,
+                "{vis}{qual}{id} = {expr}",
+                vis = self.visibility,
+                qual = self.qualifier,
+                id = self.id,
+                expr = self.expression
+            ),
         }
     }
 }
@@ -64,7 +71,14 @@ impl std::fmt::Debug for Assignment {
 
 impl TreeDisplay for Assignment {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
-        writeln!(f, "{:depth$}Assignment {}:", "", self.id)?;
+        writeln!(
+            f,
+            "{:depth$}Assignment {vis}{qual}{id}:",
+            "",
+            vis = self.visibility,
+            qual = self.qualifier,
+            id = self.id
+        )?;
         depth.indent();
         if let Some(specified_type) = &self.specified_type {
             specified_type.tree_print(f, depth)?;
