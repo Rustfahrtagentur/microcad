@@ -1,8 +1,6 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::str::FromStr;
-
 use microcad_lang::{diag::*, eval::*, parameter, resolve::*, syntax::*, value::*};
 
 pub fn assert() -> Symbol {
@@ -108,45 +106,77 @@ pub fn assert_eq() -> Symbol {
 }
 
 pub fn assert_valid() -> Symbol {
-    let id = Identifier::from_str("assert_valid").expect("valid id");
-    Symbol::new_builtin(id, None, &|_, args, context| {
-        if let Ok((_, arg)) = args.get_single() {
-            if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
-                match context.lookup(&name) {
-                    Ok(symbol) => {
-                        if !symbol.is_valid_symbol() {
-                            context.error(
-                                &arg,
-                                EvalError::AssertionFailed(format!("Invalid value: {arg}")),
-                            )?;
+    Symbol::new_builtin(
+        Identifier::no_ref("assert_valid"),
+        Some(
+            [
+                parameter!(name: Target),                    // Parameter name
+                parameter!(message: String = String::new()), // Optional message
+            ]
+            .into_iter()
+            .collect(),
+        ),
+        &|params, args, context| {
+            match ArgumentMatch::find_multi_match(args, params.expect("ParameterList")) {
+                Ok(multi_args) => {
+                    for arg in multi_args {
+                        if let Value::Target(target) =
+                            &arg.get_value("name").expect("missing parameter")
+                        {
+                            if target.is_invalid() {
+                                context.error(
+                                    &arg,
+                                    EvalError::AssertionFailed(format!("Invalid value: {arg}")),
+                                )?;
+                            }
                         }
                     }
-                    Err(err) => context.error(&arg, err)?,
+                }
+                Err(err) => {
+                    // Called `assert` with no or more than 2 parameters
+                    context.error(args, err)?
                 }
             }
-        }
-        Ok(Value::None)
-    })
+
+            Ok(Value::None)
+        },
+    )
 }
 
 pub fn assert_invalid() -> Symbol {
-    let id = Identifier::from_str("assert_invalid").expect("valid id");
-    Symbol::new_builtin(id, None, &|_, args, context| {
-        if let Ok((_, arg)) = args.get_single() {
-            if let Ok(name) = QualifiedName::try_from(arg.value.to_string()) {
-                if let Ok(symbol) = context.lookup(&name) {
-                    if symbol.is_valid_symbol() {
-                        context.error(
-                            &arg,
-                            EvalError::AssertionFailed(format!(
-                                "Found valid symbol: {}",
-                                symbol.full_name()
-                            )),
-                        )?
+    Symbol::new_builtin(
+        Identifier::no_ref("assert_invalid"),
+        Some(
+            [
+                parameter!(name: Target),                    // Parameter name
+                parameter!(message: String = String::new()), // Optional message
+            ]
+            .into_iter()
+            .collect(),
+        ),
+        &|params, args, context| {
+            match ArgumentMatch::find_multi_match(args, params.expect("ParameterList")) {
+                Ok(multi_args) => {
+                    for arg in multi_args {
+                        if let Value::Target(target) =
+                            &arg.get_value("name").expect("missing parameter")
+                        {
+                            if target.is_valid() {
+                                context.error(
+                                    &arg,
+                                    EvalError::AssertionFailed(format!("Invalid value: {arg}")),
+                                )?;
+                            }
+                        }
                     }
                 }
+                Err(err) => {
+                    // Called `assert` with no or more than 2 parameters
+                    context.error(args, err)?
+                }
             }
-        }
-        Ok(Value::None)
-    })
+
+            Ok(Value::None)
+        },
+    )
 }
