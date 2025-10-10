@@ -9,14 +9,6 @@ use derive_more::{Deref, DerefMut};
 #[derive(Debug, Deref, DerefMut, Default)]
 pub struct Symbols(Vec<Symbol>);
 
-impl Symbols {
-    /// Return all fully qualified names of all symbols.
-    #[cfg(test)]
-    pub(super) fn full_names(&self) -> QualifiedNames {
-        self.iter().map(|symbol| symbol.full_name()).collect()
-    }
-}
-
 impl FromIterator<Symbols> for Symbols {
     fn from_iter<T: IntoIterator<Item = Symbols>>(iter: T) -> Self {
         let mut symbols = Self::default();
