@@ -175,6 +175,7 @@ impl Symbolize for AssignmentStatement {
                     Some(None)
                 }
             }
+            (Visibility::Deleted, _) => unreachable!(),
         };
 
         match symbol {

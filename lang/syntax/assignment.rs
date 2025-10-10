@@ -34,15 +34,8 @@ impl std::fmt::Display for Assignment {
             Some(t) => write!(
                 f,
                 "{vis}{qual}{id}: {ty} = {expr}",
-                vis = match self.visibility {
-                    Visibility::Private => "",
-                    Visibility::Public => "pub ",
-                },
-                qual = match self.qualifier {
-                    Qualifier::Value => "",
-                    Qualifier::Const => "const ",
-                    Qualifier::Prop => "prop ",
-                },
+                vis = self.visibility,
+                qual = self.qualifier,
                 id = self.id,
                 ty = t.ty(),
                 expr = self.expression

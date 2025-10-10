@@ -14,6 +14,8 @@ pub enum Visibility {
     Private,
     /// Public visibility
     Public,
+    /// Mark symbol for deletion {used internally while resolving)
+    Deleted,
 }
 
 impl std::fmt::Display for Visibility {
@@ -21,6 +23,7 @@ impl std::fmt::Display for Visibility {
         match self {
             Visibility::Private => Ok(()),
             Visibility::Public => write!(f, "pub "),
+            Visibility::Deleted => write!(f, "DELETED "),
         }
     }
 }

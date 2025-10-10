@@ -23,7 +23,7 @@ use crate::{builtin::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
 /// `Symbol` can be shared as mutable.
 #[derive(Clone)]
 pub struct Symbol {
-    visibility: Visibility,
+    visibility: std::cell::Cell<Visibility>,
     inner: RcMut<SymbolInner>,
 }
 
@@ -35,7 +35,7 @@ impl Symbol {
     /// - `parent`: Symbol's parent symbol or none for root
     pub fn new(def: SymbolDefinition, parent: Option<Symbol>) -> Self {
         Symbol {
-            visibility: def.visibility(),
+            visibility: std::cell::Cell::new(def.visibility()),
             inner: RcMut::new(SymbolInner {
                 def,
                 parent,
@@ -55,7 +55,7 @@ impl Symbol {
         parent: Option<Symbol>,
     ) -> Self {
         Symbol {
-            visibility,
+            visibility: std::cell::Cell::new(visibility),
             inner: RcMut::new(SymbolInner {
                 def,
                 parent,
@@ -178,8 +178,8 @@ impl Symbol {
 
     /// Clone this symbol but give the clone another visibility.
     pub(crate) fn clone_with_visibility(&self, visibility: Visibility) -> Self {
-        let mut cloned = self.clone();
-        cloned.visibility = visibility;
+        let cloned = self.clone();
+        cloned.visibility.set(visibility);
         cloned
     }
 
@@ -202,12 +202,12 @@ impl Symbol {
 
     /// Return `true` if symbol's visibility is private
     fn visibility(&self) -> Visibility {
-        self.visibility
+        self.visibility.get()
     }
 
     /// Set symbol's visibility.
     pub(crate) fn set_visibility(&mut self, visibility: Visibility) {
-        self.visibility = visibility
+        self.visibility.set(visibility)
     }
 
     /// Return `true` if symbol's visibility set to is public.
@@ -386,7 +386,15 @@ impl Symbol {
     // Search recursively within symbol **and** in the symbol table (global)
     fn lookup(&self, name: &QualifiedName, context: &ResolveContext) -> ResolveResult<Symbol> {
         match (self.search(name), context.lookup(name)) {
-            (Ok(_), Ok(_)) => todo!("ambiguous"),
+            (Ok(relative), Ok(global)) => {
+                if relative == global || relative.is_alias() {
+                    Ok(global)
+                } else if global.is_alias() {
+                    Ok(relative)
+                } else {
+                    todo!("lookup ambiguous:\n  {relative:?}\n  {global:?}")
+                }
+            }
             (Ok(symbol), Err(_)) | (Err(_), Ok(symbol)) => Ok(symbol),
             (Err(err), Err(_)) => Err(err),
         }
@@ -424,17 +432,34 @@ impl Symbol {
             match &inner.def {
                 SymbolDefinition::Alias(visibility, id, name) => {
                     log::trace!("resolving use (as): {self} => {visibility}{id} ({name})");
-                    let symbol = context.lookup(name)?.clone_with_visibility(*visibility);
+
+                    let symbol = if let Some(parent) = &inner.parent {
+                        parent.lookup(name, context)?
+                    } else {
+                        context.lookup(name)?
+                    }
+                    .clone_with_visibility(*visibility);
+
+                    self.visibility.set(Visibility::Deleted);
 
                     [(id.clone(), symbol)].into_iter().collect()
                 }
                 SymbolDefinition::UseAll(visibility, name) => {
                     log::trace!("resolving use all: {self} => {visibility}{name}");
-                    if let Some(parent) = &inner.parent {
-                        parent.lookup(name, context)?.public_children(*visibility)
+
+                    self.visibility.set(Visibility::Deleted);
+
+                    let symbols = if let Some(parent) = &inner.parent {
+                        parent.lookup(name, context)?
                     } else {
-                        context.lookup(name)?.public_children(*visibility)
+                        context.lookup(name)?
                     }
+                    .public_children(*visibility);
+
+                    if !symbols.is_empty() {
+                        self.visibility.set(Visibility::Deleted);
+                    }
+                    symbols
                 }
                 // skip others
                 _ => SymbolMap::default(),
@@ -451,7 +476,9 @@ impl Symbol {
         let mut inner_mut = self.inner.borrow_mut();
 
         // remove all `UseAll` and Alias symbols
-        inner_mut.children.retain(|_, symbol| !symbol.is_link());
+        inner_mut
+            .children
+            .retain(|_, symbol| !matches!(symbol.visibility.get(), Visibility::Deleted));
 
         inner_mut
             .children
@@ -463,6 +490,10 @@ impl Symbol {
 
     /// check names in symbol definition
     pub(super) fn check(&self, context: &mut ResolveContext) -> ResolveResult<()> {
+        if matches!(self.visibility.get(), Visibility::Deleted) {
+            return Err(ResolveError::ResolveCheckFailed);
+        }
+
         let names = match &self.inner.borrow().def {
             SymbolDefinition::SourceFile(sf) => sf.names(),
             SymbolDefinition::Module(m) => m.names(),
@@ -585,7 +616,7 @@ impl FullyQualify for Symbol {
 impl Default for Symbol {
     fn default() -> Self {
         Self {
-            visibility: Visibility::default(),
+            visibility: std::cell::Cell::new(Visibility::default()),
             inner: RcMut::new(Default::default()),
         }
     }
