@@ -178,10 +178,14 @@ impl ResolveContext {
     /// check names in all symbols
     pub fn check(&mut self) -> ResolveResult<()> {
         log::trace!("Checking symbol table");
-        self.symbol_table
+        if let Err(err) = self
+            .symbol_table
             .values()
             .iter_mut()
-            .try_for_each(|symbol| symbol.check(self))?;
+            .try_for_each(|symbol| symbol.check(self))
+        {
+            self.error(&crate::src_ref::SrcRef::default(), err)?;
+        }
 
         log::info!("Symbol table OK!");
 

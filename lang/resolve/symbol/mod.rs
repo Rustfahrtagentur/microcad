@@ -195,6 +195,10 @@ impl Symbol {
         self.inner.borrow().children.get(id).cloned()
     }
 
+    fn is_deleted(&self) -> bool {
+        self.visibility.get() == Visibility::Deleted
+    }
+
     /// True if symbol has any children
     pub(crate) fn is_empty(&self) -> bool {
         self.inner.borrow().children.is_empty()
@@ -236,7 +240,7 @@ impl Symbol {
 
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first) {
-                if name.is_single_identifier() {
+                if name.is_single_identifier() && !child.is_deleted() {
                     log::trace!("Found {name:?} in {:?}", self.full_name());
                     Ok(child.clone())
                 } else {
@@ -345,7 +349,7 @@ impl Symbol {
                 | SymbolDefinition::Module(..)
                 | SymbolDefinition::UseAll(..)
                 | SymbolDefinition::Alias(..)
-        )
+        ) && !self.is_deleted()
     }
 
     pub(super) fn is_link(&self) -> bool {
@@ -472,15 +476,8 @@ impl Symbol {
         // collect symbols resolved from children
         let from_children = self.inner.borrow().children.resolve_ordered(context)?;
 
-        // make changes
-        let mut inner_mut = self.inner.borrow_mut();
-
-        // remove all `UseAll` and Alias symbols
-        inner_mut
-            .children
-            .retain(|_, symbol| !matches!(symbol.visibility.get(), Visibility::Deleted));
-
-        inner_mut
+        self.inner
+            .borrow_mut()
             .children
             .extend(from_children.iter().map(|(k, v)| (k.clone(), v.clone())));
 
@@ -490,45 +487,45 @@ impl Symbol {
 
     /// check names in symbol definition
     pub(super) fn check(&self, context: &mut ResolveContext) -> ResolveResult<()> {
-        if matches!(self.visibility.get(), Visibility::Deleted) {
-            return Err(ResolveError::ResolveCheckFailed);
-        }
+        if !matches!(self.visibility.get(), Visibility::Deleted) {
+            let names = match &self.inner.borrow().def {
+                SymbolDefinition::SourceFile(sf) => sf.names(),
+                SymbolDefinition::Module(m) => m.names(),
+                SymbolDefinition::Workbench(wb) => wb.names(),
+                SymbolDefinition::Function(f) => f.names(),
+                SymbolDefinition::Alias(..) | SymbolDefinition::UseAll(..) => {
+                    log::error!("Resolve Context:\n{context:?}");
+                    return Err(ResolveError::ResolveCheckFailed);
+                }
+                _ => Default::default(),
+            };
 
-        let names = match &self.inner.borrow().def {
-            SymbolDefinition::SourceFile(sf) => sf.names(),
-            SymbolDefinition::Module(m) => m.names(),
-            SymbolDefinition::Workbench(wb) => wb.names(),
-            SymbolDefinition::Function(f) => f.names(),
-            SymbolDefinition::Alias(..) | SymbolDefinition::UseAll(..) => {
-                log::error!("Resolve Context:\n{context:?}");
-                return Err(ResolveError::ResolveCheckFailed);
-            }
-            _ => Default::default(),
-        };
+            let prefix = self.module_name().clone();
 
-        let prefix = self.module_name().clone();
+            if !names.is_empty() {
+                log::debug!("checking symbols:\n{names:?}");
 
-        if !names.is_empty() {
-            log::debug!("checking symbols:\n{names:?}");
-
-            names
-                .iter()
-                .try_for_each(|name| match context.lookup(name) {
-                    Ok(_) => Ok::<_, ResolveError>(()),
-                    Err(err) => {
-                        if context.lookup(&name.with_prefix(&prefix)).is_err() {
-                            context.error(name, err)?;
+                names
+                    .iter()
+                    .try_for_each(|name| match context.lookup(name) {
+                        Ok(_) => Ok::<_, ResolveError>(()),
+                        Err(err) => {
+                            if context.lookup(&name.with_prefix(&prefix)).is_err() {
+                                context.error(name, err)?;
+                            }
+                            Ok(())
                         }
-                        Ok(())
-                    }
-                })?;
-        }
+                    })?;
+            }
 
-        // check children
-        let children = self.inner.borrow().children.clone();
-        children
-            .values()
-            .try_for_each(|symbol| symbol.check(context))
+            // check children
+            let children = self.inner.borrow().children.clone();
+            children
+                .values()
+                .try_for_each(|symbol| symbol.check(context))
+        } else {
+            Ok(())
+        }
     }
 
     fn module_name(&self) -> QualifiedName {
