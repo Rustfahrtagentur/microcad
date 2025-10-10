@@ -34,16 +34,16 @@
 
 -- Output --
 -- Errors --
-error: Symbol c not found.
-  ---> <FROM STR>:5:34
-     |
-   5 | __builtin::debug::assert_invalid(c);
-     |                                  ^
-     |
 error: Symbol b not found.
   ---> <FROM STR>:4:34
      |
    4 | __builtin::debug::assert_invalid(b);
+     |                                  ^
+     |
+error: Symbol c not found.
+  ---> <FROM STR>:5:34
+     |
+   5 | __builtin::debug::assert_invalid(c);
      |                                  ^
      |
 -- Test Result --

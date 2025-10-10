@@ -190,29 +190,35 @@ error: Statement is not available within function
   80 |         assert_eq([fn_param, 11]);
      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol Workbench not found.
-  ---> <FROM STR>:78:24
-     |
-  78 |         assert_invalid(Workbench);
-     |                        ^^^^^^^^^
-     |
 error: Symbol PrivateWorkbench not found.
   ---> <FROM STR>:79:24
      |
   79 |         assert_invalid(PrivateWorkbench);
      |                        ^^^^^^^^^^^^^^^^
      |
-error: Symbol super::pub_value not found.
-  ---> <FROM STR>:32:28
+error: Symbol Workbench not found.
+  ---> <FROM STR>:78:24
      |
-  32 |                 assert_eq([super::pub_value, 2]);
-     |                            ^^^^^^^^^^^^^^^^
+  78 |         assert_invalid(Workbench);
+     |                        ^^^^^^^^^
+     |
+error: Symbol super::value not found.
+  ---> <FROM STR>:31:28
+     |
+  31 |                 assert_eq([super::value, 1]);
+     |                            ^^^^^^^^^^^^
      |
 error: Symbol alt_param not found.
   ---> <FROM STR>:53:28
      |
   53 |             assert_invalid(alt_param);
      |                            ^^^^^^^^^
+     |
+error: Symbol super::pub_value not found.
+  ---> <FROM STR>:32:28
+     |
+  32 |                 assert_eq([super::pub_value, 2]);
+     |                            ^^^^^^^^^^^^^^^^
      |
 error: Symbol init_local not found.
   ---> <FROM STR>:54:28
@@ -221,9 +227,9 @@ error: Symbol init_local not found.
      |                            ^^^^^^^^^^
      |
 error: Symbol super::value not found.
-  ---> <FROM STR>:31:28
+  ---> <FROM STR>:61:28
      |
-  31 |                 assert_eq([super::value, 1]);
+  61 |             assert_invalid(super::value);
      |                            ^^^^^^^^^^^^
      |
 error: Symbol param not found.
@@ -231,12 +237,6 @@ error: Symbol param not found.
      |
   65 |             assert_invalid(param);
      |                            ^^^^^
-     |
-error: Symbol super::value not found.
-  ---> <FROM STR>:61:28
-     |
-  61 |             assert_invalid(super::value);
-     |                            ^^^^^^^^^^^^
      |
 error: Symbol super::pub_value not found.
   ---> <FROM STR>:62:24

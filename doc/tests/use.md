@@ -40,3 +40,12 @@ part MyPart() {
 
 assert_valid(MyPart);
 ```
+
+[![test](.test/use_as_test.svg)](.test/use_as_test.log)
+
+```µcad,use_as_test
+use std::geo2d::*; 
+use Rect as Cap;
+
+Cap(width=1mm,height=1mm);
+```
