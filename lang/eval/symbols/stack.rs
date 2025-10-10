@@ -172,12 +172,12 @@ impl Stack {
     }
 
     /// Lookup a symbol from local stack.
-    pub fn lookup(&self, name: &QualifiedName) -> EvalResult<SymbolOrName> {
+    pub fn lookup(&self, name: &QualifiedName) -> EvalResult<Symbol> {
         log::trace!("Looking for local symbol '{name:?}'");
         let symbol = if let Some(id) = name.single_identifier() {
             self.fetch(id)
         } else {
-            let (id, mut tail) = name.split_first();
+            let (id, _) = name.split_first();
             let local = match self.fetch(&id) {
                 Ok(local) => local,
                 Err(err) => {
@@ -188,9 +188,7 @@ impl Stack {
                     return Err(err);
                 }
             };
-            let mut alias = local.full_name();
-            alias.append(&mut tail);
-            return Ok(SymbolOrName::Name(alias));
+            return Ok(local);
         };
 
         match symbol {
@@ -199,7 +197,7 @@ impl Stack {
                     "{found} local symbol: {symbol:?}",
                     found = crate::mark!(FOUND),
                 );
-                Ok(SymbolOrName::Symbol(symbol))
+                Ok(symbol)
             }
             Err(err) => {
                 log::trace!(
@@ -210,14 +208,6 @@ impl Stack {
             }
         }
     }
-}
-
-/// Include either a symbol or a qualified name.
-pub enum SymbolOrName {
-    /// Includes a symbol.
-    Symbol(Symbol),
-    /// Includes a qualified name.
-    Name(QualifiedName),
 }
 
 impl Locals for Stack {

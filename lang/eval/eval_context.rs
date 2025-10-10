@@ -400,13 +400,7 @@ impl Lookup<EvalError> for EvalContext {
         log::trace!("- lookups -------------------------------------------------------");
         // collect all symbols that can be found and remember origin
         let result = [
-            ("local", {
-                match self.stack.lookup(name) {
-                    Ok(SymbolOrName::Name(name)) => Ok(self.symbol_table.lookup(&name)?),
-                    Ok(SymbolOrName::Symbol(symbol)) => Ok(symbol),
-                    Err(err) => Err(err),
-                }
-            }),
+            ("local", { self.stack.lookup(name) }),
             ("module", {
                 self.lookup_within(name, self.stack.current_module_name())
             }),
