@@ -83,7 +83,7 @@ The following example aliases **all** symbols of `std::geo3d` into the current s
 
 [![test](.test/use_all.svg)](.test/use_all.log)
 
-```µcad,use_all#todo
+```µcad,use_all
 use std::geo3d::*;
 
 Sphere(r = 4mm);
