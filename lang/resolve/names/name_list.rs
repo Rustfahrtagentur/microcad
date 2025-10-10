@@ -7,8 +7,8 @@ use crate::syntax::*;
 
 #[derive(Default)]
 pub(crate) struct NameList {
-    symbols: indexmap::IndexSet<QualifiedName>,
-    locals: indexmap::IndexSet<Identifier>,
+    symbols: QualifiedNameSet,
+    locals: IdentifierSet,
 }
 
 impl NameList {
