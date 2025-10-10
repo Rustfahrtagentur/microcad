@@ -32,6 +32,7 @@ impl std::fmt::Display for UseStatement {
         match &self.visibility {
             Visibility::Private => write!(f, "use ")?,
             Visibility::Public => write!(f, "pub use ")?,
+            Visibility::Deleted => unreachable!(),
         }
         write!(f, "{}", self.decl)?;
         Ok(())
@@ -43,6 +44,7 @@ impl std::fmt::Debug for UseStatement {
         match &self.visibility {
             Visibility::Private => write!(f, "use ")?,
             Visibility::Public => write!(f, "pub use ")?,
+            Visibility::Deleted => unreachable!(),
         }
         write!(f, "{:?}", self.decl)?;
         Ok(())

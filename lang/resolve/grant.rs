@@ -229,6 +229,7 @@ impl Grant for UseStatement {
                 match self.visibility {
                     Visibility::Private => true,
                     Visibility::Public => false,
+                    Visibility::Deleted => unreachable!(),
                 }
             }
             _ => false,
