@@ -11,7 +11,7 @@ pub struct Assignment {
     /// Value's visibility
     pub visibility: Visibility,
     /// Assignee qualifier
-    pub qualifier: Qualifier,
+    qualifier: Qualifier,
     /// Assignee
     pub id: Identifier,
     /// Type of the assignee
@@ -22,6 +22,35 @@ pub struct Assignment {
     pub src_ref: SrcRef,
 }
 
+impl Assignment {
+    /// Create new assignment.
+    pub fn new(
+        visibility: Visibility,
+        qualifier: Qualifier,
+        id: Identifier,
+        specified_type: Option<TypeAnnotation>,
+        expression: Rc<Expression>,
+        src_ref: SrcRef,
+    ) -> Self {
+        Self {
+            visibility,
+            qualifier,
+            id,
+            specified_type,
+            expression,
+            src_ref,
+        }
+    }
+
+    /// Get qualifier (makes `pub` => `pub const`)
+    pub fn qualifier(&self) -> Qualifier {
+        match self.visibility {
+            Visibility::Private => self.qualifier,
+            Visibility::Public => Qualifier::Const,
+            Visibility::Deleted => unreachable!(),
+        }
+    }
+}
 impl SrcReferrer for Assignment {
     fn src_ref(&self) -> SrcRef {
         self.src_ref.clone()

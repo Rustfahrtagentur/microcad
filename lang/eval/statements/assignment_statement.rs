@@ -96,7 +96,7 @@ impl Eval<()> for AssignmentStatement {
         }
 
         // now check what to do with the value
-        match assignment.qualifier {
+        match assignment.qualifier() {
             Qualifier::Const => {
                 if context.get_property(&assignment.id).is_ok() {
                     todo!("property with that name exists")
