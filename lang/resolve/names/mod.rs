@@ -59,10 +59,7 @@ impl Names for Statement {
 
 impl Names for WorkbenchDefinition {
     fn names(&self) -> NameList {
-        self.plan
-            .names()
-            .merge(self.body.names())
-            .add_as_name(&self.id)
+        self.plan.names().add_as_name(&self.id)
     }
 }
 
@@ -78,7 +75,7 @@ impl Names for ParameterList {
 
 impl Names for FunctionDefinition {
     fn names(&self) -> NameList {
-        self.signature.names().merge(self.body.names())
+        self.signature.names()
     }
 }
 
@@ -90,7 +87,7 @@ impl Names for FunctionSignature {
 
 impl Names for InitDefinition {
     fn names(&self) -> NameList {
-        self.parameters.names().merge(self.body.names())
+        self.parameters.names()
     }
 }
 
@@ -109,12 +106,6 @@ impl Names for IfStatement {
         let mut result = NameList::default();
         result.merge_in_place(self.cond.names());
         result.merge_in_place(self.body.names());
-        if let Some(next_if) = &self.next_if {
-            result.merge_in_place(next_if.names());
-        }
-        if let Some(body_else) = &self.body_else {
-            result.merge_in_place(body_else.names());
-        }
         result
     }
 }
