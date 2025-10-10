@@ -13,6 +13,8 @@ pub struct QualifiedName(Refer<Vec<Identifier>>);
 #[derive(Deref)]
 pub struct QualifiedNames(Vec<QualifiedName>);
 
+pub(crate) type QualifiedNameSet = indexmap::IndexSet<QualifiedName>;
+
 impl std::fmt::Display for QualifiedNames {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(

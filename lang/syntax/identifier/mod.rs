@@ -15,6 +15,8 @@ use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(pub Refer<Id>);
 
+pub(crate) type IdentifierSet = indexmap::IndexSet<Identifier>;
+
 static UNIQUE_ID_NEXT: std::sync::Mutex<usize> = std::sync::Mutex::new(0);
 
 /// A case for an identifier.
