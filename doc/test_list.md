@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**272** tests from markdown.
+**273** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -253,6 +253,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/use_all.svg)](../doc/structure/.test/use_all.log) | [use_all](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_as.svg)](../doc/structure/.test/use_as.log) | [use_as](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_as_module.svg)](../doc/structure/.test/use_as_module.log) | [use_as_module](../doc/structure/use.md) |
+| [![test](../doc/tests/.test/use_as_test.svg)](../doc/tests/.test/use_as_test.log) | [use_as_test](../doc/tests/use.md) |
 | [![test](../doc/structure/.test/use_module.svg)](../doc/structure/.test/use_module.log) | [use_module](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_statement_pub.svg)](../doc/structure/.test/use_statement_pub.log) | [use_statement_pub](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_statement_pub_in_module.svg)](../doc/structure/.test/use_statement_pub_in_module.log) | [use_statement_pub_in_module](../doc/structure/use.md) |

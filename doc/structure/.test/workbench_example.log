@@ -18,17 +18,17 @@
 
 -- Output --
 -- Errors --
-error: Symbol inner not found.
-  ---> <FROM STR>:8:29
-     |
-   8 |     Circle(radius) - Circle(inner());
-     |                             ^^^^^
-     |
 error: Symbol Circle not found.
   ---> <FROM STR>:8:5
      |
    8 |     Circle(radius) - Circle(inner());
      |     ^^^^^^
+     |
+error: Symbol inner not found.
+  ---> <FROM STR>:8:29
+     |
+   8 |     Circle(radius) - Circle(inner());
+     |                             ^^^^^
      |
 error: Symbol radius not found.
   ---> <FROM STR>:5:25

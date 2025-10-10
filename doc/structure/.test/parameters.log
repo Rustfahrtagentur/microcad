@@ -29,17 +29,17 @@ error: Symbol error not found.
    9 |         std::error("punch_disk must get one object");
      |         ^^^^^^^^^^
      |
-error: Symbol count not found.
-  ---> <FROM STR>:3:15
-     |
-   3 |     if @input.count() == 1 {
-     |               ^^^^^
-     |
 error: Symbol subtract not found.
   ---> <FROM STR>:7:11
      |
    7 |         }.subtract();
      |           ^^^^^^^^
+     |
+error: Symbol count not found.
+  ---> <FROM STR>:3:15
+     |
+   3 |     if @input.count() == 1 {
+     |               ^^^^^
      |
 error: Symbol count not found.
   ---> <FROM STR>:3:15
