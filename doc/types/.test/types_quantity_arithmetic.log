@@ -19,7 +19,7 @@
 
 -- Output --
 -- Errors --
-error: Symbol all_equal not found.
+error: Symbol all_equal not found while resolving.
   ---> <FROM STR>:4:24
      |
    4 | assert([a, 2mm, 2.0mm].all_equal());

@@ -16,4 +16,4 @@ error: Value a already in defined: 5 (at line 1:1)
      | ^
      |
 -- Test Result --
-FAILED AS EXPECTED BUT IS TODO
+FAILED AS EXPECTED

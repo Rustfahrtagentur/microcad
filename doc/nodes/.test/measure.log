@@ -14,7 +14,7 @@
 
 -- Output --
 -- Errors --
-error: Symbol area not found.
+error: Symbol area not found while resolving.
   ---> <FROM STR>:3:37
      |
    3 |     std::geo2d::Circle(radius=10mm).area(),

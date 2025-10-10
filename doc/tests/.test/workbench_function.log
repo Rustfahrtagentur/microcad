@@ -10,11 +10,10 @@
 
 -- Output --
 -- Errors --
-error: Symbol f not found.
-  ---> <FROM STR>:2:13
-     |
-   2 |   fn f() {} f();
-     |             ^
-     |
+-- Model --
+  Group (root) ->
+    Workpiece(sketch) workbench_function::K() ->
+
 -- Test Result --
-FAIL
+OK
+Export error: Render error: Nothing to render

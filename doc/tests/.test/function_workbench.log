@@ -22,7 +22,7 @@ error: sketch is not available within function
    2 |   sketch S() {} // error
      |   ^^^^^^^^^^^^^
      |
-error: Symbol S not found.
+error: Symbol S not found while resolving.
   ---> <FROM STR>:2:10
      |
    2 |   sketch S() {} // error

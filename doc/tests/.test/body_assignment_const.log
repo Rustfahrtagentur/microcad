@@ -10,7 +10,7 @@
 
 -- Output --
 -- Errors --
-error: Symbol B not found.
+error: Symbol B not found while resolving.
   ---> <FROM STR>:2:9
      |
    2 |   const B = 1; // error
