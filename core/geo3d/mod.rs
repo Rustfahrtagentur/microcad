@@ -5,16 +5,18 @@
 
 mod bounds;
 mod collection;
+mod extrude;
 mod geometry;
+mod mesh;
 mod primitives;
-mod triangle_mesh;
 
 pub use bounds::*;
 pub use collection::*;
+pub use extrude::*;
 pub use geometry::*;
 pub use manifold_rs::Manifold;
+pub use mesh::{Triangle, TriangleMesh, Vertex};
 pub use primitives::*;
-pub use triangle_mesh::{Triangle, TriangleMesh, Vertex};
 
 use crate::{BooleanOp, RenderResolution};
 
