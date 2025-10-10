@@ -21,7 +21,7 @@ Another assignment of a variable with the same name is not allowed.
 
 [![test](.test/assignment_immutable.svg)](.test/assignment_immutable.log)
 
-```µcad,assignment_immutable#todo_fail
+```µcad,assignment_immutable#fail
 a = 5;
 a = a * 2; // error: a already defined in this scope
 ```
