@@ -13,6 +13,23 @@ pub struct Vertex {
     pub normal: Vec3,
 }
 
+impl Vertex {
+    /// Accumulate normal.
+    pub fn accumulate_normal(vertices: &mut [Vertex], i0: u32, i1: u32, i2: u32) {
+        let v0 = vertices[i0 as usize].pos;
+        let v1 = vertices[i1 as usize].pos;
+        let v2 = vertices[i2 as usize].pos;
+
+        let edge1 = v1 - v0;
+        let edge2 = v2 - v0;
+        let face_normal = edge1.cross(edge2);
+
+        vertices[i0 as usize].normal += face_normal;
+        vertices[i1 as usize].normal += face_normal;
+        vertices[i2 as usize].normal += face_normal;
+    }
+}
+
 /// Triangle
 #[derive(Clone, Copy, Debug)]
 pub struct Triangle<T>(pub T, pub T, pub T);
@@ -79,6 +96,11 @@ impl<'a> Iterator for Triangles<'a> {
 }
 
 impl TriangleMesh {
+    /// Is this mesh empty?
+    pub fn is_empty(&self) -> bool {
+        self.vertices.is_empty() || self.triangle_indices.is_empty()
+    }
+
     /// Clear mesh.
     pub fn clear(&mut self) {
         self.vertices.clear();
