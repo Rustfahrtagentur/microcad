@@ -3,6 +3,8 @@
 
 //! 3D extrusion algorithm.
 
+use std::f64::consts::PI;
+
 use cgmath::{InnerSpace, Point3, SquareMatrix, Transform};
 
 use geo::TriangulateEarcut;
@@ -13,16 +15,57 @@ use crate::*;
 pub trait Extrude {
     fn extrude_slice(&self, m_a: &Mat4, m_b: &Mat4) -> TriangleMesh;
 
-    fn cap(&self, _m: &Mat4) -> TriangleMesh {
+    /// Generate the cap geometry.
+    fn cap(&self, _m: &Mat4, _normal: &Vec3, _bottom: bool) -> TriangleMesh {
         TriangleMesh::default()
     }
 
+    /// Perform a linear extrusion with a certain height.
     fn linear_extrude(&self, height: Scalar) -> TriangleMesh {
         let m_a = Mat4::identity();
         let m_b = Mat4::from_translation(Vec3::new(0.0, 0.0, height));
         let mut mesh = self.extrude_slice(&m_a, &m_b);
-        //   mesh.append(&self.cap(&m_a));
-        //  mesh.append(&self.cap(&m_b));
+        mesh.append(&self.cap(&m_a, &-m_a.z.truncate(), true));
+        mesh.append(&self.cap(&m_b, &m_b.z.truncate(), false));
+        mesh
+    }
+
+    /// Perform a revolve extrusion with a certain angle.
+    fn revolve_extrude(&self, angle_rad: Angle, segments: usize) -> TriangleMesh {
+        let mut mesh = TriangleMesh::default();
+        if segments < 2 {
+            return mesh;
+        }
+
+        let delta = angle_rad / segments as Scalar;
+
+        // Generate all rotation matrices
+        let transforms: Vec<Mat4> = (0..=segments)
+            .map(|i| {
+                let a = delta * i as Scalar;
+                Mat4::from_angle_y(-a)
+            })
+            .collect();
+
+        // For each segment, extrude between slice i and i+1
+        for i in 0..segments {
+            let m_a = &transforms[i];
+            let m_b = &transforms[i + 1];
+            let slice = self.extrude_slice(m_a, m_b);
+            mesh.append(&slice);
+        }
+
+        // Optionally add caps at start and end
+        if angle_rad.0 < PI * 2.0 {
+            let m_start = &transforms[0];
+            let m_end = transforms.last().unwrap();
+            let normal_start = m_start.x.truncate(); // Points outward at start
+            let normal_end = -m_end.x.truncate(); // Points inward at end
+
+            mesh.append(&self.cap(m_start, &normal_start, true));
+            mesh.append(&self.cap(m_end, &normal_end, false));
+        }
+
         mesh
     }
 }
@@ -105,20 +148,20 @@ impl Extrude for Polygon {
         mesh
     }
 
-    fn cap(&self, m: &Mat4) -> TriangleMesh {
+    fn cap(&self, m: &Mat4, normal: &Vec3, flip: bool) -> TriangleMesh {
         let raw_triangulation = self.earcut_triangles_raw();
 
         TriangleMesh {
             vertices: raw_triangulation
                 .vertices
                 .as_slice()
-                .chunks_exact(3)
+                .chunks_exact(2)
                 .map(|chunk| {
-                    let p = Point3::new(chunk[0], chunk[1], chunk[2]);
+                    let p = Point3::new(chunk[0], chunk[1], 0.0);
                     let p = m.transform_point(p);
                     Vertex {
                         pos: Vec3::new(p.x, p.y, p.z),
-                        normal: m.z.truncate().normalize(),
+                        normal: *normal,
                     }
                 })
                 .collect(),
@@ -126,7 +169,10 @@ impl Extrude for Polygon {
                 .triangle_indices
                 .as_slice()
                 .chunks_exact(3)
-                .map(|chunk| Triangle(chunk[0] as u32, chunk[1] as u32, chunk[2] as u32))
+                .map(|chunk| match flip {
+                    true => Triangle(chunk[2] as u32, chunk[1] as u32, chunk[0] as u32),
+                    false => Triangle(chunk[0] as u32, chunk[1] as u32, chunk[2] as u32),
+                })
                 .collect(),
         }
     }
@@ -141,10 +187,10 @@ impl Extrude for MultiPolygon {
         mesh
     }
 
-    fn cap(&self, m: &Mat4) -> TriangleMesh {
+    fn cap(&self, m: &Mat4, normal: &Vec3, flip: bool) -> TriangleMesh {
         let mut mesh = TriangleMesh::default();
         self.iter().for_each(|polygon| {
-            mesh.append(&polygon.cap(m));
+            mesh.append(&polygon.cap(m, normal, flip));
         });
         mesh
     }
@@ -155,7 +201,7 @@ impl Extrude for Geometries2D {
         self.to_multi_polygon().extrude_slice(m_a, m_b)
     }
 
-    fn cap(&self, m: &Mat4) -> TriangleMesh {
-        self.to_multi_polygon().cap(m)
+    fn cap(&self, m: &Mat4, normal: &Vec3, flip: bool) -> TriangleMesh {
+        self.to_multi_polygon().cap(m, normal, flip)
     }
 }

@@ -124,7 +124,7 @@ impl TriangleMesh {
     /// Append a triangle mesh.
     pub fn append(&mut self, other: &TriangleMesh) {
         let offset = self.vertices.len() as u32;
-        self.vertices.extend_from_slice(&other.vertices);
+        self.vertices.append(&mut other.vertices.clone());
         self.triangle_indices.extend(
             other
                 .triangle_indices
