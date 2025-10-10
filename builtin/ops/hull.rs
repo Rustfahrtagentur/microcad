@@ -19,14 +19,16 @@ impl Operation for Hull {
         })
     }
 
-    fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
-        todo!()
-        /*let model_ = model.borrow();
-        let output = model_.output.as_ref().expect("Some render output");
-
-        Ok(Rc::new(Geometry3D::Manifold(Rc::new(
-            model.render_geometry_3d(cache)?.hull(&output.resolution()),
-        ))))*/
+    fn process_3d(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        context.update_3d(|context, model, resolution| {
+            let model_ = model.borrow();
+            let geometry: Geometry3DOutput = model_.children.render(context)?;
+            Ok(geometry.map(|geometry| {
+                Rc::new(microcad_core::Geometry3D::Manifold(Rc::new(
+                    geometry.hull(&resolution),
+                )))
+            }))
+        })
     }
 }
 
