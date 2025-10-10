@@ -29,24 +29,6 @@ error: Symbol count not found.
    4 |     if @input.count() == 2 {
      |               ^^^^^
      |
-error: Symbol subtract not found.
-  ---> <FROM STR>:6:16
-     |
-   6 |         @input.subtract(); 
-     |                ^^^^^^^^
-     |
-error: Symbol error not found.
-  ---> <FROM STR>:8:9
-     |
-   8 |         std::error("punched_disk must get two objects");
-     |         ^^^^^^^^^^
-     |
-error: Symbol count not found.
-  ---> <FROM STR>:4:15
-     |
-   4 |     if @input.count() == 2 {
-     |               ^^^^^
-     |
 error: If condition is not a boolean: <NO VALUE>
   ---> <FROM STR>:4:5
      |

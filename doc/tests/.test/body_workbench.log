@@ -10,7 +10,7 @@
 
 -- Output --
 -- Errors --
-error: Symbol F not found.
+error: Symbol F not found while resolving.
   ---> <FROM STR>:2:17
      |
    2 |   sketch F() {} F(); // error

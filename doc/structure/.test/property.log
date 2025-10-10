@@ -28,11 +28,5 @@
 outer: 10mm
 inner: 5mm
 -- Errors --
-error: Symbol Circle not found.
-  ---> <FROM STR>:11:5
-     |
-  11 |     Circle(outer) - Circle(inner);
-     |     ^^^^^^
-     |
 -- Test Result --
-TODO
+OK BUT IS TODO

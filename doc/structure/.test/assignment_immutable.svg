@@ -1,54 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="113.8645"
+   width="79.621346"
    height="20"
    version="1.1"
    id="svg8"
-   sodipodi:docname="not_todo_fail.svg"
+   sodipodi:docname="fail_ok.svg"
    inkscape:version="1.4.2 (ebf0e94, 2025-05-08)"
-   inkscape:export-filename="not_todo_fail.svg"
+   inkscape:export-filename="fail_ok.svg"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview1"
-     pagecolor="#ffffff"
-     bordercolor="#999999"
-     borderopacity="1"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="7.2118927"
-     inkscape:cx="65.100802"
-     inkscape:cy="43.747184"
-     inkscape:window-width="1888"
-     inkscape:window-height="1127"
-     inkscape:window-x="16"
-     inkscape:window-y="34"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg8" />
   <defs
      id="defs8">
     <mask
-       id="round-3">
+       id="round-7">
       <rect
          width="192"
          height="20"
          rx="3"
          fill="#ffffff"
-         id="rect2-6"
+         id="rect2-5"
          x="0"
          y="0" />
     </mask>
     <linearGradient
-       id="smooth-7"
+       id="smooth-3"
        x2="0"
        y2="61.967735"
-       gradientTransform="scale(3.0031053,0.32274861)"
+       gradientTransform="scale(3.0983867,0.32274861)"
        x1="0"
        y1="0"
        gradientUnits="userSpaceOnUse">
@@ -60,9 +42,38 @@
       <stop
          offset="1"
          stop-opacity=".1"
-         id="stop2-3" />
+         id="stop2-6" />
     </linearGradient>
+    <mask
+       id="round-2">
+      <rect
+         width="192"
+         height="20"
+         rx="3"
+         fill="#ffffff"
+         id="rect2-3"
+         x="0"
+         y="0" />
+    </mask>
   </defs>
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="4"
+     inkscape:cx="30.625"
+     inkscape:cy="18.625"
+     inkscape:window-width="1888"
+     inkscape:window-height="1127"
+     inkscape:window-x="16"
+     inkscape:window-y="34"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg8" />
   <linearGradient
      id="smooth"
      x2="0"
@@ -93,18 +104,20 @@
        y="0" />
   </mask>
   <g
-     mask="url(#round-3)"
+     mask="url(#round)"
      id="g5"
+     inkscape:label="Background"
      transform="scale(1.0317276,1)"
      style="stroke-width:0.984504">
     <rect
-       width="75.510178"
+       width="34.866764"
        height="20"
-       x="34.852768"
+       x="42.306076"
        fill="#dfb317"
        id="rect9"
        y="0"
-       style="display:inline;fill:#88aa00;stroke-width:0.984505"
+       style="display:inline;fill:#44aa00;stroke-width:0.984505"
+       inkscape:label="status"
        ry="3" />
     <rect
        width="46.68108"
@@ -113,15 +126,17 @@
        id="rect3"
        x="0"
        y="0"
-       style="display:inline;stroke-width:0.984504" />
+       style="display:inline;stroke-width:0.984504"
+       inkscape:label="test_rect" />
     <rect
-       width="110.36295"
+       width="77.172836"
        height="20"
        fill="url(#smooth)"
        id="rect5"
-       style="display:inline;fill:url(#smooth-7);stroke-width:0.984504"
+       style="display:inline;fill:url(#smooth);stroke-width:0.984503"
        x="0"
-       y="0" />
+       y="0"
+       inkscape:label="gradient" />
   </g>
   <g
      fill="#ffffff"
@@ -130,36 +145,46 @@
      font-size="11px"
      text-rendering="geometricPrecision"
      id="g8"
-     transform="translate(1.816229)">
+     inkscape:label="Text"
+     transform="translate(1.8162284)">
     <text
        x="30.777098"
        y="15"
        fill="#010101"
        fill-opacity="0.3"
-       id="text5">test</text>
+       id="text5"
+       inkscape:label="test_text">test</text>
     <text
        x="30.777098"
        y="14"
-       id="text6">test</text>
+       id="text6"
+       inkscape:label="test_shadow">test</text>
     <text
-       x="78.526268"
+       x="61.631119"
        y="15"
        fill="#010101"
        fill-opacity="0.3"
        id="text7"
+       inkscape:label="status_shadow"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11px;font-family:'DejaVu Sans', Verdana, Geneva, sans-serif;-inkscape-font-specification:'DejaVu Sans, Verdana, Geneva, sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#010101;fill-opacity:0.3"><tspan
+         sodipodi:role="line"
          id="tspan10"
-         x="78.526268"
-         y="15">TODO FAIL</tspan></text>
+         x="61.631119"
+         y="15">FAIL</tspan></text>
     <text
-       x="78.526268"
+       x="61.631119"
        y="14"
-       id="text8">TODO FAIL</text>
+       id="text8"
+       inkscape:label="status_text">FAIL</text>
   </g>
   <g
      id="g20"
      transform="matrix(0.25631065,0,0,0.25631065,-48.475706,-62.386852)"
-     style="stroke-width:14.7459">
+     inkscape:export-filename="icon.png"
+     inkscape:export-xdpi="50"
+     inkscape:export-ydpi="50"
+     style="stroke-width:14.7459"
+     inkscape:label="Logo">
     <path
        id="path1"
        style="fill:#ffffff;fill-opacity:1;stroke-width:9.31734;paint-order:markers fill stroke"
@@ -193,9 +218,4 @@
        d="m 224.74248,257.85814 v 11.27032 h 11.27413 a 11.270559,11.270559 0 0 0 11.20165,11.26978 h 0.0654 v -11.26978 -11.26924 -10e-4 z"
        id="path13" />
   </g>
-  <path
-     style="fill:#ff0000;stroke:#ff0000;stroke-width:3.202;stroke-dasharray:none;stroke-opacity:0.5;paint-order:markers fill stroke"
-     d="M 51.015475,16.868915 108.54603,4.5470646"
-     id="path11"
-     sodipodi:nodetypes="cc" />
 </svg>

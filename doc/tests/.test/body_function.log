@@ -10,7 +10,7 @@
 
 -- Output --
 -- Errors --
-error: Symbol f not found.
+error: Symbol f not found while resolving.
   ---> <FROM STR>:2:13
      |
    2 |   fn f() {} f(); // error

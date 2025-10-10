@@ -13,7 +13,7 @@
 
 -- Output --
 -- Errors --
-error: Symbol all_equal not found.
+error: Symbol all_equal not found while resolving.
   ---> <FROM STR>:6:64
      |
    6 | std::debug::assert( [millimeters, centimeters, meters, inches].all_equal() );

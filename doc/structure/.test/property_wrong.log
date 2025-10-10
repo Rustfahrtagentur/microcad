@@ -25,12 +25,6 @@
 outer: 10mm
 inner: <NO VALUE>
 -- Errors --
-error: Symbol Circle not found.
-  ---> <FROM STR>:8:5
-     |
-   8 |     Circle(outer) - Circle(inner);
-     |     ^^^^^^
-     |
 error: Property not found: inner
   ---> <FROM STR>:16:21
      |
@@ -38,4 +32,4 @@ error: Property not found: inner
      |                     ^^^^^^^
      |
 -- Test Result --
-FAILED BUT WITH WRONG ERRORS
+FAILED AS EXPECTED

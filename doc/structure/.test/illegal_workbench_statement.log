@@ -25,7 +25,7 @@ error: sketch is not available within sketch
    2 |     sketch Axis(length: Length) {}  // error
      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Symbol Axis not found.
+error: Symbol Axis not found while resolving.
   ---> <FROM STR>:2:12
      |
    2 |     sketch Axis(length: Length) {}  // error

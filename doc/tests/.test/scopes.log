@@ -34,13 +34,13 @@
 
 -- Output --
 -- Errors --
-error: Symbol b not found.
+error: Symbol b not found while resolving.
   ---> <FROM STR>:4:34
      |
    4 | __builtin::debug::assert_invalid(b);
      |                                  ^
      |
-error: Symbol c not found.
+error: Symbol c not found while resolving.
   ---> <FROM STR>:5:34
      |
    5 | __builtin::debug::assert_invalid(c);

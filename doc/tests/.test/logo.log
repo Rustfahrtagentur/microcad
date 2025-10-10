@@ -47,7 +47,7 @@
 
 -- Output --
 -- Errors --
-error: Symbol gap not found.
+error: Symbol gap not found while resolving.
   ---> <FROM STR>:39:57
      |
   39 | microcad::Micro(radius, thickness).translate(x=radius*2+gap, y=-radius/2);

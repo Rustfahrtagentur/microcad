@@ -18,23 +18,24 @@
 
 -- Output --
 -- Errors --
-error: Symbol Circle not found.
-  ---> <FROM STR>:8:5
-     |
-   8 |     Circle(radius) - Circle(inner());
-     |     ^^^^^^
-     |
-error: Symbol inner not found.
-  ---> <FROM STR>:8:29
-     |
-   8 |     Circle(radius) - Circle(inner());
-     |                             ^^^^^
-     |
-error: Symbol radius not found.
-  ---> <FROM STR>:5:25
-     |
-   5 |     fn inner() { return radius/2; }
-     |                         ^^^^^^
-     |
+-- Model --
+  Group (root) ->
+    Workpiece(sketch) workbench_example::PunchedDisk(radius=10mm) ->
+      - radius = 10mm
+      Operation subtract()
+ ->
+        Group ->
+          Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) ->
+            - center = (x=0mm, y=0mm)
+            - radius = 10mm
+            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)
+ ->
+          Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=5mm) ->
+            - center = (x=0mm, y=0mm)
+            - radius = 5mm
+            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=5)
+ ->
+
 -- Test Result --
-FAIL
+OK
+Export successful.
