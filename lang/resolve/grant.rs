@@ -88,7 +88,8 @@ impl Grant for Statement {
                 Statement::Assignment(..)
                 | Statement::If(..)
                 | Statement::Return(..)
-                | Statement::Use(..),
+                | Statement::Use(..)
+                | Statement::Expression(..),
             ) => Ok(()),
             _ => context.error(
                 self,
