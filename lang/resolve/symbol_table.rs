@@ -13,13 +13,6 @@ pub struct SymbolTable {
 }
 
 impl SymbolTable {
-    /// Collect all symbols engaged in that name.
-    ///
-    /// Example: `what`=`a::b::c` will return the symbols: `a`,`a::b` and `a::b::c`
-    fn path_to(&self, what: &QualifiedName) -> ResolveResult<Symbols> {
-        self.symbols.path_to(what)
-    }
-
     /// Add a new symbol to the table
     pub fn add_symbol(&mut self, symbol: Symbol) -> ResolveResult<()> {
         self.insert_symbol(symbol.id(), symbol.clone())

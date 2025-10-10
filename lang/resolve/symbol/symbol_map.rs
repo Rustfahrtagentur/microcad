@@ -122,16 +122,6 @@ impl SymbolMap {
         Err(ResolveError::SymbolNotFound(name.clone()))
     }
 
-    /// Collect all symbols engaged in that name.
-    ///
-    /// Example: `what`=`a::b::c` will return the symbols: `a`,`a::b` and `a::b::c`
-    pub(crate) fn path_to(&self, what: &QualifiedName) -> ResolveResult<Symbols> {
-        (1..(what.len() + 1))
-            .map(|n| what[0..n].iter().cloned().collect())
-            .map(|what| self.search(&what))
-            .collect()
-    }
-
     fn merge_all<I>(iter: I) -> SymbolMap
     where
         I: IntoIterator<Item = SymbolMap>,
@@ -171,25 +161,4 @@ impl std::fmt::Debug for SymbolMap {
 
         Ok(())
     }
-}
-
-#[cfg(test)]
-fn symbol_map_path_to() {
-    let mut symbols = SymbolMap::new();
-    let a = Symbol::new(SymbolDefinition::Tester("a".into()), None);
-    let b = Symbol::new(SymbolDefinition::Tester("b".into()), Some(a.clone()));
-    let c = Symbol::new(SymbolDefinition::Tester("c".into()), Some(b.clone()));
-    Symbol::add_child(&b, c);
-    Symbol::add_child(&a, b);
-    symbols.add_node(a);
-
-    let name: QualifiedName = "a::b::c".into();
-
-    log::trace!("symbols:\n{symbols}");
-    let symbols = symbols.path_to(&name).expect("test error");
-    log::trace!("parents of {name}: {}", symbols.full_names());
-    assert_eq!(
-        symbols.full_names().to_string(),
-        "a, a::b, a::b::c".to_string(),
-    );
 }
