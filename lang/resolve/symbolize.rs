@@ -142,7 +142,7 @@ impl Symbolize for AssignmentStatement {
         parent: &Symbol,
         context: &mut ResolveContext,
     ) -> ResolveResult<Option<Symbol>> {
-        let symbol = match (self.assignment.visibility, self.assignment.qualifier) {
+        let symbol = match (self.assignment.visibility, self.assignment.qualifier()) {
             // properties do not have a visibility
             (_, Qualifier::Prop) => {
                 if !parent.can_prop() {

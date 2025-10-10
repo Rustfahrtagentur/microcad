@@ -59,7 +59,7 @@ fn check_statements(body: &Body) -> ParseResult<()> {
                 }
 
                 // Some assignments are post init statements
-                Statement::Assignment(a_stmt) => match a_stmt.assignment.qualifier {
+                Statement::Assignment(a_stmt) => match a_stmt.assignment.qualifier() {
                     Qualifier::Const => {
                         return Err(ParseError::IllegalWorkbenchStatement(stmt.src_ref()))
                     }

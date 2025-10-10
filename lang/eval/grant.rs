@@ -121,7 +121,7 @@ impl Grant<IfStatement> for EvalContext {
 impl Grant<AssignmentStatement> for EvalContext {
     fn grant(&mut self, statement: &AssignmentStatement) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
-            match statement.assignment.qualifier {
+            match statement.assignment.qualifier() {
                 Qualifier::Const => {
                     matches!(stack_frame, StackFrame::Source(..) | StackFrame::Module(..))
                 }

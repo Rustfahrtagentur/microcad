@@ -177,19 +177,19 @@ impl Grant for AssignmentStatement {
     fn grant(&self, parent: &Symbol, context: &mut ResolveContext) -> DiagResult<&Self> {
         let grant = parent.with_def(|def| match def {
             SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..) => {
-                match self.assignment.qualifier {
+                match self.assignment.qualifier() {
                     Qualifier::Value => matches!(self.assignment.visibility, Visibility::Private),
                     Qualifier::Const => true,
                     Qualifier::Prop => false,
                 }
             }
-            SymbolDefinition::Workbench(..) => match self.assignment.qualifier {
+            SymbolDefinition::Workbench(..) => match self.assignment.qualifier() {
                 Qualifier::Value | Qualifier::Prop => {
                     matches!(self.assignment.visibility, Visibility::Private)
                 }
                 Qualifier::Const => false,
             },
-            SymbolDefinition::Function(..) => match self.assignment.qualifier {
+            SymbolDefinition::Function(..) => match self.assignment.qualifier() {
                 Qualifier::Value => {
                     matches!(self.assignment.visibility, Visibility::Private)
                 }
