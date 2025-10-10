@@ -477,6 +477,14 @@ impl TryFrom<&Tuple> for Size2 {
     }
 }
 
+impl TryFrom<Target> for Value {
+    type Error = ValueError;
+
+    fn try_from(target: Target) -> Result<Self, Self::Error> {
+        Ok(Value::Target(target))
+    }
+}
+
 impl std::fmt::Display for Tuple {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(

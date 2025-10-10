@@ -33,6 +33,53 @@ impl Eval<ArgumentValueList> for ArgumentList {
     }
 }
 
+/// Alternative evaluation type.
+///
+/// Used to prevent the evaluation of `QualifiedName`.
+/// `assert_valid()` and `assert_invalid()` need these untouched.
+pub struct ArgumentValueListRaw(ArgumentValueList);
+
+impl From<ArgumentValueListRaw> for ArgumentValueList {
+    fn from(value: ArgumentValueListRaw) -> Self {
+        value.0
+    }
+}
+
+impl Eval<ArgumentValueListRaw> for ArgumentList {
+    /// Evaluate into a [`ArgumentValueList`].
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<ArgumentValueListRaw> {
+        let arguments = self
+            .iter()
+            .map(|arg| {
+                (
+                    arg.id.clone().unwrap_or(Identifier::none()),
+                    if let Expression::QualifiedName(name) = &arg.expression {
+                        Ok(ArgumentValue::new(
+                            Value::Target(Target::new(
+                                name.clone(),
+                                match context.lookup(name) {
+                                    Ok(symbol) => Some(symbol.full_name()),
+                                    Err(_) => None,
+                                },
+                            )),
+                            arg.id.clone(),
+                            arg.src_ref.clone(),
+                        ))
+                    } else {
+                        arg.eval_value(context)
+                    },
+                )
+            })
+            .map(|(id, arg)| match arg {
+                Ok(arg) => Ok((id.clone(), arg)),
+                Err(err) => Err(err),
+            })
+            .collect::<EvalResult<_>>()?;
+
+        Ok(ArgumentValueListRaw(arguments))
+    }
+}
+
 impl Eval for Call {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         // find self in symbol table by own name
@@ -45,31 +92,11 @@ impl Eval for Call {
         };
 
         // evaluate arguments
-        let args = match self.argument_list.eval(context) {
-            Ok(args) => args,
-            Err(err) => {
-                // For builtin calls ONLY: If arguments cannot be evaluated put
-                // the native argument code into a ArgumentValueList.
-                // E.g. this is needed to give assert_valid() a qualified name.
-                if symbol.with_def(|def| matches!(def, SymbolDefinition::Builtin(..))) {
-                    self.argument_list
-                        .iter()
-                        .map(|arg| match context.source_code(&arg.expression) {
-                            Ok(code) => Ok((
-                                arg.id.clone().unwrap_or(Identifier::none()),
-                                ArgumentValue::new(
-                                    code.into(),
-                                    arg.id.clone(),
-                                    arg.src_ref.clone(),
-                                ),
-                            )),
-                            Err(err) => Err(err),
-                        })
-                        .collect::<EvalResult<ArgumentValueList>>()?
-                } else {
-                    Err(err)?
-                }
-            }
+        let args: ArgumentValueList = if symbol.uses_raw_name() {
+            // for assert_valid() and assert_invalid()
+            Eval::<ArgumentValueListRaw>::eval(&self.argument_list, context)?.into()
+        } else {
+            self.argument_list.eval(context)?
         };
 
         log::debug!(

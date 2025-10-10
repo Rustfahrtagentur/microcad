@@ -13,6 +13,7 @@ mod matrix;
 mod parameter_value;
 mod parameter_value_list;
 mod quantity;
+mod target;
 mod tuple;
 mod value_access;
 mod value_error;
@@ -25,6 +26,7 @@ pub use matrix::*;
 pub use parameter_value::*;
 pub use parameter_value_list::*;
 pub use quantity::*;
+pub use target::*;
 pub use tuple::*;
 pub use value_access::*;
 pub use value_error::*;
@@ -61,6 +63,8 @@ pub enum Value {
     Return(Box<Value>),
     /// Unevaluated const expression.
     ConstExpression(Rc<Expression>),
+    /// for assert_valid() and assert_invalid()
+    Target(Target),
 }
 
 impl Value {
@@ -176,6 +180,7 @@ impl crate::ty::Ty for Value {
             Value::Matrix(matrix) => matrix.ty(),
             Value::Model(_) => Type::Models,
             Value::Return(r) => r.ty(),
+            Value::Target(..) => Type::Target,
         }
     }
 }
@@ -371,6 +376,7 @@ impl std::fmt::Display for Value {
             Value::Model(n) => write!(f, "{n}"),
             Value::Return(r) => write!(f, "{r}"),
             Value::ConstExpression(e) => write!(f, "{e}"),
+            Value::Target(target) => write!(f, "{target}"),
         }
     }
 }
@@ -389,6 +395,7 @@ impl std::fmt::Debug for Value {
             Value::Model(n) => write!(f, "Models:\n {n}"),
             Value::Return(r) => write!(f, "Return: {r}"),
             Value::ConstExpression(e) => write!(f, "{e}"),
+            Value::Target(target) => write!(f, "{target:?}"),
         }
     }
 }

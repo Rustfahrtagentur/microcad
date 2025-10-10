@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**273** tests from markdown.
+**274** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -263,6 +263,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/debug/.test/verify_assert_fail.svg)](../doc/debug/.test/verify_assert_fail.log) | [verify_assert_fail](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_error.svg)](../doc/debug/.test/verify_error.log) | [verify_error](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_todo.svg)](../doc/debug/.test/verify_todo.log) | [verify_todo](../doc/debug/README.md) |
+| [![test](../doc/tests/.test/visibility.svg)](../doc/tests/.test/visibility.log) | [visibility](../doc/tests/visibility.md) |
 | [![test](../doc/tests/.test/workbench_assignment_const.svg)](../doc/tests/.test/workbench_assignment_const.log) | [workbench_assignment_const](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/workbench_assignment_prop.svg)](../doc/tests/.test/workbench_assignment_prop.log) | [workbench_assignment_prop](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/workbench_assignment_var.svg)](../doc/tests/.test/workbench_assignment_var.log) | [workbench_assignment_var](../doc/tests/statement_usage.md) |

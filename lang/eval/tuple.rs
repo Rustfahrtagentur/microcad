@@ -5,9 +5,7 @@ use crate::eval::*;
 
 impl Eval for TupleExpression {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
-        let (unnamed, named): (Vec<_>, _) = self
-            .args
-            .eval(context)?
+        let (unnamed, named): (Vec<_>, _) = Eval::<ArgumentValueList>::eval(&self.args, context)?
             .iter()
             .map(|(id, arg)| (id.clone(), arg.value.clone()))
             .partition(|(id, _)| id.is_none());

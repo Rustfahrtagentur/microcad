@@ -12,7 +12,7 @@ pub(crate) use symbols::*;
 
 use symbol_inner::*;
 
-use crate::{builtin::*, rc::*, resolve::*, src_ref::*, syntax::*, value::*};
+use crate::{builtin::*, rc::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
 /// Symbol
 ///
@@ -583,6 +583,24 @@ impl Symbol {
 
     pub(crate) fn kind(&self) -> String {
         self.inner.borrow().def.kind()
+    }
+
+    /// Returns `true` if builtin symbol uses parameter of type Name
+    ///
+    /// (for assert_valid() and assert_invalid())
+    pub(crate) fn uses_raw_name(&self) -> bool {
+        self.with_def(|def| match def {
+            SymbolDefinition::Builtin(builtin) => {
+                if let Some(parameters) = &builtin.parameters {
+                    parameters
+                        .values()
+                        .any(|param| param.type_matches(&Type::Target))
+                } else {
+                    false
+                }
+            }
+            _ => false,
+        })
     }
 }
 
