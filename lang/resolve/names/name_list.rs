@@ -4,16 +4,15 @@
 //! Name list for collecting names and locals from within definitions.
 
 use crate::syntax::*;
-use std::collections::HashSet;
 
 #[derive(Default)]
 pub(crate) struct NameList {
-    symbols: HashSet<QualifiedName>,
-    locals: HashSet<Identifier>,
+    symbols: indexmap::IndexSet<QualifiedName>,
+    locals: indexmap::IndexSet<Identifier>,
 }
 
 impl NameList {
-    pub(crate) fn iter(&self) -> std::collections::hash_set::Iter<'_, QualifiedName> {
+    pub(crate) fn iter(&self) -> indexmap::set::Iter<'_, QualifiedName> {
         self.symbols.iter()
     }
 
@@ -103,7 +102,7 @@ impl From<&Identifier> for NameList {
 impl<'a> FromIterator<&'a QualifiedName> for NameList {
     fn from_iter<T: IntoIterator<Item = &'a QualifiedName>>(iter: T) -> Self {
         Self {
-            symbols: HashSet::from_iter(iter.into_iter().cloned()),
+            symbols: indexmap::IndexSet::from_iter(iter.into_iter().cloned()),
             ..Default::default()
         }
     }
@@ -112,7 +111,7 @@ impl<'a> FromIterator<&'a QualifiedName> for NameList {
 impl<'a> FromIterator<&'a Identifier> for NameList {
     fn from_iter<T: IntoIterator<Item = &'a Identifier>>(iter: T) -> Self {
         Self {
-            locals: HashSet::from_iter(iter.into_iter().cloned()),
+            locals: indexmap::IndexSet::from_iter(iter.into_iter().cloned()),
             ..Default::default()
         }
     }

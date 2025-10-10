@@ -32,6 +32,7 @@ pathdiff = "0.2"
 ctor = "0.5"
 color-print = { version = "0.3", optional = true }
 sqids = "0.4"
+indexmap = "2"
 
 microcad-core = { workspace = true }
 custom_debug = "0.6.2"

@@ -3,7 +3,7 @@
 
 use crate::{diag::*, resolve::*, syntax::*, value::*};
 use derive_more::{Deref, DerefMut};
-use std::collections::btree_map::BTreeMap;
+use indexmap::IndexMap;
 
 pub(super) enum Link {
     None,
@@ -13,7 +13,7 @@ pub(super) enum Link {
 
 /// Map Id to SymbolNode reference
 #[derive(Default, Clone, Deref, DerefMut)]
-pub struct SymbolMap(BTreeMap<Identifier, Symbol>);
+pub struct SymbolMap(IndexMap<Identifier, Symbol>);
 
 impl From<Tuple> for SymbolMap {
     fn from(tuple: Tuple) -> Self {
@@ -65,17 +65,24 @@ impl SymbolMap {
         self.0.insert(id, symbol);
     }
 
+    pub fn get_not_deleted<'a>(&'a self, id: &Identifier) -> Option<&'a Symbol> {
+        self.iter()
+            .filter(|(_, symbol)| !symbol.is_deleted())
+            .find(|(i, _)| *i == id)
+            .map(|(_, symbol)| symbol)
+    }
+
     /// Search for a symbol in symbol map.
     pub(crate) fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         log::trace!("Searching {name:?} in symbol map");
         if name.is_empty() {
-            if let Some(symbol) = self.get(&Identifier::none()) {
+            if let Some(symbol) = self.get_not_deleted(&Identifier::none()) {
                 log::trace!("Fetched {name:?} from globals (symbol map)");
                 return Ok(symbol.clone());
             }
         } else {
             let (id, leftover) = name.split_first();
-            if let Some(symbol) = self.get(&id) {
+            if let Some(symbol) = self.get_not_deleted(&id) {
                 match symbol.get_link() {
                     Link::None => (),
                     Link::Alias(alias) => {
@@ -84,7 +91,15 @@ impl SymbolMap {
                                 let relative = parent.search(&alias);
                                 let absolute = self.search(&alias);
                                 match (absolute, relative) {
-                                    (Ok(_), Ok(_)) => todo!("ambiguous"),
+                                    (Ok(absolute), Ok(relative)) => {
+                                        if absolute.is_deleted() {
+                                            Ok(relative)
+                                        } else if relative.is_deleted() {
+                                            Ok(absolute)
+                                        } else {
+                                            todo!("ambiguous")
+                                        }
+                                    }
                                     (Ok(symbol), Err(_)) | (Err(_), Ok(symbol)) => Ok(symbol),
                                     (Err(err), Err(_)) => Err(err),
                                 }

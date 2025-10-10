@@ -19,6 +19,7 @@
         "gltf",
         "hasher",
         "Hasher",
+        "indexmap",
         "initializers",
         "itertools",
         "jscadui",
