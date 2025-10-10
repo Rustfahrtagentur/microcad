@@ -5,7 +5,7 @@
 -- Code --
 
  1: sketch K() {
- 2:   const B = 1;
+ 2:   const B = 1;  // error
  3: } K();
 
 -- Output --
@@ -13,26 +13,26 @@
 error: Assignment statement is not available within sketch
   ---> <FROM STR>:2:3
      |
-   2 |   const B = 1;
+   2 |   const B = 1;  // error
      |   ^^^^^^^^^^^^
      |
 error: Declaration of B not allowed within workbench_assignment_const::K
   ---> <FROM STR>:2:3
      |
-   2 |   const B = 1;
+   2 |   const B = 1;  // error
      |   ^^^^^^^^^^^^
      |
 error: Assignment statement not available here
   ---> <FROM STR>:2:3
      |
-   2 |   const B = 1;
+   2 |   const B = 1;  // error
      |   ^^^^^^^^^^^^
      |
 error: Symbol B not found.
   ---> <FROM STR>:2:3
      |
-   2 |   const B = 1;
+   2 |   const B = 1;  // error
      |   ^^^^^^^^^^^^
      |
 -- Test Result --
-FAIL
+FAILED AS EXPECTED
