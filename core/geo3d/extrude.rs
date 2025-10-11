@@ -27,6 +27,8 @@ pub trait Extrude {
         let mut mesh = self.extrude_slice(&m_a, &m_b);
         mesh.append(&self.cap(&m_a, &-m_a.z.truncate(), true));
         mesh.append(&self.cap(&m_b, &m_b.z.truncate(), false));
+
+        mesh.repair(0.0001);
         mesh
     }
 
@@ -66,6 +68,7 @@ pub trait Extrude {
             mesh.append(&self.cap(m_end, &normal_end, false));
         }
 
+        mesh.repair(0.0001);
         mesh
     }
 }
