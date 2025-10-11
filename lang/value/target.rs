@@ -3,7 +3,7 @@
 
 //! Type for a lookup result.
 
-use crate::syntax::*;
+use crate::{syntax::*, value::*};
 
 /// Type for a lookup result.
 #[derive(Clone, Default, PartialEq)]
@@ -48,6 +48,21 @@ impl std::fmt::Debug for Target {
             write!(f, "{{{name:?} -> {target:?}}}")
         } else {
             color_print::cwrite!(f, "{{{name:?} -> <R!>???</>}}")
+        }
+    }
+}
+
+impl TryFrom<&Value> for Target {
+    type Error = ValueError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        if let Value::Target(target) = value {
+            Ok(target.clone())
+        } else {
+            Err(ValueError::CannotConvert(
+                value.ty().to_string(),
+                "target".into(),
+            ))
         }
     }
 }
