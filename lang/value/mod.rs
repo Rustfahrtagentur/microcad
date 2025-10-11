@@ -224,7 +224,7 @@ impl std::ops::Add for Value {
                     ));
                 }
 
-                Ok(Value::Array(Array::new(
+                Ok(Value::Array(Array::from_values(
                     lhs.iter().chain(rhs.iter()).cloned().collect(),
                     lhs.ty(),
                 )))
@@ -386,15 +386,15 @@ impl std::fmt::Debug for Value {
         match self {
             Value::None => write!(f, crate::invalid!(VALUE)),
             Value::Integer(n) => write!(f, "{n}"),
-            Value::Quantity(q) => write!(f, "{q}"),
+            Value::Quantity(q) => write!(f, "{q:?}"),
             Value::Bool(b) => write!(f, "{b}"),
-            Value::String(s) => write!(f, "\"{s}\""),
-            Value::Array(l) => write!(f, "{l}"),
-            Value::Tuple(t) => write!(f, "{t}"),
-            Value::Matrix(m) => write!(f, "{m}"),
-            Value::Model(n) => write!(f, "Models:\n {n}"),
-            Value::Return(r) => write!(f, "Return: {r}"),
-            Value::ConstExpression(e) => write!(f, "{e}"),
+            Value::String(s) => write!(f, "{s:?}"),
+            Value::Array(l) => write!(f, "{l:?}"),
+            Value::Tuple(t) => write!(f, "{t:?}"),
+            Value::Matrix(m) => write!(f, "{m:?}"),
+            Value::Model(n) => write!(f, "\n {n:?}"),
+            Value::Return(r) => write!(f, "->{r:?}"),
+            Value::ConstExpression(e) => write!(f, "{e:?}"),
             Value::Target(target) => write!(f, "{target:?}"),
         }
     }

@@ -3,7 +3,7 @@
 
 //! Import values from TOML
 
-use microcad_lang::{Id, builtin::*, src_ref::*, value::*};
+use microcad_lang::{builtin::*, src_ref::*, value::*, Id};
 
 /// Import TOML files into a tuple.
 pub struct TomlImporter;
@@ -21,7 +21,7 @@ impl TomlImporter {
                 for toml_value in values {
                     list.push(Self::toml_to_value(toml_value));
                 }
-                Value::Array(Array::new(
+                Value::Array(Array::from_values(
                     ValueList::new(list),
                     microcad_lang::ty::Type::Invalid, // TODO get common type here.
                 ))

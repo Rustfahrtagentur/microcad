@@ -47,7 +47,7 @@ impl Eval for RangeExpression {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         Ok(
             match (self.first.eval(context)?, self.last.eval(context)?) {
-                (Value::Integer(first), Value::Integer(last)) => Value::Array(Array::new(
+                (Value::Integer(first), Value::Integer(last)) => Value::Array(Array::from_values(
                     (first..last + 1).map(Value::Integer).collect(),
                     Type::Integer,
                 )),
@@ -71,7 +71,8 @@ impl Eval for ArrayExpression {
 
                 match value_list.types().common_type() {
                     Some(common_type) => {
-                        match Value::Array(Array::new(value_list, common_type)) * self.unit {
+                        match Value::Array(Array::from_values(value_list, common_type)) * self.unit
+                        {
                             Ok(value) => Ok(value),
                             Err(err) => {
                                 context.error(self, err)?;
