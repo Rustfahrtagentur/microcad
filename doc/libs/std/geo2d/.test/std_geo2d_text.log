@@ -1,0 +1,21 @@
+-- Test --
+  std_geo2d_text
+  ../doc/libs/std/geo2d/README.md:24
+
+-- Code --
+
+ 1: std::geo2d::Text(height = 20mm, text = "Hello µcad!");
+
+-- Output --
+-- Errors --
+-- Model --
+  Group (root) ->
+    Workpiece(sketch) std::geo2d::Text(font_file=, height=20mm, text=Hello µcad!) ->
+      - font_file = ""
+      - height = 20mm
+      - text = "Hello µcad!"
+      Primitive2D __builtin::geo2d::Text(font_file=, height=20, text=Hello µcad!)⏎ ->
+
+-- Test Result --
+OK
+Export successful.
