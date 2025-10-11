@@ -127,7 +127,7 @@ impl CallMethod for Value {
 
 #[test]
 fn call_list_method() {
-    let list = Array::new(
+    let list = Array::from_values(
         ValueList::new(vec![
             Value::Quantity(Quantity::new(3.0, QuantityType::Scalar)),
             Value::Quantity(Quantity::new(3.0, QuantityType::Scalar)),
