@@ -217,20 +217,7 @@ impl Symbol {
     /// # Arguments
     /// - `name`: Name to search for.
     pub(crate) fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
-        self.search_intern(name, Default::default())
-    }
-
-    /// Search down the symbol tree for a qualified name.
-    /// # Arguments
-    /// - `name`: Name to search for.
-    fn search_intern(&self, name: &QualifiedName, mut prev: Symbols) -> ResolveResult<Symbol> {
         log::trace!("Searching {name} in {:?}", self.full_name());
-
-        // prevent circular aliases
-        if prev.contains(self) {
-            return Err(ResolveError::CircularAlias(self.to_string()));
-        }
-        prev.push(self.clone());
 
         if let Some(first) = name.first() {
             if let Some(child) = self.get(first) {
@@ -239,7 +226,7 @@ impl Symbol {
                     Ok(child.clone())
                 } else {
                     let name = &name.remove_first();
-                    child.search_intern(name, prev)
+                    child.search(name)
                 }
             } else {
                 log::trace!("No child in {:?} while searching for {name:?}", self.id());
