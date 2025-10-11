@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**276** tests from markdown.
+**278** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -211,7 +211,9 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/source_use.svg)](../doc/tests/.test/source_use.log) | [source_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_workbench.svg)](../doc/tests/.test/source_workbench.log) | [source_workbench](../doc/tests/statement_usage.md) |
 | [![test](../doc/libs/std/geo2d/.test/std_geo2d_pie.svg)](../doc/libs/std/geo2d/.test/std_geo2d_pie.log) | [std_geo2d_pie](../doc/libs/std/geo2d/README.md) |
+| [![test](../doc/libs/std/geo2d/.test/std_geo2d_text.svg)](../doc/libs/std/geo2d/.test/std_geo2d_text.log) | [std_geo2d_text](../doc/libs/std/geo2d/README.md) |
 | [![test](../books/tutorials/src/lego_brick/base/frame/.test/subtract.svg)](../books/tutorials/src/lego_brick/base/frame/.test/subtract.log) | [subtract](../books/tutorials/src/lego_brick/base/frame/subtract.md) |
+| [![test](../doc/libs/builtin/.test/text.svg)](../doc/libs/builtin/.test/text.log) | [text](../doc/libs/builtin/geo2d.md) |
 | [![test](../doc/.test/toml_import.svg)](../doc/.test/toml_import.log) | [toml_import](../doc/import.md) |
 | [![test](../doc/libs/std/ops/.test/translate_2d.svg)](../doc/libs/std/ops/.test/translate_2d.log) | [translate_2d](../doc/libs/std/ops/translate.md) |
 | [![test](../doc/types/.test/tuple_add_different.svg)](../doc/types/.test/tuple_add_different.log) | [tuple_add_different](../doc/types/tuples.md) |
