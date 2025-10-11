@@ -56,6 +56,11 @@ impl Model {
         self.borrow().element.is_operation()
     }
 
+    /// Return if ,model has no children.
+    pub fn is_empty(&self) -> bool {
+        self.borrow().is_empty()
+    }
+
     /// Make a deep copy if this model.
     /// TODO: isn't this a Clone?
     pub fn make_deep_copy(&self) -> Self {

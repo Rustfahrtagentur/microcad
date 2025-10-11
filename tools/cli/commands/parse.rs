@@ -20,8 +20,10 @@ pub struct Parse {
 impl RunCommand<Rc<SourceFile>> for Parse {
     fn run(&self, _cli: &Cli) -> anyhow::Result<Rc<SourceFile>> {
         let source_file = SourceFile::load(self.input.clone())?;
-        log::info!("Parsed successfully!");
-        println!("{}", FormatTree(source_file.as_ref()));
+        eprintln!("Parsed successfully!");
+        if self.syntax {
+            println!("{}", FormatTree(source_file.as_ref()));
+        }
         Ok(source_file)
     }
 }

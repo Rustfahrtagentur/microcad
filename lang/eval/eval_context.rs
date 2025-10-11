@@ -109,8 +109,15 @@ impl EvalContext {
     }
 
     /// Evaluate context into a value.
-    pub fn eval(&mut self) -> EvalResult<Model> {
-        self.sources.root().eval(self)
+    pub fn eval(&mut self) -> EvalResult<Option<Model>> {
+        let model: Model = self.sources.root().eval(self)?;
+        log::trace!("Post-evaluation context:\n{self:?}");
+        log::debug!("Evaluated Model:\n{model:?}");
+        if model.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(model))
+        }
     }
 
     /// Run the closure `f` within the given `stack_frame`.

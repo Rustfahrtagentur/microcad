@@ -167,8 +167,8 @@ impl ResolveContext {
             }
         }
 
-        log::debug!("Resolve OK ({passes_needed} passes)");
-        log::trace!("Resolved symbol table:\n{self:?}");
+        log::info!("Resolve OK ({passes_needed} passes)");
+        log::debug!("Resolved symbol table:\n{self:?}");
 
         self.mode = ResolveMode::Resolved;
 
@@ -318,7 +318,7 @@ impl std::fmt::Display for ResolveContext {
         if self.has_errors() {
             writeln!(
                 f,
-                "There were {err} error(s) and {warn} warning(s) so far:\n{diag}",
+                "{err} error(s) and {warn} warning(s) so far:\n{diag}",
                 err = self.error_count(),
                 warn = self.warning_count(),
                 diag = self.diagnosis()

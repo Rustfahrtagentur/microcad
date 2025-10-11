@@ -117,6 +117,20 @@ impl<'a> FromIterator<&'a Identifier> for NameList {
     }
 }
 
+impl std::fmt::Display for NameList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.symbols
+                .iter()
+                .map(|name| name.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
+}
+
 impl std::fmt::Debug for NameList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.symbols

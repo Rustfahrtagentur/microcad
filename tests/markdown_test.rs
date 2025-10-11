@@ -214,7 +214,7 @@ pub fn run_test(
                         let _ = fs::hard_link("images/fail.svg", banner);
                         writeln!(log_out, "-- Test Result --\nFAIL").expect("output error");
                         panic!(
-                            "ERROR: there were {error_count} errors (see {log_filename})",
+                            "ERROR: There were {error_count} errors (see {log_filename}).",
                             error_count = context.error_count()
                         );
                     }
@@ -287,7 +287,7 @@ fn report_test_fail(
 
 fn report_model(
     log_out: &mut std::io::BufWriter<&mut std::fs::File>,
-    model: Model,
+    model: Option<Model>,
     out_filename: &str,
     hires: bool,
 ) {
@@ -299,35 +299,40 @@ fn report_model(
     };
     use std::io::Write;
 
-    write!(log_out, "-- Model --\n{}\n", FormatTree(&model)).expect("output error");
+    // print model
+    if let Some(model) = model {
+        write!(log_out, "-- Model --\n{}\n", FormatTree(&model)).expect("output error");
 
-    let export = match model.deduce_output_type() {
-        OutputType::Geometry2D => Some(Export {
-            filename: format!("{out_filename}.svg").into(),
-            resolution: RenderResolution::default(),
-            exporter: Rc::new(SvgExporter),
-        }),
-        OutputType::Geometry3D => Some(Export {
-            filename: format!("{out_filename}.stl").into(),
-            resolution: if hires {
-                RenderResolution::default()
-            } else {
-                RenderResolution::coarse()
+        let export = match model.deduce_output_type() {
+            OutputType::Geometry2D => Some(Export {
+                filename: format!("{out_filename}.svg").into(),
+                resolution: RenderResolution::default(),
+                exporter: Rc::new(SvgExporter),
+            }),
+            OutputType::Geometry3D => Some(Export {
+                filename: format!("{out_filename}.stl").into(),
+                resolution: if hires {
+                    RenderResolution::default()
+                } else {
+                    RenderResolution::coarse()
+                },
+                exporter: Rc::new(StlExporter),
+            }),
+            OutputType::NotDetermined => {
+                writeln!(log_out, "Could not determine output type.").expect("output error");
+                None
+            }
+            _ => panic!("Invalid geometry output"),
+        };
+        match export {
+            Some(export) => match export.export(&model) {
+                Ok(_) => writeln!(log_out, "Export successful."),
+                Err(error) => writeln!(log_out, "Export error: {error}"),
             },
-            exporter: Rc::new(StlExporter),
-        }),
-        OutputType::NotDetermined => {
-            writeln!(log_out, "Could not determine output type.").expect("output error");
-            None
+            None => writeln!(log_out, "Nothing will be exported."),
         }
-        _ => panic!("Invalid geometry output"),
-    };
-    match export {
-        Some(export) => match export.export(&model) {
-            Ok(_) => writeln!(log_out, "Export successful."),
-            Err(error) => writeln!(log_out, "Export error: {error}"),
-        },
-        None => writeln!(log_out, "Nothing will be exported."),
+        .expect("output error")
+    } else {
+        writeln!(log_out, "-- No model --").expect("output error");
     }
-    .expect("output error")
 }

@@ -56,7 +56,7 @@ impl<'a> ArgumentMatch<'a> {
     /// Match arguments by id
     fn match_ids(&mut self) {
         if !self.arguments.is_empty() {
-            log::trace!("find id match for:\n{self}");
+            log::trace!("find id match for:\n{self:?}");
             self.arguments.retain(|(id, arg)| {
                 let id = match (id.is_empty(), &arg.inline_id) {
                     (true, Some(id)) => id,
@@ -83,9 +83,9 @@ impl<'a> ArgumentMatch<'a> {
     fn match_types(&mut self, mut exclude_defaults: bool) {
         if !self.arguments.is_empty() {
             if exclude_defaults {
-                log::trace!("find type matches for (defaults):\n{self}");
+                log::trace!("find type matches for (defaults):\n{self:?}");
             } else {
-                log::trace!("find type matches for:\n{self}");
+                log::trace!("find type matches for:\n{self:?}");
             }
             self.arguments.retain(|(arg_id, arg)| {
                 // filter params by type
@@ -135,7 +135,7 @@ impl<'a> ArgumentMatch<'a> {
     /// Fill arguments with defaults
     fn match_defaults(&mut self) {
         if !self.params.is_empty() {
-            log::trace!("find default match for:\n{self}");
+            log::trace!("find default match for:\n{self:?}");
             // remove missing that can be found
             self.params.retain(|(id, param)| {
                 // check for any default value
@@ -213,19 +213,21 @@ impl<'a> ArgumentMatch<'a> {
     }
 }
 
-impl std::fmt::Display for ArgumentMatch<'_> {
+impl std::fmt::Debug for ArgumentMatch<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "   Arguments: {}\n  Parameters: {}",
-            self.arguments
+            "   Arguments: {args}\n  Parameters: {params}",
+            args = self
+                .arguments
                 .iter()
-                .map(|(id, arg)| format!("{id:?}: = {arg:?}"))
+                .map(|(id, arg)| format!("{id:?} = {arg:?}"))
                 .collect::<Vec<_>>()
                 .join(", "),
-            self.params
+            params = self
+                .params
                 .iter()
-                .map(|(id, param)| format!("{id:?} = {param}"))
+                .map(|(id, param)| format!("{id:?} = {param:?}"))
                 .collect::<Vec<_>>()
                 .join(", "),
         )

@@ -8,7 +8,7 @@ use compact_str::CompactStringExt;
 use derive_more::Deref;
 
 /// List of parameter values
-#[derive(Clone, Debug, Default, Deref)]
+#[derive(Clone, Default, Deref)]
 pub struct ParameterValueList(std::collections::HashMap<Identifier, ParameterValue>);
 
 impl ParameterValueList {
@@ -34,6 +34,20 @@ impl std::fmt::Display for ParameterValueList {
                 .0
                 .iter()
                 .map(|(id, p)| format!("{id}: {p}"))
+                .collect::<Vec<_>>();
+            v.sort();
+            v.join_compact(", ")
+        })
+    }
+}
+
+impl std::fmt::Debug for ParameterValueList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", {
+            let mut v = self
+                .0
+                .iter()
+                .map(|(id, p)| format!("{id:?}: {p:?}"))
                 .collect::<Vec<_>>();
             v.sort();
             v.join_compact(", ")
