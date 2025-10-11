@@ -26,7 +26,7 @@ pub fn assert() -> Symbol {
                                 EvalError::AssertionFailed(if message.is_empty() {
                                     format!("{v}")
                                 } else {
-                                    format!("{v}: {message}")
+                                    message
                                 }),
                             )?;
                         }
@@ -47,7 +47,6 @@ fn all_equal<T: PartialEq + std::fmt::Debug>(mut iter: impl Iterator<Item = T>) 
     if let Some(first) = iter.next() {
         iter.all(|x| x == first)
     } else {
-        // Wenn der Iterator leer ist, gibt es keine Elemente zum Vergleichen.
         true
     }
 }
@@ -57,7 +56,7 @@ pub fn assert_eq() -> Symbol {
         Identifier::no_ref("assert_eq"),
         Some(
             [
-                parameter!(a),                               // Parameter with any type
+                parameter!(array),                           // Parameter with any type
                 parameter!(message: String = String::new()), // Optional message
             ]
             .into_iter()
@@ -66,12 +65,12 @@ pub fn assert_eq() -> Symbol {
         &|params, args, context| {
             match ArgumentMatch::find_multi_match(args, params.expect("ParameterList")) {
                 Ok(multi_args) => {
-                    for a in multi_args {
-                        let a_value = &a.get_value("a").expect("missing parameter");
+                    for array in multi_args {
+                        let array_value = &array.get_value("array").expect("missing parameter");
 
-                        if let Value::Array(exprs) = a_value {
+                        if let Value::Array(exprs) = array_value {
                             if !all_equal(exprs.iter()) {
-                                let message: String = a.get("message");
+                                let message: String = array.get("message");
                                 context.error(
                                     args,
                                     EvalError::AssertionFailed(if message.is_empty() {
@@ -82,11 +81,11 @@ pub fn assert_eq() -> Symbol {
                                 )?;
                             }
                         } else {
-                            let message: String = a.get("message");
+                            let message: String = array.get("message");
                             context.error(
                                 args,
                                 EvalError::AssertionFailed(if message.is_empty() {
-                                    format!("Invalid: {a_value}")
+                                    format!("Invalid: {array_value}")
                                 } else {
                                     "{message}".to_string()
                                 }),
@@ -110,7 +109,7 @@ pub fn assert_valid() -> Symbol {
         Identifier::no_ref("assert_valid"),
         Some(
             [
-                parameter!(name: Target),                    // Parameter name
+                parameter!(target: Target),                  // Parameter name
                 parameter!(message: String = String::new()), // Optional message
             ]
             .into_iter()
@@ -120,15 +119,15 @@ pub fn assert_valid() -> Symbol {
             match ArgumentMatch::find_multi_match(args, params.expect("ParameterList")) {
                 Ok(multi_args) => {
                     for arg in multi_args {
-                        if let Value::Target(target) =
-                            &arg.get_value("name").expect("missing parameter")
-                        {
-                            if target.is_invalid() {
-                                context.error(
-                                    &arg,
-                                    EvalError::AssertionFailed(format!("Invalid value: {arg}")),
-                                )?;
-                            }
+                        let target = arg.get::<Target>("target");
+                        if target.target.is_none() {
+                            context.error(
+                                &arg,
+                                EvalError::AssertionFailed(format!(
+                                    "Symbol `{}` not found.",
+                                    target.name
+                                )),
+                            )?;
                         }
                     }
                 }
@@ -148,7 +147,7 @@ pub fn assert_invalid() -> Symbol {
         Identifier::no_ref("assert_invalid"),
         Some(
             [
-                parameter!(name: Target),                    // Parameter name
+                parameter!(target: Target),                  // Parameter name
                 parameter!(message: String = String::new()), // Optional message
             ]
             .into_iter()
@@ -158,15 +157,16 @@ pub fn assert_invalid() -> Symbol {
             match ArgumentMatch::find_multi_match(args, params.expect("ParameterList")) {
                 Ok(multi_args) => {
                     for arg in multi_args {
-                        if let Value::Target(target) =
-                            &arg.get_value("name").expect("missing parameter")
-                        {
-                            if target.is_valid() {
-                                context.error(
-                                    &arg,
-                                    EvalError::AssertionFailed(format!("Invalid value: {arg}")),
-                                )?;
-                            }
+                        let target = arg.get::<Target>("target");
+                        if let Some(target_name) = target.target {
+                            context.error(
+                                &arg,
+                                EvalError::AssertionFailed(format!(
+                                    "Found valid symbol '{}' within module '{}'.",
+                                    target.name,
+                                    target_name.base(&target.name)
+                                )),
+                            )?;
                         }
                     }
                 }

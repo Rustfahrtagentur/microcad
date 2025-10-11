@@ -133,6 +133,14 @@ impl QualifiedName {
         }
     }
 
+    /// Return the base of the given relative name.
+    ///
+    /// Does not check if ids match!
+    pub fn base(&self, relative: &Self) -> Self {
+        let (base, _) = self.split_at(relative.len() - 1);
+        base.iter().cloned().collect()
+    }
+
     /// Add given prefix to name
     pub fn with_prefix(&self, prefix: &QualifiedName) -> Self {
         let mut full_name = prefix.clone();
