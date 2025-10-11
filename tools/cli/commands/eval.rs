@@ -18,8 +18,8 @@ pub struct Eval {
     pub model: bool,
 }
 
-impl RunCommand<(EvalContext, Model)> for Eval {
-    fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<(EvalContext, Model)> {
+impl RunCommand<(EvalContext, Option<Model>)> for Eval {
+    fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<(EvalContext, Option<Model>)> {
         if !cli.has_std_lib() {
             return Err(anyhow!(
                 "No std library was found. Use `microcad install std` to install the std library."
@@ -35,8 +35,6 @@ impl RunCommand<(EvalContext, Model)> for Eval {
             microcad_builtin::builtin_importers(),
         );
 
-        let model = context.eval().expect("Valid model");
-
         log::info!("Result:");
         match context.has_errors() {
             true => {
@@ -47,9 +45,22 @@ impl RunCommand<(EvalContext, Model)> for Eval {
         }
 
         if self.model {
-            println!("{}", FormatTree(&model))
+            match context.eval() {
+                Result::Ok(Some(model)) => {
+                    println!("{}", FormatTree(&model));
+                    Ok((context, Some(model)))
+                }
+                Result::Ok(None) => {
+                    eprintln!("No output model.");
+                    Ok((context, None))
+                }
+                Err(err) => {
+                    eprintln!("Model construction failed.");
+                    Ok(Err(err)?)
+                }
+            }
+        } else {
+            Ok((context, None))
         }
-
-        Ok((context, model))
     }
 }

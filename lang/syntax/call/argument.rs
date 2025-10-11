@@ -66,3 +66,33 @@ impl TreeDisplay for Argument {
         self.expression.tree_print(f, depth)
     }
 }
+
+#[test]
+fn test_argument_debug() {
+    let arg1 = Argument {
+        id: Some("id1".into()),
+        expression: Expression::QualifiedName("my::name1".into()),
+        src_ref: SrcRef(None),
+    };
+
+    let arg2 = Argument {
+        id: None,
+        expression: Expression::QualifiedName("my::name2".into()),
+        src_ref: SrcRef(None),
+    };
+
+    let arg3 = Argument {
+        id: Some(Identifier::none()),
+        expression: Expression::QualifiedName("my::name2".into()),
+        src_ref: SrcRef(None),
+    };
+
+    let mut args = ArgumentList::default();
+
+    args.try_push(arg1).expect("test error");
+    args.try_push(arg2).expect("test error");
+    args.try_push(arg3).expect("test error");
+
+    log::info!("{args}");
+    log::info!("{args:?}");
+}

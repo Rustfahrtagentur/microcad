@@ -113,7 +113,7 @@ impl std::fmt::Display for Type {
             Self::Tuple(t) => write!(f, "{t}"),
             Self::Matrix(t) => write!(f, "{t}"),
             Self::Models => write!(f, "Models"),
-            Self::Target => write!(f, "Name"),
+            Self::Target => write!(f, "Target"),
         }
     }
 }
@@ -130,7 +130,7 @@ impl std::fmt::Debug for Type {
             Self::Tuple(t) => write!(f, "{t}"),
             Self::Matrix(t) => write!(f, "{t}"),
             Self::Models => write!(f, "Models"),
-            Self::Target => write!(f, "Name"),
+            Self::Target => write!(f, "Target"),
         }
     }
 }

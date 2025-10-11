@@ -34,9 +34,9 @@ impl std::fmt::Display for Target {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let name = &self.name;
         if let Some(target) = &self.target {
-            write!(f, "{name} -> {target}")
+            write!(f, "{{{name} -> {target}}}")
         } else {
-            write!(f, "{name} -> ???")
+            write!(f, "{{{name} -> ???}}")
         }
     }
 }
@@ -45,9 +45,9 @@ impl std::fmt::Debug for Target {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let name = &self.name;
         if let Some(target) = &self.target {
-            write!(f, "{name:?} -> {target:?}")
+            write!(f, "{{{name:?} -> {target:?}}}")
         } else {
-            color_print::cwrite!(f, "{name:?} -> <R!>???</>")
+            color_print::cwrite!(f, "{{{name:?} -> <R!>???</>}}")
         }
     }
 }

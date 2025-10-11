@@ -95,28 +95,22 @@ impl Symbol {
     ) -> std::fmt::Result {
         let self_id = &self.id();
         let id = id.unwrap_or(self_id);
+        let def = &self.inner.borrow().def;
+        let full_name = self.full_name();
+        let visibility = self.visibility();
         if debug && cfg!(feature = "ansi-color") && self.inner.borrow().used.get().is_none() {
+            let checked = if self.inner.borrow().checked {
+                " ✓"
+            } else {
+                ""
+            };
             color_print::cwrite!(
                 f,
-                "{:depth$}<#606060>{visibility}{id:?} {def:?} [{full_name:?}]</>{checked}",
+                "{:depth$}<#606060>{visibility:?}{id:?} {def:?} [{full_name:?}]</>{checked}",
                 "",
-                visibility = self.visibility(),
-                def = self.inner.borrow().def,
-                full_name = self.full_name(),
-                checked = if self.inner.borrow().checked {
-                    " ✓"
-                } else {
-                    ""
-                }
             )?;
         } else {
-            write!(
-                f,
-                "{:depth$}{id} {def} [{full_name}]",
-                "",
-                def = self.inner.borrow().def,
-                full_name = self.full_name(),
-            )?;
+            write!(f, "{:depth$}{id} {def} [{full_name}]", "",)?;
         }
         if children {
             writeln!(f)?;
@@ -406,7 +400,6 @@ impl Symbol {
         inner
             .children
             .values()
-            .inspect(|symbol| log::warn!("before: {} => {symbol}", inner.def.id()))
             .filter(|symbol| {
                 if symbol.is_public() {
                     true
@@ -498,7 +491,7 @@ impl Symbol {
             let prefix = self.module_name().clone();
 
             if !names.is_empty() {
-                log::debug!("checking symbols:\n{names:?}");
+                log::debug!("checking symbols: {names}");
 
                 names
                     .iter()

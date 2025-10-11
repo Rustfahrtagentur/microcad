@@ -186,7 +186,14 @@ impl std::fmt::Display for QualifiedName {
         if self.is_empty() {
             write!(f, crate::invalid_no_ansi!(NAME))
         } else {
-            write!(f, "{}", join_identifiers(&self.0, "::"))
+            write!(
+                f,
+                "{}",
+                self.iter()
+                    .map(|id| format!("{id:?}"))
+                    .collect::<Vec<_>>()
+                    .join("::")
+            )
         }
     }
 }
@@ -196,7 +203,14 @@ impl std::fmt::Debug for QualifiedName {
         if self.is_empty() {
             write!(f, crate::invalid!(NAME))
         } else {
-            write!(f, "{}", join_identifiers_debug(&self.0, "::"))
+            write!(
+                f,
+                "{}",
+                self.iter()
+                    .map(|id| format!("{id:?}"))
+                    .collect::<Vec<_>>()
+                    .join("::")
+            )
         }
     }
 }
@@ -298,7 +312,11 @@ impl From<Identifier> for QualifiedName {
 
 impl From<QualifiedName> for String {
     fn from(value: QualifiedName) -> Self {
-        join_identifiers(&value.0, "::")
+        value
+            .iter()
+            .map(|id| format!("{id}"))
+            .collect::<Vec<_>>()
+            .join("::")
     }
 }
 
@@ -308,7 +326,10 @@ impl TreeDisplay for QualifiedName {
             f,
             "{:depth$}QualifiedName: '{}'",
             "",
-            join_identifiers_debug(&self.0, "::")
+            self.iter()
+                .map(|id| format!("{id:?}"))
+                .collect::<Vec<_>>()
+                .join("::")
         )
     }
 }

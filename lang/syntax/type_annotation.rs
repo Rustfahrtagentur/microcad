@@ -23,7 +23,7 @@ impl std::fmt::Display for TypeAnnotation {
 
 impl std::fmt::Debug for TypeAnnotation {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        self.0.fmt(f)
+        write!(f, "{:?}", self.0)
     }
 }
 

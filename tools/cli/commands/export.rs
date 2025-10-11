@@ -39,19 +39,23 @@ impl RunCommand<Vec<(Model, ExportCommand)>> for Export {
         // run prior parse step
         let (context, model) = self.eval.run(cli)?;
 
-        let config = cli.fetch_config()?;
+        if let Some(model) = model {
+            let config = cli.fetch_config()?;
 
-        let target_models = self.target_models(&model, &config, context.exporters())?;
+            let target_models = self.target_models(&model, &config, context.exporters())?;
 
-        if self.targets {
-            self.list_targets(&target_models)?;
+            if self.targets {
+                self.list_targets(&target_models)?;
+            }
+
+            if !self.dry_run {
+                self.export_targets(&target_models)?;
+            }
+
+            Ok(target_models)
+        } else {
+            Err(anyhow!("Model missing!"))
         }
-
-        if !self.dry_run {
-            self.export_targets(&target_models)?;
-        }
-
-        Ok(target_models)
     }
 }
 

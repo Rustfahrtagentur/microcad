@@ -203,7 +203,7 @@ pub enum EvalError {
     InvalidSelfReference(Identifier),
 
     /// Resolve Error
-    #[error("Resolve error {0}")]
+    #[error("Resolve error: {0}")]
     ResolveError(ResolveError),
 
     /// Unexpected source file in expression
