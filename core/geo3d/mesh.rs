@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::{Bounds3D, FetchBounds3D, Vec3};
+use cgmath::InnerSpace;
 use manifold_rs::{Manifold, Mesh};
 
 /// Vertex
@@ -195,6 +196,72 @@ impl TriangleMesh {
             .map(|t| t.signed_volume())
             .sum::<f64>()
             .abs()
+    }
+
+    /// TriangleMesh.
+    pub fn repair(&mut self, position_epsilon: f64) {
+        // 1. Merge duplicate vertices using a spatial hash map (or hashmap keyed on quantized position)
+
+        // Quantize vertex positions to grid to group duplicates
+        let quantize = |pos: &Vec3| {
+            (
+                (pos.x / position_epsilon).round() as i64,
+                (pos.y / position_epsilon).round() as i64,
+                (pos.z / position_epsilon).round() as i64,
+            )
+        };
+
+        let mut vertex_map: std::collections::HashMap<(i64, i64, i64), u32> =
+            std::collections::HashMap::new();
+        let mut new_vertices: Vec<Vertex> = Vec::with_capacity(self.vertices.len());
+        let mut remap: Vec<u32> = vec![0; self.vertices.len()];
+
+        for (i, vertex) in self.vertices.iter().enumerate() {
+            let key = quantize(&vertex.pos);
+            if let Some(&existing_idx) = vertex_map.get(&key) {
+                // Duplicate vertex found
+                remap[i] = existing_idx;
+            } else {
+                // New unique vertex
+                let new_idx = new_vertices.len() as u32;
+                new_vertices.push(*vertex);
+                vertex_map.insert(key, new_idx);
+                remap[i] = new_idx;
+            }
+        }
+
+        self.vertices = new_vertices;
+
+        // 2. Remap triangle indices and remove degenerate triangles (zero area or repeated vertices)
+        let mut new_triangles = Vec::with_capacity(self.triangle_indices.len());
+
+        for tri in &self.triangle_indices {
+            let i0 = remap[tri.0 as usize];
+            let i1 = remap[tri.1 as usize];
+            let i2 = remap[tri.2 as usize];
+
+            // Skip degenerate triangles (any repeated index)
+            if i0 == i1 || i1 == i2 || i2 == i0 {
+                continue;
+            }
+
+            // Optional: check zero-area triangle by computing cross product
+            let v0 = self.vertices[i0 as usize].pos;
+            let v1 = self.vertices[i1 as usize].pos;
+            let v2 = self.vertices[i2 as usize].pos;
+
+            let edge1 = v1 - v0;
+            let edge2 = v2 - v0;
+            let area = edge1.cross(edge2).magnitude();
+
+            if area < 1e-8 {
+                continue; // Degenerate triangle
+            }
+
+            new_triangles.push(Triangle(i0, i1, i2));
+        }
+
+        self.triangle_indices = new_triangles;
     }
 }
 
