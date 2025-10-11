@@ -185,7 +185,9 @@ pub fn run_test(
                 match (eval, context.has_errors(), todo) {
                     // test expected to succeed and succeeds with no errors
                     (Ok(model), false, false) => {
-                        report_model(log_out, model, banner, out_filename, hires);
+                        let _ = std::fs::hard_link("images/ok.svg", banner);
+                        writeln!(log_out, "-- Test Result --\nOK").expect("no output error");
+                        report_model(log_out, model, out_filename, hires);
                     }
                     // test is todo but succeeds with no errors
                     (Ok(_), false, true) => {
@@ -286,7 +288,6 @@ fn report_test_fail(
 fn report_model(
     log_out: &mut std::io::BufWriter<&mut std::fs::File>,
     model: Model,
-    banner: &str,
     out_filename: &str,
     hires: bool,
 ) {
@@ -298,11 +299,7 @@ fn report_model(
     };
     use std::io::Write;
 
-    // get print output
     write!(log_out, "-- Model --\n{}\n", FormatTree(&model)).expect("output error");
-
-    let _ = std::fs::hard_link("images/ok.svg", banner);
-    writeln!(log_out, "-- Test Result --\nOK").expect("no output error");
 
     let export = match model.deduce_output_type() {
         OutputType::Geometry2D => Some(Export {
