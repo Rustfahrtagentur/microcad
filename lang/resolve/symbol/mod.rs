@@ -185,7 +185,7 @@ impl Symbol {
         self.inner.borrow().children.get(id).cloned()
     }
 
-    fn is_deleted(&self) -> bool {
+    pub(super) fn is_deleted(&self) -> bool {
         self.visibility.get() == Visibility::Deleted
     }
 
