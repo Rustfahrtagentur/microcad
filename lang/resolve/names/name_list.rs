@@ -67,7 +67,7 @@ impl NameList {
                     true
                 }
             }));
-        self.locals.extend(other.locals);
+        self.locals.extend(other.locals.iter().cloned());
     }
 
     pub(crate) fn is_empty(&self) -> bool {
@@ -111,7 +111,7 @@ impl<'a> FromIterator<&'a QualifiedName> for NameList {
 impl<'a> FromIterator<&'a Identifier> for NameList {
     fn from_iter<T: IntoIterator<Item = &'a Identifier>>(iter: T) -> Self {
         Self {
-            locals: indexmap::IndexSet::from_iter(iter.into_iter().cloned()),
+            locals: IdentifierSet::from_iter(iter.into_iter().cloned()),
             ..Default::default()
         }
     }

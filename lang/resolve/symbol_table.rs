@@ -62,6 +62,15 @@ impl SymbolTable {
             .for_each(|symbol| symbol.unused(&mut unchecked));
         unchecked
     }
+
+    /// search all ids which require target mode (e.g. `assert_valid`)
+    pub(super) fn search_target_mode_ids(&self) -> ResolveResult<IdentifierSet> {
+        let mut ids = IdentifierSet::default();
+        self.symbols
+            .values()
+            .try_for_each(|symbol| symbol.search_target_mode_ids(&mut ids))?;
+        Ok(ids)
+    }
 }
 
 impl WriteToFile for SymbolTable {}

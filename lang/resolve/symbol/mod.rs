@@ -441,7 +441,11 @@ impl Symbol {
     }
 
     /// check names in symbol definition
-    pub(super) fn check(&self, context: &mut ResolveContext) -> ResolveResult<()> {
+    pub(super) fn check(
+        &self,
+        context: &mut ResolveContext,
+        exclude_ids: &IdentifierSet,
+    ) -> ResolveResult<()> {
         if !matches!(self.visibility.get(), Visibility::Deleted) {
             let names = match &self.inner.borrow().def {
                 SymbolDefinition::SourceFile(sf) => sf.names(),
@@ -462,6 +466,9 @@ impl Symbol {
 
                 names
                     .iter()
+                    .filter(|name| {
+                        exclude_ids.contains(name.last().expect("symbol with empty name"))
+                    })
                     .try_for_each(|name| match context.lookup(name) {
                         Ok(_) => Ok::<_, ResolveError>(()),
                         Err(err) => {
@@ -477,7 +484,7 @@ impl Symbol {
             let children = self.inner.borrow().children.clone();
             children
                 .values()
-                .try_for_each(|symbol| symbol.check(context))
+                .try_for_each(|symbol| symbol.check(context, exclude_ids))
         } else {
             Ok(())
         }
@@ -538,19 +545,24 @@ impl Symbol {
     /// Returns `true` if builtin symbol uses parameter of type Name
     ///
     /// (for assert_valid() and assert_invalid())
-    pub(crate) fn uses_raw_name(&self) -> bool {
+    pub(crate) fn is_target_mode(&self) -> bool {
         self.with_def(|def| match def {
             SymbolDefinition::Builtin(builtin) => {
                 if let Some(parameters) = &builtin.parameters {
-                    parameters
-                        .values()
-                        .any(|param| param.type_matches(&Type::Target))
+                    parameters.values().any(|param| param.ty() == Type::Target)
                 } else {
                     false
                 }
             }
             _ => false,
         })
+    }
+
+    pub(super) fn search_target_mode_ids(&self, ids: &mut IdentifierSet) -> ResolveResult<()> {
+        if self.is_target_mode() {
+            ids.insert(self.id());
+        }
+        self.with_children(|(_, child)| child.search_target_mode_ids(ids))
     }
 }
 

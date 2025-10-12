@@ -185,11 +185,15 @@ impl ResolveContext {
     /// check names in all symbols
     pub fn check(&mut self) -> ResolveResult<()> {
         log::trace!("Checking symbol table");
+
+        let exclude_ids = self.symbol_table.search_target_mode_ids()?;
+        log::trace!("Excluding target mode ids: {exclude_ids}");
+
         if let Err(err) = self
             .symbol_table
             .values()
             .iter_mut()
-            .try_for_each(|symbol| symbol.check(self))
+            .try_for_each(|symbol| symbol.check(self, &exclude_ids))
         {
             self.error(&crate::src_ref::SrcRef::default(), err)?;
         } else if !self.has_errors() {

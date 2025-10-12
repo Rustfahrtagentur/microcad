@@ -92,7 +92,7 @@ impl Eval for Call {
         };
 
         // evaluate arguments
-        let args: ArgumentValueList = if symbol.uses_raw_name() {
+        let args: ArgumentValueList = if symbol.is_target_mode() {
             // for assert_valid() and assert_invalid()
             Eval::<ArgumentValueListRaw>::eval(&self.argument_list, context)?.into()
         } else {
