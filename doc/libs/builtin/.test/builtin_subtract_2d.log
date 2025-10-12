@@ -27,6 +27,6 @@
         Primitive2D __builtin::geo2d::Rect(height=3, width=3, x=0, y=0)
  ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

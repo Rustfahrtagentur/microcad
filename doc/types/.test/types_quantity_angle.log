@@ -15,11 +15,6 @@
 
 -- Output --
 -- Errors --
-error: Symbol all_equal not found while resolving.
-  ---> <FROM STR>:8:59
-     |
-   8 | std::debug::assert( [degree, degree_, grad, turn, radian].all_equal() );
-     |                                                           ^^^^^^^^^
-     |
+-- No model --
 -- Test Result --
-FAIL
+OK

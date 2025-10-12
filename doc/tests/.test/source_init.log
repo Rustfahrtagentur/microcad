@@ -14,11 +14,5 @@ error: Statement is not available within file
    1 | init() {} // error
      | ^^^^^^^^^
      |
-error: Init statement not available here
-  ---> <FROM STR>:1:1
-     |
-   1 | init() {} // error
-     | ^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED

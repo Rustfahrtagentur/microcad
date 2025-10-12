@@ -53,6 +53,6 @@
                       Primitive3D __builtin::geo3d::Cube(size_x=25, size_y=25, size_z=25)
  ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

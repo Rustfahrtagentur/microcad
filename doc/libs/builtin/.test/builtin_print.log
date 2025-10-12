@@ -6,13 +6,9 @@
 
  1: __builtin::print("ok");
 
--- Output --
-ok
--- Errors --
--- Model --
-  Group (root) ->
+-- Output --ok
 
+-- Errors --
+-- No model --
 -- Test Result --
 OK
-Could not determine output type.
-Nothing will be exported.

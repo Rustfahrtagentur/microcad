@@ -24,7 +24,7 @@ info: a is zero
   Group (root) ->
     Group ->
 
--- Test Result --
-OK
 Could not determine output type.
 Nothing will be exported.
+-- Test Result --
+OK

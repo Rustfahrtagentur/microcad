@@ -22,17 +22,5 @@ error: Declaration of B not allowed within function_assignment_const::f
    2 |   const B = 1; // error
      |   ^^^^^^^^^^^^
      |
-error: Assignment statement not available here
-  ---> <FROM STR>:2:3
-     |
-   2 |   const B = 1; // error
-     |   ^^^^^^^^^^^^
-     |
-error: Symbol B not found.
-  ---> <FROM STR>:2:3
-     |
-   2 |   const B = 1; // error
-     |   ^^^^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED

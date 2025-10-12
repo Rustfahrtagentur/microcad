@@ -24,9 +24,9 @@
 18: std::print("outer: {t.outer}");
 19: std::print("inner: {t.inner}");
 
--- Output --
-outer: 10mm
+-- Output --outer: 10mm
 inner: 5mm
+
 -- Errors --
 -- Test Result --
 OK BUT IS TODO

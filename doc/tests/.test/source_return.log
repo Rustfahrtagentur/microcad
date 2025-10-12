@@ -14,11 +14,5 @@ error: Statement is not available within file
    1 | return 1;  // error
      | ^^^^^^^^^
      |
-error: Return statement not available here
-  ---> <FROM STR>:1:1
-     |
-   1 | return 1;  // error
-     | ^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED

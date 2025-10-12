@@ -22,17 +22,5 @@ error: sketch is not available within sketch
    2 |   sketch F() {} F(); // error
      |   ^^^^^^^^^^^^^
      |
-error: Symbol F not found while resolving.
-  ---> <FROM STR>:2:10
-     |
-   2 |   sketch F() {} F(); // error
-     |          ^
-     |
-error: sketch statement not available here
-  ---> <FROM STR>:2:3
-     |
-   2 |   sketch F() {} F(); // error
-     |   ^^^^^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED
