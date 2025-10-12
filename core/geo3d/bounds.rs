@@ -161,14 +161,14 @@ pub trait Transformed3D<T = Self> {
 
 /// Holds bounds for a 3D object.
 #[derive(Clone, Default)]
-pub struct WithBounds3D<T: FetchBounds3D> {
+pub struct WithBounds3D<T: FetchBounds3D + Transformed3D> {
     /// Bounds.
     pub bounds: Bounds3D,
     /// The inner object.
     pub inner: T,
 }
 
-impl<T: FetchBounds3D> WithBounds3D<T> {
+impl<T: FetchBounds3D + Transformed3D> WithBounds3D<T> {
     /// Create a new object with bounds.
     pub fn new(inner: T) -> Self {
         Self {
