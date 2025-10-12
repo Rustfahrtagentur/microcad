@@ -148,7 +148,7 @@ impl FetchBounds2D for Model {
         let self_ = self.borrow();
         match self_.output() {
             RenderOutput::Geometry2D { geometry, .. } => match geometry {
-                Some(geometry) => geometry.fetch_bounds_2d(),
+                Some(geometry) => geometry.bounds.clone(),
                 None => Bounds2D::default(),
             },
             RenderOutput::Geometry3D { .. } => Bounds2D::default(),
@@ -247,8 +247,9 @@ impl RenderWithContext<Geometries2D> for Models {
     fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometries2D> {
         let mut geometries = Vec::new();
         for model in self.iter() {
-            if let Some(geo) = model.render_with_context(context)? {
-                geometries.push(geo);
+            let output: Geometry2DOutput = model.render_with_context(context)?;
+            if let Some(geo) = output {
+                geometries.push(Rc::new(geo.inner.clone()));
             }
         }
 
@@ -264,9 +265,9 @@ impl RenderWithContext<Geometry2DOutput> for Models {
                 .first()
                 .expect("One item")
                 .render_with_context(context)?,
-            _ => Some(Rc::new(Geometry2D::Collection(
-                self.render_with_context(context)?,
-            ))),
+            _ => Some(Rc::new(
+                Geometry2D::Collection(self.render_with_context(context)?).into(),
+            )),
         })
     }
 }
@@ -302,9 +303,9 @@ impl RenderWithContext<Geometry3DOutput> for Models {
 impl RenderWithContext<Geometry2DOutput> for BuiltinWorkpiece {
     fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         Ok(match self.call()? {
-            BuiltinWorkpieceOutput::Primitive2D(renderable) => {
-                Some(Rc::new(renderable.render(&context.current_resolution())))
-            }
+            BuiltinWorkpieceOutput::Primitive2D(renderable) => Some(Rc::new(
+                renderable.render(&context.current_resolution()).into(),
+            )),
             BuiltinWorkpieceOutput::Transform(transform) => {
                 let model = context.model();
                 let model_ = model.borrow();

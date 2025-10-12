@@ -5,12 +5,12 @@
 
 use std::rc::Rc;
 
-use microcad_core::{FetchBounds2D, Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
+use microcad_core::{Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
 
 use crate::{model::*, render::*};
 
 /// Geometry 2D type alias.
-pub type Geometry2DOutput = Option<Rc<Geometry2D>>;
+pub type Geometry2DOutput = Option<Rc<WithBounds2D<Geometry2D>>>;
 
 /// Geometry 3D type alias.
 pub type Geometry3DOutput = Option<Rc<Geometry3D>>;
@@ -177,12 +177,12 @@ impl std::fmt::Display for RenderOutput {
                     write!(
                         f,
                         "{} {}",
-                        match geometry.as_ref() {
+                        match &geometry.inner {
                             Geometry2D::Collection(geometries) =>
                                 format!("Collection({} items)", geometries.len()),
                             geometry => geometry.name().to_string(),
                         },
-                        geometry.fetch_bounds_2d()
+                        geometry.bounds
                     )?;
                 }
             }

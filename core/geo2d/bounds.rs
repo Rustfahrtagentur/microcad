@@ -3,6 +3,7 @@
 
 //! 2D Geometry bounds.
 
+use derive_more::Deref;
 use geo::coord;
 
 use crate::*;
@@ -123,15 +124,16 @@ pub trait FetchBounds2D {
 }
 
 /// Holds bounds for a 3D object.
-#[derive(Clone, Default)]
-pub struct WithBounds2D<T: FetchBounds2D> {
+#[derive(Clone, Default, Debug, Deref)]
+pub struct WithBounds2D<T: FetchBounds2D + Transformed2D> {
     /// Bounds.
+    #[deref]
     pub bounds: Bounds2D,
     /// The inner object.
     pub inner: T,
 }
 
-impl<T: FetchBounds2D> WithBounds2D<T> {
+impl<T: FetchBounds2D + Transformed2D> WithBounds2D<T> {
     /// Create a new object with bounds.
     pub fn new(inner: T) -> Self {
         Self {
@@ -143,6 +145,20 @@ impl<T: FetchBounds2D> WithBounds2D<T> {
     /// Update the bounds.
     pub fn update_bounds(&mut self) {
         self.bounds = self.inner.fetch_bounds_2d()
+    }
+}
+
+impl<T: FetchBounds2D + Transformed2D> Transformed2D for WithBounds2D<T> {
+    fn transformed_2d(&self, mat: &Mat3) -> Self {
+        let inner = self.inner.transformed_2d(mat);
+        let bounds = self.inner.fetch_bounds_2d();
+        Self { inner, bounds }
+    }
+}
+
+impl From<Geometry2D> for WithBounds2D<Geometry2D> {
+    fn from(geo: Geometry2D) -> Self {
+        Self::new(geo)
     }
 }
 
