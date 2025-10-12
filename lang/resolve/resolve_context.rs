@@ -192,6 +192,8 @@ impl ResolveContext {
             .try_for_each(|symbol| symbol.check(self))
         {
             self.error(&crate::src_ref::SrcRef::default(), err)?;
+        } else if !self.has_errors() {
+            self.mode = ResolveMode::Checked;
         }
 
         log::info!("Symbol table OK!");
@@ -206,8 +208,6 @@ impl ResolveContext {
                 .join("\n")
         );
         self.unchecked = Some(unchecked);
-
-        self.mode = ResolveMode::Checked;
 
         Ok(())
     }
@@ -226,8 +226,8 @@ impl ResolveContext {
 
     /// Create a symbol out of all sources (without resolving them)
     /// Return `true` if context has been resolved (or checked as well)
-    pub fn is_resolved(&self) -> bool {
-        self.mode >= ResolveMode::Resolved
+    pub fn is_checked(&self) -> bool {
+        self.mode >= ResolveMode::Checked
     }
 }
 
