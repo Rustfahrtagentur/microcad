@@ -5,7 +5,7 @@
 
 use std::f64::consts::PI;
 
-use cgmath::{InnerSpace, Point3, SquareMatrix, Transform};
+use cgmath::{InnerSpace, Matrix, Point3, SquareMatrix, Transform};
 
 use geo::TriangulateEarcut;
 
@@ -45,10 +45,12 @@ pub trait Extrude {
         let delta = angle_rad / segments as Scalar;
 
         // Generate all rotation matrices
-        let transforms: Vec<Mat4> = (0..=segments)
+        let transforms: Vec<_> = (0..=segments)
             .map(|i| {
                 let a = delta * i as Scalar;
-                Mat4::from_angle_y(-a)
+                let mut mat = Mat4::from_angle_y(a);
+                mat.swap_rows(2, 1); // Align to Z plane
+                mat
             })
             .collect();
 
