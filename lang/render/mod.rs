@@ -143,8 +143,8 @@ impl Model {
     }
 }
 
-impl FetchBounds2D for Model {
-    fn fetch_bounds_2d(&self) -> Bounds2D {
+impl CalcBounds2D for Model {
+    fn calc_bounds_2d(&self) -> Bounds2D {
         let self_ = self.borrow();
         match self_.output() {
             RenderOutput::Geometry2D { geometry, .. } => match geometry {
@@ -276,8 +276,9 @@ impl RenderWithContext<Geometries3D> for Models {
     fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometries3D> {
         let mut geometries = Vec::new();
         for model in self.iter() {
-            if let Some(geo) = model.render_with_context(context)? {
-                geometries.push(geo);
+            let output: Geometry3DOutput = model.render_with_context(context)?;
+            if let Some(geo) = output {
+                geometries.push(Rc::new(geo.inner.clone()));
             }
         }
 
@@ -293,9 +294,9 @@ impl RenderWithContext<Geometry3DOutput> for Models {
                 .first()
                 .expect("One item")
                 .render_with_context(context)?,
-            _ => Some(Rc::new(Geometry3D::Collection(
-                self.render_with_context(context)?,
-            ))),
+            _ => Some(Rc::new(
+                Geometry3D::Collection(self.render_with_context(context)?).into(),
+            )),
         })
     }
 }
@@ -321,9 +322,9 @@ impl RenderWithContext<Geometry2DOutput> for BuiltinWorkpiece {
 impl RenderWithContext<Geometry3DOutput> for BuiltinWorkpiece {
     fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
         Ok(match self.call()? {
-            BuiltinWorkpieceOutput::Primitive3D(renderable) => {
-                Some(Rc::new(renderable.render(&context.current_resolution())))
-            }
+            BuiltinWorkpieceOutput::Primitive3D(renderable) => Some(Rc::new(
+                renderable.render(&context.current_resolution()).into(),
+            )),
             BuiltinWorkpieceOutput::Transform(transform) => {
                 let model = context.model();
                 let model_ = model.borrow();

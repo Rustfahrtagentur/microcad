@@ -30,9 +30,9 @@ pub trait Extrude {
         let mut mesh = self.extrude_slice(&m_a, &m_b);
         mesh.append(&self.cap(&m_a, &-m_a.z.truncate(), true));
         mesh.append(&self.cap(&m_b, &m_b.z.truncate(), false));
-        let mut mesh = WithBounds3D::new(mesh);
-        mesh.repair();
-        mesh
+        let bounds = mesh.calc_bounds_3d();
+        mesh.repair(&bounds);
+        WithBounds3D::new(mesh, bounds)
     }
 
     /// Perform a revolve extrusion with a certain angle.
@@ -71,9 +71,9 @@ pub trait Extrude {
             mesh.append(&self.cap(m_end, &normal_end, false));
         }
 
-        let mut mesh = WithBounds3D::new(mesh);
-        mesh.repair();
-        mesh
+        let bounds = mesh.calc_bounds_3d();
+        mesh.repair(&bounds);
+        WithBounds3D::new(mesh, bounds)
     }
 }
 

@@ -50,20 +50,25 @@ impl Geometry3D {
             }
         }
     }
-}
 
-impl FetchBounds3D for Rc<Manifold> {
-    fn fetch_bounds_3d(&self) -> Bounds3D {
-        todo!()
+    /// Return this geometry with calculated bounds.
+    pub fn with_bounds(self) -> WithBounds3D<Geometry3D> {
+        let bounds = self.calc_bounds_3d();
+        WithBounds3D {
+            bounds,
+            inner: self,
+        }
     }
 }
 
-impl FetchBounds3D for Geometry3D {
-    fn fetch_bounds_3d(&self) -> Bounds3D {
+impl CalcBounds3D for Geometry3D {
+    fn calc_bounds_3d(&self) -> Bounds3D {
         match self {
-            Geometry3D::Mesh(triangle_mesh) => triangle_mesh.fetch_bounds_3d(),
-            Geometry3D::Manifold(manifold) => manifold.fetch_bounds_3d(),
-            Geometry3D::Collection(collection) => collection.fetch_bounds_3d(),
+            Geometry3D::Mesh(triangle_mesh) => triangle_mesh.calc_bounds_3d(),
+            Geometry3D::Manifold(manifold) => {
+                TriangleMesh::from(manifold.to_mesh()).calc_bounds_3d()
+            }
+            Geometry3D::Collection(collection) => collection.calc_bounds_3d(),
         }
     }
 }

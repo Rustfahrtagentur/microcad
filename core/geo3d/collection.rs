@@ -8,7 +8,7 @@ use std::rc::Rc;
 use derive_more::{Deref, DerefMut};
 
 use crate::{
-    geo3d::{FetchBounds3D, bounds::Bounds3D},
+    geo3d::{CalcBounds3D, bounds::Bounds3D},
     *,
 };
 
@@ -61,10 +61,10 @@ impl FromIterator<Rc<Geometry3D>> for Geometries3D {
     }
 }
 
-impl FetchBounds3D for Geometries3D {
-    fn fetch_bounds_3d(&self) -> Bounds3D {
+impl CalcBounds3D for Geometries3D {
+    fn calc_bounds_3d(&self) -> Bounds3D {
         self.0.iter().fold(Bounds3D::default(), |bounds, geometry| {
-            bounds.extend(geometry.fetch_bounds_3d())
+            bounds.extend(geometry.calc_bounds_3d())
         })
     }
 }

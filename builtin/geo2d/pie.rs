@@ -78,8 +78,8 @@ impl Render<Geometry2D> for Pie {
     }
 }
 
-impl FetchBounds2D for Pie {
-    fn fetch_bounds_2d(&self) -> Bounds2D {
+impl CalcBounds2D for Pie {
+    fn calc_bounds_2d(&self) -> Bounds2D {
         use geo::Coord;
 
         if self.radius > 0.0 {

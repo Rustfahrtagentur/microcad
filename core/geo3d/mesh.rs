@@ -187,8 +187,8 @@ impl TriangleMesh {
     }
 }
 
-impl FetchBounds3D for TriangleMesh {
-    fn fetch_bounds_3d(&self) -> Bounds3D {
+impl CalcBounds3D for TriangleMesh {
+    fn calc_bounds_3d(&self) -> Bounds3D {
         self.vertices.iter().map(|vertex| vertex.pos).collect()
     }
 }

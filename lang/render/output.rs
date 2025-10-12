@@ -13,7 +13,7 @@ use crate::{model::*, render::*};
 pub type Geometry2DOutput = Option<Rc<WithBounds2D<Geometry2D>>>;
 
 /// Geometry 3D type alias.
-pub type Geometry3DOutput = Option<Rc<Geometry3D>>;
+pub type Geometry3DOutput = Option<Rc<WithBounds3D<Geometry3D>>>;
 
 /// The model output when a model has been processed.
 #[derive(Debug, Clone)]
@@ -197,8 +197,8 @@ impl std::fmt::Display for RenderOutput {
                     (None, Some(_)) => {
                         write!(f, "transform")
                     }
-                    (Some(geometry), None) => write!(f, "{}", geometry.name()),
-                    (Some(geometry), Some(_)) => write!(f, "transformed {}", geometry.name()),
+                    (Some(geometry), None) => write!(f, "{}", geometry.inner.name()),
+                    (Some(geometry), Some(_)) => write!(f, "transformed {}", geometry.inner.name()),
                 }?;
             }
         }
