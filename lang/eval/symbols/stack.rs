@@ -173,7 +173,10 @@ impl Stack {
 
     /// Lookup a symbol from local stack.
     pub fn lookup(&self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("Looking for local symbol '{name:?}'");
+        log::trace!(
+            "{lookup} for local symbol '{name:?}'",
+            lookup = crate::mark!(LOOKUP)
+        );
         let symbol = if let Some(id) = name.single_identifier() {
             self.fetch(id)
         } else {

@@ -10,7 +10,7 @@ use derive_more::Deref;
 ///
 /// A map of *qualified name* -> *source file path* which is generated at creation
 /// by scanning in the given `search_paths`.
-#[derive(Debug, Default, Deref)]
+#[derive(Default, Deref)]
 pub struct Externals(std::collections::HashMap<QualifiedName, std::path::PathBuf>);
 
 impl Externals {
@@ -28,8 +28,8 @@ impl Externals {
             if new.is_empty() {
                 log::warn!("Did not find any externals in any search path");
             } else {
-                log::info!("Found {} external module(s)", new.len());
-                log::trace!("Externals:\n{new}");
+                log::info!("Found {} external module(s): {new}", new.len());
+                log::trace!("Externals:\n{new:?}");
             }
             Ok(new)
         }
@@ -94,7 +94,7 @@ impl Externals {
                                         .expect("cannot strip search path from file name"),
                                 );
                                 let path = file.canonicalize().expect("path not found");
-                                log::debug!("Found external: {name} {path:?}");
+                                log::trace!("Found external: {name} {path:?}");
                                 Ok((name, path))
                             })
                             .collect::<Result<Vec<_>, _>>()
@@ -109,6 +109,22 @@ impl Externals {
 }
 
 impl std::fmt::Display for Externals {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut v = self.0.iter().collect::<Vec<_>>();
+        // sort for better readability
+        v.sort();
+        write!(
+            f,
+            "{}",
+            v.iter()
+                .map(|file| file.0.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
+}
+
+impl std::fmt::Debug for Externals {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut v = self.0.iter().collect::<Vec<_>>();
         // sort for better readability

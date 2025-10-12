@@ -188,7 +188,10 @@ impl EvalContext {
 
     /// Lookup a property by qualified name.
     fn lookup_property(&self, name: &QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("looking for property {name:?}");
+        log::trace!(
+            "{lookup} for property {name:?}",
+            lookup = crate::mark!(LOOKUP)
+        );
 
         match name.single_identifier() {
             Some(id) => match self.get_property(id) {
@@ -228,7 +231,10 @@ impl EvalContext {
 
     fn lookup_workbench(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         if let Some(workbench) = &self.stack.current_workbench_name() {
-            log::trace!("Looking for symbol '{name:?}' in current workbench '{workbench:?}'");
+            log::trace!(
+                "{lookup} for symbol '{name:?}' in current workbench '{workbench:?}'",
+                lookup = crate::mark!(LOOKUP)
+            );
             let name = &name.with_prefix(workbench);
             match self.symbol_table.lookup(name) {
                 Ok(symbol) => {
@@ -252,7 +258,10 @@ impl EvalContext {
     }
 
     fn lookup_within(&self, what: &QualifiedName, within: QualifiedName) -> EvalResult<Symbol> {
-        log::trace!("Looking for symbol '{what:?}' within '{within:?}':",);
+        log::trace!(
+            "{lookup} for symbol '{what:?}' within '{within:?}':",
+            lookup = crate::mark!(LOOKUP)
+        );
 
         // process internal supers
         let (what, within) = what.dissolve_super(within);
