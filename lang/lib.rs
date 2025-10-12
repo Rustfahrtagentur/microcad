@@ -125,6 +125,9 @@ macro_rules! mark {
     (CALL) => {
         color_print::cformat!("<B,k,s> CALL </>")
     };
+    (LOOKUP) => {
+        color_print::cformat!("<c,s>LOOKUP</>")
+    };
     (LOAD) => {
         color_print::cformat!("<Y,k,s> LOADING </>")
     };
@@ -159,6 +162,9 @@ macro_rules! found {
     };
     (CALL) => {
         "Call"
+    };
+    (LOOKUP) => {
+        "Lookup"
     };
     (LOAD) => {
         "Loading"

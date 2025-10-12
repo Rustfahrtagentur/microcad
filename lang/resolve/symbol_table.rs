@@ -69,7 +69,10 @@ impl WriteToFile for SymbolTable {}
 impl Lookup for SymbolTable {
     /// Lookup a symbol from global symbols.
     fn lookup(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
-        log::trace!("Looking for global symbol '{name:?}'");
+        log::trace!(
+            "{lookup} for global symbol '{name:?}'",
+            lookup = crate::mark!(LOOKUP)
+        );
         let symbol = match self.symbols.search(name) {
             Ok(symbol) => symbol,
             Err(err) => {

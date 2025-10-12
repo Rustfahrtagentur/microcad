@@ -37,7 +37,7 @@ impl SourceFile {
         source_file.set_filename(path.as_ref());
         source_file.name = name;
         log::debug!(
-            "Successfully loaded file {} to {}",
+            "Successfully loaded external file {} to {}",
             path.as_ref().to_string_lossy(),
             source_file.name
         );
