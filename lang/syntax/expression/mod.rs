@@ -18,10 +18,6 @@ use crate::{src_ref::*, syntax::*, value::*};
 /// List of expressions.
 pub type ListExpression = Vec<Expression>;
 
-pub(crate) trait Const {
-    fn is_const(&self) -> bool;
-}
-
 /// Any expression.
 #[derive(Clone, Default)]
 pub enum Expression {
@@ -249,29 +245,6 @@ impl TreeDisplay for Expression {
 impl AsRef<Self> for Expression {
     fn as_ref(&self) -> &Self {
         self
-    }
-}
-
-impl Const for Expression {
-    fn is_const(&self) -> bool {
-        match self {
-            Expression::Literal(_) => true,
-            Expression::ArrayExpression(array_expression) => array_expression.is_const(),
-            Expression::TupleExpression(tuple_expression) => tuple_expression.is_const(),
-            Expression::QualifiedName(_) => {
-                // in real this can only be determined after looking up the name
-                true
-            }
-            Expression::BinaryOp {
-                lhs, op: _, rhs, ..
-            } => lhs.is_const() && rhs.is_const(),
-            Expression::UnaryOp { op: _, rhs, .. } => rhs.is_const(),
-            Expression::ArrayElementAccess(expression, expression1, ..) => {
-                expression.is_const() && expression1.is_const()
-            }
-            Expression::AttributeAccess(expression, ..) => expression.is_const(),
-            _ => false,
-        }
     }
 }
 
