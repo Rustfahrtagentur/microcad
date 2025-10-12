@@ -473,8 +473,8 @@ impl SizeMeasure {
         if let Some(rect) = bounds.rect() {
             Self {
                 bounds: bounds.clone(),
-                width: Some(EdgeLengthMeasure::width(rect, 7.0, None)),
-                height: Some(EdgeLengthMeasure::height(rect, 7.0, None)),
+                width: Some(EdgeLengthMeasure::width(&rect, 7.0, None)),
+                height: Some(EdgeLengthMeasure::height(&rect, 7.0, None)),
             }
         } else {
             Self {
