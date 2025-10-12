@@ -107,7 +107,9 @@ impl std::fmt::Display for SymbolTable {
             "{}",
             self.symbols
                 .iter()
-                .map(|symbol| symbol.1.full_name().to_string())
+                .map(|(_, symbol)| symbol)
+                .filter(|symbol| !symbol.is_deleted())
+                .map(|symbol| symbol.full_name().to_string())
                 .collect::<Vec<_>>()
                 .join(", ")
         )

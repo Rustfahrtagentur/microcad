@@ -311,6 +311,7 @@ impl std::fmt::Display for ResolveContext {
                     "Unreferenced symbols:\n{}\n",
                     unchecked
                         .iter()
+                        .filter(|symbol| !symbol.is_deleted())
                         .map(|symbol| symbol.full_name().to_string())
                         .collect::<Vec<_>>()
                         .join(", ")
