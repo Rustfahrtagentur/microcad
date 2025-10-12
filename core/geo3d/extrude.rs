@@ -14,8 +14,6 @@ use crate::*;
 /// Extrude.
 pub trait Extrude {
     /// Extrude a single slice of the geometry with top and bottom plane.
-    ///
-    ///
     fn extrude_slice(&self, m_a: &Mat4, m_b: &Mat4) -> TriangleMesh;
 
     /// Generate the cap geometry.
@@ -118,8 +116,11 @@ impl Extrude for LineString {
             top_indices.push(top_index);
         }
 
-        let is_closed = self.is_closed();
-        let range = if is_closed { 0..len } else { 0..(len - 1) };
+        let range = if self.is_closed() {
+            0..len
+        } else {
+            0..(len - 1)
+        };
 
         for i in range {
             let next = (i + 1) % len;
