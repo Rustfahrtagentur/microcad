@@ -21,20 +21,14 @@ impl Operation for Revolve {
         context.update_3d(|context, model| {
             let model_ = model.borrow();
             let geometries: Geometries2D = model_.children.render_with_context(context)?;
+            let radius = geometries.fetch_bounds_2d().max_extent();
 
             use microcad_core::Extrude;
-            let radius = geometries
-                .fetch_bounds_2d()
-                .max()
-                .map(|v| v.x.max(v.y))
-                .unwrap_or_default();
-            let circular_segments = context.current_resolution().circular_segments(radius);
-
             Ok(Some(Rc::new(Geometry3D::Mesh(
                 geometries
                     .revolve_extrude(
                         cgmath::Deg(self.revolve_degrees).into(),
-                        circular_segments as usize,
+                        context.current_resolution().circular_segments(radius) as usize,
                     )
                     .inner, // TODO: Geometry3DOutput should be Rc<WithBounds3D<Geometry3D>>
             ))))
