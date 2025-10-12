@@ -46,8 +46,10 @@ impl std::fmt::Debug for Target {
         let name = &self.name;
         if let Some(target) = &self.target {
             write!(f, "{{{name:?} -> {target:?}}}")
-        } else {
+        } else if cfg!(feature = "ansi-color") {
             color_print::cwrite!(f, "{{{name:?} -> <R!>???</>}}")
+        } else {
+            write!(f, "{{{name:?} -> ???}}")
         }
     }
 }
