@@ -39,13 +39,13 @@ mod function;
 mod grant;
 mod init;
 mod literal;
+mod locals;
 mod module_definition;
 mod output;
 mod parameter;
 mod source_file;
 mod sources;
 mod statements;
-mod symbols;
 mod tuple;
 mod workbench;
 
@@ -57,8 +57,8 @@ pub use eval_error::*;
 pub use output::*;
 
 use grant::*;
+use locals::*;
 use statements::*;
-use symbols::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
