@@ -40,13 +40,13 @@ impl EvalContext {
         exporters: ExporterRegistry,
         importers: ImporterRegistry,
     ) -> Self {
-        log::debug!("Creating Context");
+        log::debug!("Creating evaluation context");
 
-        if !resolve_context.is_resolved() {
-            log::warn!("Evaluating unresolved symbol table!");
+        if !resolve_context.is_checked() {
+            log::error!("Aborting evaluation of unresolved symbol table!");
+            return Self::default();
         }
 
-        // put all together
         Self {
             symbol_table: resolve_context.symbol_table,
             sources: resolve_context.sources,
