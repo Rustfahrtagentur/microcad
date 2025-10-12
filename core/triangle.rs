@@ -1,6 +1,8 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+//! Generic triangle.
+
 /// Triangle
 #[derive(Clone, Copy, Debug)]
 pub struct Triangle<T>(pub T, pub T, pub T);

@@ -3,20 +3,14 @@
 
 use cgmath::ElementWise;
 
-use crate::{Mat4, Vec3};
+use crate::*;
 
-/// Inner struct for bounds.
-#[derive(Debug, Clone)]
-struct BoundsInner {
-    /// Minimum corner.
-    min: Vec3,
-    /// Maximum corner.
-    max: Vec3,
-}
+/// Bounds3D type alias.
+pub type Bounds3D = Bounds<Vec3>;
 
 /// Corners iterator struct.
 pub struct Bounds3DCorners {
-    bounds: BoundsInner,
+    bounds: Bounds3D,
     index: u8, // Only goes from 0 to 7
 }
 
@@ -51,76 +45,52 @@ impl Iterator for Bounds3DCorners {
     }
 }
 
-/// A 3D bounds is a 3D bounding box with a minimum and maximum corner.
-#[derive(Debug, Clone, Default)]
-pub struct Bounds3D(Option<BoundsInner>);
-
 impl Bounds3D {
-    /// Create new 3D bounds.
-    pub fn new(min: Vec3, max: Vec3) -> Self {
-        Self(Some(BoundsInner { min, max }))
-    }
-
-    /// Minimum corner.
-    pub fn min(&self) -> Option<Vec3> {
-        self.0.as_ref().map(|s| s.min)
-    }
-
-    /// Maximum corner.
-    pub fn max(&self) -> Option<Vec3> {
-        self.0.as_ref().map(|s| s.max)
-    }
-
     /// Minimum and maximum corner.
-    pub fn min_max(&self) -> Option<(Vec3, Vec3)> {
-        self.0.as_ref().map(|s| (s.min, s.max))
+    pub fn min_max(&self) -> (Vec3, Vec3) {
+        (self.min, self.max)
     }
 
     /// Calculate extended bounds.
     pub fn extend(self, other: Bounds3D) -> Self {
-        match (self.0, other.0) {
-            (None, None) => Self(None),
-            (None, Some(b)) | (Some(b), None) => Self(Some(b)),
-            (Some(b1), Some(b2)) => Self::new(
+        match (self.is_valid(), other.is_valid()) {
+            (false, false) => Self::default(),
+            (false, true) => other,
+            (true, false) => self,
+            (true, true) => Self::new(
                 Vec3::new(
-                    b1.min.x.min(b2.min.x),
-                    b1.min.y.min(b2.min.y),
-                    b1.min.z.min(b2.min.z),
+                    self.min.x.min(other.min.x),
+                    self.min.y.min(other.min.y),
+                    self.min.z.min(other.min.z),
                 ),
                 Vec3::new(
-                    b1.max.x.max(b2.max.x),
-                    b1.max.y.max(b2.max.y),
-                    b1.max.z.max(b2.max.z),
+                    self.max.x.max(other.max.x),
+                    self.max.y.max(other.max.y),
+                    self.max.z.max(other.max.z),
                 ),
             ),
         }
     }
 
+    /// Check if bounds are valid
+    pub fn is_valid(&self) -> bool {
+        self.min.x <= self.max.x && self.min.y <= self.max.y && self.min.z <= self.max.z
+    }
+
     /// Extend these bounds by point.
     pub fn extend_by_point(&mut self, p: Vec3) {
-        match &mut self.0 {
-            Some(bounds) => {
-                *bounds = BoundsInner {
-                    min: Vec3::new(
-                        bounds.min.x.min(p.x),
-                        bounds.min.y.min(p.y),
-                        bounds.min.z.min(p.z),
-                    ),
-                    max: Vec3::new(
-                        bounds.max.x.max(p.x),
-                        bounds.max.y.max(p.y),
-                        bounds.max.z.max(p.z),
-                    ),
-                }
-            }
-            None => *self = Self::new(p, p),
-        }
+        self.min.x = p.x.min(self.min.x);
+        self.min.y = p.y.min(self.min.y);
+        self.min.z = p.z.min(self.min.z);
+        self.max.x = p.x.max(self.max.x);
+        self.max.y = p.y.max(self.max.y);
+        self.max.z = p.z.max(self.max.z);
     }
 
     /// Corner iterator.
     pub fn corners(&self) -> Bounds3DCorners {
         Bounds3DCorners {
-            bounds: self.0.clone().expect("Bounds"),
+            bounds: self.clone(),
             index: 0,
         }
     }
@@ -129,10 +99,16 @@ impl Bounds3D {
     ///
     /// The resulting `Vec3` is normalized between (0,0,0) = min  and (1,1,1) = max.
     pub fn map_vec3(&self, v: Vec3) -> Vec3 {
-        let min = self.min().unwrap();
-        let max = self.max().unwrap();
+        (v - self.min).div_element_wise(self.max - self.min)
+    }
+}
 
-        (v - min).div_element_wise(max - min)
+impl Default for Bounds3D {
+    fn default() -> Self {
+        // Bounds are invalid by default.
+        let min = Scalar::MAX;
+        let max = Scalar::MIN;
+        Self::new(Vec3::new(min, min, min), Vec3::new(max, max, max))
     }
 }
 
@@ -141,7 +117,7 @@ impl FromIterator<Vec3> for Bounds3D {
         let mut iter = iter.into_iter();
         let first_point = match iter.next() {
             Some(point) => point,
-            None => return Bounds3D(None),
+            None => return Bounds3D::default(),
         };
 
         let mut min = first_point;
@@ -186,8 +162,9 @@ pub trait Transformed3D<T = Self> {
 /// Holds bounds for a 3D object.
 #[derive(Clone, Default)]
 pub struct WithBounds3D<T: FetchBounds3D> {
-    /// Bounds
+    /// Bounds.
     pub bounds: Bounds3D,
+    /// The inner object.
     pub inner: T,
 }
 
