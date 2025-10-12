@@ -257,6 +257,10 @@ pub enum EvalError {
         /// where it was searched
         within: QualifiedName,
     },
+
+    /// Evaluation aborted because of prior resolve errors
+    #[error("Evaluation aborted because of prior resolve errors!")]
+    ResolveFailed,
 }
 
 /// Result type of any evaluation.

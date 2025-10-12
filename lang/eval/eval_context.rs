@@ -42,11 +42,6 @@ impl EvalContext {
     ) -> Self {
         log::debug!("Creating evaluation context");
 
-        if !resolve_context.is_checked() {
-            log::error!("Aborting evaluation of unresolved symbol table!");
-            return Self::default();
-        }
-
         Self {
             symbol_table: resolve_context.symbol_table,
             sources: resolve_context.sources,
@@ -110,6 +105,10 @@ impl EvalContext {
 
     /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Option<Model>> {
+        if self.diag.error_count() > 0 {
+            log::error!("Aborting evaluation because of prior resolve errors!");
+            return Err(EvalError::ResolveFailed);
+        }
         let model: Model = self.sources.root().eval(self)?;
         log::trace!("Post-evaluation context:\n{self:?}");
         log::debug!("Evaluated Model:\n{model:?}");
