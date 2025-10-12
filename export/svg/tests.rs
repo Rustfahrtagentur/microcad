@@ -225,11 +225,7 @@ fn svg_sample_sketch() -> std::io::Result<()> {
 
     // Draw intersection.
     let intersection = Geometry2D::Rect(rect).boolean_op(
-        Geometry2D::Polygon(
-            circle
-                .render_to_polygon(&RenderResolution::default())
-                .expect("Some polygon"),
-        ),
+        Geometry2D::Polygon(circle.render(&RenderResolution::default())),
         &BooleanOp::Intersect,
     );
 

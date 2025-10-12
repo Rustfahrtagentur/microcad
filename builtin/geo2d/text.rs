@@ -24,8 +24,8 @@ impl Text {
     }
 }
 
-impl RenderToGeometry2D for Text {
-    fn render_to_geometry(&self, resolution: &RenderResolution) -> std::rc::Rc<Geometry2D> {
+impl Render<Geometry2D> for Text {
+    fn render(&self, resolution: &RenderResolution) -> Geometry2D {
         let font_data = if self.font_file.is_empty() {
             Vec::from(include_bytes!("../assets/dosis-regular.ttf"))
         } else {
@@ -39,9 +39,7 @@ impl RenderToGeometry2D for Text {
         let options = geo_rusttype::TextOptions::new(self.height as f32, font, None, None);
         let polygons = geo_rusttype::text_to_multi_polygon(&self.text, options);
 
-        std::rc::Rc::new(Geometry2D::MultiPolygon(
-            polygons.simplify(resolution.linear),
-        ))
+        Geometry2D::MultiPolygon(polygons.simplify(resolution.linear))
     }
 }
 

@@ -10,7 +10,7 @@ use super::*;
 use geo::{ConvexHull, MultiPolygon};
 use strum::IntoStaticStr;
 
-/// A 2D Geometry which independent from resolution.
+/// A 2D Geometry which is independent from resolution.
 #[derive(IntoStaticStr, Clone, Debug)]
 pub enum Geometry2D {
     /// Line string.
@@ -112,23 +112,21 @@ impl FetchBounds2D for Geometry2D {
 }
 
 impl Transformed2D for Geometry2D {
-    fn transformed_2d(&self, resolution: &RenderResolution, mat: &Mat3) -> Self {
+    fn transformed_2d(&self, mat: &Mat3) -> Self {
         if self.is_areal() {
-            Self::MultiPolygon(
-                self.render_to_multi_polygon(resolution)
-                    .transformed_2d(resolution, mat),
-            )
+            let multi_polygon: MultiPolygon = self.clone().into();
+            Self::MultiPolygon(multi_polygon.transformed_2d(mat))
         } else {
             match self {
                 Geometry2D::LineString(line_string) => {
-                    Self::LineString(line_string.transformed_2d(resolution, mat))
+                    Self::LineString(line_string.transformed_2d(mat))
                 }
                 Geometry2D::MultiLineString(multi_line_string) => {
-                    Self::MultiLineString(multi_line_string.transformed_2d(resolution, mat))
+                    Self::MultiLineString(multi_line_string.transformed_2d(mat))
                 }
-                Geometry2D::Line(line) => Self::Line(line.transformed_2d(resolution, mat)),
+                Geometry2D::Line(line) => Self::Line(line.transformed_2d(mat)),
                 Geometry2D::Collection(geometries) => {
-                    Self::Collection(geometries.transformed_2d(resolution, mat))
+                    Self::Collection(geometries.transformed_2d(mat))
                 }
                 _ => unreachable!("Geometry type not supported"),
             }
@@ -137,34 +135,24 @@ impl Transformed2D for Geometry2D {
 }
 
 impl Align for Geometry2D {
-    fn align(&self, resolution: &RenderResolution) -> Self {
+    fn align(&self) -> Self {
         if let Some(bounds) = self.fetch_bounds_2d().rect() {
             let d: Vec2 = bounds.center().x_y().into();
-            self.transformed_2d(resolution, &Mat3::from_translation(-d))
+            self.transformed_2d(&Mat3::from_translation(-d))
         } else {
             self.clone()
         }
     }
 }
 
-impl RenderToMultiPolygon for Geometry2D {
-    fn render_to_existing_multi_polygon(
-        &self,
-        resolution: &RenderResolution,
-        polygons: &mut MultiPolygon,
-    ) {
-        match self {
-            Geometry2D::Polygon(polygon) => polygons.0.push(polygon.clone()),
-            Geometry2D::MultiPolygon(multi_polygon) => {
-                polygons.0.append(&mut multi_polygon.0.clone())
-            }
-            Geometry2D::Rect(rect) => polygons
-                .0
-                .push(rect.render_to_polygon(resolution).expect("Polygon")),
-            Geometry2D::Collection(geometries) => {
-                geometries.render_to_existing_multi_polygon(resolution, polygons);
-            }
-            _ => {}
+impl From<Geometry2D> for MultiPolygon {
+    fn from(geo: Geometry2D) -> Self {
+        match geo {
+            Geometry2D::Polygon(polygon) => polygon.into(),
+            Geometry2D::MultiPolygon(multi_polygon) => multi_polygon,
+            Geometry2D::Rect(rect) => MultiPolygon(vec![rect.to_polygon()]),
+            Geometry2D::Collection(collection) => collection.into(),
+            _ => MultiPolygon::empty(),
         }
     }
 }

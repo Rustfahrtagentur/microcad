@@ -44,9 +44,7 @@ impl WriteStl for Model {
             } => {
                 let mat = world_matrix.expect("Some matrix");
                 match geometry {
-                    Some(geometry) => geometry
-                        .transformed_3d(&self_.resolution(), &mat)
-                        .write_stl(writer),
+                    Some(geometry) => geometry.transformed_3d(&mat).write_stl(writer),
                     None => self_
                         .children()
                         .try_for_each(|model| model.write_stl(writer)),

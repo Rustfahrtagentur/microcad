@@ -45,8 +45,8 @@ impl Pie {
     }
 }
 
-impl RenderToGeometry2D for Pie {
-    fn render_to_geometry(&self, resolution: &RenderResolution) -> std::rc::Rc<Geometry2D> {
+impl Render<Geometry2D> for Pie {
+    fn render(&self, resolution: &RenderResolution) -> Geometry2D {
         use std::f64::consts::PI;
         let offset_angle = self.offset_angle();
         let n =
@@ -74,10 +74,7 @@ impl RenderToGeometry2D for Pie {
                 .collect()
         };
 
-        std::rc::Rc::new(Geometry2D::Polygon(Polygon::new(
-            LineString::new(points),
-            vec![],
-        )))
+        Geometry2D::Polygon(Polygon::new(LineString::new(points), vec![]))
     }
 }
 

@@ -72,9 +72,7 @@ impl WriteWkt for Model {
             } => {
                 let mat = world_matrix.expect("Some matrix");
                 match geometry {
-                    Some(geometry) => geometry
-                        .transformed_2d(&self_.resolution(), &mat)
-                        .write_wkt(writer),
+                    Some(geometry) => geometry.transformed_2d(&mat).write_wkt(writer),
                     None => self_
                         .children()
                         .try_for_each(|model| model.write_wkt(writer)),

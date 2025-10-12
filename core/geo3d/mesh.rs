@@ -1,67 +1,9 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Bounds3D, FetchBounds3D, Vec3};
-use cgmath::InnerSpace;
+use crate::*;
+use cgmath::ElementWise;
 use manifold_rs::{Manifold, Mesh};
-
-/// Vertex
-#[derive(Clone, Copy, Debug)]
-pub struct Vertex {
-    /// position
-    pub pos: Vec3,
-    /// normal vector
-    pub normal: Vec3,
-}
-
-impl Vertex {
-    /// Accumulate normal.
-    pub fn accumulate_normal(vertices: &mut [Vertex], i0: u32, i1: u32, i2: u32) {
-        let v0 = vertices[i0 as usize].pos;
-        let v1 = vertices[i1 as usize].pos;
-        let v2 = vertices[i2 as usize].pos;
-
-        let edge1 = v1 - v0;
-        let edge2 = v2 - v0;
-        let face_normal = edge1.cross(edge2);
-
-        vertices[i0 as usize].normal += face_normal;
-        vertices[i1 as usize].normal += face_normal;
-        vertices[i2 as usize].normal += face_normal;
-    }
-}
-
-/// Triangle
-#[derive(Clone, Copy, Debug)]
-pub struct Triangle<T>(pub T, pub T, pub T);
-
-impl Triangle<Vertex> {
-    /// Get normal of triangle
-    pub fn normal(&self) -> Vec3 {
-        (self.2.pos - self.0.pos).cross(self.1.pos - self.0.pos)
-    }
-}
-
-impl Triangle<&Vertex> {
-    /// Get normal of triangle
-    pub fn normal(&self) -> Vec3 {
-        (self.2.pos - self.0.pos).cross(self.1.pos - self.0.pos)
-    }
-
-    /// Get signed volume of triangle
-    ///
-    /// <https://stackoverflow.com/questions/1406029/how-to-calculate-the-volume-of-a-3d-mesh-object-the-surface-of-which-is-made-up>
-    pub fn signed_volume(&self) -> f64 {
-        let v210 = self.2.pos.x * self.1.pos.y * self.0.pos.z;
-        let v120 = self.1.pos.x * self.2.pos.y * self.0.pos.z;
-        let v201 = self.2.pos.x * self.0.pos.y * self.1.pos.z;
-        let v021 = self.0.pos.x * self.2.pos.y * self.1.pos.z;
-        let v102 = self.1.pos.x * self.0.pos.y * self.2.pos.z;
-        let v012 = self.0.pos.x * self.1.pos.y * self.2.pos.z;
-
-        (1.0 / 6.0) * (-v210 + v120 + v201 - v021 - v102 + v012)
-    }
-}
 
 /// Triangle mesh
 #[derive(Default, Clone)]
@@ -162,34 +104,6 @@ impl TriangleMesh {
         Manifold::from_mesh(Mesh::new(&vertices, &triangle_indices))
     }
 
-    /// Transform the mesh.
-    ///
-    /// # Arguments
-    /// - `transform`: Transformation matrix
-    ///
-    /// # Returns
-    /// Transformed mesh
-    pub fn transform(&self, transform: &crate::Mat4) -> Self {
-        let rot_mat = crate::Mat3::from_cols(
-            transform.x.truncate(),
-            transform.y.truncate(),
-            transform.z.truncate(),
-        );
-        let vertices = self
-            .vertices
-            .iter()
-            .map(|v| Vertex {
-                pos: (transform * v.pos.extend(1.0)).truncate(),
-                normal: rot_mat * v.normal,
-            })
-            .collect();
-
-        TriangleMesh {
-            vertices,
-            triangle_indices: self.triangle_indices.clone(),
-        }
-    }
-
     /// Calculate volume of mesh.
     pub fn volume(&self) -> f64 {
         self.triangles()
@@ -198,20 +112,33 @@ impl TriangleMesh {
             .abs()
     }
 
+    /// Fetch a vertex triangle from index triangle.
+    pub fn fetch_triangle<'a>(&'a self, tri: Triangle<u32>) -> Triangle<&'a Vertex> {
+        Triangle(
+            &self.vertices[tri.0 as usize],
+            &self.vertices[tri.1 as usize],
+            &self.vertices[tri.2 as usize],
+        )
+    }
+
     /// TriangleMesh.
-    pub fn repair(&mut self, position_epsilon: f64) {
+    pub fn repair(&mut self, bounds: &Bounds3D) {
         // 1. Merge duplicate vertices using a spatial hash map (or hashmap keyed on quantized position)
+
+        let min = bounds.min().unwrap();
+        let inv_size = 1.0 / (bounds.max().unwrap() - bounds.min().unwrap());
 
         // Quantize vertex positions to grid to group duplicates
         let quantize = |pos: &Vec3| {
+            let mapped = (pos - min).mul_element_wise(inv_size) * (u32::MAX as Scalar);
             (
-                (pos.x / position_epsilon).round() as i64,
-                (pos.y / position_epsilon).round() as i64,
-                (pos.z / position_epsilon).round() as i64,
+                mapped.x.floor() as u32,
+                mapped.y.floor() as u32,
+                mapped.z.floor() as u32,
             )
         };
 
-        let mut vertex_map: std::collections::HashMap<(i64, i64, i64), u32> =
+        let mut vertex_map: std::collections::HashMap<(u32, u32, u32), u32> =
             std::collections::HashMap::new();
         let mut new_vertices: Vec<Vertex> = Vec::with_capacity(self.vertices.len());
         let mut remap: Vec<u32> = vec![0; self.vertices.len()];
@@ -236,29 +163,24 @@ impl TriangleMesh {
         let mut new_triangles = Vec::with_capacity(self.triangle_indices.len());
 
         for tri in &self.triangle_indices {
-            let i0 = remap[tri.0 as usize];
-            let i1 = remap[tri.1 as usize];
-            let i2 = remap[tri.2 as usize];
+            let tri_idx = crate::Triangle(
+                remap[tri.0 as usize],
+                remap[tri.1 as usize],
+                remap[tri.2 as usize],
+            );
 
-            // Skip degenerate triangles (any repeated index)
-            if i0 == i1 || i1 == i2 || i2 == i0 {
+            if tri_idx.is_degenerated() {
                 continue;
             }
 
             // Optional: check zero-area triangle by computing cross product
-            let v0 = self.vertices[i0 as usize].pos;
-            let v1 = self.vertices[i1 as usize].pos;
-            let v2 = self.vertices[i2 as usize].pos;
+            let tri = self.fetch_triangle(tri_idx);
 
-            let edge1 = v1 - v0;
-            let edge2 = v2 - v0;
-            let area = edge1.cross(edge2).magnitude();
-
-            if area < 1e-8 {
+            if tri.area() < 1e-8 {
                 continue; // Degenerate triangle
             }
 
-            new_triangles.push(Triangle(i0, i1, i2));
+            new_triangles.push(tri_idx);
         }
 
         self.triangle_indices = new_triangles;
@@ -326,6 +248,50 @@ impl From<Manifold> for TriangleMesh {
     }
 }
 
+impl Transformed3D for TriangleMesh {
+    fn transformed_3d(&self, mat: &Mat4) -> Self {
+        let rot_mat = crate::Mat3::from_cols(mat.x.truncate(), mat.y.truncate(), mat.z.truncate());
+        Self {
+            vertices: self
+                .vertices
+                .iter()
+                .map(|v| Vertex {
+                    pos: (mat * v.pos.extend(1.0)).truncate(),
+                    normal: rot_mat * v.normal,
+                })
+                .collect(),
+            triangle_indices: self.triangle_indices.clone(),
+        }
+    }
+}
+
+impl WithBounds3D<TriangleMesh> {
+    /// Update bounds and repair mesh.
+    pub fn repair(&mut self) {
+        self.update_bounds();
+        self.inner.repair(&self.bounds);
+    }
+}
+
+impl From<Geometry3D> for TriangleMesh {
+    fn from(geo: Geometry3D) -> Self {
+        match geo {
+            Geometry3D::Mesh(triangle_mesh) => triangle_mesh,
+            Geometry3D::Manifold(manifold) => manifold.to_mesh().into(),
+            Geometry3D::Collection(ref collection) => collection.into(),
+        }
+    }
+}
+
+impl From<&Geometries3D> for TriangleMesh {
+    fn from(geo: &Geometries3D) -> Self {
+        let mut mesh = TriangleMesh::default();
+        geo.iter()
+            .for_each(|geo| mesh.append(&geo.as_ref().clone().into()));
+        mesh
+    }
+}
+
 #[test]
 fn test_triangle_mesh_transform() {
     let mesh = TriangleMesh {
@@ -346,7 +312,7 @@ fn test_triangle_mesh_transform() {
         triangle_indices: vec![Triangle(0, 1, 2)],
     };
 
-    let mesh = mesh.transform(&crate::Mat4::from_translation(Vec3::new(1.0, 2.0, 3.0)));
+    let mesh = mesh.transformed_3d(&crate::Mat4::from_translation(Vec3::new(1.0, 2.0, 3.0)));
 
     assert_eq!(mesh.vertices[0].pos, Vec3::new(1.0, 2.0, 3.0));
     assert_eq!(mesh.vertices[0].normal, Vec3::new(0.0, 0.0, 1.0));

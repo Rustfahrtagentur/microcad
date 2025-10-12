@@ -1,7 +1,9 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{Mat4, RenderResolution, Vec3};
+use cgmath::ElementWise;
+
+use crate::{Mat4, Vec3};
 
 /// Inner struct for bounds.
 #[derive(Debug, Clone)]
@@ -122,6 +124,16 @@ impl Bounds3D {
             index: 0,
         }
     }
+
+    /// Maps a vec3 to bounds.
+    ///
+    /// The resulting `Vec3` is normalized between (0,0,0) = min  and (1,1,1) = max.
+    pub fn map_vec3(&self, v: Vec3) -> Vec3 {
+        let min = self.min().unwrap();
+        let max = self.max().unwrap();
+
+        (v - min).div_element_wise(max - min)
+    }
 }
 
 impl FromIterator<Vec3> for Bounds3D {
@@ -150,7 +162,7 @@ impl FromIterator<Vec3> for Bounds3D {
 }
 
 impl Transformed3D for Bounds3D {
-    fn transformed_3d(&self, _: &crate::RenderResolution, mat: &crate::Mat4) -> Self {
+    fn transformed_3d(&self, mat: &Mat4) -> Self {
         let mut bounds = Bounds3D::default();
         self.corners()
             .for_each(|corner| bounds.extend_by_point((mat * corner.extend(1.0)).truncate()));
@@ -168,5 +180,28 @@ pub trait FetchBounds3D {
 /// Transformed version of a 3D geometry.
 pub trait Transformed3D<T = Self> {
     /// Transform from matrix.
-    fn transformed_3d(&self, render_resolution: &RenderResolution, mat: &Mat4) -> T;
+    fn transformed_3d(&self, mat: &Mat4) -> T;
+}
+
+/// Holds bounds for a 3D object.
+#[derive(Clone, Default)]
+pub struct WithBounds3D<T: FetchBounds3D> {
+    /// Bounds
+    pub bounds: Bounds3D,
+    pub inner: T,
+}
+
+impl<T: FetchBounds3D> WithBounds3D<T> {
+    /// Create a new object with bounds.
+    pub fn new(inner: T) -> Self {
+        Self {
+            bounds: inner.fetch_bounds_3d(),
+            inner,
+        }
+    }
+
+    /// Update the bounds.
+    pub fn update_bounds(&mut self) {
+        self.bounds = self.inner.fetch_bounds_3d()
+    }
 }

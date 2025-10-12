@@ -64,11 +64,10 @@ impl RenderContext {
     /// TODO Add cache look up functionality.
     pub fn update_3d(
         &mut self,
-        f: impl FnOnce(&mut RenderContext, Model, RenderResolution) -> RenderResult<Geometry3DOutput>,
+        f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<Geometry3DOutput>,
     ) -> RenderResult<Geometry3DOutput> {
         let model = self.model();
-        let resolution = self.current_resolution();
-        f(self, model, resolution)
+        f(self, model)
     }
 
     /// Return current render resolution.

@@ -1,11 +1,17 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Render resolution
+//! Render trait.
 
 use cgmath::InnerSpace;
 
 use crate::*;
+
+/// A trait renders something.
+pub trait Render<T> {
+    /// The render function.
+    fn render(&self, resolution: &RenderResolution) -> T;
+}
 
 /// Render resolution when rendering things to polygons or meshes.
 #[derive(Debug, Clone)]
