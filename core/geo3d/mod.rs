@@ -8,17 +8,18 @@ mod collection;
 mod extrude;
 mod geometry;
 mod mesh;
-mod primitives;
+mod triangle;
+mod vertex;
 
 pub use bounds::*;
 pub use collection::*;
 pub use extrude::*;
 pub use geometry::*;
 pub use manifold_rs::Manifold;
-pub use mesh::{Triangle, TriangleMesh, Vertex};
-pub use primitives::*;
+pub use mesh::TriangleMesh;
+pub use vertex::Vertex;
 
-use crate::{BooleanOp, RenderResolution};
+use crate::BooleanOp;
 
 impl From<&BooleanOp> for manifold_rs::BooleanOp {
     fn from(op: &BooleanOp) -> Self {
@@ -28,21 +29,6 @@ impl From<&BooleanOp> for manifold_rs::BooleanOp {
             BooleanOp::Subtract => manifold_rs::BooleanOp::Difference,
             _ => unimplemented!(),
         }
-    }
-}
-
-/// Trait to render a 3D geometry into a mesh.
-pub trait RenderToMesh: Sized {
-    /// Render to manifold.
-    ///
-    /// Implement this method preferably.
-    fn render_to_manifold(&self, resolution: &RenderResolution) -> std::rc::Rc<Manifold>;
-
-    /// Render to mesh.
-    ///
-    /// Implement only if [`RenderToMesh::render_to_manifold`] is not possible.
-    fn render_to_mesh(&self, resolution: &RenderResolution) -> TriangleMesh {
-        self.render_to_manifold(resolution).to_mesh().into()
     }
 }
 

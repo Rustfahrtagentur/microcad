@@ -125,7 +125,7 @@ impl AffineOps<Scalar> for Bounds2D {
 }
 
 impl Transformed2D for Bounds2D {
-    fn transformed_2d(&self, _: &crate::RenderResolution, mat: &crate::Mat3) -> Self {
+    fn transformed_2d(&self, mat: &crate::Mat3) -> Self {
         self.affine_transform(&mat3_to_affine_transform(mat))
     }
 }

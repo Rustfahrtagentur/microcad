@@ -27,9 +27,11 @@ impl ExportCommand {
     pub fn export(&self, model: &Model) -> Result<Value, ExportError> {
         let mut render_context = RenderContext::init(model, self.resolution.clone())?;
 
-        use crate::render::Render;
-        self.exporter
-            .export(&model.render(&mut render_context)?, &self.filename)
+        use crate::render::RenderWithContext;
+        self.exporter.export(
+            &model.render_with_context(&mut render_context)?,
+            &self.filename,
+        )
     }
 }
 

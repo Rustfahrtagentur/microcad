@@ -15,13 +15,7 @@ pub enum Geometry3D {
     Mesh(TriangleMesh),
     /// Manifold.
     Manifold(Rc<Manifold>),
-    /// Cube.
-    Cube(Cube),
-    /// Sphere.
-    Sphere(Sphere),
-    /// Cylinder.
-    Cylinder(Cylinder),
-    /// Collection,
+    /// Collection.
     Collection(Geometries3D),
 }
 
@@ -39,35 +33,21 @@ impl Geometry3D {
     }
 
     /// Execute boolean operation.
-    pub fn boolean_op(
-        &self,
-        resolution: &RenderResolution,
-        other: &Geometry3D,
-        op: &BooleanOp,
-    ) -> Option<Self> {
+    pub fn boolean_op(&self, other: &Geometry3D, op: &BooleanOp) -> Option<Self> {
         let op: manifold_rs::BooleanOp = op.into();
-        let a = self.clone().render_to_manifold(resolution);
-        let b = other.clone().render_to_manifold(resolution);
-
+        let a: Rc<Manifold> = self.clone().into();
+        let b: Rc<Manifold> = other.clone().into();
         Some(Geometry3D::Manifold(Rc::new(a.boolean_op(&b, op))))
     }
 
-    /// Convex hull for geometry.
-    pub fn hull(&self, resolution: &RenderResolution) -> Manifold {
-        self.render_to_manifold(resolution).hull()
-    }
-
-    /// Transform mesh geometry
-    pub fn transform(&self, transform: &crate::Mat4) -> Self {
-        match self {
-            Geometry3D::Mesh(mesh) => Geometry3D::Mesh(mesh.transform(transform)),
-
-            Geometry3D::Manifold(manifold) => {
-                // TODO: Implement transform for manifold instead of converting to mesh
-                let mesh = TriangleMesh::from(manifold.to_mesh()).transform(transform);
-                Geometry3D::Manifold(Rc::new(mesh.to_manifold()))
+    /// Calculate contex hull.
+    pub fn hull(&self) -> Self {
+        match &self {
+            Geometry3D::Mesh(triangle_mesh) => triangle_mesh.to_manifold().hull().into(),
+            Geometry3D::Manifold(manifold) => manifold.hull().into(),
+            Geometry3D::Collection(collection) => {
+                TriangleMesh::from(collection).to_manifold().hull().into()
             }
-            _ => todo!(),
         }
     }
 }
@@ -83,41 +63,43 @@ impl FetchBounds3D for Geometry3D {
         match self {
             Geometry3D::Mesh(triangle_mesh) => triangle_mesh.fetch_bounds_3d(),
             Geometry3D::Manifold(manifold) => manifold.fetch_bounds_3d(),
-            Geometry3D::Cube(cube) => cube.fetch_bounds_3d(),
-            Geometry3D::Sphere(sphere) => sphere.fetch_bounds_3d(),
-            Geometry3D::Cylinder(cylinder) => cylinder.fetch_bounds_3d(),
             Geometry3D::Collection(collection) => collection.fetch_bounds_3d(),
         }
     }
 }
 
 impl Transformed3D for Geometry3D {
-    fn transformed_3d(&self, render_resolution: &RenderResolution, mat: &Mat4) -> Self {
-        Self::Mesh(match self {
-            Geometry3D::Mesh(triangle_mesh) => triangle_mesh.transform(mat),
-            geometry => geometry
-                .clone()
-                .render_to_mesh(render_resolution)
-                .transform(mat),
-        })
-    }
-}
-
-impl RenderToMesh for Geometry3D {
-    fn render_to_manifold(&self, resolution: &RenderResolution) -> std::rc::Rc<Manifold> {
-        match self {
-            Geometry3D::Mesh(triangle_mesh) => std::rc::Rc::new(triangle_mesh.to_manifold()),
-            Geometry3D::Manifold(manifold) => manifold.clone(),
-            Geometry3D::Cube(cube) => cube.render_to_manifold(resolution),
-            Geometry3D::Sphere(sphere) => sphere.render_to_manifold(resolution),
-            Geometry3D::Cylinder(cylinder) => cylinder.render_to_manifold(resolution),
-            Geometry3D::Collection(collection) => collection.render_to_manifold(resolution),
-        }
+    fn transformed_3d(&self, mat: &Mat4) -> Self {
+        TriangleMesh::from(self.clone()).transformed_3d(mat).into()
     }
 }
 
 impl From<TriangleMesh> for Geometry3D {
     fn from(mesh: TriangleMesh) -> Self {
         Geometry3D::Mesh(mesh)
+    }
+}
+
+impl From<Manifold> for Geometry3D {
+    fn from(manifold: Manifold) -> Self {
+        Geometry3D::Manifold(Rc::new(manifold))
+    }
+}
+
+impl From<Rc<Manifold>> for Geometry3D {
+    fn from(manifold: Rc<Manifold>) -> Self {
+        Geometry3D::Manifold(manifold)
+    }
+}
+
+impl From<Geometry3D> for Rc<Manifold> {
+    fn from(geo: Geometry3D) -> Self {
+        match geo {
+            Geometry3D::Mesh(triangle_mesh) => Rc::new(triangle_mesh.to_manifold()),
+            Geometry3D::Manifold(manifold) => manifold,
+            Geometry3D::Collection(ref collection) => {
+                Rc::new(TriangleMesh::from(collection).to_manifold())
+            }
+        }
     }
 }

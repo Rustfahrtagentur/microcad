@@ -69,7 +69,7 @@ impl FetchBounds2D for Line {
 }
 
 impl Transformed2D for Line {
-    fn transformed_2d(&self, _: &RenderResolution, mat: &Mat3) -> Self {
+    fn transformed_2d(&self, mat: &Mat3) -> Self {
         let transform = &geo2d::mat3_to_affine_transform(mat);
         Self(
             self.0.affine_transform(transform),

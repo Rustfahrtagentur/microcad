@@ -3,7 +3,7 @@
 
 //! STL Export
 
-use microcad_core::geo3d::{Triangle, Vertex};
+use microcad_core::*;
 
 /// Write into STL file
 pub struct StlWriter<'a> {

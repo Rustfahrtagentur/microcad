@@ -3,7 +3,7 @@
 
 //! PLY Export
 
-use microcad_core::geo3d::*;
+use microcad_core::*;
 
 /// PLY writer
 pub struct PlyWriter<'a> {

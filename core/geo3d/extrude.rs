@@ -13,6 +13,9 @@ use crate::*;
 
 /// Extrude.
 pub trait Extrude {
+    /// Extrude a single slice of the geometry with top and bottom plane.
+    ///
+    ///
     fn extrude_slice(&self, m_a: &Mat4, m_b: &Mat4) -> TriangleMesh;
 
     /// Generate the cap geometry.
@@ -21,22 +24,22 @@ pub trait Extrude {
     }
 
     /// Perform a linear extrusion with a certain height.
-    fn linear_extrude(&self, height: Scalar) -> TriangleMesh {
+    fn linear_extrude(&self, height: Scalar) -> WithBounds3D<TriangleMesh> {
         let m_a = Mat4::identity();
         let m_b = Mat4::from_translation(Vec3::new(0.0, 0.0, height));
         let mut mesh = self.extrude_slice(&m_a, &m_b);
         mesh.append(&self.cap(&m_a, &-m_a.z.truncate(), true));
         mesh.append(&self.cap(&m_b, &m_b.z.truncate(), false));
-
-        mesh.repair(0.0001);
+        let mut mesh = WithBounds3D::new(mesh);
+        mesh.repair();
         mesh
     }
 
     /// Perform a revolve extrusion with a certain angle.
-    fn revolve_extrude(&self, angle_rad: Angle, segments: usize) -> TriangleMesh {
+    fn revolve_extrude(&self, angle_rad: Angle, segments: usize) -> WithBounds3D<TriangleMesh> {
         let mut mesh = TriangleMesh::default();
         if segments < 2 {
-            return mesh;
+            return WithBounds3D::default();
         }
 
         let delta = angle_rad / segments as Scalar;
@@ -60,7 +63,7 @@ pub trait Extrude {
         // Optionally add caps at start and end
         if angle_rad.0 < PI * 2.0 {
             let m_start = &transforms[0];
-            let m_end = transforms.last().unwrap();
+            let m_end = transforms.last().expect("Transform");
             let normal_start = m_start.x.truncate(); // Points outward at start
             let normal_end = -m_end.x.truncate(); // Points inward at end
 
@@ -68,7 +71,8 @@ pub trait Extrude {
             mesh.append(&self.cap(m_end, &normal_end, false));
         }
 
-        mesh.repair(0.0001);
+        let mut mesh = WithBounds3D::new(mesh);
+        mesh.repair();
         mesh
     }
 }

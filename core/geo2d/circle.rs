@@ -38,12 +38,10 @@ impl FetchPoints2D for Circle {
     }
 }
 
-impl RenderToMultiPolygon for Circle {
-    fn render_to_polygon(&self, resolution: &RenderResolution) -> Option<Polygon> {
+impl Render<Polygon> for Circle {
+    fn render(&self, resolution: &RenderResolution) -> Polygon {
         use std::f64::consts::PI;
-
         let n = resolution.circular_segments(self.radius);
-
         let points = (0..n)
             .map(|i| {
                 let angle = 2.0 * PI * (i as f64) / (n as f64);
@@ -51,6 +49,6 @@ impl RenderToMultiPolygon for Circle {
             })
             .collect();
 
-        Some(Polygon::new(LineString::new(points), vec![]))
+        Polygon::new(LineString::new(points), vec![])
     }
 }

@@ -4,7 +4,7 @@
 //! 2D Geometry collection
 
 use derive_more::{Deref, DerefMut};
-use geo::{CoordsIter, HasDimensions};
+use geo::{CoordsIter, HasDimensions, MultiPolygon};
 use std::rc::Rc;
 
 use crate::{
@@ -118,23 +118,25 @@ impl FetchBounds2D for Geometries2D {
 }
 
 impl Transformed2D for Geometries2D {
-    fn transformed_2d(&self, render_resolution: &RenderResolution, mat: &Mat3) -> Self {
+    fn transformed_2d(&self, mat: &Mat3) -> Self {
         Self(
             self.iter()
-                .map(|geometry| Rc::new(geometry.transformed_2d(render_resolution, mat)))
+                .map(|geometry| Rc::new(geometry.transformed_2d(mat)))
                 .collect::<Vec<_>>(),
         )
     }
 }
 
-impl RenderToMultiPolygon for Geometries2D {
-    fn render_to_existing_multi_polygon(
-        &self,
-        resolution: &RenderResolution,
-        polygons: &mut geo2d::MultiPolygon,
-    ) {
-        self.iter().for_each(|geometry| {
-            geometry.render_to_existing_multi_polygon(resolution, polygons);
-        });
+impl From<Geometries2D> for MultiPolygon {
+    fn from(geometries: Geometries2D) -> Self {
+        Self(
+            geometries
+                .iter()
+                .flat_map(|geo| {
+                    let multi_polygon: MultiPolygon = geo.as_ref().clone().into();
+                    multi_polygon.0
+                })
+                .collect(),
+        )
     }
 }

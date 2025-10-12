@@ -14,20 +14,16 @@ impl Operation for Hull {
     fn process_2d(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         context.update_2d(|context, model| {
             let model_ = model.borrow();
-            let geometry: Geometry2DOutput = model_.children.render(context)?;
+            let geometry: Geometry2DOutput = model_.children.render_with_context(context)?;
             Ok(geometry.map(|geometry| Rc::new(geometry.hull())))
         })
     }
 
     fn process_3d(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
-        context.update_3d(|context, model, resolution| {
+        context.update_3d(|context, model| {
             let model_ = model.borrow();
-            let geometry: Geometry3DOutput = model_.children.render(context)?;
-            Ok(geometry.map(|geometry| {
-                Rc::new(microcad_core::Geometry3D::Manifold(Rc::new(
-                    geometry.hull(&resolution),
-                )))
-            }))
+            let geometry: Geometry3DOutput = model_.children.render_with_context(context)?;
+            Ok(geometry.map(|geometry| Rc::new(geometry.hull())))
         })
     }
 }

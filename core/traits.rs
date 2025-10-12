@@ -3,10 +3,10 @@
 
 //! µcad core geometry traits
 
-use crate::RenderResolution;
-
 /// Trait to align something to center
+///
+/// TODO: This trait might be extended so that.
 pub trait Align<T = Self> {
     /// Align geometry.
-    fn align(&self, resolution: &RenderResolution) -> T;
+    fn align(&self) -> T;
 }

@@ -22,14 +22,14 @@ impl Operation for Extrude {
     }
 
     fn process_3d(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
-        context.update_3d(|context, model, resolution| {
+        context.update_3d(|context, model| {
             let model_ = model.borrow();
-            let geometries: Geometries2D = model_.children.render(context)?;
+            let geometries: Geometries2D = model_.children.render_with_context(context)?;
 
             use microcad_core::Extrude;
             let mesh = geometries.linear_extrude(self.height);
 
-            Ok(Some(Rc::new(Geometry3D::Mesh(mesh))))
+            Ok(Some(Rc::new(Geometry3D::Mesh(mesh.inner))))
         })
     }
 }
