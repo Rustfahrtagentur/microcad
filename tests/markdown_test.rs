@@ -186,8 +186,8 @@ pub fn run_test(
                     // test expected to succeed and succeeds with no errors
                     (Ok(model), false, false) => {
                         let _ = std::fs::hard_link("images/ok.svg", banner);
-                        writeln!(log_out, "-- Test Result --\nOK").expect("no output error");
                         report_model(log_out, model, out_filename, hires);
+                        writeln!(log_out, "-- Test Result --\nOK").expect("no output error");
                     }
                     // test is todo but succeeds with no errors
                     (Ok(_), false, true) => {
@@ -240,10 +240,10 @@ fn create_context(source: &Rc<SourceFile>) -> EvalContext {
 fn report_output(log_out: &mut std::io::BufWriter<&mut std::fs::File>, context: &EvalContext) {
     use std::io::Write;
 
-    write!(
+    writeln!(
         log_out,
-        "-- Output --\n{}",
-        context.output().expect("capture error")
+        "-- Output --{}",
+        context.output().unwrap_or("output error".into())
     )
     .expect("output error");
 }
