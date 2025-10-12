@@ -279,15 +279,6 @@ impl Symbol {
         }
     }
 
-    /// Check if symbol has a valid value
-    pub fn is_valid_symbol(&self) -> bool {
-        match &self.inner.borrow().def {
-            SymbolDefinition::Constant(.., value) => !value.is_invalid(),
-            SymbolDefinition::ConstExpression(_, _, expr) => expr.is_const(),
-            _ => true,
-        }
-    }
-
     /// Return file path of top level parent source file.
     pub(super) fn source_path(&self) -> Option<std::path::PathBuf> {
         if let SymbolDefinition::SourceFile(source_file) = &self.inner.borrow().def {
