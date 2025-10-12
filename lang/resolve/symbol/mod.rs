@@ -116,13 +116,9 @@ impl Symbol {
             writeln!(f)?;
             let indent = 4;
 
-            self.inner
-                .borrow()
-                .children
-                .iter()
-                .try_for_each(|(id, child)| {
-                    child.print_symbol(f, Some(id), depth + indent, debug, true)
-                })?;
+            self.with_children(|(id, child)| {
+                child.print_symbol(f, Some(id), depth + indent, debug, true)
+            })?;
         }
         Ok(())
     }
@@ -347,13 +343,6 @@ impl Symbol {
         }
     }
 
-    fn get_link(&self) -> Link {
-        self.with_def(|def| match def {
-            SymbolDefinition::Alias(.., name) => Link::Alias(name.clone()),
-            _ => Link::None,
-        })
-    }
-
     // Search recursively within symbol **and** in the symbol table (global)
     fn lookup(&self, name: &QualifiedName, context: &ResolveContext) -> ResolveResult<Symbol> {
         match (self.search(name), context.lookup(name)) {
@@ -495,26 +484,16 @@ impl Symbol {
     }
 
     fn module_name(&self) -> QualifiedName {
-        let (id, is_module) = {
-            let def = &self.inner.borrow().def;
-            (
-                def.id(),
-                matches!(
-                    def,
-                    SymbolDefinition::Module(..) | SymbolDefinition::SourceFile(..)
-                ),
-            )
-        };
-        match is_module {
+        match self.is_module() {
             true => {
-                if let Some(parent) = &self.inner.borrow().parent {
-                    parent.module_name().with_suffix(&id)
+                if let Some(parent) = &self.get_parent() {
+                    parent.module_name().with_suffix(&self.id())
                 } else {
-                    QualifiedName::from_id(id)
+                    QualifiedName::from_id(self.id())
                 }
             }
             false => {
-                if let Some(parent) = &self.inner.borrow().parent {
+                if let Some(parent) = &self.get_parent() {
                     parent.module_name()
                 } else {
                     unreachable!("root must be source file")
@@ -579,7 +558,7 @@ impl FullyQualify for Symbol {
     /// Get fully qualified name.
     fn full_name(&self) -> QualifiedName {
         let id = self.id();
-        match &self.inner.borrow().parent {
+        match &self.get_parent() {
             Some(parent) => {
                 let mut name = parent.full_name();
                 name.push(id);

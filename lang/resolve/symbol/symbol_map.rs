@@ -5,11 +5,6 @@ use crate::{diag::*, resolve::*, syntax::*, value::*};
 use derive_more::{Deref, DerefMut};
 use indexmap::IndexMap;
 
-pub(super) enum Link {
-    None,
-    Alias(QualifiedName),
-}
-
 /// Map Id to SymbolNode reference
 #[derive(Default, Clone, Deref, DerefMut)]
 pub struct SymbolMap(IndexMap<Identifier, Symbol>);
@@ -64,7 +59,7 @@ impl SymbolMap {
         self.0.insert(id, symbol);
     }
 
-    pub fn get_not_deleted<'a>(&'a self, id: &Identifier) -> Option<&'a Symbol> {
+    pub fn get<'a>(&'a self, id: &Identifier) -> Option<&'a Symbol> {
         self.iter()
             .filter(|(_, symbol)| !symbol.is_deleted())
             .find(|(i, _)| *i == id)
@@ -75,39 +70,13 @@ impl SymbolMap {
     pub(crate) fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         log::trace!("Searching {name:?} in symbol map");
         if name.is_empty() {
-            if let Some(symbol) = self.get_not_deleted(&Identifier::none()) {
+            if let Some(symbol) = self.get(&Identifier::none()) {
                 log::trace!("Fetched {name:?} from globals (symbol map)");
                 return Ok(symbol.clone());
             }
         } else {
             let (id, leftover) = name.split_first();
-            if let Some(symbol) = self.get_not_deleted(&id) {
-                match symbol.get_link() {
-                    Link::None => (),
-                    Link::Alias(alias) => {
-                        if let Some(parent) = symbol.get_parent() {
-                            let symbol = {
-                                let relative = parent.search(&alias);
-                                let absolute = self.search(&alias);
-                                match (absolute, relative) {
-                                    (Ok(absolute), Ok(relative)) => {
-                                        if absolute.is_deleted() {
-                                            Ok(relative)
-                                        } else if relative.is_deleted() {
-                                            Ok(absolute)
-                                        } else {
-                                            todo!("ambiguous")
-                                        }
-                                    }
-                                    (Ok(symbol), Err(_)) | (Err(_), Ok(symbol)) => Ok(symbol),
-                                    (Err(err), Err(_)) => Err(err),
-                                }
-                            }?;
-                            return symbol.search(&leftover);
-                        }
-                    }
-                }
-
+            if let Some(symbol) = self.get(&id) {
                 if leftover.is_empty() {
                     log::trace!("Fetched {name:?} from globals (symbol map)");
                     return Ok(symbol.clone());
@@ -125,9 +94,8 @@ impl SymbolMap {
         I: IntoIterator<Item = SymbolMap>,
     {
         let mut merged = SymbolMap::new();
-        for map in iter {
-            merged.extend(map.iter().map(|(k, v)| (k.clone(), v.clone())));
-        }
+        iter.into_iter()
+            .for_each(|map| merged.extend(map.iter().map(|(k, v)| (k.clone(), v.clone()))));
         merged
     }
 
