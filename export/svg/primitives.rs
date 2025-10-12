@@ -467,8 +467,8 @@ pub struct SizeMeasure {
 
 impl SizeMeasure {
     /// Size measure for something that has bounds.
-    pub fn bounds<T: FetchBounds2D>(bounds: &T) -> Self {
-        let bounds = bounds.fetch_bounds_2d();
+    pub fn bounds<T: CalcBounds2D>(bounds: &T) -> Self {
+        let bounds = bounds.calc_bounds_2d();
 
         if let Some(rect) = bounds.rect() {
             Self {

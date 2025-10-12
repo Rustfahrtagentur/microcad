@@ -29,7 +29,10 @@ impl Operation for Extrude {
             use microcad_core::Extrude;
             let mesh = geometries.linear_extrude(self.height);
 
-            Ok(Some(Rc::new(Geometry3D::Mesh(mesh.inner))))
+            Ok(Some(Rc::new(WithBounds3D::new(
+                mesh.inner.into(),
+                mesh.bounds,
+            ))))
         })
     }
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use cgmath::ElementWise;
+use derive_more::Deref;
 
 use crate::*;
 
@@ -147,10 +148,10 @@ impl Transformed3D for Bounds3D {
     }
 }
 
-/// Trait to return a bounding box of 3D geometry.
-pub trait FetchBounds3D {
+/// Trait to calculate a bounding box of 3D geometry.
+pub trait CalcBounds3D {
     /// Fetch bounds.
-    fn fetch_bounds_3d(&self) -> Bounds3D;
+    fn calc_bounds_3d(&self) -> Bounds3D;
 }
 
 /// Transformed version of a 3D geometry.
@@ -160,25 +161,38 @@ pub trait Transformed3D<T = Self> {
 }
 
 /// Holds bounds for a 3D object.
-#[derive(Clone, Default)]
-pub struct WithBounds3D<T: FetchBounds3D + Transformed3D> {
+#[derive(Clone, Default, Debug, Deref)]
+pub struct WithBounds3D<T: CalcBounds3D + Transformed3D> {
     /// Bounds.
     pub bounds: Bounds3D,
     /// The inner object.
+    #[deref]
     pub inner: T,
 }
 
-impl<T: FetchBounds3D + Transformed3D> WithBounds3D<T> {
+impl<T: CalcBounds3D + Transformed3D> WithBounds3D<T> {
     /// Create a new object with bounds.
-    pub fn new(inner: T) -> Self {
-        Self {
-            bounds: inner.fetch_bounds_3d(),
-            inner,
-        }
+    pub fn new(inner: T, bounds: Bounds3D) -> Self {
+        Self { bounds, inner }
     }
 
     /// Update the bounds.
     pub fn update_bounds(&mut self) {
-        self.bounds = self.inner.fetch_bounds_3d()
+        self.bounds = self.inner.calc_bounds_3d()
+    }
+}
+
+impl<T: CalcBounds3D + Transformed3D> Transformed3D for WithBounds3D<T> {
+    fn transformed_3d(&self, mat: &Mat4) -> Self {
+        let inner = self.inner.transformed_3d(mat);
+        let bounds = inner.calc_bounds_3d();
+        Self { inner, bounds }
+    }
+}
+
+impl From<Geometry3D> for WithBounds3D<Geometry3D> {
+    fn from(geo: Geometry3D) -> Self {
+        let bounds = geo.calc_bounds_3d();
+        Self::new(geo, bounds)
     }
 }

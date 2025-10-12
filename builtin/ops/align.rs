@@ -16,7 +16,7 @@ impl Operation for Align {
             let model_ = model.borrow();
             let geometry: Geometry2DOutput = model_.children.render_with_context(context)?;
             use microcad_core::traits::Align;
-            Ok(geometry.map(|geometry| Rc::new(geometry.align())))
+            Ok(geometry.map(|geometry| Rc::new(geometry.align().into())))
         })
     }
 

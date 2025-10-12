@@ -117,41 +117,41 @@ impl std::fmt::Display for Bounds2D {
     }
 }
 
-/// Trait to return a bounding box of 2D geometry.
-pub trait FetchBounds2D {
+/// Trait to calculate a bounding box of 2D geometry.
+pub trait CalcBounds2D {
     /// Fetch bounds.
-    fn fetch_bounds_2d(&self) -> Bounds2D;
+    fn calc_bounds_2d(&self) -> Bounds2D;
 }
 
 /// Holds bounds for a 3D object.
 #[derive(Clone, Default, Debug, Deref)]
-pub struct WithBounds2D<T: FetchBounds2D + Transformed2D> {
+pub struct WithBounds2D<T: CalcBounds2D + Transformed2D> {
     /// Bounds.
-    #[deref]
     pub bounds: Bounds2D,
     /// The inner object.
+    #[deref]
     pub inner: T,
 }
 
-impl<T: FetchBounds2D + Transformed2D> WithBounds2D<T> {
+impl<T: CalcBounds2D + Transformed2D> WithBounds2D<T> {
     /// Create a new object with bounds.
     pub fn new(inner: T) -> Self {
         Self {
-            bounds: inner.fetch_bounds_2d(),
+            bounds: inner.calc_bounds_2d(),
             inner,
         }
     }
 
     /// Update the bounds.
     pub fn update_bounds(&mut self) {
-        self.bounds = self.inner.fetch_bounds_2d()
+        self.bounds = self.inner.calc_bounds_2d()
     }
 }
 
-impl<T: FetchBounds2D + Transformed2D> Transformed2D for WithBounds2D<T> {
+impl<T: CalcBounds2D + Transformed2D> Transformed2D for WithBounds2D<T> {
     fn transformed_2d(&self, mat: &Mat3) -> Self {
         let inner = self.inner.transformed_2d(mat);
-        let bounds = self.inner.fetch_bounds_2d();
+        let bounds = inner.calc_bounds_2d();
         Self { inner, bounds }
     }
 }

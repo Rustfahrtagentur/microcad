@@ -28,9 +28,9 @@ impl Operation for BooleanOp {
             let model_ = model.borrow();
             let geometries: Geometries3D = model_.children.render_with_context(context)?;
 
-            Ok(Some(Rc::new(Geometry3D::Manifold(
-                geometries.boolean_op(self),
-            ))))
+            Ok(Some(Rc::new(
+                Geometry3D::Manifold(geometries.boolean_op(self)).into(),
+            )))
         })
     }
 }

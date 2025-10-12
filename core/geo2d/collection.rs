@@ -8,7 +8,7 @@ use geo::{CoordsIter, HasDimensions, MultiPolygon};
 use std::rc::Rc;
 
 use crate::{
-    geo2d::{FetchBounds2D, bounds::Bounds2D},
+    geo2d::{CalcBounds2D, bounds::Bounds2D},
     *,
 };
 
@@ -109,10 +109,10 @@ impl FromIterator<Rc<Geometry2D>> for Geometries2D {
     }
 }
 
-impl FetchBounds2D for Geometries2D {
-    fn fetch_bounds_2d(&self) -> Bounds2D {
+impl CalcBounds2D for Geometries2D {
+    fn calc_bounds_2d(&self) -> Bounds2D {
         self.0.iter().fold(Bounds2D::default(), |bounds, geometry| {
-            bounds.extend(geometry.fetch_bounds_2d())
+            bounds.extend(geometry.calc_bounds_2d())
         })
     }
 }

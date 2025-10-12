@@ -62,8 +62,8 @@ impl Line {
     }
 }
 
-impl FetchBounds2D for Line {
-    fn fetch_bounds_2d(&self) -> geo2d::Bounds2D {
+impl CalcBounds2D for Line {
+    fn calc_bounds_2d(&self) -> geo2d::Bounds2D {
         geo2d::Bounds2D::new(self.0.x_y().into(), self.1.x_y().into())
     }
 }

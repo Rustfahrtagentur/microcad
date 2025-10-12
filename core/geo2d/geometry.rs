@@ -84,17 +84,26 @@ impl Geometry2D {
                 | Geometry2D::Collection(_)
         )
     }
+
+    /// Return this geometry with calculated bounds.
+    pub fn with_bounds(self) -> WithBounds2D<Geometry2D> {
+        let bounds = self.calc_bounds_2d();
+        WithBounds2D {
+            bounds,
+            inner: self,
+        }
+    }
 }
 
-impl FetchBounds2D for MultiPolygon {
-    fn fetch_bounds_2d(&self) -> Bounds2D {
+impl CalcBounds2D for MultiPolygon {
+    fn calc_bounds_2d(&self) -> Bounds2D {
         use geo::BoundingRect;
         self.bounding_rect().into()
     }
 }
 
-impl FetchBounds2D for Geometry2D {
-    fn fetch_bounds_2d(&self) -> Bounds2D {
+impl CalcBounds2D for Geometry2D {
+    fn calc_bounds_2d(&self) -> Bounds2D {
         use geo::BoundingRect;
 
         match &self {
@@ -103,10 +112,10 @@ impl FetchBounds2D for Geometry2D {
                 multi_line_string.bounding_rect().into()
             }
             Geometry2D::Polygon(polygon) => polygon.bounding_rect().into(),
-            Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.fetch_bounds_2d(),
+            Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.calc_bounds_2d(),
             Geometry2D::Rect(rect) => Some(*rect).into(),
-            Geometry2D::Line(line) => line.fetch_bounds_2d(),
-            Geometry2D::Collection(collection) => collection.fetch_bounds_2d(),
+            Geometry2D::Line(line) => line.calc_bounds_2d(),
+            Geometry2D::Collection(collection) => collection.calc_bounds_2d(),
         }
     }
 }
@@ -136,7 +145,7 @@ impl Transformed2D for Geometry2D {
 
 impl Align for Geometry2D {
     fn align(&self) -> Self {
-        if let Some(bounds) = self.fetch_bounds_2d().rect() {
+        if let Some(bounds) = self.calc_bounds_2d().rect() {
             let d: Vec2 = bounds.center().x_y().into();
             self.transformed_2d(&Mat3::from_translation(-d))
         } else {
