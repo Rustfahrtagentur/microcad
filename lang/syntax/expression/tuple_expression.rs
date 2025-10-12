@@ -65,9 +65,3 @@ impl TreeDisplay for TupleExpression {
         self.args.tree_print(f, depth)
     }
 }
-
-impl Const for TupleExpression {
-    fn is_const(&self) -> bool {
-        self.args.iter().any(|arg| !arg.expression.is_const())
-    }
-}

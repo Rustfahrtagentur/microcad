@@ -104,9 +104,3 @@ impl TreeDisplay for RangeExpression {
         self.last.tree_print(f, depth)
     }
 }
-
-impl Const for RangeExpression {
-    fn is_const(&self) -> bool {
-        self.first.is_const() && self.last.is_const()
-    }
-}
