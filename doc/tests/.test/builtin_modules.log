@@ -24,6 +24,6 @@
     Workpiece(part) builtin_modules::a::b::c::M1() ->
     Workpiece(part) builtin_modules::a::M2() ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

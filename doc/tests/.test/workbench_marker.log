@@ -15,6 +15,6 @@
     Workpiece(sketch) workbench_marker::K() ->
       InputPlaceholder ->
 
+Export error: Render error: Invalid output type: Undetermined
 -- Test Result --
 OK
-Export error: Render error: Invalid output type: Undetermined

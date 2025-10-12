@@ -28,11 +28,5 @@ error: Declaration of hole not allowed within workbench_fn_prop::PunchedDisk::in
    3 |         prop hole = radius/2;  // error: prop not allowed in function
      |         ^^^^^^^^^^^^^^^^^^^^^
      |
-error: Assignment statement not available here
-  ---> <FROM STR>:3:9
-     |
-   3 |         prop hole = radius/2;  // error: prop not allowed in function
-     |         ^^^^^^^^^^^^^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED

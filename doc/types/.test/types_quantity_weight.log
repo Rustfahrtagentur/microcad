@@ -12,11 +12,6 @@
 
 -- Output --
 -- Errors --
-error: Symbol all_equal not found while resolving.
-  ---> <FROM STR>:5:37
-     |
-   5 | std::debug::assert([gram, kilogram].all_equal());
-     |                                     ^^^^^^^^^
-     |
+-- No model --
 -- Test Result --
-FAIL
+OK

@@ -10,13 +10,9 @@
  4: // logging
  5: std::print(text);
 
--- Output --
-Hello µcad!
--- Errors --
--- Model --
-  Group (root) ->
+-- Output --Hello µcad!
 
+-- Errors --
+-- No model --
 -- Test Result --
 OK
-Could not determine output type.
-Nothing will be exported.

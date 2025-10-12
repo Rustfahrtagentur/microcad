@@ -16,11 +16,5 @@ error: Statement is not available within function
    2 |   init() {} // error
      |   ^^^^^^^^^
      |
-error: Init statement not available here
-  ---> <FROM STR>:2:3
-     |
-   2 |   init() {} // error
-     |   ^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED

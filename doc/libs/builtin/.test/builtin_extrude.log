@@ -31,6 +31,6 @@
             Primitive2D __builtin::geo2d::Circle(cx=3, cy=3, radius=4)
  ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

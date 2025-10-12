@@ -16,11 +16,5 @@ error: Use statement is not available within sketch
    2 |   pub use std; // error
      |   ^^^^^^^^^^^^
      |
-error: Public use statement not available here
-  ---> <FROM STR>:2:3
-     |
-   2 |   pub use std; // error
-     |   ^^^^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED

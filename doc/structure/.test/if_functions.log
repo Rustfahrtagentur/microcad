@@ -19,13 +19,9 @@
 13: f(-1); // prints "invalid"
 14: f(6);  // prints "invalid"
 
--- Output --
-match
--- Errors --
--- Model --
-  Group (root) ->
+-- Output --match
 
+-- Errors --
+-- No model --
 -- Test Result --
 OK
-Could not determine output type.
-Nothing will be exported.

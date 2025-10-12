@@ -22,11 +22,5 @@ error: Function definition is not available within function
    2 |   fn f() {} // error
      |   ^^^^^^^^^
      |
-error: Function statement not available here
-  ---> <FROM STR>:2:3
-     |
-   2 |   fn f() {} // error
-     |   ^^^^^^^^^
-     |
 -- Test Result --
 FAILED AS EXPECTED
