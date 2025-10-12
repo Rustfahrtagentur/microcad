@@ -113,7 +113,7 @@ impl TriangleMesh {
     }
 
     /// Fetch a vertex triangle from index triangle.
-    pub fn fetch_triangle<'a>(&'a self, tri: Triangle<u32>) -> Triangle<&'a Vertex> {
+    pub fn fetch_triangle(&self, tri: Triangle<u32>) -> Triangle<&Vertex> {
         Triangle(
             &self.vertices[tri.0 as usize],
             &self.vertices[tri.1 as usize],
@@ -125,8 +125,8 @@ impl TriangleMesh {
     pub fn repair(&mut self, bounds: &Bounds3D) {
         // 1. Merge duplicate vertices using a spatial hash map (or hashmap keyed on quantized position)
 
-        let min = bounds.min().unwrap();
-        let inv_size = 1.0 / (bounds.max().unwrap() - bounds.min().unwrap());
+        let min = bounds.min;
+        let inv_size = 1.0 / (bounds.max - bounds.min);
 
         // Quantize vertex positions to grid to group duplicates
         let quantize = |pos: &Vec3| {
