@@ -207,7 +207,7 @@ impl ResolveContext {
             "Symbols never used in ANY code:\n{}",
             unchecked
                 .iter()
-                .map(|symbol| format!("{:?}", symbol))
+                .map(|symbol| format!("{symbol:?}"))
                 .collect::<Vec<_>>()
                 .join("\n")
         );

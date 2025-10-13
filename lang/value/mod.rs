@@ -32,7 +32,7 @@ pub use value_access::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{model::*, rc::*, syntax::*, ty::*, *};
+use crate::{model::*, rc::*, syntax::*, ty::*};
 use microcad_core::*;
 
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;

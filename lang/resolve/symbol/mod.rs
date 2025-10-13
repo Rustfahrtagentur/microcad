@@ -638,6 +638,6 @@ fn test_symbol_resolve() {
     let mut context =
         ResolveContext::test_create(root, ResolveMode::Symbolized).expect("resolve error");
     context.test_add_file(my);
-    log::trace!("{:?}", context);
+    log::trace!("{context:?}");
     context.resolve().expect("resolve error");
 }

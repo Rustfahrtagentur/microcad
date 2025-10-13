@@ -31,7 +31,7 @@ impl SymbolTable {
 
     /// Add a new symbol to the table
     pub fn insert_symbol(&mut self, id: Identifier, symbol: Symbol) -> ResolveResult<()> {
-        log::trace!("insert symbol: {}", id);
+        log::trace!("insert symbol: {id}");
         if let Some(symbol) = self.symbols.insert(id, symbol.clone()) {
             Err(ResolveError::AmbiguousSymbol(symbol.id()))
         } else {

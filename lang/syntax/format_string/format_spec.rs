@@ -35,7 +35,7 @@ impl std::fmt::Display for FormatSpec {
 
 impl std::fmt::Debug for FormatSpec {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self)
+        write!(f, "{self}")
     }
 }
 
