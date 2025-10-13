@@ -137,7 +137,7 @@ impl QualifiedName {
     ///
     /// Does not check if ids match!
     pub fn base(&self, relative: &Self) -> Self {
-        let (base, _) = self.split_at(relative.len() - 1);
+        let (base, _) = self.split_at(relative.len() - 2);
         base.iter().cloned().collect()
     }
 
