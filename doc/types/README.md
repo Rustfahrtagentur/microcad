@@ -27,7 +27,7 @@ Using units is recommended and what you get in return is that declarations are q
 
 ```µcad,types_def_vs_decl
 x: Length = 4mm;   // explicit type declaration
-x = 4mm;           // implicit type declaration via units.
+y = 4mm;           // implicit type declaration via units.
 ```
 
 Declarations without any initializations are *not allowed* in µcad.
