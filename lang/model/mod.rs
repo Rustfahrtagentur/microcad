@@ -56,9 +56,18 @@ impl Model {
         self.borrow().element.is_operation()
     }
 
-    /// Return if ,model has no children.
+    /// Return `true`, if model has no children.
     pub fn is_empty(&self) -> bool {
         self.borrow().is_empty()
+    }
+
+    /// Return `true`, if model wont produce any output
+    pub fn is_empty_model(&self) -> bool {
+        let self_ = self.borrow();
+        match self_.element.value {
+            Element::BuiltinWorkpiece(_) | Element::InputPlaceholder => false,
+            _ => self_.is_empty(),
+        }
     }
 
     /// Make a deep copy if this model.

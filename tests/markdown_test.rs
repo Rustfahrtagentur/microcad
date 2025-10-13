@@ -80,7 +80,7 @@ pub fn run_test(
 
     match mode {
         // test is expected to fail?
-        "fail" | "todo_fail" => match source_file_result {
+        "fail" | "todo_fail" | "warn" | "todo_warn" => match source_file_result {
             // test expected to fail failed at parsing?
             Err(err) => {
                 writeln!(log_out, "-- Parse Error --").expect("output error");
@@ -105,12 +105,14 @@ pub fn run_test(
 
                 report_output(log_out, &context);
                 report_errors(log_out, &context);
-                report_test_fail(log_out, &context, code, banner, todo);
+                if !todo {
+                    report_wrong_errors(log_out, &context, code, banner);
+                }
 
                 let _ = fs::remove_file(banner);
 
                 // check if test expected to fail failed at evaluation
-                match (eval, context.has_errors(), todo) {
+                match (eval, context.has_errors() || context.has_warnings(), todo) {
                     // evaluation had been aborted?
                     (Err(err), _, false) => {
                         let _ = fs::hard_link("images/fail_ok.svg", banner);
@@ -150,7 +152,7 @@ pub fn run_test(
             }
         },
         // test is expected to succeed?
-        _ => match source_file_result {
+        "ok" | "todo" => match source_file_result {
             // test awaited to succeed and parsing failed?
             Err(err) => {
                 let _ = fs::remove_file(banner);
@@ -182,7 +184,7 @@ pub fn run_test(
                 let _ = fs::remove_file(banner);
 
                 // check if test awaited to succeed but failed at evaluation
-                match (eval, context.has_errors(), todo) {
+                match (eval, context.has_errors() || context.has_warnings(), todo) {
                     // test expected to succeed and succeeds with no errors
                     (Ok(model), false, false) => {
                         let _ = std::fs::hard_link("images/ok.svg", banner);
@@ -221,6 +223,8 @@ pub fn run_test(
                 }
             }
         },
+        "no-test" => (),
+        _ => unreachable!(),
     }
 }
 
@@ -257,31 +261,21 @@ fn report_errors(log_out: &mut std::io::BufWriter<&mut std::fs::File>, context: 
     context.write_diagnosis(log_out).expect("internal error");
 }
 
-fn report_test_fail(
+fn report_wrong_errors(
     log_out: &mut std::io::BufWriter<&mut std::fs::File>,
     context: &EvalContext,
     code: &str,
     banner: &str,
-    todo: bool,
 ) {
     use microcad_lang::diag::Diag;
     use std::io::Write;
 
-    if context.has_errors()
-        && (lines_with(code, "// error") != context.error_lines()
-            || lines_with(code, "// warning")
-                .iter()
-                .any(|l| !context.warning_lines().contains(l)))
+    if (context.has_errors() && lines_with(code, "// error") != context.error_lines())
+        || (context.has_warnings() && lines_with(code, "// warning") != context.warning_lines())
     {
-        if todo {
-            let _ = std::fs::hard_link("images/todo_fail.svg", banner);
-            writeln!(log_out, "-- Test Result --\nFAIL(TODO)").expect("output error");
-        } else {
-            let _ = std::fs::hard_link("images/fail_wrong.svg", banner);
-            writeln!(log_out, "-- Test Result --\nFAILED BUT WITH WRONG ERRORS")
-                .expect("output error");
-            panic!("ERROR: test is marked to fail but fails with wrong errors");
-        }
+        let _ = std::fs::hard_link("images/fail_wrong.svg", banner);
+        writeln!(log_out, "-- Test Result --\nFAILED BUT WITH WRONG ERRORS").expect("output error");
+        panic!("ERROR: test is marked to fail but fails with wrong errors");
     }
 }
 

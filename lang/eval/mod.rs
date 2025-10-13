@@ -92,7 +92,7 @@ impl MethodCall {
     fn eval(&self, context: &mut EvalContext, lhs: &Expression) -> EvalResult<Value> {
         let value: Value = lhs.eval(context)?;
         if let Value::Model(model) = &value {
-            if model.is_empty() {
+            if model.is_empty_model() {
                 context.warning(&lhs, EvalError::EmptyModelExpression)?;
             }
         }

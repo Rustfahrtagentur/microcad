@@ -35,7 +35,7 @@ use std::ops::translate;
 
 [![test](.test/sketch_with_empty_body.svg)](.test/sketch_with_empty_body.log)
 
-```µcad,sketch_with_empty_body#fail
+```µcad,sketch_with_empty_body#warn
 {}.std::ops::translate(x = 5mm) // warning: Calling operation on empty geometry
 ```
 
