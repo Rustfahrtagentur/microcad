@@ -28,7 +28,7 @@ pub trait Locals {
     fn close(&mut self);
 
     /// Fetch a local variable from current stack frame.
-    fn fetch(&self, id: &Identifier) -> EvalResult<Symbol>;
+    fn fetch_symbol(&self, id: &Identifier) -> EvalResult<Symbol>;
 
     /// Set/add a named local value to current locals.
     fn set_local_value(&mut self, id: Identifier, value: Value) -> EvalResult<()>;

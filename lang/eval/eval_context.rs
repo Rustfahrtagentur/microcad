@@ -225,7 +225,7 @@ impl EvalContext {
     /// Fetch local variable from local stack (for testing only).
     #[cfg(test)]
     pub fn fetch_local(&self, id: &Identifier) -> EvalResult<Symbol> {
-        self.stack.fetch(id)
+        self.stack.fetch_symbol(id)
     }
 
     fn lookup_workbench(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
@@ -383,8 +383,8 @@ impl Locals for EvalContext {
         self.stack.close();
     }
 
-    fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
-        self.stack.fetch(id)
+    fn fetch_symbol(&self, id: &Identifier) -> EvalResult<Symbol> {
+        self.stack.fetch_symbol(id)
     }
 
     fn get_model(&self) -> EvalResult<Model> {

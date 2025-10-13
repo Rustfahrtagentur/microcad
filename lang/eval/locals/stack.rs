@@ -178,10 +178,10 @@ impl Stack {
             lookup = crate::mark!(LOOKUP)
         );
         let symbol = if let Some(id) = name.single_identifier() {
-            self.fetch(id)
+            self.fetch_symbol(id)
         } else {
             let (id, _) = name.split_first();
-            let local = match self.fetch(&id) {
+            let local = match self.fetch_symbol(&id) {
                 Ok(local) => local,
                 Err(err) => {
                     log::trace!(
@@ -244,7 +244,7 @@ impl Locals for Stack {
     }
 
     fn get_local_value(&self, id: &Identifier) -> EvalResult<Value> {
-        match self.fetch(id) {
+        match self.fetch_symbol(id) {
             Ok(symbol) => symbol.with_def(|def| match def {
                 SymbolDefinition::Constant(.., value) | SymbolDefinition::Argument(.., value) => {
                     Ok(value.clone())
@@ -267,7 +267,7 @@ impl Locals for Stack {
         }
     }
 
-    fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
+    fn fetch_symbol(&self, id: &Identifier) -> EvalResult<Symbol> {
         // search from inner scope to root scope to shadow outside locals
         for (n, frame) in self.0.iter().rev().enumerate() {
             match frame {
@@ -338,7 +338,7 @@ fn local_stack() {
     };
 
     let fetch_int = |stack: &Stack, id: &str| -> Option<i64> {
-        match stack.fetch(&id.into()) {
+        match stack.fetch_symbol(&id.into()) {
             Ok(node) => node.with_def(|def| match def {
                 SymbolDefinition::Constant(.., Value::Integer(value)) => Some(*value),
                 _ => todo!("error"),
