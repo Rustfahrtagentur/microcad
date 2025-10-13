@@ -10,8 +10,9 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Primitive2D __builtin::geo2d::Text(font_file=, height=20, text=Hello World)⏎ ->
+    Primitive2D __builtin::geo2d::Text(font_file=, height=20, text=Hello World)
+ ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.
