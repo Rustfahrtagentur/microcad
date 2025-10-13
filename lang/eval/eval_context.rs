@@ -559,6 +559,11 @@ impl PushDiag for EvalContext {
     fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         let result = self.diag.push_diag(diag);
         log::trace!("Error Context:\n{self:?}");
+        #[cfg(debug_assertions)]
+        if std::env::var("MICROCAD_ERROR_PANIC").is_ok() {
+            eprintln!("{}", self.diagnosis());
+            panic!("MICROCAD_ERROR_PANIC")
+        }
         result
     }
 }
