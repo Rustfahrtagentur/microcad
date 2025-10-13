@@ -119,7 +119,7 @@ When you provide all parameters but some are redundant, you will get a warning:
 
 ```µcad,tuple_match_warnings#fail
 fn f( x: Length, y: Length, z: Length ) {}
-f( (x=1cm, y=2cm, v=5cm), z=3cm);  // warning: v is redundant
+f( (x=1cm, y=2cm, v=5cm), z=3cm);  // error: Missing arguments: x,y
 ```
 
 ## Argument Multiplicity
