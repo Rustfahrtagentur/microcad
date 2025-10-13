@@ -59,6 +59,10 @@ pub trait PushDiag {
         } else {
             log::error!("{err}");
         }
+        #[cfg(debug_assertions)]
+        if std::env::var("MICROCAD_ERROR_PANIC").is_ok() {
+            panic!("MICROCAD_ERROR_PANIC")
+        }
         self.push_diag(err)
     }
 }
