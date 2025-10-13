@@ -102,7 +102,7 @@ impl BuiltinWorkpiece {
 
 impl std::fmt::Display for BuiltinWorkpiece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(
+        write!(
             f,
             "{kind} {creator}",
             kind = self.kind,
