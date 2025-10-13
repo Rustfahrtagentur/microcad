@@ -15,60 +15,30 @@
  9:     }
 10: }
 11: 
-12: __builtin::debug::assert_valid(my.mod_public.const_public);
-13: __builtin::debug::assert_invalid(my.mod_public.const_private);
-14: __builtin::debug::assert_invalid(my.mod_private.const_public);
-15: __builtin::debug::assert_invalid(my.mod_private.const_private);
+12: __builtin::debug::assert_valid(my::mod_public::const_public);
+13: __builtin::debug::assert_invalid(my::mod_public::const_private);
+14: __builtin::debug::assert_invalid(my::mod_private::const_public);
+15: __builtin::debug::assert_invalid(my::mod_private::const_private);
 
 -- Output --
 -- Errors --
-error: Unexpected mod my within expression
-  ---> <FROM STR>:12:32
-     |
-  12 | __builtin::debug::assert_valid(my.mod_public.const_public);
-     |                                ^^
-     |
-error: Missing arguments: target
-  ---> <FROM STR>:12:32
-     |
-  12 | __builtin::debug::assert_valid(my.mod_public.const_public);
-     |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Unexpected mod my within expression
+error: Assertion failed: Found valid symbol 'my::mod_public::const_private' within module 'visibility::my'.
   ---> <FROM STR>:13:34
      |
-  13 | __builtin::debug::assert_invalid(my.mod_public.const_private);
-     |                                  ^^
+  13 | __builtin::debug::assert_invalid(my::mod_public::const_private);
+     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Missing arguments: target
-  ---> <FROM STR>:13:34
-     |
-  13 | __builtin::debug::assert_invalid(my.mod_public.const_private);
-     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Unexpected mod my within expression
+error: Assertion failed: Found valid symbol 'my::mod_private::const_public' within module 'visibility::my'.
   ---> <FROM STR>:14:34
      |
-  14 | __builtin::debug::assert_invalid(my.mod_private.const_public);
-     |                                  ^^
+  14 | __builtin::debug::assert_invalid(my::mod_private::const_public);
+     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
-error: Missing arguments: target
-  ---> <FROM STR>:14:34
-     |
-  14 | __builtin::debug::assert_invalid(my.mod_private.const_public);
-     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Unexpected mod my within expression
+error: Assertion failed: Found valid symbol 'my::mod_private::const_private' within module 'visibility::my'.
   ---> <FROM STR>:15:34
      |
-  15 | __builtin::debug::assert_invalid(my.mod_private.const_private);
-     |                                  ^^
-     |
-error: Missing arguments: target
-  ---> <FROM STR>:15:34
-     |
-  15 | __builtin::debug::assert_invalid(my.mod_private.const_private);
-     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | __builtin::debug::assert_invalid(my::mod_private::const_private);
+     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      |
 -- Test Result --
 FAIL
