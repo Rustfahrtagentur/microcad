@@ -11,11 +11,12 @@
 -- Model --
   Group (root) ->
     Workpiece(sketch) std::geo2d::Text(font_file=, height=20mm, text=Hello µcad!) ->
-      - font_file = ""
+      - font_file = 
       - height = 20mm
-      - text = "Hello µcad!"
-      Primitive2D __builtin::geo2d::Text(font_file=, height=20, text=Hello µcad!)⏎ ->
+      - text = Hello µcad!
+      Primitive2D __builtin::geo2d::Text(font_file=, height=20, text=Hello µcad!)
+ ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

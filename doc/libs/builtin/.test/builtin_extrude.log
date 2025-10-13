@@ -19,16 +19,16 @@
       Operation subtract()
  ->
         Group ->
-          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=8)
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=9)
  ->
           Multiplicity ->
-            Primitive2D __builtin::geo2d::Circle(cx=-3, cy=-3, radius=4)
+            Primitive2D __builtin::geo2d::Circle(cx=-3, cy=-3, radius=2)
  ->
-            Primitive2D __builtin::geo2d::Circle(cx=3, cy=-3, radius=4)
+            Primitive2D __builtin::geo2d::Circle(cx=3, cy=-3, radius=2)
  ->
-            Primitive2D __builtin::geo2d::Circle(cx=-3, cy=3, radius=4)
+            Primitive2D __builtin::geo2d::Circle(cx=-3, cy=3, radius=2)
  ->
-            Primitive2D __builtin::geo2d::Circle(cx=3, cy=3, radius=4)
+            Primitive2D __builtin::geo2d::Circle(cx=3, cy=3, radius=2)
  ->
 
 Export successful.
