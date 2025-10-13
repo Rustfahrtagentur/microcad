@@ -171,40 +171,6 @@ impl Model {
             }
         })
     }
-
-    /// A [`Model`] signature has the form `[id: ]ElementType[ = origin][ -> result_type]`.
-    pub fn signature_display(&self) -> String {
-        format!(
-            "{id}{element}{is_root} ->",
-            id = match &self.borrow().id {
-                Some(id) => format!("{id}: "),
-                None => String::new(),
-            },
-            element = *self.borrow().element,
-            is_root = if self.parents().next().is_some() {
-                ""
-            } else {
-                " (root)"
-            }
-        )
-    }
-
-    /// Print signature in debug mode
-    pub fn signature_debug(&self) -> String {
-        crate::shorten!(format!(
-            "{id}{element}{is_root} ->",
-            id = match &self.borrow().id {
-                Some(id) => format!("{id:?}: "),
-                None => String::new(),
-            },
-            element = *self.borrow().element,
-            is_root = if self.parents().next().is_some() {
-                ""
-            } else {
-                " (root)"
-            }
-        ))
-    }
 }
 
 /// Iterator methods.
@@ -271,8 +237,17 @@ impl std::fmt::Display for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{signature}",
-            signature = crate::shorten!(self.signature_display())
+            "{id}{element}{is_root} ->",
+            id = match &self.borrow().id {
+                Some(id) => format!("{id}: "),
+                None => String::new(),
+            },
+            element = *self.borrow().element,
+            is_root = if self.parents().next().is_some() {
+                ""
+            } else {
+                " (root)"
+            }
         )
     }
 }
@@ -281,8 +256,20 @@ impl std::fmt::Debug for Model {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{signature}",
-            signature = crate::shorten!(self.signature_display())
+            "{}",
+            crate::shorten!(format!(
+                "{id}{element}{is_root} ->",
+                id = match &self.borrow().id {
+                    Some(id) => format!("{id:?}: "),
+                    None => String::new(),
+                },
+                element = *self.borrow().element,
+                is_root = if self.parents().next().is_some() {
+                    ""
+                } else {
+                    " (root)"
+                }
+            ))
         )
     }
 }
@@ -294,9 +281,9 @@ impl TreeDisplay for Model {
         mut tree_state: TreeState,
     ) -> std::fmt::Result {
         let signature = if tree_state.debug {
-            self.signature_debug()
+            format!("{self:?}")
         } else {
-            self.signature_display()
+            self.to_string()
         };
         let self_ = self.borrow();
         if let Some(output) = &self_.output {
