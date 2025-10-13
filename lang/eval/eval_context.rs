@@ -582,10 +582,21 @@ impl std::fmt::Debug for EvalContext {
         self.stack.pretty_print_call_trace(f, &self.sources)?;
 
         write!(f, "\nSymbol Table:\n{:?}", self.symbol_table)?;
-        if self.has_errors() {
-            writeln!(f, "Errors:")?;
-            self.fmt_diagnosis(f)?;
-        }
+        match self.error_count() {
+            0 => write!(f, "No errors")?,
+            1 => write!(f, "1 error")?,
+            _ => write!(f, "{} errors", self.error_count())?,
+        };
+        match self.warning_count() {
+            0 => writeln!(
+                f,
+                ", no warnings{}",
+                if self.error_count() > 0 { ":" } else { "." }
+            )?,
+            1 => writeln!(f, ", 1 warning:")?,
+            _ => writeln!(f, ", {} warnings:", self.warning_count())?,
+        };
+        self.fmt_diagnosis(f)?;
         Ok(())
     }
 }

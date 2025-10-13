@@ -190,6 +190,10 @@ pub enum EvalError {
     #[error("This expression statement did not produce any model")]
     EmptyModelExpression,
 
+    /// Workbench with empty body - suspicious!
+    #[error("{0} {1} has empty body")]
+    WarnEmptyWorkbench(String, Identifier),
+
     /// This error happens if the workbench produced a different output type.
     #[error("The {0} workbench produced a 2D output, but expected {2} output.")]
     WorkbenchInvalidOutput(WorkbenchKind, OutputType, OutputType),

@@ -91,6 +91,11 @@ impl MethodCall {
     /// ```
     fn eval(&self, context: &mut EvalContext, lhs: &Expression) -> EvalResult<Value> {
         let value: Value = lhs.eval(context)?;
+        if let Value::Model(model) = &value {
+            if model.is_empty() {
+                context.warning(&lhs, EvalError::EmptyModelExpression)?;
+            }
+        }
         let args = self.argument_list.eval(context)?;
         value.call_method(&self.name, &args, context)
     }

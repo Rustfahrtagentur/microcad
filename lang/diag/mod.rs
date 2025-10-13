@@ -45,7 +45,13 @@ pub trait PushDiag {
         src: &impl SrcReferrer,
         error: impl std::error::Error + 'static,
     ) -> DiagResult<()> {
-        self.push_diag(Diagnostic::Warning(Refer::new(error.into(), src.src_ref())))
+        let err = Diagnostic::Warning(Refer::new(error.into(), src.src_ref()));
+        if cfg!(feature = "ansi-color") {
+            log::warn!("{}", color_print::cformat!("<y,s>{err}</>"));
+        } else {
+            log::warn!("{err}");
+        }
+        self.push_diag(err)
     }
     /// Push new error.
     fn error(
