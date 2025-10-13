@@ -114,15 +114,24 @@ impl Eval for QualifiedName {
             SymbolDefinition::ConstExpression(.., expr) => expr.eval(context),
             SymbolDefinition::SourceFile(_) => Ok(Value::None),
 
-            SymbolDefinition::Module(ns) => Err(EvalError::UnexpectedNested("mod", ns.id.clone())),
+            SymbolDefinition::Module(ns) => {
+                context.error(self, EvalError::UnexpectedNested("mod", ns.id.clone()))?;
+                Ok(Value::None)
+            }
             SymbolDefinition::Workbench(w) => {
-                Err(EvalError::UnexpectedNested(w.kind.as_str(), w.id.clone()))
+                context.error(
+                    self,
+                    EvalError::UnexpectedNested(w.kind.as_str(), w.id.clone()),
+                )?;
+                Ok(Value::None)
             }
             SymbolDefinition::Function(f) => {
-                Err(EvalError::UnexpectedNested("function", f.id.clone()))
+                context.error(self, EvalError::UnexpectedNested("function", f.id.clone()))?;
+                Ok(Value::None)
             }
             SymbolDefinition::Builtin(bm) => {
-                Err(EvalError::UnexpectedNested("builtin", bm.id.clone()))
+                context.error(self, EvalError::UnexpectedNested("builtin", bm.id.clone()))?;
+                Ok(Value::None)
             }
             SymbolDefinition::Alias(_, id, _) => {
                 // Alias should have been resolved within previous lookup()
