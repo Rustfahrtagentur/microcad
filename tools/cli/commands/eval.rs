@@ -35,32 +35,30 @@ impl RunCommand<(EvalContext, Option<Model>)> for Eval {
             microcad_builtin::builtin_importers(),
         );
 
-        log::info!("Result:");
         match context.has_errors() {
             true => {
-                log::warn!("Evaluated with errors:");
+                log::warn!("Evaluated with errors.");
                 eprintln!("{}", context.diagnosis());
             }
             false => log::info!("Evaluated successfully!"),
         }
 
-        if self.model {
-            match context.eval() {
-                Result::Ok(Some(model)) => {
+        match context.eval() {
+            Result::Ok(Some(model)) => {
+                log::info!("Created model.");
+                if self.model {
                     println!("{}", FormatTree(&model));
-                    Ok((context, Some(model)))
                 }
-                Result::Ok(None) => {
-                    eprintln!("No output model.");
-                    Ok((context, None))
-                }
-                Err(err) => {
-                    eprintln!("Model construction failed.");
-                    Ok(Err(err)?)
-                }
+                Ok((context, Some(model)))
             }
-        } else {
-            Ok((context, None))
+            Result::Ok(None) => {
+                eprintln!("No output model.");
+                Ok((context, None))
+            }
+            Err(err) => {
+                eprintln!("Model construction failed.");
+                Ok(Err(err)?)
+            }
         }
     }
 }

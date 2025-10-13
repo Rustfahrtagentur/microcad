@@ -197,7 +197,7 @@ impl Export {
 
     pub fn list_targets(&self, models: &Vec<(Model, ExportCommand)>) -> anyhow::Result<()> {
         for (model, attr) in models {
-            log::info!("{model} => {attr}", model = model.signature_debug());
+            eprintln!("{model} => {attr}", model = model.signature_debug());
         }
         Ok(())
     }
