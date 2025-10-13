@@ -23,8 +23,7 @@
       - x = 10mm
       - y = 0mm
       - z = 0mm
-      Transform __builtin::ops::translate(x=10, y=0, z=0)
- ->
+      Transform __builtin::ops::translate(x=10, y=0, z=0) ->
         Workpiece(sketch) call_workbench::Square(size=20mm) (root) ->
           - size = 20mm
           Workpiece(sketch) std::geo2d::Rect(size=20mm) ->
@@ -32,8 +31,7 @@
             - width = 20mm
             - x = -10mm
             - y = -10mm
-            Primitive2D __builtin::geo2d::Rect(height=20, width=20, x=-10, y=-10)
- ->
+            Primitive2D __builtin::geo2d::Rect(height=20, width=20, x=-10, y=-10) ->
 
 Export successful.
 -- Test Result --

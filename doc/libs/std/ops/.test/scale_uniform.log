@@ -12,15 +12,13 @@
   Group (root) ->
     Workpiece(op) std::ops::scale(s=2) ->
       - v = (x=2, y=2, z=2)
-      Transform __builtin::ops::scale(x=2, y=2, z=2)
- ->
+      Transform __builtin::ops::scale(x=2, y=2, z=2) ->
         Workpiece(sketch) std::geo2d::Rect(size=30mm) (root) ->
           - height = 30mm
           - width = 30mm
           - x = -15mm
           - y = -15mm
-          Primitive2D __builtin::geo2d::Rect(height=30, width=30, x=-15, y=-15)
- ->
+          Primitive2D __builtin::geo2d::Rect(height=30, width=30, x=-15, y=-15) ->
 
 Export successful.
 -- Test Result --

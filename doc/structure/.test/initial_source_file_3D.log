@@ -13,8 +13,7 @@
   Group (root) ->
     Workpiece(part) std::geo3d::Sphere(radius=10mm) ->
       - radius = 10mm
-      Primitive3D __builtin::geo3d::Sphere(radius=10)
- ->
+      Primitive3D __builtin::geo3d::Sphere(radius=10) ->
 
 Export successful.
 -- Test Result --

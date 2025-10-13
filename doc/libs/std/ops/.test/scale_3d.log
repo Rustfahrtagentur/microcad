@@ -12,17 +12,14 @@
   Group (root) ->
     Workpiece(op) std::ops::scale(x=2, y=1, z=1) ->
       - v = (x=2, y=1, z=1)
-      Transform __builtin::ops::scale(x=2, y=1, z=1)
- ->
+      Transform __builtin::ops::scale(x=2, y=1, z=1) ->
         Workpiece(part) std::geo3d::Cylinder(d=20mm, h=50mm) (root) ->
           - height = 50mm
           - offset = -25mm
           - radius_bottom = 10mm
           - radius_top = 10mm
-          Transform __builtin::ops::translate(x=0, y=0, z=-25)
- ->
-            Primitive3D __builtin::geo3d::Cylinder(height=50, radius_bottom=10, radius_top=10)
- ->
+          Transform __builtin::ops::translate(x=0, y=0, z=-25) ->
+            Primitive3D __builtin::geo3d::Cylinder(height=50, radius_bottom=10, radius_top=10) ->
 
 Export successful.
 -- Test Result --

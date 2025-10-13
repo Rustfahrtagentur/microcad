@@ -14,15 +14,12 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Operation __builtin::ops::revolve(revolve_degrees=360)
- ->
-      Transform __builtin::ops::translate(x=20, y=0, z=0)
- ->
+    Operation __builtin::ops::revolve(revolve_degrees=360) ->
+      Transform __builtin::ops::translate(x=20, y=0, z=0) ->
         Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) ->
           - center = (x=0mm, y=0mm)
           - radius = 10mm
-          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)
- ->
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10) ->
 
 Export successful.
 -- Test Result --

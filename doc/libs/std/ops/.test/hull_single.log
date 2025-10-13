@@ -16,31 +16,26 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Operation __builtin::ops::hull()
- ->
+    Operation __builtin::ops::hull() ->
       Group ->
         Workpiece(op) std::ops::translate(x=10mm, y=0mm, z=0mm) ->
           - x = 10mm
           - y = 0mm
           - z = 0mm
-          Transform __builtin::ops::translate(x=10, y=0, z=0)
- ->
+          Transform __builtin::ops::translate(x=10, y=0, z=0) ->
             Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) ->
               - center = (x=0mm, y=0mm)
               - radius = 10mm
-              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)
- ->
+              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10) ->
         Workpiece(op) std::ops::translate(x=0mm, y=10mm, z=0mm) ->
           - x = 0mm
           - y = 10mm
           - z = 0mm
-          Transform __builtin::ops::translate(x=0, y=10, z=0)
- ->
+          Transform __builtin::ops::translate(x=0, y=10, z=0) ->
             Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) ->
               - center = (x=0mm, y=0mm)
               - radius = 10mm
-              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)
- ->
+              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10) ->
 
 Export successful.
 -- Test Result --

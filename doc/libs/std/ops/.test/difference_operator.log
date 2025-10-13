@@ -10,21 +10,18 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Operation subtract()
- ->
+    Operation subtract() ->
       Group ->
         Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) ->
           - center = (x=0mm, y=0mm)
           - radius = 10mm
-          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)
- ->
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10) ->
         Workpiece(sketch) std::geo2d::Rect(size=2mm) ->
           - height = 2mm
           - width = 2mm
           - x = -1mm
           - y = -1mm
-          Primitive2D __builtin::geo2d::Rect(height=2, width=2, x=-1, y=-1)
- ->
+          Primitive2D __builtin::geo2d::Rect(height=2, width=2, x=-1, y=-1) ->
 
 Export successful.
 -- Test Result --

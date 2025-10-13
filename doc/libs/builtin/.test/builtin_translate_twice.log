@@ -15,13 +15,10 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Transform __builtin::ops::translate(x=15, y=0, z=0)
- ->
+    Transform __builtin::ops::translate(x=15, y=0, z=0) ->
       #[svg = svg = (fill=, style=fill:red)]
-      Transform __builtin::ops::translate(x=0, y=15, z=0)
- ->
-        Primitive2D __builtin::geo2d::Rect(height=10, width=10, x=0, y=0)
- ->
+      Transform __builtin::ops::translate(x=0, y=15, z=0) ->
+        Primitive2D __builtin::geo2d::Rect(height=10, width=10, x=0, y=0) ->
 
 Export successful.
 -- Test Result --

@@ -10,8 +10,7 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Primitive2D __builtin::geo2d::Pie(end_angle=2.35619449019234rad, radius=20, start_angle=0.78539816339745rad)
- ->
+    Primitive2D __builtin::geo2d::Pie(end_angle=2.35619449019234rad, radius=20, start_angle=0.78539816339745rad) ->
 
 Export successful.
 -- Test Result --

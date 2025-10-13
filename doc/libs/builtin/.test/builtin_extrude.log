@@ -14,22 +14,15 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Operation __builtin::ops::extrude(height=4, n_divisions=0, scale_top_x=1, scale_top_y=1, twist_degrees=0)
- ->
-      Operation subtract()
- ->
+    Operation __builtin::ops::extrude(height=4, n_divisions=0, scale_top_x=1, scale_top_y=1, twist_degrees=0) ->
+      Operation subtract() ->
         Group ->
-          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=9)
- ->
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=9) ->
           Multiplicity ->
-            Primitive2D __builtin::geo2d::Circle(cx=-3, cy=-3, radius=2)
- ->
-            Primitive2D __builtin::geo2d::Circle(cx=3, cy=-3, radius=2)
- ->
-            Primitive2D __builtin::geo2d::Circle(cx=-3, cy=3, radius=2)
- ->
-            Primitive2D __builtin::geo2d::Circle(cx=3, cy=3, radius=2)
- ->
+            Primitive2D __builtin::geo2d::Circle(cx=-3, cy=-3, radius=2) ->
+            Primitive2D __builtin::geo2d::Circle(cx=3, cy=-3, radius=2) ->
+            Primitive2D __builtin::geo2d::Circle(cx=-3, cy=3, radius=2) ->
+            Primitive2D __builtin::geo2d::Circle(cx=3, cy=3, radius=2) ->
 
 Export successful.
 -- Test Result --
