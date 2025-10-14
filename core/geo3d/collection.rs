@@ -8,7 +8,7 @@ use std::rc::Rc;
 use derive_more::{Deref, DerefMut};
 
 use crate::{
-    geo3d::{FetchBounds3D, bounds::Bounds3D},
+    geo3d::{CalcBounds3D, bounds::Bounds3D},
     *,
 };
 
@@ -28,13 +28,13 @@ impl Geometries3D {
     }
 
     /// Apply boolean operation on collection and render to manifold.
-    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> Rc<Manifold> {
+    pub fn boolean_op(&self, op: &BooleanOp) -> Rc<Manifold> {
         let manifold_list: Vec<_> = self
             .0
             .iter()
             // Render each geometry into a multipolygon and filter out empty ones
             .filter_map(|geo| {
-                let manifold = geo.render_to_manifold(resolution);
+                let manifold: Rc<Manifold> = geo.as_ref().clone().into();
                 if manifold.is_empty() {
                     None
                 } else {
@@ -53,11 +53,6 @@ impl Geometries3D {
                 Rc::new(acc.boolean_op(other, op.into()))
             })
     }
-
-    /// Convex hull.
-    pub fn hull(&self, resolution: &RenderResolution) -> Manifold {
-        self.render_to_manifold(resolution).hull()
-    }
 }
 
 impl FromIterator<Rc<Geometry3D>> for Geometries3D {
@@ -66,26 +61,20 @@ impl FromIterator<Rc<Geometry3D>> for Geometries3D {
     }
 }
 
-impl FetchBounds3D for Geometries3D {
-    fn fetch_bounds_3d(&self) -> Bounds3D {
+impl CalcBounds3D for Geometries3D {
+    fn calc_bounds_3d(&self) -> Bounds3D {
         self.0.iter().fold(Bounds3D::default(), |bounds, geometry| {
-            bounds.extend(geometry.fetch_bounds_3d())
+            bounds.extend(geometry.calc_bounds_3d())
         })
     }
 }
 
 impl Transformed3D for Geometries3D {
-    fn transformed_3d(&self, render_resolution: &RenderResolution, mat: &Mat4) -> Self {
+    fn transformed_3d(&self, mat: &Mat4) -> Self {
         Self(
             self.iter()
-                .map(|geometry| Rc::new(geometry.transformed_3d(render_resolution, mat)))
+                .map(|geometry| Rc::new(geometry.transformed_3d(mat)))
                 .collect::<Vec<_>>(),
         )
-    }
-}
-
-impl RenderToMesh for Geometries3D {
-    fn render_to_manifold(&self, resolution: &RenderResolution) -> std::rc::Rc<Manifold> {
-        self.boolean_op(resolution, &BooleanOp::Union)
     }
 }

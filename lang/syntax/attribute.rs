@@ -7,7 +7,7 @@ use crate::{src_ref::*, syntax::*};
 use derive_more::{Deref, DerefMut};
 
 /// *Command syntax* within an attribute.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum AttributeCommand {
     /// A command with an optional identifier and optional arguments: `width(offset = 30mm)`.
     Call(Option<Identifier>, Option<ArgumentList>),
@@ -37,6 +37,28 @@ impl std::fmt::Display for AttributeCommand {
     }
 }
 
+impl std::fmt::Debug for AttributeCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            AttributeCommand::Call(id, argument_list) => {
+                write!(
+                    f,
+                    "{id:?}{argument_list:?}",
+                    id = match id {
+                        Some(id) => format!("{id:?}"),
+                        None => String::new(),
+                    },
+                    argument_list = match argument_list {
+                        Some(argument_list) => format!("({argument_list:?})"),
+                        None => String::new(),
+                    }
+                )
+            }
+            AttributeCommand::Expression(expression) => write!(f, "{expression:?}"),
+        }
+    }
+}
+
 impl SrcReferrer for AttributeCommand {
     fn src_ref(&self) -> SrcRef {
         match &self {
@@ -54,7 +76,7 @@ impl SrcReferrer for AttributeCommand {
 }
 
 /// An attribute item.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Attribute {
     /// The id of the attribute.
     pub id: Identifier,
@@ -105,6 +127,12 @@ impl std::fmt::Display for Attribute {
     }
 }
 
+impl std::fmt::Debug for Attribute {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{self}")
+    }
+}
+
 impl SrcReferrer for Attribute {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         self.src_ref.clone()
@@ -112,12 +140,18 @@ impl SrcReferrer for Attribute {
 }
 
 /// A list of attributes, e.g. `#foo #[bar, baz = 42]`
-#[derive(Debug, Clone, Default, Deref, DerefMut)]
+#[derive(Clone, Default, Deref, DerefMut)]
 pub struct AttributeList(Vec<Attribute>);
 
 impl std::fmt::Display for AttributeList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0.iter().try_for_each(|attr| writeln!(f, "{attr}"))
+    }
+}
+
+impl std::fmt::Debug for AttributeList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{self}")
     }
 }
 

@@ -11,26 +11,26 @@ use crate::{builtin::*, model::*, render::*, value::Tuple};
 
 impl Operation for BooleanOp {
     fn process_2d(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
-        context.update_2d(|context, model, resolution| {
+        context.update_2d(|context, model| {
             let model = model.into_group().unwrap_or(model);
             let model_ = model.borrow();
-            let geometries: Geometries2D = model_.children.render(context)?;
+            let geometries: Geometries2D = model_.children.render_with_context(context)?;
 
-            Ok(Some(Rc::new(Geometry2D::MultiPolygon(
-                geometries.boolean_op(&resolution, self),
-            ))))
+            Ok(Some(Rc::new(
+                Geometry2D::MultiPolygon(geometries.boolean_op(self)).into(),
+            )))
         })
     }
 
     fn process_3d(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
-        context.update_3d(|context, model, resolution| {
+        context.update_3d(|context, model| {
             let model = model.into_group().unwrap_or(model);
             let model_ = model.borrow();
-            let geometries: Geometries3D = model_.children.render(context)?;
+            let geometries: Geometries3D = model_.children.render_with_context(context)?;
 
-            Ok(Some(Rc::new(Geometry3D::Manifold(
-                geometries.boolean_op(&resolution, self),
-            ))))
+            Ok(Some(Rc::new(
+                Geometry3D::Manifold(geometries.boolean_op(self)).into(),
+            )))
         })
     }
 }

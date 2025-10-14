@@ -4,13 +4,16 @@
 use crate::eval::*;
 
 impl Eval for ModuleDefinition {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         context.grant(self)?;
         context.scope(
             StackFrame::Module(self.id.clone(), Default::default()),
             |context| {
-                // avoid body frame
-                self.body.statements.eval(context)
+                if let Some(body) = &self.body {
+                    body.statements.eval(context)
+                } else {
+                    Ok(Value::None)
+                }
             },
         )
     }

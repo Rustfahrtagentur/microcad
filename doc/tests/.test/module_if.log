@@ -10,7 +10,7 @@
 
 -- Output --
 -- Errors --
-error: If statement not available here
+error: Statement is not available within module
   ---> <FROM STR>:2:3
      |
    2 |   if std::math::PI == 3 { __builtin::geo2d::Circle(radius=1); }  // error

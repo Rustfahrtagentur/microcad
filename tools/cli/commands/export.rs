@@ -4,37 +4,62 @@
 //! µcad CLI export command
 
 use anyhow::anyhow;
-use microcad_builtin::{Exporter, ExporterAccess, ExporterRegistry};
+use microcad_builtin::*;
 use microcad_core::RenderResolution;
-use microcad_lang::{model::*, ty::QuantityType, value::*};
+use microcad_lang::{model::*, ty::*, value::*};
 
 use crate::{config::Config, *};
 
 /// Parse and evaluate and export a µcad file.
 #[derive(clap::Parser)]
-pub struct ExportArgs {
-    /// Input µcad file.
-    pub input: std::path::PathBuf,
+pub struct Export {
+    #[clap(flatten)]
+    pub eval: Eval,
 
     /// Output file (e.g. an SVG or STL).
     pub output: Option<std::path::PathBuf>,
 
     /// List all export target files.
-    #[arg(short = 'l', long = "list", action = clap::ArgAction::SetTrue)]
-    pub list: bool,
+    #[arg(short, long)]
+    pub targets: bool,
+
+    /// Omit export.
+    #[arg(short, long)]
+    pub dry_run: bool,
 
     /// The resolution of this export.
     ///
     /// The resolution can changed relatively `200%` or to an absolute value `0.05mm`.
-    #[arg(short = 'r', long = "resolution", default_value = "0.1mm")]
+    #[arg(short, long, default_value = "0.1mm")]
     pub resolution: String,
-
-    /// Layers to export (or all layers).
-    #[arg(long = "layer", action = clap::ArgAction::Append, default_value = "./lib", global = true)]
-    pub layers: Vec<String>,
 }
 
-impl ExportArgs {
+impl RunCommand<Vec<(Model, ExportCommand)>> for Export {
+    fn run(&self, cli: &Cli) -> anyhow::Result<Vec<(Model, ExportCommand)>> {
+        // run prior parse step
+        let (context, model) = self.eval.run(cli)?;
+
+        if let Some(model) = model {
+            let config = cli.fetch_config()?;
+
+            let target_models = self.target_models(&model, &config, context.exporters())?;
+
+            if self.targets {
+                self.list_targets(&target_models)?;
+            }
+
+            if !self.dry_run {
+                self.export_targets(&target_models)?;
+            }
+
+            Ok(target_models)
+        } else {
+            Err(anyhow!("Model missing!"))
+        }
+    }
+}
+
+impl Export {
     /// Get default exporter.
     fn default_exporter(
         output_type: &OutputType,
@@ -99,7 +124,7 @@ impl ExportArgs {
                     .or(default_exporter)?,
             }),
             None => {
-                let mut filename = self.input.clone();
+                let mut filename = self.eval.resolve.parse.input.clone();
                 let exporter = default_exporter?;
 
                 let ext = exporter
@@ -172,33 +197,8 @@ impl ExportArgs {
 
     pub fn list_targets(&self, models: &Vec<(Model, ExportCommand)>) -> anyhow::Result<()> {
         for (model, attr) in models {
-            log::info!("{model} => {attr}", model = model.signature());
+            eprintln!("{model} => {attr}");
         }
         Ok(())
-    }
-}
-
-/// Parse and evaluate and export a µcad file.
-#[derive(clap::Parser)]
-pub struct Export {
-    /// Input µcad file.
-    #[clap(flatten)]
-    args: ExportArgs,
-}
-
-impl RunCommand for Export {
-    fn run(&self, cli: &Cli) -> anyhow::Result<()> {
-        let mut context = cli.make_context(&self.args.input)?;
-        let model = context.eval().expect("Valid model");
-        let config = cli.fetch_config()?;
-
-        let target_models = &self
-            .args
-            .target_models(&model, &config, context.exporters())?;
-        if self.args.list {
-            self.args.list_targets(target_models)
-        } else {
-            self.args.export_targets(target_models)
-        }
     }
 }

@@ -22,7 +22,7 @@ impl DiagList {
 }
 
 impl PushDiag for DiagList {
-    fn push_diag(&mut self, diag: Diagnostic) -> crate::eval::EvalResult<()> {
+    fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         self.0.push(diag);
         Ok(())
     }

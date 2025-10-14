@@ -19,21 +19,21 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Operation __builtin::ops::subtract()⏎ ->
+    Operation __builtin::ops::subtract() ->
       Group ->
         Workpiece(sketch) std::geo2d::Rect(height=15.8mm, width=31.8mm) ->
           - height = 15.8mm
           - width = 31.8mm
           - x = -15.9mm
           - y = -7.9mm
-          Primitive2D __builtin::geo2d::Rect(height=15.8, width=31.8, x=-15.9, y=-7.9)⏎ ->
+          Primitive2D __builtin::geo2d::Rect(height=15.8, width=31.8, x=-15.9, y=-7.9) ->
         Workpiece(sketch) std::geo2d::Rect(height=13.4mm, width=29.4mm) ->
           - height = 13.4mm
           - width = 29.4mm
           - x = -14.7mm
           - y = -6.7mm
-          Primitive2D __builtin::geo2d::Rect(height=13.4, width=29.4, x=-14.7, y=-6.7)⏎ ->
+          Primitive2D __builtin::geo2d::Rect(height=13.4, width=29.4, x=-14.7, y=-6.7) ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

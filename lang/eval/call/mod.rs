@@ -17,7 +17,7 @@ use thiserror::Error;
 
 impl Eval<ArgumentValueList> for ArgumentList {
     /// Evaluate into a [`ArgumentValueList`].
-    fn eval(&self, context: &mut Context) -> EvalResult<ArgumentValueList> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<ArgumentValueList> {
         self.iter()
             .map(|arg| {
                 (
@@ -33,8 +33,55 @@ impl Eval<ArgumentValueList> for ArgumentList {
     }
 }
 
+/// Alternative evaluation type.
+///
+/// Used to prevent the evaluation of `QualifiedName`.
+/// `assert_valid()` and `assert_invalid()` need these untouched.
+pub struct ArgumentValueListRaw(ArgumentValueList);
+
+impl From<ArgumentValueListRaw> for ArgumentValueList {
+    fn from(value: ArgumentValueListRaw) -> Self {
+        value.0
+    }
+}
+
+impl Eval<ArgumentValueListRaw> for ArgumentList {
+    /// Evaluate into a [`ArgumentValueList`].
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<ArgumentValueListRaw> {
+        let arguments = self
+            .iter()
+            .map(|arg| {
+                (
+                    arg.id.clone().unwrap_or(Identifier::none()),
+                    if let Expression::QualifiedName(name) = &arg.expression {
+                        Ok(ArgumentValue::new(
+                            Value::Target(Target::new(
+                                name.clone(),
+                                match context.lookup(name) {
+                                    Ok(symbol) => Some(symbol.full_name()),
+                                    Err(_) => None,
+                                },
+                            )),
+                            arg.id.clone(),
+                            arg.src_ref.clone(),
+                        ))
+                    } else {
+                        arg.eval_value(context)
+                    },
+                )
+            })
+            .map(|(id, arg)| match arg {
+                Ok(arg) => Ok((id.clone(), arg)),
+                Err(err) => Err(err),
+            })
+            .collect::<EvalResult<_>>()?;
+
+        Ok(ArgumentValueListRaw(arguments))
+    }
+}
+
 impl Eval for Call {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         // find self in symbol table by own name
         let symbol = match context.lookup(&self.name) {
             Ok(symbol) => symbol,
@@ -45,35 +92,15 @@ impl Eval for Call {
         };
 
         // evaluate arguments
-        let args = match self.argument_list.eval(context) {
-            Ok(args) => args,
-            Err(err) => {
-                // For builtin calls ONLY: If arguments cannot be evaluated put
-                // the native argument code into a ArgumentValueList.
-                // E.g. this is needed to give assert_valid() a qualified name.
-                if matches!(symbol.borrow().def, SymbolDefinition::Builtin(..)) {
-                    self.argument_list
-                        .iter()
-                        .map(|arg| match context.source_code(&arg.value) {
-                            Ok(code) => Ok((
-                                arg.id.clone().unwrap_or(Identifier::none()),
-                                ArgumentValue::new(
-                                    code.into(),
-                                    arg.id.clone(),
-                                    arg.src_ref.clone(),
-                                ),
-                            )),
-                            Err(err) => Err(err),
-                        })
-                        .collect::<EvalResult<ArgumentValueList>>()?
-                } else {
-                    Err(err)?
-                }
-            }
+        let args: ArgumentValueList = if symbol.is_target_mode() {
+            // for assert_valid() and assert_invalid()
+            Eval::<ArgumentValueListRaw>::eval(&self.argument_list, context)?.into()
+        } else {
+            self.argument_list.eval(context)?
         };
 
         log::debug!(
-            "{call} {name}({args})",
+            "{call} {name:?}({args:?})",
             name = self.name,
             call = crate::mark!(CALL),
         );
@@ -84,29 +111,28 @@ impl Eval for Call {
                 args: args.clone(),
                 src_ref: self.src_ref(),
             },
-            |context| match &symbol.borrow().def {
-                SymbolDefinition::Builtin(f) => f.call(&args, context),
-                SymbolDefinition::Workbench(w) => {
-                    if matches!(*w.kind, WorkbenchKind::Operation) {
-                        context.error(self, EvalError::CannotCallOperationWithoutWorkpiece)?;
-                        Ok(Value::None)
-                    } else {
-                        Ok(Value::Model(w.call(
-                            self.src_ref(),
-                            symbol.clone(),
-                            &args,
-                            context,
-                        )?))
+            |context| {
+                symbol.with_def(|def| match def {
+                    SymbolDefinition::Builtin(f) => f.call(&args, context),
+                    SymbolDefinition::Workbench(w) => {
+                        if matches!(*w.kind, WorkbenchKind::Operation) {
+                            context.error(self, EvalError::CannotCallOperationWithoutWorkpiece)?;
+                            Ok(Value::None)
+                        } else {
+                            Ok(Value::Model(w.call(
+                                self.src_ref(),
+                                symbol.clone(),
+                                &args,
+                                context,
+                            )?))
+                        }
                     }
-                }
-                SymbolDefinition::Function(f) => f.call(&args, context),
-                def => {
-                    context.error(
-                        self,
-                        EvalError::SymbolCannotBeCalled(symbol.full_name(), Box::new(def.clone())),
-                    )?;
-                    Ok(Value::None)
-                }
+                    SymbolDefinition::Function(f) => f.call(&args, context),
+                    _ => {
+                        context.error(self, EvalError::SymbolCannotBeCalled(symbol.full_name()))?;
+                        Ok(Value::None)
+                    }
+                })
             },
         ) {
             Ok(value) => Ok(value),

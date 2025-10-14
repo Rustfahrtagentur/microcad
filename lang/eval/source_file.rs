@@ -3,8 +3,17 @@
 
 use crate::{eval::*, model::*, syntax::*};
 
+impl Eval for std::rc::Rc<SourceFile> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+        context.scope(
+            StackFrame::Source(self.id(), SymbolMap::default()),
+            |context| self.statements.eval(context),
+        )
+    }
+}
+
 impl Eval<Model> for std::rc::Rc<SourceFile> {
-    fn eval(&self, context: &mut Context) -> EvalResult<Model> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Model> {
         context.scope(
             StackFrame::Source(self.id(), SymbolMap::default()),
             |context| {

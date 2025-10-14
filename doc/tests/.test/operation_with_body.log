@@ -20,23 +20,23 @@
         - x = 0mm
         - y = -17mm
         - z = 0mm
-        Transform __builtin::ops::translate(x=0, y=-17, z=0)⏎ ->
+        Transform __builtin::ops::translate(x=0, y=-17, z=0) ->
           Group (root) ->
             Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=5mm) ->
               - center = (x=0mm, y=0mm)
               - radius = 5mm
-              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=5)⏎ ->
+              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=5) ->
       Workpiece(op) std::ops::translate(x=0mm, y=17mm, z=0mm) ->
         - x = 0mm
         - y = 17mm
         - z = 0mm
-        Transform __builtin::ops::translate(x=0, y=17, z=0)⏎ ->
+        Transform __builtin::ops::translate(x=0, y=17, z=0) ->
           Group (root) ->
             Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=5mm) ->
               - center = (x=0mm, y=0mm)
               - radius = 5mm
-              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=5)⏎ ->
+              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=5) ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

@@ -29,7 +29,7 @@ error: Symbol count not found.
    4 |     if @input.count() == 2 {
      |               ^^^^^
      |
-error: If condition is not a boolean: <INVALID VALUE>
+error: If condition is not a boolean: <NO VALUE>
   ---> <FROM STR>:4:5
      |
    4 |     if @input.count() == 2 {

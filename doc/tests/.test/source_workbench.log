@@ -10,8 +10,8 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::F() ->
+    Workpiece(sketch) source_workbench::F() ->
 
+Export error: Render error: Nothing to render
 -- Test Result --
 OK
-Export error: Render error: Nothing to render

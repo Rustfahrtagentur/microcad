@@ -19,9 +19,9 @@ use std::geo3d::*;
 assert_valid(Sphere);
 assert_valid(Cube);
 
-// alias `bar` in `std/text/foo.µcad` into `baz`
-use std::test::foo::Bar as baz;
-assert_valid(baz);
+// alias `Circle` in `std/geo2d/mod.µcad` into `foo`
+use std::geo2d::Circle as foo;
+assert_valid(foo);
 
 // use print from `std/module.µcad`
 use std::print;
@@ -31,7 +31,7 @@ print("Hello");
 // public use operation from `std/module.µcad`
 pub use std::ops;
 assert_valid(ops);
-assert_invalid(use_test::ops);
+assert_valid(use_test::ops);
 
 part MyPart() {
     Circle(radius=1);
@@ -39,4 +39,13 @@ part MyPart() {
 }
 
 assert_valid(MyPart);
+```
+
+[![test](.test/use_as_test.svg)](.test/use_as_test.log)
+
+```µcad,use_as_test
+use std::geo2d::*; 
+use Rect as Cap;
+
+Cap(width=1mm,height=1mm);
 ```

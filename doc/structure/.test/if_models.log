@@ -19,21 +19,21 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::MySketch(a=1) ->
+    Workpiece(sketch) if_models::MySketch(a=1) ->
       - a = 1
       Group ->
         Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=1mm) ->
           - center = (x=0mm, y=0mm)
           - radius = 1mm
-          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=1)⏎ ->
-    Workpiece(sketch) <NO ID>::MySketch(a=2) ->
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=1) ->
+    Workpiece(sketch) if_models::MySketch(a=2) ->
       - a = 2
       Group ->
         Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=4mm) ->
           - center = (x=0mm, y=0mm)
           - radius = 4mm
-          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=4)⏎ ->
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=4) ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

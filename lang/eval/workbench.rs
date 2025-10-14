@@ -16,7 +16,7 @@ impl WorkbenchDefinition {
         call_src_ref: SrcRef,
         creator: Creator,
         init: Option<&'a InitDefinition>,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Model> {
         log::debug!(
             "Evaluating model of `{id:?}` {kind}",
@@ -128,10 +128,10 @@ impl WorkbenchDefinition {
         call_src_ref: SrcRef,
         symbol: Symbol,
         arguments: &ArgumentValueList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Model> {
         log::debug!(
-            "Workbench {call} {kind} {id:?}({arguments})",
+            "Workbench {call} {kind} {id:?}({arguments:?})",
             call = crate::mark!(CALL),
             id = self.id,
             kind = self.kind
@@ -149,7 +149,7 @@ impl WorkbenchDefinition {
                     "Building plan matches: {}",
                     matches
                         .iter()
-                        .map(|m| m.to_string())
+                        .map(|m| format!("{m:?}"))
                         .collect::<Vec<_>>()
                         .join("\n")
                 );
@@ -178,7 +178,7 @@ impl WorkbenchDefinition {
                             "Initializer matches: {}",
                             matches
                                 .iter()
-                                .map(|m| m.to_string())
+                                .map(|m| format!("{m:?}"))
                                 .collect::<Vec<_>>()
                                 .join("\n")
                         );

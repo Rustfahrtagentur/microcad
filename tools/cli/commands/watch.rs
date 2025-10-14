@@ -3,50 +3,37 @@
 
 //! µcad CLI parse command
 
-use crate::{commands::export::ExportArgs, *};
+use crate::*;
 
 #[derive(clap::Parser)]
 pub struct Watch {
     /// Export arguments.
     #[clap(flatten)]
-    pub export_args: ExportArgs,
+    pub export: Export,
 }
 
 /// Run this command for a CLI.
 impl RunCommand for Watch {
     fn run(&self, cli: &Cli) -> anyhow::Result<()> {
         let mut watcher = Watcher::new()?;
-        let config = cli.fetch_config()?;
-        let export = &self.export_args;
 
-        if export.list {
-            let mut context = cli.make_context(&self.export_args.input)?;
-            let model = context.eval().expect("Valid model");
-            export.list_targets(&export.target_models(&model, &config, context.exporters())?)
-        } else {
+        if !self.export.dry_run {
             // Recompile whenever something relevant happens.
             loop {
-                match cli.make_context(&self.export_args.input) {
-                    Ok(mut context) => {
-                        // Re-evaluate context.
-                        if let Ok(model) = context.eval() {
-                            match export.target_models(&model, &config, context.exporters()) {
-                                Ok(target_models) => export.export_targets(&target_models)?,
-                                Err(err) => log::error!("{err}"),
-                            }
-                        }
-                    }
-                    Err(err) => {
-                        log::error!("{err}");
-                    }
+                // run prior parse step
+                match self.export.run(cli) {
+                    Ok(target_models) => self.export.export_targets(&target_models)?,
+                    Err(err) => log::error!("{err}"),
                 }
 
                 // Watch all dependencies of the most recent compilation.
-                watcher.update(vec![self.export_args.input.clone()])?;
+                watcher.update(vec![self.export.eval.resolve.parse.input.clone()])?;
 
                 // Wait until anything relevant happens.
                 watcher.wait()?;
             }
         }
+
+        Ok(())
     }
 }

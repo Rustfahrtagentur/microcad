@@ -13,6 +13,7 @@ mod matrix;
 mod parameter_value;
 mod parameter_value_list;
 mod quantity;
+mod target;
 mod tuple;
 mod value_access;
 mod value_error;
@@ -25,12 +26,13 @@ pub use matrix::*;
 pub use parameter_value::*;
 pub use parameter_value_list::*;
 pub use quantity::*;
+pub use target::*;
 pub use tuple::*;
 pub use value_access::*;
 pub use value_error::*;
 pub use value_list::*;
 
-use crate::{model::*, syntax::*, ty::*, *};
+use crate::{model::*, rc::*, syntax::*, ty::*};
 use microcad_core::*;
 
 pub(crate) type ValueResult<Type = Value> = std::result::Result<Type, ValueError>;
@@ -59,6 +61,10 @@ pub enum Value {
     Model(Model),
     /// Return value
     Return(Box<Value>),
+    /// Unevaluated const expression.
+    ConstExpression(Rc<Expression>),
+    /// for assert_valid() and assert_invalid()
+    Target(Target),
 }
 
 impl Value {
@@ -113,7 +119,7 @@ impl Value {
         match self {
             Value::Bool(b) => Ok(*b),
             Value::None => Ok(false),
-            value => Err(ValueError::CannotConvertToBool(value.clone())),
+            value => Err(ValueError::CannotConvertToBool(value.to_string())),
         }
     }
 
@@ -125,7 +131,7 @@ impl Value {
             _ => {}
         }
 
-        Err(ValueError::CannotConvert(self.clone(), "String".into()))
+        Err(ValueError::CannotConvert(self.to_string(), "String".into()))
     }
 
     /// Try to convert to [`Scalar`].
@@ -136,7 +142,7 @@ impl Value {
             _ => {}
         }
 
-        Err(ValueError::CannotConvert(self.clone(), "Scalar".into()))
+        Err(ValueError::CannotConvert(self.to_string(), "Scalar".into()))
     }
 }
 
@@ -164,7 +170,7 @@ impl PartialOrd for Value {
 impl crate::ty::Ty for Value {
     fn ty(&self) -> Type {
         match self {
-            Value::None => Type::Invalid,
+            Value::None | Value::ConstExpression(_) => Type::Invalid,
             Value::Integer(_) => Type::Integer,
             Value::Quantity(q) => q.ty(),
             Value::Bool(_) => Type::Bool,
@@ -174,6 +180,7 @@ impl crate::ty::Ty for Value {
             Value::Matrix(matrix) => matrix.ty(),
             Value::Model(_) => Type::Models,
             Value::Return(r) => r.ty(),
+            Value::Target(..) => Type::Target,
         }
     }
 }
@@ -217,7 +224,7 @@ impl std::ops::Add for Value {
                     ));
                 }
 
-                Ok(Value::Array(Array::new(
+                Ok(Value::Array(Array::from_values(
                     lhs.iter().chain(rhs.iter()).cloned().collect(),
                     lhs.ty(),
                 )))
@@ -300,7 +307,7 @@ impl std::ops::Mul<Unit> for Value {
             (Value::Array(array), Type::Quantity(quantity_type)) => {
                 Ok((array * Value::Quantity(Quantity::new(unit.normalize(1.0), quantity_type)))?)
             }
-            (value, _) => Err(ValueError::CannotAddUnitToValueWithUnit(value.clone())),
+            (value, _) => Err(ValueError::CannotAddUnitToValueWithUnit(value.to_string())),
         }
     }
 }
@@ -368,6 +375,8 @@ impl std::fmt::Display for Value {
             Value::Matrix(m) => write!(f, "{m}"),
             Value::Model(n) => write!(f, "{n}"),
             Value::Return(r) => write!(f, "{r}"),
+            Value::ConstExpression(e) => write!(f, "{e}"),
+            Value::Target(target) => write!(f, "{target}"),
         }
     }
 }
@@ -377,14 +386,16 @@ impl std::fmt::Debug for Value {
         match self {
             Value::None => write!(f, crate::invalid!(VALUE)),
             Value::Integer(n) => write!(f, "{n}"),
-            Value::Quantity(q) => write!(f, "{q}"),
+            Value::Quantity(q) => write!(f, "{q:?}"),
             Value::Bool(b) => write!(f, "{b}"),
-            Value::String(s) => write!(f, "\"{s}\""),
-            Value::Array(l) => write!(f, "{l}"),
-            Value::Tuple(t) => write!(f, "{t}"),
-            Value::Matrix(m) => write!(f, "{m}"),
-            Value::Model(n) => write!(f, "Models:\n {n}"),
-            Value::Return(r) => write!(f, "Return: {r}"),
+            Value::String(s) => write!(f, "{s:?}"),
+            Value::Array(l) => write!(f, "{l:?}"),
+            Value::Tuple(t) => write!(f, "{t:?}"),
+            Value::Matrix(m) => write!(f, "{m:?}"),
+            Value::Model(n) => write!(f, "\n {n:?}"),
+            Value::Return(r) => write!(f, "->{r:?}"),
+            Value::ConstExpression(e) => write!(f, "{e:?}"),
+            Value::Target(target) => write!(f, "{target:?}"),
         }
     }
 }
@@ -397,7 +408,7 @@ macro_rules! impl_try_from {
             fn try_from(value: Value) -> std::result::Result<Self, Self::Error> {
                 match value {
                     $(Value::$variant(v) => Ok(v),)*
-                    value => Err(ValueError::CannotConvert(value, stringify!($ty).into())),
+                    value => Err(ValueError::CannotConvert(value.to_string(), stringify!($ty).into())),
                 }
             }
         }
@@ -408,7 +419,7 @@ macro_rules! impl_try_from {
             fn try_from(value: &Value) -> std::result::Result<Self, Self::Error> {
                 match value {
                     $(Value::$variant(v) => Ok(v.clone().into()),)*
-                    value => Err(ValueError::CannotConvert(value.clone(), stringify!($ty).into())),
+                    value => Err(ValueError::CannotConvert(value.to_string(), stringify!($ty).into())),
                 }
             }
         }
@@ -429,7 +440,10 @@ impl TryFrom<&Value> for Scalar {
                 value,
                 quantity_type: QuantityType::Scalar,
             }) => Ok(*value),
-            _ => Err(ValueError::CannotConvert(value.clone(), "Scalar".into())),
+            _ => Err(ValueError::CannotConvert(
+                value.to_string(),
+                "Scalar".into(),
+            )),
         }
     }
 }
@@ -444,7 +458,24 @@ impl TryFrom<Value> for Scalar {
                 value,
                 quantity_type: QuantityType::Scalar,
             }) => Ok(value),
-            _ => Err(ValueError::CannotConvert(value.clone(), "Scalar".into())),
+            _ => Err(ValueError::CannotConvert(
+                value.to_string(),
+                "Scalar".into(),
+            )),
+        }
+    }
+}
+
+impl TryFrom<&Value> for Angle {
+    type Error = ValueError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Quantity(Quantity {
+                value,
+                quantity_type: QuantityType::Angle,
+            }) => Ok(cgmath::Rad(*value)),
+            _ => Err(ValueError::CannotConvert(value.to_string(), "Angle".into())),
         }
     }
 }
@@ -455,7 +486,7 @@ impl TryFrom<&Value> for Size2 {
     fn try_from(value: &Value) -> Result<Self, Self::Error> {
         match value {
             Value::Tuple(tuple) => Ok(tuple.as_ref().try_into()?),
-            _ => Err(ValueError::CannotConvert(value.clone(), "Size2".into())),
+            _ => Err(ValueError::CannotConvert(value.to_string(), "Size2".into())),
         }
     }
 }
@@ -470,7 +501,10 @@ impl TryFrom<&Value> for Mat3 {
             }
         }
 
-        Err(ValueError::CannotConvert(value.clone(), "Matrix3".into()))
+        Err(ValueError::CannotConvert(
+            value.to_string(),
+            "Matrix3".into(),
+        ))
     }
 }
 

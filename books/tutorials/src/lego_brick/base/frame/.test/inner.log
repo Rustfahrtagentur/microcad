@@ -16,8 +16,8 @@
       - width = 29.4mm
       - x = -14.7mm
       - y = -6.7mm
-      Primitive2D __builtin::geo2d::Rect(height=13.4, width=29.4, x=-14.7, y=-6.7)⏎ ->
+      Primitive2D __builtin::geo2d::Rect(height=13.4, width=29.4, x=-14.7, y=-6.7) ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

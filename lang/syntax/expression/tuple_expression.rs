@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Tuple expression, e.g. `(x=1+2,4,z=9)`.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default, PartialEq)]
 pub struct TupleExpression {
     /// List of tuple members.
     pub args: ArgumentList,
@@ -28,7 +28,26 @@ impl std::fmt::Display for TupleExpression {
             self.args
                 .iter()
                 .map(|arg| if let Some(name) = &arg.id {
-                    format!("{} = {}", &name, arg.value)
+                    format!("{} = {}", &name, arg.expression)
+                } else {
+                    arg.to_string()
+                })
+                .collect::<Vec<String>>()
+                .join(", ")
+        )?;
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for TupleExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "({})",
+            self.args
+                .iter()
+                .map(|arg| if let Some(name) = &arg.id {
+                    format!("{:?} = {:?}", &name, arg.expression)
                 } else {
                     arg.to_string()
                 })

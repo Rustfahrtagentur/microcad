@@ -14,3 +14,19 @@
  8: 
  9: PunchedDisk(1cm);
 
+-- Output --
+-- Errors --
+error: Assignment statement is not available within function
+  ---> <FROM STR>:3:9
+     |
+   3 |         prop hole = radius/2;  // error: prop not allowed in function
+     |         ^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Declaration of hole not allowed within workbench_fn_prop::PunchedDisk::inner
+  ---> <FROM STR>:3:9
+     |
+   3 |         prop hole = radius/2;  // error: prop not allowed in function
+     |         ^^^^^^^^^^^^^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

@@ -6,7 +6,7 @@
 use crate::{syntax::*, ty::*};
 
 /// Definition of type & scale of numbers.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Unit {
     // Scalar
     /// No unit was given.

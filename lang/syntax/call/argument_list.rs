@@ -7,7 +7,7 @@ use crate::{ord_map::*, src_ref::*, syntax::*};
 use derive_more::{Deref, DerefMut};
 
 /// *Ordered map* of arguments in a [`Call`].
-#[derive(Clone, Debug, Default, Deref, DerefMut)]
+#[derive(Clone, Default, Deref, DerefMut, PartialEq)]
 pub struct ArgumentList(pub Refer<OrdMap<Identifier, Argument>>);
 
 impl SrcReferrer for ArgumentList {
@@ -24,6 +24,21 @@ impl std::fmt::Display for ArgumentList {
                 .value
                 .iter()
                 .map(|p| p.to_string())
+                .collect::<Vec<_>>();
+            v.sort();
+            v.join(", ")
+        })
+    }
+}
+
+impl std::fmt::Debug for ArgumentList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", {
+            let mut v = self
+                .0
+                .value
+                .iter()
+                .map(|p| format!("{p:?}"))
                 .collect::<Vec<_>>();
             v.sort();
             v.join(", ")

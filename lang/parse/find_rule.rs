@@ -30,7 +30,7 @@ pub fn find_rule<T: crate::parser::Parse>(
     }
 }
 
-/// Find rule  or use default with proper error handling.
+/// Find rule or use default with proper error handling.
 ///
 /// e.g.:
 ///

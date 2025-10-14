@@ -7,7 +7,7 @@
 ///
 /// This is used to determine if an entity is public or private.
 /// By default, entities are private.
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Default)]
 pub enum Qualifier {
     /// local variable
     #[default]
@@ -16,4 +16,14 @@ pub enum Qualifier {
     Const,
     /// workbench property
     Prop,
+}
+
+impl std::fmt::Display for Qualifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Qualifier::Value => Ok(()),
+            Qualifier::Const => write!(f, "const "),
+            Qualifier::Prop => write!(f, "prop "),
+        }
+    }
 }

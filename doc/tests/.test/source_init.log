@@ -8,7 +8,7 @@
 
 -- Output --
 -- Errors --
-error: Init statement not available here
+error: Statement is not available within file
   ---> <FROM STR>:1:1
      |
    1 | init() {} // error

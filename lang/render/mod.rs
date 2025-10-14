@@ -39,9 +39,9 @@ pub enum RenderError {
 pub type RenderResult<T> = Result<T, RenderError>;
 
 /// The render trait.
-pub trait Render<T> {
+pub trait RenderWithContext<T> {
     /// Render method.
-    fn render(&self, context: &mut RenderContext) -> RenderResult<T>;
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<T>;
 }
 
 impl Element {
@@ -143,12 +143,12 @@ impl Model {
     }
 }
 
-impl FetchBounds2D for Model {
-    fn fetch_bounds_2d(&self) -> Bounds2D {
+impl CalcBounds2D for Model {
+    fn calc_bounds_2d(&self) -> Bounds2D {
         let self_ = self.borrow();
         match self_.output() {
             RenderOutput::Geometry2D { geometry, .. } => match geometry {
-                Some(geometry) => geometry.fetch_bounds_2d(),
+                Some(geometry) => geometry.bounds.clone(),
                 None => Bounds2D::default(),
             },
             RenderOutput::Geometry3D { .. } => Bounds2D::default(),
@@ -161,8 +161,8 @@ impl FetchBounds2D for Model {
 /// Notes:
 /// * The impl attaches the output geometry to the model's render output.
 /// * It is assumed the model has been pre-rendered.
-impl Render<Geometry2DOutput> for Model {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
+impl RenderWithContext<Geometry2DOutput> for Model {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         context.with_model(self.clone(), |context| {
             let model = context.model();
             let geometry = {
@@ -173,9 +173,9 @@ impl Render<Geometry2DOutput> for Model {
                         match model_.element() {
                             // A group geometry will render the child geometry
                             Element::BuiltinWorkpiece(builtin_workpiece) => {
-                                builtin_workpiece.render(context)
+                                builtin_workpiece.render_with_context(context)
                             }
-                            _ => model_.children.render(context),
+                            _ => model_.children.render_with_context(context),
                         }
                     }
                     _ => Ok(None),
@@ -195,8 +195,8 @@ impl Render<Geometry2DOutput> for Model {
 /// Notes:
 /// * The impl attaches the output geometry to the model's render output.
 /// * It is assumed the model has been pre-rendered.
-impl Render<Geometry3DOutput> for Model {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+impl RenderWithContext<Geometry3DOutput> for Model {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
         context.with_model(self.clone(), |context| {
             let model = context.model();
             let geometry = {
@@ -207,9 +207,9 @@ impl Render<Geometry3DOutput> for Model {
                         match model_.element() {
                             // A group geometry will render the child geometry
                             Element::BuiltinWorkpiece(builtin_workpiece) => {
-                                builtin_workpiece.render(context)
+                                builtin_workpiece.render_with_context(context)
                             }
-                            _ => model_.children.render(context),
+                            _ => model_.children.render_with_context(context),
                         }
                     }
                     _ => Ok(None),
@@ -224,14 +224,14 @@ impl Render<Geometry3DOutput> for Model {
     }
 }
 
-impl Render<Model> for Model {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Model> {
+impl RenderWithContext<Model> for Model {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Model> {
         match self.deduce_output_type() {
             OutputType::Geometry2D => {
-                let _: Geometry2DOutput = self.render(context)?;
+                let _: Geometry2DOutput = self.render_with_context(context)?;
             }
             OutputType::Geometry3D => {
-                let _: Geometry3DOutput = self.render(context)?;
+                let _: Geometry3DOutput = self.render_with_context(context)?;
             }
             output_type => {
                 log::warn!("Nothing to render: {output_type}");
@@ -243,12 +243,13 @@ impl Render<Model> for Model {
     }
 }
 
-impl Render<Geometries2D> for Models {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometries2D> {
+impl RenderWithContext<Geometries2D> for Models {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometries2D> {
         let mut geometries = Vec::new();
         for model in self.iter() {
-            if let Some(geo) = model.render(context)? {
-                geometries.push(geo);
+            let output: Geometry2DOutput = model.render_with_context(context)?;
+            if let Some(geo) = output {
+                geometries.push(Rc::new(geo.inner.clone()));
             }
         }
 
@@ -256,22 +257,28 @@ impl Render<Geometries2D> for Models {
     }
 }
 
-impl Render<Geometry2DOutput> for Models {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
+impl RenderWithContext<Geometry2DOutput> for Models {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         Ok(match self.len() {
             0 => None,
-            1 => self.first().expect("One item").render(context)?,
-            _ => Some(Rc::new(Geometry2D::Collection(self.render(context)?))),
+            1 => self
+                .first()
+                .expect("One item")
+                .render_with_context(context)?,
+            _ => Some(Rc::new(
+                Geometry2D::Collection(self.render_with_context(context)?).into(),
+            )),
         })
     }
 }
 
-impl Render<Geometries3D> for Models {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometries3D> {
+impl RenderWithContext<Geometries3D> for Models {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometries3D> {
         let mut geometries = Vec::new();
         for model in self.iter() {
-            if let Some(geo) = model.render(context)? {
-                geometries.push(geo);
+            let output: Geometry3DOutput = model.render_with_context(context)?;
+            if let Some(geo) = output {
+                geometries.push(Rc::new(geo.inner.clone()));
             }
         }
 
@@ -279,30 +286,32 @@ impl Render<Geometries3D> for Models {
     }
 }
 
-impl Render<Geometry3DOutput> for Models {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+impl RenderWithContext<Geometry3DOutput> for Models {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
         Ok(match self.len() {
             0 => None,
-            1 => self.first().expect("One item").render(context)?,
-            _ => Some(Rc::new(Geometry3D::Collection(self.render(context)?))),
+            1 => self
+                .first()
+                .expect("One item")
+                .render_with_context(context)?,
+            _ => Some(Rc::new(
+                Geometry3D::Collection(self.render_with_context(context)?).into(),
+            )),
         })
     }
 }
 
-impl Render<Geometry2DOutput> for BuiltinWorkpiece {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
+impl RenderWithContext<Geometry2DOutput> for BuiltinWorkpiece {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         Ok(match self.call()? {
-            BuiltinWorkpieceOutput::Primitive2D(geo2d) => Some(Rc::new(geo2d)),
+            BuiltinWorkpieceOutput::Primitive2D(renderable) => Some(Rc::new(
+                renderable.render(&context.current_resolution()).into(),
+            )),
             BuiltinWorkpieceOutput::Transform(transform) => {
                 let model = context.model();
                 let model_ = model.borrow();
-                let geometry: Geometry2DOutput = model_.children.render(context)?;
-
-                geometry.map(|geometry| {
-                    Rc::new(
-                        geometry.transformed_2d(&context.current_resolution(), &transform.mat2d()),
-                    )
-                })
+                let output: Geometry2DOutput = model_.children.render_with_context(context)?;
+                output.map(|geometry| Rc::new(geometry.transformed_2d(&transform.mat2d())))
             }
             BuiltinWorkpieceOutput::Operation(operation) => operation.process_2d(context)?,
             _ => None,
@@ -310,20 +319,17 @@ impl Render<Geometry2DOutput> for BuiltinWorkpiece {
     }
 }
 
-impl Render<Geometry3DOutput> for BuiltinWorkpiece {
-    fn render(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+impl RenderWithContext<Geometry3DOutput> for BuiltinWorkpiece {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
         Ok(match self.call()? {
-            BuiltinWorkpieceOutput::Primitive3D(geo3d) => Some(Rc::new(geo3d)),
+            BuiltinWorkpieceOutput::Primitive3D(renderable) => Some(Rc::new(
+                renderable.render(&context.current_resolution()).into(),
+            )),
             BuiltinWorkpieceOutput::Transform(transform) => {
                 let model = context.model();
                 let model_ = model.borrow();
-                let geometry: Geometry3DOutput = model_.children.render(context)?;
-
-                geometry.map(|geometry| {
-                    Rc::new(
-                        geometry.transformed_3d(&context.current_resolution(), &transform.mat3d()),
-                    )
-                })
+                let output: Geometry3DOutput = model_.children.render_with_context(context)?;
+                output.map(|geometry| Rc::new(geometry.transformed_3d(&transform.mat3d())))
             }
             BuiltinWorkpieceOutput::Operation(operation) => operation.process_3d(context)?,
             _ => None,

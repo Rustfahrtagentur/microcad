@@ -11,20 +11,20 @@ use strum::IntoStaticStr;
 /// A use declaration is an element of a use statement.
 /// It can be a single symbol, all symbols from a module, or an alias.
 ///
-/// ```ucad
+/// ```µcad
 /// use std::print;
 /// use std::*;
 /// use std::print as p;
 /// ```
 ///
-#[derive(Clone, Debug, IntoStaticStr)]
+#[derive(Clone, IntoStaticStr)]
 pub enum UseDeclaration {
     /// Import symbols given as qualified names: `use a, b`
-    Use(Visibility, QualifiedName),
+    Use(QualifiedName),
     /// Import all symbols from a module: `use std::*`
-    UseAll(Visibility, QualifiedName),
+    UseAll(QualifiedName),
     /// Import as alias: `use a as b`
-    UseAlias(Visibility, QualifiedName, Identifier),
+    UseAlias(QualifiedName, Identifier),
 }
 
 impl SrcReferrer for UseDeclaration {
@@ -40,10 +40,22 @@ impl SrcReferrer for UseDeclaration {
 impl std::fmt::Display for UseDeclaration {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            UseDeclaration::Use(visibility, name) => write!(f, "{visibility}{name}"),
-            UseDeclaration::UseAll(visibility, name) => write!(f, "{visibility}{name}::*"),
-            UseDeclaration::UseAlias(visibility, name, alias) => {
-                write!(f, "{visibility}{name} as {alias}")
+            UseDeclaration::Use(name) => write!(f, "{name}"),
+            UseDeclaration::UseAll(name) => write!(f, "{name}::*"),
+            UseDeclaration::UseAlias(name, alias) => {
+                write!(f, "{name} as {alias}")
+            }
+        }
+    }
+}
+
+impl std::fmt::Debug for UseDeclaration {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            UseDeclaration::Use(name) => write!(f, "{name:?}"),
+            UseDeclaration::UseAll(name) => write!(f, "{name:?}::*"),
+            UseDeclaration::UseAlias(name, alias) => {
+                write!(f, "{name:?} as {alias:?}")
             }
         }
     }
@@ -53,18 +65,14 @@ impl TreeDisplay for UseDeclaration {
     fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         // use declaration is transparent
         match self {
-            UseDeclaration::Use(visibility, name) => {
-                writeln!(f, "{:depth$}{visibility}use {name}", "")
+            UseDeclaration::Use(name) => {
+                writeln!(f, "{:depth$}use {name}", "")
             }
-            UseDeclaration::UseAll(visibility, name) => {
-                writeln!(f, "{:depth$}{visibility}use {name}::* ({visibility})", "")
+            UseDeclaration::UseAll(name) => {
+                writeln!(f, "{:depth$}use {name}::*", "")
             }
-            UseDeclaration::UseAlias(visibility, name, alias) => {
-                writeln!(
-                    f,
-                    "{:depth$}{visibility}use {name} as {alias} ({visibility})",
-                    ""
-                )
+            UseDeclaration::UseAlias(name, alias) => {
+                writeln!(f, "{:depth$}use {name} as {alias}", "")
             }
         }
     }

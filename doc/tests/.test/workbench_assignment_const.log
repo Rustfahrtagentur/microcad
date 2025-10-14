@@ -5,6 +5,22 @@
 -- Code --
 
  1: sketch K() {
- 2:   const B = 1;
+ 2:   const B = 1;  // error
  3: } K();
 
+-- Output --
+-- Errors --
+error: Assignment statement is not available within sketch
+  ---> <FROM STR>:2:3
+     |
+   2 |   const B = 1;  // error
+     |   ^^^^^^^^^^^^
+     |
+error: Declaration of B not allowed within workbench_assignment_const::K
+  ---> <FROM STR>:2:3
+     |
+   2 |   const B = 1;  // error
+     |   ^^^^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

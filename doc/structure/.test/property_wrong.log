@@ -21,9 +21,9 @@
 15: // but you cannot access `inner` anymore
 16: std::print("inner: {t.inner}"); // error
 
--- Output --
-outer: 10mm
-inner: <INVALID VALUE>
+-- Output --outer: 10mm
+inner: <NO VALUE>
+
 -- Errors --
 error: Property not found: inner
   ---> <FROM STR>:16:21

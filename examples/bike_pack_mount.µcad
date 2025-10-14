@@ -55,11 +55,11 @@ mod bike_pack_mount {
     }
 
     part Lower() {
-        bike_pack_mount::Mount(height = 15mm);
+        Mount(height = 15mm);
     }
 
     part Upper() {
-        bike_pack_mount::Mount(height = 55mm);
+        Mount(height = 55mm);
     }
 }
 

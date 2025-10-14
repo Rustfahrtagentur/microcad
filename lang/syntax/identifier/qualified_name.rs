@@ -10,8 +10,10 @@ use derive_more::{Deref, DerefMut};
 pub struct QualifiedName(Refer<Vec<Identifier>>);
 
 /// List of *qualified names* which can be displayed.
-#[derive(Debug, Deref)]
+#[derive(Deref)]
 pub struct QualifiedNames(Vec<QualifiedName>);
+
+pub(crate) type QualifiedNameSet = indexmap::IndexSet<QualifiedName>;
 
 impl std::fmt::Display for QualifiedNames {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -57,11 +59,16 @@ impl QualifiedName {
 
     /// If the QualifiedName only consists of a single identifier, return it
     pub fn single_identifier(&self) -> Option<&Identifier> {
-        if self.0.len() == 1 {
+        if self.is_single_identifier() {
             self.0.first()
         } else {
             None
         }
+    }
+
+    /// Returns true if the QualifiedName only consists of a single identifier.
+    pub fn is_single_identifier(&self) -> bool {
+        self.0.len() == 1
     }
 
     /// Returns true if self is a qualified name with multiple ids in it
@@ -126,6 +133,14 @@ impl QualifiedName {
         }
     }
 
+    /// Return the base of the given relative name.
+    ///
+    /// Does not check if ids match!
+    pub fn base(&self, relative: &Self) -> Self {
+        let (base, _) = self.split_at(relative.len() - 1);
+        base.iter().cloned().collect()
+    }
+
     /// Add given prefix to name
     pub fn with_prefix(&self, prefix: &QualifiedName) -> Self {
         let mut full_name = prefix.clone();
@@ -134,7 +149,7 @@ impl QualifiedName {
     }
 
     /// Add a given identifier as suffix.
-    pub fn with_suffix(&self, suffix: Identifier) -> Self {
+    pub fn with_suffix(&self, suffix: &Identifier) -> Self {
         let mut name = self.clone();
         name.push(suffix.clone());
         name
@@ -179,7 +194,14 @@ impl std::fmt::Display for QualifiedName {
         if self.is_empty() {
             write!(f, crate::invalid_no_ansi!(NAME))
         } else {
-            write!(f, "{}", join_identifiers(&self.0, "::"))
+            write!(
+                f,
+                "{}",
+                self.iter()
+                    .map(|id| format!("{id:?}"))
+                    .collect::<Vec<_>>()
+                    .join("::")
+            )
         }
     }
 }
@@ -189,7 +211,14 @@ impl std::fmt::Debug for QualifiedName {
         if self.is_empty() {
             write!(f, crate::invalid!(NAME))
         } else {
-            write!(f, "{}", join_identifiers_debug(&self.0, "::"))
+            write!(
+                f,
+                "{}",
+                self.iter()
+                    .map(|id| format!("{id:?}"))
+                    .collect::<Vec<_>>()
+                    .join("::")
+            )
         }
     }
 }
@@ -291,7 +320,11 @@ impl From<Identifier> for QualifiedName {
 
 impl From<QualifiedName> for String {
     fn from(value: QualifiedName) -> Self {
-        join_identifiers(&value.0, "::")
+        value
+            .iter()
+            .map(|id| format!("{id}"))
+            .collect::<Vec<_>>()
+            .join("::")
     }
 }
 
@@ -301,7 +334,10 @@ impl TreeDisplay for QualifiedName {
             f,
             "{:depth$}QualifiedName: '{}'",
             "",
-            join_identifiers_debug(&self.0, "::")
+            self.iter()
+                .map(|id| format!("{id:?}"))
+                .collect::<Vec<_>>()
+                .join("::")
         )
     }
 }

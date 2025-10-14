@@ -10,7 +10,13 @@
 
 -- Output --
 -- Errors --
-error: sketch statement not available here
+error: Statement is not available within function
+  ---> <FROM STR>:2:3
+     |
+   2 |   sketch S() {} // error
+     |   ^^^^^^^^^^^^^
+     |
+error: sketch is not available within function
   ---> <FROM STR>:2:3
      |
    2 |   sketch S() {} // error

@@ -3,7 +3,7 @@
 The following table lists all tests included in this documentation.
 Click on the test names to jump to file with the test or click the buttons to get the logs.
 
-**274** tests from markdown.
+**278** tests from markdown.
 
 | Result | Name |
 |-------:|------|
@@ -68,7 +68,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/libs/std/ops/.test/difference_operator.svg)](../doc/libs/std/ops/.test/difference_operator.log) | [difference_operator](../doc/libs/std/ops/subtract.md) |
 | [![test](../doc/tests/.test/empty_op.svg)](../doc/tests/.test/empty_op.log) | [empty_op](../doc/tests/semicolon.md) |
 | [![test](../doc/structure/.test/example.svg)](../doc/structure/.test/example.log) | [example](../doc/structure/functions.md) |
-| [![test](../books/tutorials/src/lego_brick/.test/export.svg)](../books/tutorials/src/lego_brick/.test/export.log) | [export](../books/tutorials/src/lego_brick/export.md) |
 | [![test](../doc/.test/export_attributes.svg)](../doc/.test/export_attributes.log) | [export_attributes](../doc/export.md) |
 | [![test](../doc/libs/std/ops/.test/extrude.svg)](../doc/libs/std/ops/.test/extrude.log) | [extrude](../doc/libs/std/ops/extrude.md) |
 | [![test](../books/tutorials/src/lego_brick/part/.test/extrude_cap.svg)](../books/tutorials/src/lego_brick/part/.test/extrude_cap.log) | [extrude_cap](../books/tutorials/src/lego_brick/part/extrude.md) |
@@ -125,7 +124,6 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../books/tutorials/src/lego_brick/.test/knobs.svg)](../books/tutorials/src/lego_brick/.test/knobs.log) | [knobs](../books/tutorials/src/lego_brick/caps_knobs.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/knobs_align.svg)](../books/tutorials/src/lego_brick/.test/knobs_align.log) | [knobs_align](../books/tutorials/src/lego_brick/caps_knobs.md) |
 | [![test](../books/tutorials/src/lego_brick/.test/knobs_multiplicity.svg)](../books/tutorials/src/lego_brick/.test/knobs_multiplicity.log) | [knobs_multiplicity](../books/tutorials/src/lego_brick/caps_knobs.md) |
-| [![test](../books/tutorials/src/lego_brick/.test/library.svg)](../books/tutorials/src/lego_brick/.test/library.log) | [library](../books/tutorials/src/lego_brick/external.md) |
 | [![test](../doc/tests/.test/logo.svg)](../doc/tests/.test/logo.log) | [logo](../doc/tests/logo.md) |
 | [![test](../doc/libs/std/math/.test/math_abs.svg)](../doc/libs/std/math/.test/math_abs.log) | [math_abs](../doc/libs/std/math/README.md) |
 | [![test](../doc/libs/std/math/.test/math_trigonometric.svg)](../doc/libs/std/math/.test/math_trigonometric.log) | [math_trigonometric](../doc/libs/std/math/README.md) |
@@ -165,6 +163,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/parameters.svg)](../doc/structure/.test/parameters.log) | [parameters](../doc/structure/op.md) |
 | [![test](../doc/structure/.test/part_basic.svg)](../doc/structure/.test/part_basic.log) | [part_basic](../doc/structure/part.md) |
 | [![test](../doc/structure/.test/part_declaration.svg)](../doc/structure/.test/part_declaration.log) | [part_declaration](../doc/structure/workbench.md) |
+| [![test](../doc/libs/builtin/.test/pie.svg)](../doc/libs/builtin/.test/pie.log) | [pie](../doc/libs/builtin/geo2d.md) |
 | [![test](../doc/tests/.test/pre_init_assignment_const.svg)](../doc/tests/.test/pre_init_assignment_const.log) | [pre_init_assignment_const](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/pre_init_assignment_prop.svg)](../doc/tests/.test/pre_init_assignment_prop.log) | [pre_init_assignment_prop](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/pre_init_assignment_var.svg)](../doc/tests/.test/pre_init_assignment_var.log) | [pre_init_assignment_var](../doc/tests/statement_usage.md) |
@@ -211,7 +210,10 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/tests/.test/source_return.svg)](../doc/tests/.test/source_return.log) | [source_return](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_use.svg)](../doc/tests/.test/source_use.log) | [source_use](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/source_workbench.svg)](../doc/tests/.test/source_workbench.log) | [source_workbench](../doc/tests/statement_usage.md) |
+| [![test](../doc/libs/std/geo2d/.test/std_geo2d_pie.svg)](../doc/libs/std/geo2d/.test/std_geo2d_pie.log) | [std_geo2d_pie](../doc/libs/std/geo2d/README.md) |
+| [![test](../doc/libs/std/geo2d/.test/std_geo2d_text.svg)](../doc/libs/std/geo2d/.test/std_geo2d_text.log) | [std_geo2d_text](../doc/libs/std/geo2d/README.md) |
 | [![test](../books/tutorials/src/lego_brick/base/frame/.test/subtract.svg)](../books/tutorials/src/lego_brick/base/frame/.test/subtract.log) | [subtract](../books/tutorials/src/lego_brick/base/frame/subtract.md) |
+| [![test](../doc/libs/builtin/.test/text.svg)](../doc/libs/builtin/.test/text.log) | [text](../doc/libs/builtin/geo2d.md) |
 | [![test](../doc/.test/toml_import.svg)](../doc/.test/toml_import.log) | [toml_import](../doc/import.md) |
 | [![test](../doc/libs/std/ops/.test/translate_2d.svg)](../doc/libs/std/ops/.test/translate_2d.log) | [translate_2d](../doc/libs/std/ops/translate.md) |
 | [![test](../doc/types/.test/tuple_add_different.svg)](../doc/types/.test/tuple_add_different.log) | [tuple_add_different](../doc/types/tuples.md) |
@@ -255,6 +257,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/structure/.test/use_all.svg)](../doc/structure/.test/use_all.log) | [use_all](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_as.svg)](../doc/structure/.test/use_as.log) | [use_as](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_as_module.svg)](../doc/structure/.test/use_as_module.log) | [use_as_module](../doc/structure/use.md) |
+| [![test](../doc/tests/.test/use_as_test.svg)](../doc/tests/.test/use_as_test.log) | [use_as_test](../doc/tests/use.md) |
 | [![test](../doc/structure/.test/use_module.svg)](../doc/structure/.test/use_module.log) | [use_module](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_statement_pub.svg)](../doc/structure/.test/use_statement_pub.log) | [use_statement_pub](../doc/structure/use.md) |
 | [![test](../doc/structure/.test/use_statement_pub_in_module.svg)](../doc/structure/.test/use_statement_pub_in_module.log) | [use_statement_pub_in_module](../doc/structure/use.md) |
@@ -264,6 +267,7 @@ Click on the test names to jump to file with the test or click the buttons to ge
 | [![test](../doc/debug/.test/verify_assert_fail.svg)](../doc/debug/.test/verify_assert_fail.log) | [verify_assert_fail](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_error.svg)](../doc/debug/.test/verify_error.log) | [verify_error](../doc/debug/README.md) |
 | [![test](../doc/debug/.test/verify_todo.svg)](../doc/debug/.test/verify_todo.log) | [verify_todo](../doc/debug/README.md) |
+| [![test](../doc/tests/.test/visibility.svg)](../doc/tests/.test/visibility.log) | [visibility](../doc/tests/visibility.md) |
 | [![test](../doc/tests/.test/workbench_assignment_const.svg)](../doc/tests/.test/workbench_assignment_const.log) | [workbench_assignment_const](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/workbench_assignment_prop.svg)](../doc/tests/.test/workbench_assignment_prop.log) | [workbench_assignment_prop](../doc/tests/statement_usage.md) |
 | [![test](../doc/tests/.test/workbench_assignment_var.svg)](../doc/tests/.test/workbench_assignment_var.log) | [workbench_assignment_var](../doc/tests/statement_usage.md) |

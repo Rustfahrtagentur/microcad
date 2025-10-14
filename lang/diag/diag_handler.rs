@@ -1,15 +1,17 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use crate::{diag::*, eval::*, resolve::*};
+use crate::{diag::*, resolve::*};
 
 /// Handler for diagnostics.
 #[derive(Default)]
 pub struct DiagHandler {
     /// The list of diagnostics per source file.
     diag_list: DiagList,
-    /// The current number of overall errors in the evaluation process.
+    /// The number of overall errors in the evaluation process.
     error_count: u32,
+    /// The number of overall errors in the evaluation process.
+    warning_count: u32,
     /// The maximum number of collected errors until abort
     /// (`0` means unlimited number of errors).
     error_limit: Option<u32>,
@@ -37,6 +39,11 @@ impl DiagHandler {
         source_by_hash: &impl GetSourceByHash,
     ) -> std::fmt::Result {
         self.diag_list.pretty_print(f, source_by_hash)
+    }
+
+    /// Return overall number of occurred errors.
+    pub fn warning_count(&self) -> u32 {
+        self.warning_count
     }
 
     /// Return overall number of occurred errors.
@@ -74,19 +81,18 @@ impl DiagHandler {
 }
 
 impl PushDiag for DiagHandler {
-    fn push_diag(&mut self, diag: super::Diagnostic) -> crate::eval::EvalResult<()> {
+    fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         if let Some(error_limit) = self.error_limit {
             if self.error_count >= error_limit && !self.error_limit_reached {
                 self.error(
                     &SrcRef(None),
-                    Box::new(EvalError::ErrorLimitReached(error_limit)),
+                    Box::new(DiagError::ErrorLimitReached(error_limit)),
                 )?;
                 self.error_limit_reached = true;
             }
-            return Err(EvalError::ErrorLimitReached(error_limit));
+            return Err(DiagError::ErrorLimitReached(error_limit));
         }
 
-        use super::Diagnostic;
         match &diag {
             Diagnostic::Error(_) => {
                 self.error_count += 1;
@@ -94,6 +100,8 @@ impl PushDiag for DiagHandler {
             Diagnostic::Warning(_) => {
                 if self.warnings_as_errors {
                     self.error_count += 1;
+                } else {
+                    self.warning_count += 1;
                 }
             }
             _ => (),

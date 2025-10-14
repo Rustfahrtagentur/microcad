@@ -55,13 +55,13 @@ impl Parse for Argument {
 
                 Ok(Argument {
                     id: Some(Identifier::parse(first)?),
-                    value: Expression::parse(second)?,
+                    expression: Expression::parse(second)?,
                     src_ref: pair.src_ref(),
                 })
             }
             Rule::expression => Ok(Argument {
                 id: None,
-                value: Expression::parse(pair.clone())?,
+                expression: Expression::parse(pair.clone())?,
                 src_ref: pair.into(),
             }),
             rule => unreachable!("Argument::parse expected argument, found {rule:?}"),
@@ -72,7 +72,7 @@ impl Parse for Argument {
 impl Parse for MethodCall {
     fn parse(pair: Pair) -> ParseResult<Self> {
         Ok(MethodCall {
-            id: pair.find(Rule::qualified_name).expect(INTERNAL_PARSE_ERROR),
+            name: pair.find(Rule::qualified_name).expect(INTERNAL_PARSE_ERROR),
             argument_list: pair.find(Rule::argument_list).unwrap_or_default(),
             src_ref: pair.clone().into(),
         })

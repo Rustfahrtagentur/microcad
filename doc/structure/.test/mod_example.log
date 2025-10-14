@@ -4,7 +4,7 @@
 
 -- Code --
 
- 1: mod std {
+ 1: mod my {
  2:     mod math {
  3:         // define PI as property
  4:         const PI = 3.14159;
@@ -17,14 +17,10 @@
 11: }
 12: 
 13: // call both
-14: x = std::math::abs(-1) * std::math::PI;
+14: x = my::math::abs(-1.0) * my::math::PI;
 
 -- Output --
 -- Errors --
--- Model --
-  Group (root) ->
-
+-- No model --
 -- Test Result --
 OK
-Could not determine output type.
-Nothing will be exported.

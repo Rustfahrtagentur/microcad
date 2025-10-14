@@ -265,17 +265,17 @@ init(l:Length) {} } K();
 
 [![test](.test/pre_init_assignment_const.svg)](.test/pre_init_assignment_const.log)
 
-```µcad,pre_init_assignment_const
+```µcad,pre_init_assignment_const#fail
 sketch K() { 
-  const B = 1;
+  const B = 1; // error
 init(l:Length) {} } K();
 ```
 
 [![test](.test/pre_init_assignment_var.svg)](.test/pre_init_assignment_var.log)
 
-```µcad,pre_init_assignment_var#fail
+```µcad,pre_init_assignment_var
 sketch K() { 
-  a = 1; // error
+  a = 1;
 init(l:Length) {} } K();
 ```
 
@@ -485,9 +485,9 @@ sketch K() {
 
 [![test](.test/workbench_assignment_const.svg)](.test/workbench_assignment_const.log)
 
-```µcad,workbench_assignment_const
+```µcad,workbench_assignment_const#fail
 sketch K() {
-  const B = 1;
+  const B = 1;  // error
 } K();
 ```
 

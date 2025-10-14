@@ -18,7 +18,7 @@ pub use return_statement::*;
 pub use statement_list::*;
 
 /// Any statement.
-#[derive(Clone, Debug, strum::IntoStaticStr)]
+#[derive(Clone, strum::IntoStaticStr)]
 pub enum Statement {
     /// Part definition
     Workbench(Rc<WorkbenchDefinition>),
@@ -86,6 +86,32 @@ impl std::fmt::Display for Statement {
 
             Self::Assignment(a) => write!(f, "{a}"),
             Self::Expression(e) => write!(f, "{e}"),
+        }
+    }
+}
+impl std::fmt::Debug for Statement {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::Workbench(w) => {
+                write!(f, "{w:?}")
+            }
+            Self::Module(m) => {
+                write!(f, "{:?}", m.id)
+            }
+            Self::Function(_f) => {
+                write!(f, "{:?}", _f.id)
+            }
+            Self::Init(mi) => {
+                write!(f, "{mi:?}")
+            }
+
+            Self::Use(u) => write!(f, "{u:?};"),
+            Self::Return(r) => write!(f, "{r:?};"),
+            Self::If(i) => write!(f, "{i:?}"),
+            Self::InnerAttribute(i) => write!(f, "{i:?}"),
+
+            Self::Assignment(a) => write!(f, "{a:?}"),
+            Self::Expression(e) => write!(f, "{e:?}"),
         }
     }
 }

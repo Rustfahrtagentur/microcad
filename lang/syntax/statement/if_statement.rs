@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// If statement.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct IfStatement {
     /// If condition.
     pub cond: Expression,
@@ -31,6 +31,21 @@ impl std::fmt::Display for IfStatement {
         writeln!(f, "if {cond} {body}", cond = self.cond, body = self.body)?;
         if let Some(body) = &self.body_else {
             writeln!(f, "else {body}")?;
+        }
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for IfStatement {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        writeln!(
+            f,
+            "if {cond:?} {body:?}",
+            cond = self.cond,
+            body = self.body
+        )?;
+        if let Some(body) = &self.body_else {
+            writeln!(f, "else {body:?}")?;
         }
         Ok(())
     }

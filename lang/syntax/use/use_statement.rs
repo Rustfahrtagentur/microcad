@@ -11,7 +11,7 @@ use crate::{src_ref::*, syntax::*};
 /// ```ucad
 /// use std::*;
 /// ```
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct UseStatement {
     /// export of use
     pub visibility: Visibility,
@@ -32,8 +32,21 @@ impl std::fmt::Display for UseStatement {
         match &self.visibility {
             Visibility::Private => write!(f, "use ")?,
             Visibility::Public => write!(f, "pub use ")?,
+            Visibility::Deleted => unreachable!(),
         }
         write!(f, "{}", self.decl)?;
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for UseStatement {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match &self.visibility {
+            Visibility::Private => write!(f, "use ")?,
+            Visibility::Public => write!(f, "pub use ")?,
+            Visibility::Deleted => unreachable!(),
+        }
+        write!(f, "{:?}", self.decl)?;
         Ok(())
     }
 }

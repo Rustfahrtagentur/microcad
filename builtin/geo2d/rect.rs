@@ -1,9 +1,26 @@
 // Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use microcad_core::*;
 use microcad_lang::builtin::*;
 
-pub struct Rect;
+pub struct Rect(geo2d::Rect);
+
+impl Rect {
+    pub fn new(x: Scalar, y: Scalar, width: Scalar, height: Scalar) -> Self {
+        use geo::coord;
+        Self(geo2d::Rect::new(
+            coord! {x: x, y: y},
+            coord! {x: x + width, y: y + height},
+        ))
+    }
+}
+
+impl Render<Geometry2D> for Rect {
+    fn render(&self, _: &RenderResolution) -> Geometry2D {
+        Geometry2D::Rect(self.0)
+    }
+}
 
 impl BuiltinWorkbenchDefinition for Rect {
     fn id() -> &'static str {
@@ -15,18 +32,13 @@ impl BuiltinWorkbenchDefinition for Rect {
     }
 
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
-        use geo::coord;
-        use microcad_core::*;
-
         &|args| {
-            let width: Scalar = args.get("width");
-            let height: Scalar = args.get("height");
-            let x = args.get("x");
-            let y = args.get("y");
-
-            Ok(BuiltinWorkpieceOutput::Primitive2D(Geometry2D::Rect(
-                geo2d::Rect::new(coord! {x: x, y: y}, coord! {x: x + width, y: y + height}),
-            )))
+            Ok(BuiltinWorkpieceOutput::Primitive2D(Box::new(Rect::new(
+                args.get("x"),
+                args.get("y"),
+                args.get("width"),
+                args.get("height"),
+            ))))
         }
     }
 

@@ -3,11 +3,15 @@
 
 mod circle;
 mod line;
+mod pie;
 mod rect;
+mod text;
 
 pub use circle::*;
 pub use line::*;
+pub use pie::*;
 pub use rect::*;
+pub use text::*;
 
 use microcad_lang::builtin::*;
 
@@ -15,7 +19,9 @@ use microcad_lang::builtin::*;
 pub fn geo2d() -> Symbol {
     crate::ModuleBuilder::new("geo2d".try_into().expect("valid id"))
         .symbol(Circle::symbol())
-        .symbol(Rect::symbol())
         .symbol(Line::symbol())
+        .symbol(Pie::symbol())
+        .symbol(Rect::symbol())
+        .symbol(Text::symbol())
         .build()
 }

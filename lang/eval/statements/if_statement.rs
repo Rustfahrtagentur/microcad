@@ -6,7 +6,7 @@
 use crate::{eval::*, model::*, syntax::*, value::*};
 
 impl Eval<Value> for IfStatement {
-    fn eval(&self, context: &mut crate::eval::Context) -> crate::eval::EvalResult<Value> {
+    fn eval(&self, context: &mut crate::eval::EvalContext) -> crate::eval::EvalResult<Value> {
         log::debug!("Evaluating if statement to value: {self}");
         context.grant(self)?;
         let cond = self.cond.eval(context)?;
@@ -20,7 +20,7 @@ impl Eval<Value> for IfStatement {
                 }
             }
             _ => {
-                context.error(self, EvalError::IfConditionIsNotBool(cond.clone()))?;
+                context.error(self, EvalError::IfConditionIsNotBool(cond.to_string()))?;
                 Ok(Value::None)
             }
         }
@@ -28,21 +28,21 @@ impl Eval<Value> for IfStatement {
 }
 
 impl Eval<Option<Model>> for IfStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<Model>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<Model>> {
         log::debug!("Evaluating if statement to model: {self}");
         context.grant(self)?;
         let cond = self.cond.eval(context)?;
         match cond {
-            Value::Bool(true) => Ok(Some(self.body.eval(context)?)),
+            Value::Bool(true) => Ok(self.body.eval(context)?),
             Value::Bool(false) => {
                 if let Some(body) = &self.body_else {
-                    Ok(Some(body.eval(context)?))
+                    Ok(body.eval(context)?)
                 } else {
                     Ok(None)
                 }
             }
             _ => {
-                context.error(self, EvalError::IfConditionIsNotBool(cond.clone()))?;
+                context.error(self, EvalError::IfConditionIsNotBool(cond.to_string()))?;
                 Ok(None)
             }
         }

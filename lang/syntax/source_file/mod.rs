@@ -6,14 +6,14 @@
 use crate::{src_ref::*, syntax::*};
 
 /// µcad source file
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct SourceFile {
     /// Qualified name of the file if loaded from externals
     pub name: QualifiedName,
     /// Root code body.
     pub statements: StatementList,
     /// Name of loaded file.
-    pub filename: Option<std::path::PathBuf>,
+    filename: Option<std::path::PathBuf>,
     /// Source file string, TODO: might be a &'a str in the future
     pub source: String,
 
@@ -25,11 +25,26 @@ pub struct SourceFile {
 }
 
 impl SourceFile {
+    /// Create new source file from existing source.
+    pub fn new(statements: StatementList, source: String, hash: u64) -> Self {
+        Self {
+            statements,
+            source,
+            hash,
+            ..Default::default()
+        }
+    }
     /// Return filename of loaded file or `<no file>`
     pub fn filename(&self) -> std::path::PathBuf {
         self.filename
             .clone()
             .unwrap_or(std::path::PathBuf::from(crate::invalid_no_ansi!(SOURCE)))
+    }
+
+    /// Return filename of loaded file or `<no file>`
+    pub fn set_filename(&mut self, path: impl AsRef<std::path::Path>) {
+        assert!(self.filename.is_none());
+        self.filename = Some(path.as_ref().canonicalize().expect("path not found"))
     }
 
     /// Return filename of loaded file or `<no file>`
@@ -42,18 +57,7 @@ impl SourceFile {
 
     /// Return the module name from the file name
     pub fn id(&self) -> Identifier {
-        match &self.filename {
-            Some(filename) => Identifier(Refer::new(
-                filename
-                    .file_stem()
-                    .expect("cannot get file stem")
-                    .to_str()
-                    .expect("File name error {filename:?}")
-                    .into(),
-                SrcRef::new(0..0, 0, 0, self.hash),
-            )),
-            None => Identifier::none(),
-        }
+        self.name.last().unwrap_or(&Identifier::none()).clone()
     }
 
     /// get a specific line
@@ -67,10 +71,24 @@ impl SourceFile {
     pub fn num_lines(&self) -> usize {
         self.source.lines().count()
     }
+
+    /// Set file name.
+    pub fn set_name(&mut self, name: QualifiedName) {
+        self.name = name
+    }
 }
+
 impl std::fmt::Display for SourceFile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.statements.iter().try_for_each(|s| writeln!(f, "{s}"))
+    }
+}
+
+impl std::fmt::Debug for SourceFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.statements
+            .iter()
+            .try_for_each(|s| writeln!(f, "{s:?}"))
     }
 }
 

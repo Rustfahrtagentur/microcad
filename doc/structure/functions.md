@@ -78,7 +78,7 @@ mod math {
     // square is callable from outside math
     pub fn square(x: Scalar) {
         // call internal pow
-        pow(x, 2.0)
+        pow(x, 2)
     }
 }
 

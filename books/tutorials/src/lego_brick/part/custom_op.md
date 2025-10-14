@@ -8,6 +8,8 @@ which arranges elements in a grid which is centered to origin:
 [![test](.test/grid.svg)](.test/grid.log)
 
 ```µcad,grid
+use std::ops::*;
+
 const SPACING = 8mm;
 
 op grid(rows: Integer, columns: Integer) {

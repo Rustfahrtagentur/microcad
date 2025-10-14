@@ -7,7 +7,7 @@ use crate::{ty::*, value::*};
 use derive_more::{Deref, DerefMut};
 
 /// List of values
-#[derive(Clone, Debug, Default, Deref, DerefMut)]
+#[derive(Clone, Default, Deref, DerefMut)]
 pub struct ValueList(Vec<Value>);
 
 impl ValueList {
@@ -48,5 +48,18 @@ impl std::iter::FromIterator<Value> for ValueList {
     fn from_iter<T: IntoIterator<Item = Value>>(iter: T) -> Self {
         let vec = Vec::from_iter(iter);
         ValueList(vec)
+    }
+}
+
+impl std::fmt::Debug for ValueList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.iter()
+                .map(|value| format!("{value}"))
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
     }
 }

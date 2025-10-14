@@ -1,0 +1,25 @@
+-- Test --
+  use_as_test
+  ../doc/tests/use.md:46
+
+-- Code --
+
+ 1: use std::geo2d::*; 
+ 2: use Rect as Cap;
+ 3: 
+ 4: Cap(width=1mm,height=1mm);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group (root) ->
+    Workpiece(sketch) std::geo2d::Rect(height=1mm, width=1mm) ->
+      - height = 1mm
+      - width = 1mm
+      - x = -0.5mm
+      - y = -0.5mm
+      Primitive2D __builtin::geo2d::Rect(height=1, width=1, x=-0.5, y=-0.5) ->
+
+Export successful.
+-- Test Result --
+OK

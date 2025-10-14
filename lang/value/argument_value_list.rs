@@ -4,15 +4,16 @@
 //! *Argument value list* evaluation entity.
 
 use crate::{eval::*, src_ref::*, value::*};
-use derive_more::Deref;
+use derive_more::{Deref, DerefMut};
 
 /// Collection of *argument values* (e.g. `( x=1, y=2 )`).
 ///
 /// Also provides methods to find a matching call
 /// between it and a given *parameter list*.
-#[derive(Clone, Debug, Default, Deref)]
+#[derive(Clone, Default, Deref, DerefMut)]
 pub struct ArgumentValueList {
     #[deref]
+    #[deref_mut]
     map: Vec<(Identifier, ArgumentValue)>,
     src_ref: SrcRef,
 }
@@ -34,7 +35,7 @@ impl ArgumentValueList {
         }
 
         Err(EvalError::ArgumentCountMismatch {
-            args: self.clone(),
+            args: self.to_string(),
             expected: 1,
             found: self.map.len(),
         })
@@ -72,7 +73,21 @@ impl std::fmt::Display for ArgumentValueList {
             let mut v = self
                 .map
                 .iter()
-                .map(|(id, p)| format!("{id:?}: {p}"))
+                .map(|(id, p)| format!("{id}{p}"))
+                .collect::<Vec<_>>();
+            v.sort();
+            v.join(", ")
+        })
+    }
+}
+
+impl std::fmt::Debug for ArgumentValueList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", {
+            let mut v = self
+                .map
+                .iter()
+                .map(|(id, av)| format!("{id:?}{av:?}"))
                 .collect::<Vec<_>>();
             v.sort();
             v.join(", ")
@@ -88,4 +103,27 @@ impl FromIterator<(Identifier, ArgumentValue)> for ArgumentValueList {
             map,
         }
     }
+}
+
+#[test]
+fn test_argument_value_debug() {
+    let arg1 = ArgumentValue::new(
+        Value::Target(Target::new("my::name1".into(), Some("my::target1".into()))),
+        Some("id1".into()),
+        SrcRef(None),
+    );
+
+    let arg2 = ArgumentValue::new(
+        Value::Target(Target::new("my::name2".into(), None)),
+        Some("id2".into()),
+        SrcRef(None),
+    );
+
+    let mut args = ArgumentValueList::default();
+
+    args.push(("id1".into(), arg1));
+    args.push(("id2".into(), arg2));
+
+    log::info!("{args}");
+    log::info!("{args:?}");
 }

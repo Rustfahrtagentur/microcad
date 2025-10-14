@@ -20,9 +20,9 @@
 14: assert_valid(Sphere);
 15: assert_valid(Cube);
 16: 
-17: // alias `bar` in `std/text/foo.µcad` into `baz`
-18: use std::test::foo::Bar as baz;
-19: assert_valid(baz);
+17: // alias `Circle` in `std/geo2d/mod.µcad` into `foo`
+18: use std::geo2d::Circle as foo;
+19: assert_valid(foo);
 20: 
 21: // use print from `std/module.µcad`
 22: use std::print;
@@ -32,7 +32,7 @@
 26: // public use operation from `std/module.µcad`
 27: pub use std::ops;
 28: assert_valid(ops);
-29: assert_invalid(use_test::ops);
+29: assert_valid(use_test::ops);
 30: 
 31: part MyPart() {
 32:     Circle(radius=1);
@@ -41,13 +41,9 @@
 35: 
 36: assert_valid(MyPart);
 
--- Output --
-Hello
--- Errors --
--- Model --
-  Group (root) ->
+-- Output --Hello
 
+-- Errors --
+-- No model --
 -- Test Result --
 OK
-Could not determine output type.
-Nothing will be exported.

@@ -5,10 +5,10 @@ use crate::{eval::*, model::*, syntax::*};
 
 impl InitDefinition {
     /// Evaluate a call to the init definition
-    pub fn eval(&self, args: Tuple, context: &mut Context) -> EvalResult<()> {
+    pub fn eval(&self, non_property_args: Tuple, context: &mut EvalContext) -> EvalResult<()> {
         context.grant(self)?;
         let model = context.get_model()?;
-        context.scope(StackFrame::Init(args.into()), |context| {
+        context.scope(StackFrame::Init(non_property_args.into()), |context| {
             let _: Value = self.body.statements.eval(context)?;
 
             if let Some(properties) = model.borrow().get_properties() {

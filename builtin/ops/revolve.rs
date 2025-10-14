@@ -9,7 +9,6 @@ use microcad_lang::{builtin::*, model::*, render::*};
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct Revolve {
-    circular_segments: Integer,
     revolve_degrees: Scalar,
 }
 
@@ -19,24 +18,21 @@ impl Operation for Revolve {
     }
 
     fn process_3d(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
-        context.update_3d(|context, model, resolution| {
+        context.update_3d(|context, model| {
             let model_ = model.borrow();
-            let geometries: Geometries2D = model_.children.render(context)?;
+            let geometries: Geometries2D = model_.children.render_with_context(context)?;
+            let radius = geometries.calc_bounds_2d().max_extent();
 
-            let multi_polygon_data =
-                geo2d::multi_polygon_to_vec(&geometries.render_to_multi_polygon(&resolution));
-            let multi_polygon_data: Vec<_> = multi_polygon_data
-                .iter()
-                .map(|ring| ring.as_slice())
-                .collect();
+            let WithBounds3D { inner, bounds } = geometries.revolve_extrude(
+                cgmath::Deg(self.revolve_degrees).into(),
+                context.current_resolution().circular_segments(radius) as usize,
+            );
 
-            Ok(Some(Rc::new(Geometry3D::Manifold(Rc::new(
-                Manifold::revolve(
-                    &multi_polygon_data,
-                    self.circular_segments as u32,
-                    self.revolve_degrees,
-                ),
-            )))))
+            use microcad_core::Extrude;
+            Ok(Some(Rc::new(WithBounds3D::new(
+                Geometry3D::from(inner),
+                bounds,
+            ))))
         })
     }
 }
@@ -57,18 +53,12 @@ impl BuiltinWorkbenchDefinition for Revolve {
     fn workpiece_function() -> &'static BuiltinWorkpieceFn {
         &|args| {
             Ok(BuiltinWorkpieceOutput::Operation(Box::new(Revolve {
-                circular_segments: args.get("circular_segments"),
                 revolve_degrees: args.get("revolve_degrees"),
             })))
         }
     }
 
     fn parameters() -> ParameterValueList {
-        [
-            parameter!(circular_segments: Integer),
-            parameter!(revolve_degrees: Scalar),
-        ]
-        .into_iter()
-        .collect()
+        [parameter!(revolve_degrees: Scalar)].into_iter().collect()
     }
 }

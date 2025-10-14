@@ -19,13 +19,11 @@ use crate::{src_ref::*, syntax::*, value::*};
 pub type ListExpression = Vec<Expression>;
 
 /// Any expression.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub enum Expression {
     /// Something went wrong (and an error will be reported)
     #[default]
     Invalid,
-    /// A processed value.
-    Value(Value),
     /// An integer, float, color or bool literal: 1, 1.0, #00FF00, false
     Literal(Literal),
     /// A string that contains format expressions: "value = {a}"
@@ -75,11 +73,20 @@ pub enum Expression {
     MethodCall(Box<Expression>, MethodCall, SrcRef),
 }
 
+impl Expression {
+    /// If the expression consists of a single identifier, e.g. `a`
+    pub fn single_identifier(&self) -> Option<&Identifier> {
+        match &self {
+            Self::QualifiedName(qualified_name) => qualified_name.single_identifier(),
+            _ => None,
+        }
+    }
+}
+
 impl SrcReferrer for Expression {
     fn src_ref(&self) -> crate::src_ref::SrcRef {
         match self {
             Self::Invalid => SrcRef(None),
-            Self::Value(_) => SrcRef(None),
             Self::Literal(l) => l.src_ref(),
             Self::FormatString(fs) => fs.src_ref(),
             Self::ArrayExpression(le) => le.src_ref(),
@@ -110,7 +117,6 @@ impl SrcReferrer for Expression {
 impl std::fmt::Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Value(value) => write!(f, "{value}"),
             Self::Literal(literal) => write!(f, "{literal}"),
             Self::FormatString(format_string) => write!(f, "{format_string}"),
             Self::ArrayExpression(array_expression) => write!(f, "{array_expression}"),
@@ -139,6 +145,37 @@ impl std::fmt::Display for Expression {
     }
 }
 
+impl std::fmt::Debug for Expression {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::Literal(literal) => write!(f, "{literal}"),
+            Self::FormatString(format_string) => write!(f, "{format_string:?}"),
+            Self::ArrayExpression(array_expression) => write!(f, "{array_expression:?}"),
+            Self::TupleExpression(tuple_expression) => write!(f, "{tuple_expression:?}"),
+            Self::BinaryOp {
+                lhs,
+                op,
+                rhs,
+                src_ref: _,
+            } => write!(f, "{lhs:?} {op} {rhs:?}"),
+            Self::UnaryOp {
+                op,
+                rhs,
+                src_ref: _,
+            } => write!(f, "{op}{rhs:?}"),
+            Self::ArrayElementAccess(lhs, rhs, _) => write!(f, "{lhs:?}[{rhs:?}]"),
+            Self::PropertyAccess(lhs, rhs, _) => write!(f, "{lhs:?}.{rhs:?}"),
+            Self::AttributeAccess(lhs, rhs, _) => write!(f, "{lhs:?}#{rhs:?}"),
+            Self::MethodCall(lhs, method_call, _) => write!(f, "{lhs:?}.{method_call:?}"),
+            Self::Call(call) => write!(f, "{call:?}"),
+            Self::Body(body) => write!(f, "{body:?}"),
+            Self::QualifiedName(qualified_name) => write!(f, "{qualified_name:?}"),
+            Self::Marker(marker) => write!(f, "{marker:?}"),
+            _ => unimplemented!(),
+        }
+    }
+}
+
 impl TreeDisplay for Value {
     fn tree_print(&self, f: &mut std::fmt::Formatter, depth: TreeState) -> std::fmt::Result {
         write!(f, "{:depth$}Value: {value}", "", value = self)
@@ -148,7 +185,6 @@ impl TreeDisplay for Value {
 impl TreeDisplay for Expression {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         match self {
-            Expression::Value(value) => value.tree_print(f, depth),
             Expression::Literal(literal) => literal.tree_print(f, depth),
             Expression::FormatString(format_string) => format_string.tree_print(f, depth),
             Expression::ArrayExpression(array_expression) => array_expression.tree_print(f, depth),
@@ -206,12 +242,50 @@ impl TreeDisplay for Expression {
     }
 }
 
-impl Expression {
-    /// If the expression consists of a single identifier, e.g. `a`
-    pub fn single_identifier(&self) -> Option<&Identifier> {
-        match &self {
-            Self::QualifiedName(qualified_name) => qualified_name.single_identifier(),
-            _ => None,
+impl AsRef<Self> for Expression {
+    fn as_ref(&self) -> &Self {
+        self
+    }
+}
+
+impl PartialEq for Expression {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Literal(l0), Self::Literal(r0)) => l0 == r0,
+            (Self::FormatString(l0), Self::FormatString(r0)) => l0 == r0,
+            (Self::ArrayExpression(l0), Self::ArrayExpression(r0)) => l0 == r0,
+            (Self::TupleExpression(l0), Self::TupleExpression(r0)) => l0 == r0,
+            (Self::QualifiedName(l0), Self::QualifiedName(r0)) => l0 == r0,
+            (
+                Self::BinaryOp {
+                    lhs: l_lhs,
+                    op: l_op,
+                    rhs: l_rhs,
+                    src_ref: l_src_ref,
+                },
+                Self::BinaryOp {
+                    lhs: r_lhs,
+                    op: r_op,
+                    rhs: r_rhs,
+                    src_ref: r_src_ref,
+                },
+            ) => l_lhs == r_lhs && l_op == r_op && l_rhs == r_rhs && l_src_ref == r_src_ref,
+            (
+                Self::UnaryOp {
+                    op: l_op,
+                    rhs: l_rhs,
+                    src_ref: l_src_ref,
+                },
+                Self::UnaryOp {
+                    op: r_op,
+                    rhs: r_rhs,
+                    src_ref: r_src_ref,
+                },
+            ) => l_op == r_op && l_rhs == r_rhs && l_src_ref == r_src_ref,
+            (Self::ArrayElementAccess(l0, l1, l2), Self::ArrayElementAccess(r0, r1, r2)) => {
+                l0 == r0 && l1 == r1 && l2 == r2
+            }
+            _ => unreachable!("PartialEq implemented for const expressions only"),
         }
     }
 }

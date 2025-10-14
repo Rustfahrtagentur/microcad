@@ -13,7 +13,13 @@
 
 -- Output --
 -- Errors --
-error: sketch statement not available here
+error: Statement is not available within sketch
+  ---> <FROM STR>:2:5
+     |
+   2 |     sketch Axis(length: Length) {}  // error
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: sketch is not available within sketch
   ---> <FROM STR>:2:5
      |
    2 |     sketch Axis(length: Length) {}  // error

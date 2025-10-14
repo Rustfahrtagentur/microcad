@@ -10,22 +10,24 @@
 //! - [`PushDiag`]: Collects error in [`DiagHandler`]
 //! - [`Diag`]: Get diagnostic messages
 
+mod diag_error;
 mod diag_handler;
 mod diag_list;
 mod diagnostic;
 mod level;
 
+pub use diag_error::*;
 pub use diag_handler::*;
 pub use diag_list::*;
 pub use diagnostic::*;
 pub use level::*;
 
-use crate::{eval::*, src_ref::*};
+use crate::src_ref::*;
 
 /// A trait to add diagnostics with different levels conveniently.
 pub trait PushDiag {
     /// Push a diagnostic message (must be implemented).
-    fn push_diag(&mut self, diag: Diagnostic) -> EvalResult<()>;
+    fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()>;
 
     /// Push new trace message.
     fn trace(&mut self, src: &impl SrcReferrer, message: String) {
@@ -42,17 +44,31 @@ pub trait PushDiag {
         &mut self,
         src: &impl SrcReferrer,
         error: impl std::error::Error + 'static,
-    ) -> EvalResult<()> {
-        self.push_diag(Diagnostic::Warning(Refer::new(error.into(), src.src_ref())))
+    ) -> DiagResult<()> {
+        let err = Diagnostic::Warning(Refer::new(error.into(), src.src_ref()));
+        if cfg!(feature = "ansi-color") {
+            log::warn!("{}", color_print::cformat!("<y,s>{err}</>"));
+        } else {
+            log::warn!("{err}");
+        }
+        self.push_diag(err)
     }
     /// Push new error.
     fn error(
         &mut self,
         src: &impl SrcReferrer,
         error: impl std::error::Error + 'static,
-    ) -> EvalResult<()> {
+    ) -> DiagResult<()> {
         let err = Diagnostic::Error(Refer::new(error.into(), src.src_ref()));
-        log::error!("{err}");
+        if cfg!(feature = "ansi-color") {
+            log::error!("{}", color_print::cformat!("<r,s>{err}</>"));
+        } else {
+            log::error!("{err}");
+        }
+        #[cfg(debug_assertions)]
+        if std::env::var("MICROCAD_ERROR_PANIC").is_ok() {
+            panic!("MICROCAD_ERROR_PANIC")
+        }
         self.push_diag(err)
     }
 }
@@ -73,6 +89,14 @@ pub trait Diag {
         self.fmt_diagnosis(&mut str).expect("displayable diagnosis");
         str
     }
+
+    /// Returns true if there are warnings.
+    fn has_warnings(&self) -> bool {
+        self.warning_count() > 0
+    }
+
+    /// Return number of occurred warnings.
+    fn warning_count(&self) -> u32;
 
     /// Returns true if there are errors.
     fn has_errors(&self) -> bool {

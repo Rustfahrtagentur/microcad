@@ -4,11 +4,9 @@
 
 -- Code --
 
- 1: geo2d = 1;
+ 1: use std::geo2d as geo;
  2: 
- 3: use std::geo2d as geo;
- 4: 
- 5: geo::Circle(r = 4mm);
+ 3: geo::Circle(r = 4mm);
 
 -- Output --
 -- Errors --
@@ -17,8 +15,8 @@
     Workpiece(sketch) std::geo2d::Circle(c=(x=0mm, y=0mm), r=4mm) ->
       - center = (x=0mm, y=0mm)
       - radius = 4mm
-      Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=4)⏎ ->
+      Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=4) ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

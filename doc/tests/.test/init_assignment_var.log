@@ -12,8 +12,8 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::K(l=10mm) ->
+    Workpiece(sketch) init_assignment_var::K(l=10mm) ->
 
+Export error: Render error: Nothing to render
 -- Test Result --
 OK
-Export error: Render error: Nothing to render

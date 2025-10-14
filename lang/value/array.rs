@@ -7,7 +7,7 @@ use crate::{ty::*, value::*};
 use derive_more::{Deref, DerefMut};
 
 /// Collection of values of the same type.
-#[derive(Clone, Debug, Deref, DerefMut)]
+#[derive(Clone, Deref, DerefMut)]
 pub struct Array {
     /// List of values
     #[deref]
@@ -19,7 +19,15 @@ pub struct Array {
 
 impl Array {
     /// Create new list
-    pub fn new(items: ValueList, ty: Type) -> Self {
+    pub fn new(ty: Type) -> Self {
+        Self {
+            items: ValueList::default(),
+            ty,
+        }
+    }
+
+    /// Create new list from `ValueList`.
+    pub fn from_values(items: ValueList, ty: Type) -> Self {
         Self { items, ty }
     }
 
@@ -48,7 +56,7 @@ impl TryFrom<ValueList> for Array {
     type Error = ValueError;
     fn try_from(items: ValueList) -> ValueResult<Array> {
         match items.types().common_type() {
-            Some(ty) => Ok(Array::new(items, ty)),
+            Some(ty) => Ok(Array::from_values(items, ty)),
             None => Err(ValueError::CommonTypeExpected),
         }
     }
@@ -77,6 +85,21 @@ impl std::fmt::Display for Array {
     }
 }
 
+impl std::fmt::Debug for Array {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "[{items}]",
+            items = self
+                .items
+                .iter()
+                .map(|v| format!("{v:?}"))
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
+}
+
 impl crate::ty::Ty for Array {
     fn ty(&self) -> Type {
         Type::Array(Box::new(self.ty.clone()))
@@ -89,7 +112,7 @@ impl std::ops::Add<Value> for Array {
 
     fn add(self, rhs: Value) -> Self::Output {
         if self.ty.is_add_compatible_to(&rhs.ty()) {
-            Ok(Value::Array(Self::new(
+            Ok(Value::Array(Self::from_values(
                 ValueList::new(
                     self.items
                         .iter()
@@ -110,7 +133,7 @@ impl std::ops::Sub<Value> for Array {
 
     fn sub(self, rhs: Value) -> Self::Output {
         if self.ty.is_add_compatible_to(&rhs.ty()) {
-            Ok(Value::Array(Self::new(
+            Ok(Value::Array(Self::from_values(
                 ValueList::new(
                     self.items
                         .iter()
@@ -132,7 +155,7 @@ impl std::ops::Mul<Value> for Array {
     fn mul(self, rhs: Value) -> Self::Output {
         match self.ty {
             // List * Scalar or List * Integer
-            Type::Quantity(_) | Type::Integer => Ok(Value::Array(Array::new(
+            Type::Quantity(_) | Type::Integer => Ok(Value::Array(Array::from_values(
                 ValueList::new({
                     self.iter()
                         .map(|value| value.clone() * rhs.clone())
@@ -158,7 +181,7 @@ impl std::ops::Div<Value> for Array {
 
         match (&self.ty, rhs.ty()) {
             // Integer / Integer => Scalar
-            (Type::Integer, Type::Integer) => Ok(Value::Array(Array::new(
+            (Type::Integer, Type::Integer) => Ok(Value::Array(Array::from_values(
                 values,
                 self.ty / rhs.ty().clone(),
             ))),
@@ -180,4 +203,17 @@ impl std::ops::Neg for Array {
             .collect();
         Ok(Value::Array(items.try_into()?))
     }
+}
+
+#[test]
+fn test_array_debug() {
+    let val1 = Value::Target(Target::new("my::name1".into(), Some("my::target1".into())));
+    let val2 = Value::Target(Target::new("my::name2".into(), None));
+
+    let mut array = Array::new(Type::Target);
+    array.push(val1);
+    array.push(val2);
+
+    log::info!("{array}");
+    log::info!("{array:?}");
 }

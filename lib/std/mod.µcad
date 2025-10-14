@@ -1,5 +1,8 @@
+pub mod geo2d;
+pub mod geo3d;
+pub mod ops;
+
 pub use __builtin::math;
-pub use __builtin::string;
 pub use __builtin::print;
 pub use __builtin::type_of;
 pub use __builtin::count;

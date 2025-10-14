@@ -15,17 +15,17 @@
   Group (root) ->
     Workpiece(op) std::ops::revolve(angle=3.14159265358979rad) ->
       - angle = 3.14159265358979rad
-      Operation __builtin::ops::revolve(circular_segments=64, revolve_degrees=180)⏎ ->
+      Operation __builtin::ops::revolve(revolve_degrees=180) ->
         Workpiece(op) std::ops::translate(x=40mm, y=0mm, z=0mm) (root) ->
           - x = 40mm
           - y = 0mm
           - z = 0mm
-          Transform __builtin::ops::translate(x=40, y=0, z=0)⏎ ->
+          Transform __builtin::ops::translate(x=40, y=0, z=0) ->
             Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) (root) ->
               - center = (x=0mm, y=0mm)
               - radius = 10mm
-              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)⏎ ->
+              Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10) ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

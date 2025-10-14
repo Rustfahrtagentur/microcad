@@ -6,3 +6,19 @@
 
  1: prop a = 1;  // error
 
+-- Output --
+-- Errors --
+error: Assignment statement is not available within file
+  ---> <FROM STR>:1:1
+     |
+   1 | prop a = 1;  // error
+     | ^^^^^^^^^^^
+     |
+error: Declaration of a not allowed within source_assignment_prop
+  ---> <FROM STR>:1:1
+     |
+   1 | prop a = 1;  // error
+     | ^^^^^^^^^^^
+     |
+-- Test Result --
+FAILED AS EXPECTED

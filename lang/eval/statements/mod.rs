@@ -17,7 +17,7 @@ mod use_statement;
 pub use use_statement::*;
 
 impl Eval for Statement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match self {
             Self::Workbench(w) => {
                 context.grant(w.as_ref())?;
@@ -49,7 +49,7 @@ impl Eval for Statement {
 }
 
 impl Eval<Option<Model>> for Statement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<Model>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<Model>> {
         let model: Option<Model> = match self {
             Self::Workbench(w) => {
                 context.grant(w.as_ref())?;
@@ -57,8 +57,6 @@ impl Eval<Option<Model>> for Statement {
             }
             Self::Module(m) => {
                 m.eval(context)?;
-
-                context.grant(m.as_ref())?;
                 None
             }
             Self::Function(f) => {
@@ -85,7 +83,7 @@ impl Eval<Option<Model>> for Statement {
             Self::Expression(e) => e.eval(context)?,
             Self::InnerAttribute(a) => {
                 context.grant(a)?;
-                Default::default()
+                None
             }
         };
 
@@ -100,7 +98,7 @@ impl Eval<Option<Model>> for Statement {
 }
 
 impl Eval<Value> for StatementList {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         for statement in self.iter() {
             if let Value::Return(result) = statement.eval(context)? {
                 return Ok(*result);
@@ -112,7 +110,7 @@ impl Eval<Value> for StatementList {
 
 /// Parse inner attributes of a statement list.
 impl Eval<Attributes> for StatementList {
-    fn eval(&self, context: &mut Context) -> EvalResult<Attributes> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Attributes> {
         let mut attributes = Vec::new();
         for statement in self.iter() {
             if let Statement::InnerAttribute(attribute) = statement {
@@ -125,7 +123,7 @@ impl Eval<Attributes> for StatementList {
 }
 
 impl Eval<Models> for StatementList {
-    fn eval(&self, context: &mut Context) -> EvalResult<Models> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Models> {
         let mut models = Models::default();
         let mut output_type = OutputType::NotDetermined;
 

@@ -10,7 +10,7 @@ use crate::{src_ref::*, ty::*, value::*};
 /// Tuple with named values
 ///
 /// Names are optional, which means Identifiers can be empty.
-#[derive(Clone, Default, Debug, PartialEq)]
+#[derive(Clone, Default, PartialEq)]
 pub struct Tuple {
     pub(crate) named: std::collections::HashMap<Identifier, Value>,
     pub(crate) unnamed: std::collections::HashMap<Type, Value>,
@@ -391,7 +391,7 @@ impl<'a> TryFrom<&'a Value> for &'a Tuple {
         match value {
             Value::Tuple(tuple) => Ok(tuple),
             _ => Err(ValueError::CannotConvert(
-                value.clone(),
+                value.to_string(),
                 "Tuple".to_string(),
             )),
         }
@@ -431,7 +431,7 @@ impl TryFrom<&Tuple> for Color {
                     quantity_type: QuantityType::Scalar,
                 }),
             ) => Ok(Color::new(*r as f32, *g as f32, *b as f32, a as f32)),
-            _ => Err(ValueError::CannotConvertToColor(Box::new(tuple.clone()))),
+            _ => Err(ValueError::CannotConvertToColor(tuple.to_string())),
         }
     }
 }
@@ -472,11 +472,16 @@ impl TryFrom<&Tuple> for Size2 {
                 width: *width,
                 height: *height,
             }),
-            _ => Err(ValueError::CannotConvert(
-                tuple.clone().into(),
-                "Size2".into(),
-            )),
+            _ => Err(ValueError::CannotConvert(tuple.to_string(), "Size2".into())),
         }
+    }
+}
+
+impl TryFrom<Target> for Value {
+    type Error = ValueError;
+
+    fn try_from(target: Target) -> Result<Self, Self::Error> {
+        Ok(Value::Target(target))
     }
 }
 
@@ -491,6 +496,25 @@ impl std::fmt::Display for Tuple {
                     .iter()
                     .map(|(id, v)| format!("{id}={v}"))
                     .chain(self.unnamed.values().map(|v| format!("{v}")))
+                    .collect::<Vec<String>>();
+                items.sort();
+                items.join(", ")
+            }
+        )
+    }
+}
+
+impl std::fmt::Debug for Tuple {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "({items})",
+            items = {
+                let mut items = self
+                    .named
+                    .iter()
+                    .map(|(id, v)| format!("{id:?}={v:?}"))
+                    .chain(self.unnamed.values().map(|v| format!("{v:?}")))
                     .collect::<Vec<String>>();
                 items.sort();
                 items.join(", ")

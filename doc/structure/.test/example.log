@@ -13,14 +13,10 @@
  7: print_error("first");
  8: print_error("second");
 
--- Output --
-ERROR: first
+-- Output --ERROR: first
 ERROR: second
--- Errors --
--- Model --
-  Group (root) ->
 
+-- Errors --
+-- No model --
 -- Test Result --
 OK
-Could not determine output type.
-Nothing will be exported.

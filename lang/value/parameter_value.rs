@@ -6,7 +6,7 @@
 use crate::{src_ref::*, ty::*, value::*};
 
 /// Parameter value is the result of evaluating a parameter
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct ParameterValue {
     /// Parameter type
     pub specified_type: Option<Type>,
@@ -57,6 +57,16 @@ impl std::fmt::Display for ParameterValue {
             write!(f, "{} = {def}", def.ty())?;
         } else if let Some(ty) = &self.specified_type {
             write!(f, "{ty}")?;
+        }
+        Ok(())
+    }
+}
+impl std::fmt::Debug for ParameterValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(def) = &self.default_value {
+            write!(f, "{ty:?} = {def:?}", ty = def.ty())?;
+        } else if let Some(ty) = &self.specified_type {
+            write!(f, "{ty:?}")?;
         }
         Ok(())
     }

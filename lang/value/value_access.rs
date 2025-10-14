@@ -25,7 +25,7 @@ pub trait ValueAccess {
                 Ok(val)
             } else {
                 Err(ValueError::CannotConvert(
-                    val.clone(),
+                    val.to_string(),
                     std::any::type_name::<T>().into(),
                 ))
             }

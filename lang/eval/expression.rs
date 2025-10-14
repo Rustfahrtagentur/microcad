@@ -4,7 +4,7 @@
 use crate::{eval::*, model::*};
 
 impl Eval for RangeFirst {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         let value: Value = self.0.eval(context)?;
         Ok(match value {
             Value::Integer(_) => value,
@@ -24,7 +24,7 @@ impl Eval for RangeFirst {
 }
 
 impl Eval for RangeLast {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         let value: Value = self.0.eval(context)?;
         Ok(match value {
             Value::Integer(_) => value,
@@ -44,10 +44,10 @@ impl Eval for RangeLast {
 }
 
 impl Eval for RangeExpression {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         Ok(
             match (self.first.eval(context)?, self.last.eval(context)?) {
-                (Value::Integer(first), Value::Integer(last)) => Value::Array(Array::new(
+                (Value::Integer(first), Value::Integer(last)) => Value::Array(Array::from_values(
                     (first..last + 1).map(Value::Integer).collect(),
                     Type::Integer,
                 )),
@@ -58,7 +58,7 @@ impl Eval for RangeExpression {
 }
 
 impl Eval for ArrayExpression {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         match &self.inner {
             ArrayExpressionInner::Range(range_expression) => range_expression.eval(context),
             ArrayExpressionInner::List(expressions) => {
@@ -71,7 +71,8 @@ impl Eval for ArrayExpression {
 
                 match value_list.types().common_type() {
                     Some(common_type) => {
-                        match Value::Array(Array::new(value_list, common_type)) * self.unit {
+                        match Value::Array(Array::from_values(value_list, common_type)) * self.unit
+                        {
                             Ok(value) => Ok(value),
                             Err(err) => {
                                 context.error(self, err)?;
@@ -93,7 +94,7 @@ impl Eval for ArrayExpression {
 }
 
 impl Eval<Option<Symbol>> for QualifiedName {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<Symbol>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<Symbol>> {
         match context.lookup(self) {
             Ok(symbol) => Ok(Some(symbol.clone())),
             Err(error) => {
@@ -105,38 +106,48 @@ impl Eval<Option<Symbol>> for QualifiedName {
 }
 
 impl Eval for QualifiedName {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
-        match &context.lookup(self)?.borrow().def {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
+        context.lookup(self)?.with_def(|def| match def {
             SymbolDefinition::Constant(.., value) | SymbolDefinition::Argument(_, value) => {
                 Ok(value.clone())
             }
-            SymbolDefinition::Module(ns) => Err(EvalError::UnexpectedNested("mod", ns.id.clone())),
+            SymbolDefinition::ConstExpression(.., expr) => expr.eval(context),
+            SymbolDefinition::SourceFile(_) => Ok(Value::None),
+
+            SymbolDefinition::Module(ns) => {
+                context.error(self, EvalError::UnexpectedNested("mod", ns.id.clone()))?;
+                Ok(Value::None)
+            }
             SymbolDefinition::Workbench(w) => {
-                Err(EvalError::UnexpectedNested(w.kind.as_str(), w.id.clone()))
+                context.error(
+                    self,
+                    EvalError::UnexpectedNested(w.kind.as_str(), w.id.clone()),
+                )?;
+                Ok(Value::None)
             }
             SymbolDefinition::Function(f) => {
-                Err(EvalError::UnexpectedNested("function", f.id.clone()))
+                context.error(self, EvalError::UnexpectedNested("function", f.id.clone()))?;
+                Ok(Value::None)
             }
             SymbolDefinition::Builtin(bm) => {
-                Err(EvalError::UnexpectedNested("builtin", bm.id.clone()))
+                context.error(self, EvalError::UnexpectedNested("builtin", bm.id.clone()))?;
+                Ok(Value::None)
             }
             SymbolDefinition::Alias(_, id, _) => {
-                unreachable!("Unexpected alias {id} in expression")
-            }
-            SymbolDefinition::SourceFile(sf) => {
+                // Alias should have been resolved within previous lookup()
                 unreachable!(
-                    "Unexpected source file {} in expression",
-                    sf.filename_as_str()
+                    "Unexpected alias {id} in value expression at {}",
+                    self.src_ref()
                 )
             }
             SymbolDefinition::UseAll(_, name) => {
-                unreachable!("Unexpected use {name} in expression")
+                unreachable!("Unexpected use {name} in value expression")
             }
             #[cfg(test)]
             SymbolDefinition::Tester(..) => {
                 unreachable!()
             }
-        }
+        })
     }
 }
 
@@ -148,7 +159,7 @@ impl Expression {
     pub fn eval_with_attribute_list(
         &self,
         attribute_list: &AttributeList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Value> {
         let value = self.eval(context)?;
         match value {
@@ -162,7 +173,7 @@ impl Expression {
                 if !attribute_list.is_empty() {
                     context.error(
                         attribute_list,
-                        AttributeError::CannotAssignAttribute(self.clone().into()),
+                        AttributeError::CannotAssignAttribute(self.to_string()),
                     )?;
                 }
                 Ok(value)
@@ -172,7 +183,7 @@ impl Expression {
 }
 
 impl Eval for Expression {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         log::trace!("Evaluating expression:\n{self}");
         let result = match self {
             Self::Literal(literal) => literal.eval(context),
@@ -239,8 +250,11 @@ impl Eval for Expression {
             Self::MethodCall(lhs, method_call, _) => method_call.eval(context, lhs),
             Self::Call(call) => call.eval(context),
             Self::Body(body) => {
-                let model: Model = body.eval(context)?;
-                Ok(model.into())
+                if let Some(model) = body.eval(context)? {
+                    Ok(model.into())
+                } else {
+                    Ok(Value::None)
+                }
             }
             Self::QualifiedName(qualified_name) => qualified_name.eval(context),
             Self::Marker(marker) => {
@@ -275,15 +289,15 @@ impl Eval for Expression {
             expr => todo!("{expr:?}"),
         };
         match &result {
-            Ok(result) => log::trace!("Evaluated expression:\n{self}\n--- into ---\n{result}"),
-            Err(_) => log::trace!("Evaluation of expression failed:\n{self}"),
+            Ok(result) => log::trace!("Evaluated expression:\n{self:?}\n--- into ---\n{result:?}"),
+            Err(_) => log::trace!("Evaluation of expression failed:\n{self:?}"),
         };
         result
     }
 }
 
 impl Eval<Option<Model>> for Expression {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<Model>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<Model>> {
         Ok(match self.eval(context)? {
             Value::Model(model) => Some(model),
             _ => None,

@@ -137,7 +137,6 @@ impl WriteSvg for Geometry2D {
             Geometry2D::Polygon(polygon) => polygon.write_svg(writer, attr),
             Geometry2D::MultiPolygon(multi_polygon) => multi_polygon.write_svg(writer, attr),
             Geometry2D::Rect(rect) => rect.write_svg(writer, attr),
-            Geometry2D::Circle(circle) => circle.write_svg(writer, attr),
             Geometry2D::Line(edge) => edge.write_svg(writer, attr),
             Geometry2D::Collection(collection) => collection.write_svg(writer, attr),
         }
@@ -468,14 +467,14 @@ pub struct SizeMeasure {
 
 impl SizeMeasure {
     /// Size measure for something that has bounds.
-    pub fn bounds<T: FetchBounds2D>(bounds: &T) -> Self {
-        let bounds = bounds.fetch_bounds_2d();
+    pub fn bounds<T: CalcBounds2D>(bounds: &T) -> Self {
+        let bounds = bounds.calc_bounds_2d();
 
         if let Some(rect) = bounds.rect() {
             Self {
                 bounds: bounds.clone(),
-                width: Some(EdgeLengthMeasure::width(rect, 7.0, None)),
-                height: Some(EdgeLengthMeasure::height(rect, 7.0, None)),
+                width: Some(EdgeLengthMeasure::width(&rect, 7.0, None)),
+                height: Some(EdgeLengthMeasure::height(&rect, 7.0, None)),
             }
         } else {
             Self {

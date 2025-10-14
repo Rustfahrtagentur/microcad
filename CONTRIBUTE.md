@@ -104,21 +104,21 @@ There is a [script](https://github.com/Rustfahrtagentur/microcad/tree/master/upd
 
 #### Test results and marks
 
-| Image                                            | MD Code Type | Mark         | Code                                     | What do do?            |
-| ------------------------------------------------ | ------------ | ------------ | ---------------------------------------- | ---------------------- |
-| ![fail_ok](tests/images/fail_ok.svg)             | `µcad`       | `#fail`      | fails intentionally                      | ok                     |
-| ![fail_wrong](tests/images/fail_wrong.svg)       | `µcad`       | `#fail`      | fails but with wrong errors              | fix test or code       |
-| ![fail](tests/images/fail.svg)                   | `µcad`       |              | fails                                    | fix test or code       |
-| ![not_todo_fail](tests/images/not_todo_fail.svg) | `µcad`       | `#todo_fail` | Fails as expected but still marked to do | remove `#todo_`        |
-| ![not_todo](tests/images/not_todo.svg)           | `µcad`       | `#todo`      | Succeeds but still marked to do          | remove `#todo`         |
-| ![ok_fail](tests/images/ok_fail.svg)             | `µcad`       | `#fail`      | succeeds but should fail                 | find out why           |
-| ![ok](tests/images/ok.svg)                       | `µcad`       |              | succeeds                                 | ok                     |
-| ![parse_fail](tests/images/parse_fail.svg)       | `µcad`       | -            | Parsing has failed                       | fix grammar            |
-| ![todo_fail](tests/images/todo_fail.svg)         | `µcad`       | `#todo_fail` | needs more work to fail                  | create issue/implement |
-| ![todo](tests/images/todo.svg)                   | `µcad`       | `#todo`      | needs more work to succeed               | create issue/implement |
-| -                                                | `µcad`       | `#no-test`   | Ignore completely                        | yolo!                  |
-| -                                                | -            | -            | Ignore completely                        | yolo!                  |
-| -                                                | *(other)*    | -            | Ignore completely                        | yolo!                  |
+| Image                                            | MD Code Type | Mark                      | Code                                     | What do do?            |
+| ------------------------------------------------ | ------------ | ------------------------- | ---------------------------------------- | ---------------------- |
+| ![fail_ok](tests/images/fail_ok.svg)             | `µcad`       | `#fail`,`#warn`           | Fails intentionally                      | ok                     |
+| ![fail_wrong](tests/images/fail_wrong.svg)       | `µcad`       | `#fail`,`#warn`           | Fails but with wrong errors or warnings  | fix test or code       |
+| ![fail](tests/images/fail.svg)                   | `µcad`       |                           | Fails                                    | fix test or code       |
+| ![not_todo_fail](tests/images/not_todo_fail.svg) | `µcad`       | `#todo_fail`,`#todo_warn` | Fails as expected but still marked to do | remove `#todo_`        |
+| ![not_todo](tests/images/not_todo.svg)           | `µcad`       | `#todo`                   | Succeeds but still marked to do          | remove `#todo`         |
+| ![ok_fail](tests/images/ok_fail.svg)             | `µcad`       | `#fail`                   | Succeeds but should fail                 | find out why           |
+| ![ok](tests/images/ok.svg)                       | `µcad`       |                           | Succeeds                                 | ok                     |
+| ![parse_fail](tests/images/parse_fail.svg)       | `µcad`       | -                         | Parsing has failed                       | fix grammar            |
+| ![todo_fail](tests/images/todo_fail.svg)         | `µcad`       | `#todo_fail`,`#todo_warn` | Needs more work to fail (proper)         | create issue/implement |
+| ![todo](tests/images/todo.svg)                   | `µcad`       | `#todo`                   | Needs more work to succeed               | create issue/implement |
+| -                                                | `µcad`       | `#no-test`                | Ignore completely                        | yolo!                  |
+| -                                                | -            | -                         | Ignore completely                        | yolo!                  |
+| -                                                | *(other)*    | -                         | Ignore completely                        | yolo!                  |
 
 #### Mark errors and warnings
 

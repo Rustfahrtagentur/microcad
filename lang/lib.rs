@@ -40,7 +40,7 @@ fn init() {
     env_logger::init();
 }
 
-const MICROCAD_EXTENSIONS: &[&str] = &[".µcad", ".mcad"];
+const MICROCAD_EXTENSIONS: &[&str] = &["µcad", "mcad", "ucad"];
 
 /// Parse a rule from given string into a syntax element.
 /// - `ty`: Type of the output syntax element
@@ -73,7 +73,11 @@ pub fn shorten(what: &str, max_chars: usize) -> String {
             if p == max_chars {
                 Some('…')
             } else if p < max_chars {
-                if ch == '\n' { Some('⏎') } else { Some(ch) }
+                if ch == '\n' {
+                    Some('⏎')
+                } else {
+                    Some(ch)
+                }
             } else {
                 None
             }
@@ -110,19 +114,19 @@ macro_rules! shorten {
 #[macro_export]
 macro_rules! mark {
     (FOUND) => {
-        color_print::cformat!("<W!,k,s> FOUND </>")
+        color_print::cformat!("<G!,k,s> FOUND </>")
     };
     (FOUND_INTERIM) => {
-        color_print::cformat!("<Y!,k,s> FOUND </>")
-    };
-    (FOUND_FINAL) => {
-        color_print::cformat!("<G!,k,s> FOUND </>")
+        color_print::cformat!("<W!,k,s> FOUND </>")
     };
     (MATCH) => {
         color_print::cformat!("<Y!,k,s> MATCH </>")
     };
     (CALL) => {
         color_print::cformat!("<B,k,s> CALL </>")
+    };
+    (LOOKUP) => {
+        color_print::cformat!("<c,s>LOOKUP</>")
     };
     (LOAD) => {
         color_print::cformat!("<Y,k,s> LOADING </>")
@@ -159,6 +163,9 @@ macro_rules! found {
     (CALL) => {
         "Call"
     };
+    (LOOKUP) => {
+        "Lookup"
+    };
     (LOAD) => {
         "Loading"
     };
@@ -171,7 +178,7 @@ macro_rules! found {
     (NOT_FOUND) => {
         "Not found"
     };
-    (NOT_FOUND_INTERIMEDIATE) => {
+    (NOT_FOUND_INTERIM) => {
         "Not found"
     };
 }
@@ -181,7 +188,7 @@ macro_rules! found {
 #[macro_export]
 macro_rules! invalid {
     (VALUE) => {
-        color_print::cstr!("<R!,k,s> INVALID VALUE </>")
+        color_print::cstr!("<R!,k,s> NO VALUE </>")
     };
     (TYPE) => {
         color_print::cstr!("<R!,k,s> INVALID TYPE </>")
@@ -225,7 +232,7 @@ macro_rules! invalid {
 #[macro_export]
 macro_rules! invalid_no_ansi {
     (VALUE) => {
-        "<INVALID VALUE>"
+        "<NO VALUE>"
     };
     (TYPE) => {
         "<INVALID TYPE>"

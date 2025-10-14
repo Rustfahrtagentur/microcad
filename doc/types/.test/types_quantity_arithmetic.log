@@ -19,10 +19,6 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group (root) ->
-
+-- No model --
 -- Test Result --
 OK
-Could not determine output type.
-Nothing will be exported.

@@ -40,7 +40,7 @@ use __builtin::*;
 ```µcad,builtin_extrude
 use __builtin::*;
 
-a = geo2d::Circle(radius = 8.0) - geo2d::Circle(radius = 4.0, cx = [-3.0, 3.0], cy = [-3.0, 3.0]);
+a = geo2d::Circle(radius = 9.0) - geo2d::Circle(radius = 2.0, cx = [-3.0, 3.0], cy = [-3.0, 3.0]);
 
 a.ops::extrude(height = 4.0, n_divisions = 0, twist_degrees = 0.0, scale_top_x = 1.0, scale_top_y = 1.0);
 ```
@@ -56,7 +56,7 @@ use __builtin::*;
 
 std::geo2d::Circle(10mm)
     .ops::translate(x = 20.0, y = 0.0, z = 0.0)
-    .ops::revolve(circular_segments = 64, revolve_degrees = 360.0);
+    .ops::revolve(revolve_degrees = 360.0);
 ```
 
 ### `rotate`

@@ -50,16 +50,16 @@ pub enum EvalError {
     SymbolFound(QualifiedName),
 
     /// The symbol cannot be called, e.g. when it is a source file or a module.
-    #[error("Symbol `{0}` cannot be called {1}.")]
-    SymbolCannotBeCalled(QualifiedName, Box<SymbolDefinition>),
+    #[error("Symbol `{0}` cannot be called.")]
+    SymbolCannotBeCalled(QualifiedName),
 
     /// Found ambiguous symbols.
-    #[error("Ambiguous symbol {ambiguous} might be one of the following:\n{others}")]
+    #[error("Ambiguous symbol {ambiguous} might be one of the following: {others}")]
     AmbiguousSymbol {
         /// Searched name
         ambiguous: QualifiedName,
         /// Symbols which matches the name
-        others: Symbols,
+        others: String,
     },
 
     /// Local Symbol not found.
@@ -70,20 +70,20 @@ pub enum EvalError {
     #[error("Property not found: {0}")]
     PropertyNotFound(Identifier),
 
+    /// A property of a value was not found.
+    #[error("Not a property id: {0}")]
+    NoPropertyId(QualifiedName),
+
     /// Argument count mismatch.
     #[error("Argument count mismatch: expected {expected}, got {found} in {args}")]
     ArgumentCountMismatch {
         /// Argument list including the error
-        args: ArgumentValueList,
+        args: String,
         /// Expected number of arguments
         expected: usize,
         /// Found number of arguments
         found: usize,
     },
-
-    /// Called assertion
-    #[error("assert called with wrong number of arguments.")]
-    AssertWrongSignature(ArgumentValueList),
 
     /// Invalid argument type.
     #[error("Invalid argument type: {0}")]
@@ -106,9 +106,9 @@ pub enum EvalError {
         found: Type,
     },
 
-    /// Cannot continue evaluation after error limit has been reached.
-    #[error("Error limit reached: Stopped evaluation after {0} errors")]
-    ErrorLimitReached(u32),
+    /// Diagnostic error
+    #[error("Diagnostic error: {0}")]
+    DiagError(#[from] DiagError),
 
     /// No locals  available on stack.
     #[error("Local stack needed to store {0}")]
@@ -176,7 +176,7 @@ pub enum EvalError {
 
     /// A condition of an if statement is not a boolean
     #[error("If condition is not a boolean: {0}")]
-    IfConditionIsNotBool(Value),
+    IfConditionIsNotBool(String),
 
     /// Workbench didn't find a initialization routine matching the given arguments
     #[error("Workbench {0} cannot find initialization for those arguments")]
@@ -189,6 +189,10 @@ pub enum EvalError {
     /// This errors happens if the expression is supposed to produce models but did not.
     #[error("This expression statement did not produce any model")]
     EmptyModelExpression,
+
+    /// Workbench with empty body - suspicious!
+    #[error("{0} {1} has empty body")]
+    WarnEmptyWorkbench(String, Identifier),
 
     /// This error happens if the workbench produced a different output type.
     #[error("The {0} workbench produced a 2D output, but expected {2} output.")]
@@ -203,8 +207,8 @@ pub enum EvalError {
     InvalidSelfReference(Identifier),
 
     /// Resolve Error
-    #[error("Resolve error {0}")]
-    ResolveError(#[from] ResolveError),
+    #[error("Resolve error: {0}")]
+    ResolveError(ResolveError),
 
     /// Unexpected source file in expression
     #[error("{0} is not operation.")]
@@ -230,9 +234,9 @@ pub enum EvalError {
     #[error("Found a symbol and a property with names {0} and {1}")]
     AmbiguousProperty(QualifiedName, Identifier),
 
-    /// Assignment failed because value already has been initialized
-    #[error("Value {0} already has been initialized with {1} (at line {2})")]
-    ValueAlreadyInitialized(Identifier, Value, SrcRef),
+    /// Assignment failed because value already has been defined before.
+    #[error("Value {0} already in defined: {1} (at line {2})")]
+    ValueAlreadyDefined(Identifier, String, SrcRef),
 
     /// Assignment failed because left side is not an l-value
     #[error("Assignment failed because {0} is not an l-value")]
@@ -257,7 +261,20 @@ pub enum EvalError {
         /// where it was searched
         within: QualifiedName,
     },
+
+    /// Evaluation aborted because of prior resolve errors
+    #[error("Evaluation aborted because of prior resolve errors!")]
+    ResolveFailed,
 }
 
 /// Result type of any evaluation.
 pub type EvalResult<T> = std::result::Result<T, EvalError>;
+
+impl From<ResolveError> for EvalError {
+    fn from(err: ResolveError) -> Self {
+        match err {
+            ResolveError::SymbolNotFound(name) => EvalError::SymbolNotFound(name),
+            other => EvalError::ResolveError(other),
+        }
+    }
+}

@@ -3,14 +3,14 @@
 
 //! µcad Type
 
-use crate::{syntax::*, ty::*};
+use crate::ty::*;
 
 /// µcad Basic Types
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Type {
     /// Invalid type (used for error handling)
     Invalid,
-    /// A 64-bit integer number: `Interger: 10`.
+    /// A 64-bit integer number: `Integer: 10`.
     Integer,
     /// A quantity type: `Scalar: 1.0`, `Length: 1.0mm`
     Quantity(QuantityType),
@@ -26,8 +26,8 @@ pub enum Type {
     Matrix(MatrixType),
     /// Models.
     Models,
-    /// A custom type in the syntax tree
-    Custom(QualifiedName),
+    /// used for assert_valid() and assert_invalid()
+    Target,
 }
 
 impl Type {
@@ -113,7 +113,7 @@ impl std::fmt::Display for Type {
             Self::Tuple(t) => write!(f, "{t}"),
             Self::Matrix(t) => write!(f, "{t}"),
             Self::Models => write!(f, "Models"),
-            Self::Custom(n) => write!(f, "Custom({n})"),
+            Self::Target => write!(f, "Target"),
         }
     }
 }
@@ -130,7 +130,7 @@ impl std::fmt::Debug for Type {
             Self::Tuple(t) => write!(f, "{t}"),
             Self::Matrix(t) => write!(f, "{t}"),
             Self::Models => write!(f, "Models"),
-            Self::Custom(n) => write!(f, "Custom({n})"),
+            Self::Target => write!(f, "Target"),
         }
     }
 }
@@ -138,6 +138,7 @@ impl std::fmt::Debug for Type {
 #[test]
 fn builtin_type() {
     use crate::parser::*;
+    use crate::syntax::*;
 
     let ty = Parser::parse_rule::<TypeAnnotation>(Rule::r#type, "Integer", 0).expect("test error");
     assert_eq!(ty.0.to_string(), "Integer");

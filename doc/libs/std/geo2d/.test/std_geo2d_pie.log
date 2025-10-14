@@ -1,0 +1,21 @@
+-- Test --
+  std_geo2d_pie
+  ../doc/libs/std/geo2d/README.md:9
+
+-- Code --
+
+ 1: std::geo2d::Pie(radius = 20mm, start_angle = 45°, end_angle = 135°);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group (root) ->
+    Workpiece(sketch) std::geo2d::Pie(end_angle=2.35619449019234rad, radius=20mm, start_angle=0.78539816339745rad) ->
+      - end_angle = 2.35619449019234rad
+      - radius = 20mm
+      - start_angle = 0.78539816339745rad
+      Primitive2D __builtin::geo2d::Pie(end_angle=2.35619449019234rad, radius=20, start_angle=0.78539816339745rad) ->
+
+Export successful.
+-- Test Result --
+OK

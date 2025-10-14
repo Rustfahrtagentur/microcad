@@ -6,12 +6,12 @@
 use crate::{ord_map::*, src_ref::*, syntax::*};
 
 /// Argument in a [`Call`].
-#[derive(Clone, Debug)]
+#[derive(Clone, PartialEq)]
 pub struct Argument {
     /// Name of the argument
     pub id: Option<Identifier>,
     /// Value of the argument
-    pub value: Expression,
+    pub expression: Expression,
     /// Source code reference
     pub src_ref: SrcRef,
 }
@@ -21,7 +21,7 @@ impl Argument {
     pub fn derived_name(&self) -> Option<Identifier> {
         match &self.id {
             Some(name) => Some(name.clone()),
-            None => self.value.single_identifier().cloned(),
+            None => self.expression.single_identifier().cloned(),
         }
     }
 }
@@ -41,8 +41,17 @@ impl OrdMapValue<Identifier> for Argument {
 impl std::fmt::Display for Argument {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self.id {
-            Some(ref id) => write!(f, "{id:?} = {}", self.value),
-            None => write!(f, "{}", self.value),
+            Some(ref id) => write!(f, "{id} = {}", self.expression),
+            None => write!(f, "{}", self.expression),
+        }
+    }
+}
+
+impl std::fmt::Debug for Argument {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self.id {
+            Some(ref id) => write!(f, "{id:?} = {:?}", self.expression),
+            None => write!(f, "{:?}", self.expression),
         }
     }
 }
@@ -54,6 +63,36 @@ impl TreeDisplay for Argument {
             None => writeln!(f, "{:depth$}Argument:", "")?,
         };
         depth.indent();
-        self.value.tree_print(f, depth)
+        self.expression.tree_print(f, depth)
     }
+}
+
+#[test]
+fn test_argument_debug() {
+    let arg1 = Argument {
+        id: Some("id1".into()),
+        expression: Expression::QualifiedName("my::name1".into()),
+        src_ref: SrcRef(None),
+    };
+
+    let arg2 = Argument {
+        id: None,
+        expression: Expression::QualifiedName("my::name2".into()),
+        src_ref: SrcRef(None),
+    };
+
+    let arg3 = Argument {
+        id: Some(Identifier::none()),
+        expression: Expression::QualifiedName("my::name2".into()),
+        src_ref: SrcRef(None),
+    };
+
+    let mut args = ArgumentList::default();
+
+    args.try_push(arg1).expect("test error");
+    args.try_push(arg2).expect("test error");
+    args.try_push(arg3).expect("test error");
+
+    log::info!("{args}");
+    log::info!("{args:?}");
 }

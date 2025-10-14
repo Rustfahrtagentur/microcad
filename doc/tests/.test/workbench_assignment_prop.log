@@ -12,9 +12,9 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::K() ->
+    Workpiece(sketch) workbench_assignment_prop::K() ->
       - a = 1
 
+Export error: Render error: Nothing to render
 -- Test Result --
 OK
-Export error: Render error: Nothing to render

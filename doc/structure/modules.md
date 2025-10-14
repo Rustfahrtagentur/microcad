@@ -9,7 +9,7 @@ TODO
 [![test](.test/mod_example.svg)](.test/mod_example.log)
 
 ```µcad,mod_example
-mod std {
+mod my {
     mod math {
         // define PI as property
         const PI = 3.14159;
@@ -22,5 +22,5 @@ mod std {
 }
 
 // call both
-x = std::math::abs(-1) * std::math::PI;
+x = my::math::abs(-1.0) * my::math::PI;
 ```

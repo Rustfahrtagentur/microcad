@@ -17,8 +17,8 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::YourSketch() ->
+    Workpiece(sketch) create::YourSketch() ->
 
+Export error: Render error: Nothing to render
 -- Test Result --
 OK
-Export error: Render error: Nothing to render

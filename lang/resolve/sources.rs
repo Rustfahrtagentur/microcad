@@ -3,6 +3,8 @@
 
 //! Source file cache
 
+use derive_more::Deref;
+
 use crate::{parse::*, rc::*, resolve::*, src_ref::*, syntax::*};
 use std::collections::HashMap;
 
@@ -13,7 +15,7 @@ use std::collections::HashMap;
 ///
 /// The *root model* (given at creation) will be stored but will only be accessible by hash and path
 /// but not by it's qualified name.
-#[derive(Default)]
+#[derive(Default, Deref)]
 pub struct Sources {
     /// External files read from search path.
     externals: Externals,
@@ -22,8 +24,12 @@ pub struct Sources {
     by_path: HashMap<std::path::PathBuf, usize>,
     by_name: HashMap<QualifiedName, usize>,
 
+    //root source file.
+    root: Rc<SourceFile>,
+
     /// External source files.
-    source_files: Vec<Rc<SourceFile>>,
+    #[deref]
+    pub source_files: Vec<Rc<SourceFile>>,
 
     /// Search paths.
     search_paths: Vec<std::path::PathBuf>,
@@ -33,7 +39,10 @@ impl Sources {
     /// Create source cache
     ///
     /// Inserts the `root` file and loads all files from `search_paths`.
-    pub fn load(root: Rc<SourceFile>, search_paths: &[std::path::PathBuf]) -> ParseResult<Self> {
+    pub fn load(
+        root: Rc<SourceFile>,
+        search_paths: &[impl AsRef<std::path::Path>],
+    ) -> ResolveResult<Self> {
         let mut source_files = Vec::new();
         let mut by_name = HashMap::new();
         let mut by_hash = HashMap::new();
@@ -42,10 +51,10 @@ impl Sources {
         by_hash.insert(root.hash, 0);
         by_path.insert(root.filename(), 0);
         by_name.insert(root.name.clone(), 0);
-        source_files.push(root);
+        source_files.push(root.clone());
 
         // search for external source files
-        let externals = Externals::new(search_paths);
+        let externals = Externals::new(search_paths)?;
 
         log::trace!("Externals:\n{externals}");
 
@@ -64,92 +73,82 @@ impl Sources {
 
         Ok(Self {
             externals,
+            root,
             source_files,
             by_hash,
             by_path,
             by_name,
-            search_paths: search_paths.to_vec(),
+            search_paths: search_paths
+                .iter()
+                .map(|path| path.as_ref().canonicalize().expect("valid path"))
+                .collect(),
         })
     }
 
     /// Return root file.
     pub fn root(&self) -> Rc<SourceFile> {
-        self.source_files
-            .first()
-            .expect("empty source cache has not root")
-            .clone()
+        self.root.clone()
     }
 
-    /// Creates symbol map from externals.
-    fn create_modules(externals: &Externals) -> SymbolMap {
-        let mut map = SymbolMap::new();
-        externals.iter().for_each(|(basename, _)| {
-            let (id, name) = basename.split_first();
-            let module = match map.get(&id) {
-                Some(symbol) => symbol.clone(),
-                _ => Symbol::new(
-                    SymbolDefinition::Module(ModuleDefinition::new(Visibility::Public, id.clone())),
-                    None,
-                ),
-            };
-            Self::recursive_create_modules(&module, &name);
-            map.insert(id.clone(), module);
-        });
-        map
-    }
-
-    fn recursive_create_modules(parent: &Symbol, name: &QualifiedName) -> Option<Symbol> {
-        if name.is_empty() {
-            return None;
-        }
-
-        let node_id = name.first().expect("Non-empty qualified name");
-        if let Some(child) = parent.get(node_id) {
-            return Some(child.clone());
-        }
-
-        let child = Symbol::new(
-            SymbolDefinition::Module(ModuleDefinition::new(Visibility::Public, node_id.clone())),
-            None,
-        );
-        Symbol::add_child(parent, child.clone());
-
-        Self::recursive_create_modules(&child, &name.remove_first());
-        Some(child)
-    }
-
-    /// Create initial symbol map from externals.
-    pub fn resolve(&self) -> ResolveResult<SymbolMap> {
-        let mut symbols = Self::create_modules(&self.externals);
-        symbols.insert(
-            self.root().id(),
-            Symbol::new(SymbolDefinition::SourceFile(self.root()), None),
-        );
-
-        self.source_files
-            .iter()
-            .try_for_each(|source_file| -> Result<(), ResolveError> {
-                let name = &source_file.name;
-                log::trace!(
-                    "{resolve} file {path:?} [{name}]",
-                    resolve = crate::mark!(RESOLVE),
-                    path = source_file.filename(),
-                );
-                let symbol = source_file.resolve()?;
-
-                // search module where to place loaded source file into
-                let target = symbols.search(name)?;
-                target.move_children(&symbol);
-
-                Ok(())
-            })?;
-
-        Ok(symbols)
+    /// Insert a file to the sources.
+    pub fn insert(&mut self, source_file: Rc<SourceFile>) {
+        let index = self.source_files.len();
+        self.source_files.push(source_file.clone());
+        self.by_hash.insert(source_file.hash, index);
+        self.by_path.insert(source_file.filename(), index);
+        self.by_name.insert(source_file.name.clone(), index);
     }
 
     /// Return the qualified name of a file by it's path
-    pub fn name_by_path(&self, filename: &std::path::Path) -> ResolveResult<QualifiedName> {
-        Ok(self.externals.get_name(filename)?.clone())
+    pub fn generate_name_from_path(
+        &self,
+        file_path: &std::path::Path,
+    ) -> ResolveResult<QualifiedName> {
+        // check root file name
+        if self.root.filename() == file_path {
+            return Ok(QualifiedName::from_id(self.root.id()));
+        }
+
+        // check file names relative to search paths
+        let path = if let Some(path) = self
+            .search_paths
+            .iter()
+            .find_map(|path| file_path.strip_prefix(path).ok())
+        {
+            path.with_extension("")
+        }
+        // check file names relative to project root directory
+        else if let Some(root_dir) = self.root_dir() {
+            if let Ok(path) = file_path.strip_prefix(root_dir) {
+                path.with_extension("")
+            } else {
+                return Err(ResolveError::InvalidPath(file_path.to_path_buf()));
+            }
+        } else {
+            return Err(ResolveError::InvalidPath(file_path.to_path_buf()));
+        };
+
+        // check if file is a mod file then it gets it"s name from the parent directory
+        let path = if path
+            .iter()
+            .next_back()
+            .map(|s| s.to_string_lossy().to_string())
+            == Some("mod".into())
+        {
+            path.parent()
+        } else {
+            Some(path.as_path())
+        };
+
+        // get name from path which was found
+        if let Some(path) = path {
+            Ok(path
+                .iter()
+                .map(|name| Identifier::no_ref(name.to_string_lossy().as_ref()))
+                .collect())
+        } else {
+            Err(ResolveError::InvalidPath(file_path.to_path_buf()))
+        }
     }
 
     /// Convenience function to get a source file by from a `SrcReferrer`.
@@ -216,6 +215,24 @@ impl Sources {
     pub fn search_paths(&self) -> &Vec<std::path::PathBuf> {
         &self.search_paths
     }
+
+    fn root_dir(&self) -> Option<std::path::PathBuf> {
+        self.root.filename().parent().map(|p| p.to_path_buf())
+    }
+
+    /// Load another source file into cache.
+    pub fn load_file(
+        &mut self,
+        parent_path: impl AsRef<std::path::Path>,
+        id: &Identifier,
+    ) -> ResolveResult<Rc<SourceFile>> {
+        log::trace!("load_file: {:?} {id}", parent_path.as_ref());
+        let file_path = find_mod_file_by_id(parent_path, id)?;
+        let name = self.generate_name_from_path(&file_path)?;
+        let source_file = SourceFile::load_with_name(&file_path, name)?;
+        self.insert(source_file.clone());
+        Ok(source_file)
+    }
 }
 
 /// Trait that can fetch for a file by it's hash value.
@@ -238,6 +255,20 @@ impl GetSourceByHash for Sources {
 }
 
 impl std::fmt::Display for Sources {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for (index, source_file) in self.source_files.iter().enumerate() {
+            let filename = source_file.filename_as_str();
+            let name = self
+                .name_from_index(index)
+                .unwrap_or(QualifiedName::no_ref(vec![]));
+            let hash = source_file.hash;
+            writeln!(f, "[{index}] {name} {hash:#x} {filename}")?;
+        }
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for Sources {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (index, source_file) in self.source_files.iter().enumerate() {
             let filename = source_file.filename_as_str();

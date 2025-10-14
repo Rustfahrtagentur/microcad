@@ -5,14 +5,16 @@
 
 mod boolean_op;
 
+pub mod bounds;
 pub mod color;
 pub mod core_error;
 pub mod geo2d;
 #[cfg(feature = "geo3d")]
 pub mod geo3d;
-pub mod render_resolution;
+pub mod render;
 pub mod theme;
 pub mod traits;
+pub mod triangle;
 
 /// Primitive integer type
 pub type Integer = i64;
@@ -34,8 +36,10 @@ pub type Mat4 = cgmath::Matrix4<Scalar>;
 pub type Angle = cgmath::Rad<Scalar>;
 
 pub use boolean_op::BooleanOp;
+pub use bounds::*;
 pub use color::*;
 pub use core_error::*;
 pub use geo2d::*;
 pub use geo3d::*;
-pub use render_resolution::*;
+pub use render::*;
+pub use triangle::*;

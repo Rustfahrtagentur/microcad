@@ -15,8 +15,8 @@ pub struct Circle {
     pub offset: Vec2,
 }
 
-impl FetchBounds2D for Circle {
-    fn fetch_bounds_2d(&self) -> Bounds2D {
+impl CalcBounds2D for Circle {
+    fn calc_bounds_2d(&self) -> Bounds2D {
         use geo::Coord;
 
         if self.radius > 0.0 {
@@ -38,13 +38,10 @@ impl FetchPoints2D for Circle {
     }
 }
 
-impl RenderToMultiPolygon for Circle {
-    fn render_to_polygon(&self, resolution: &RenderResolution) -> Option<Polygon> {
+impl Render<Polygon> for Circle {
+    fn render(&self, resolution: &RenderResolution) -> Polygon {
         use std::f64::consts::PI;
-
-        let n = (self.radius / resolution.linear * PI * 0.5).max(3.0);
-        let n = 2_u32.pow(n.log2().ceil() as u32).min(1024);
-
+        let n = resolution.circular_segments(self.radius);
         let points = (0..n)
             .map(|i| {
                 let angle = 2.0 * PI * (i as f64) / (n as f64);
@@ -52,6 +49,6 @@ impl RenderToMultiPolygon for Circle {
             })
             .collect();
 
-        Some(Polygon::new(LineString::new(points), vec![]))
+        Polygon::new(LineString::new(points), vec![])
     }
 }

@@ -41,7 +41,7 @@ thickness = 4mm;
 icon = microcad::Icon(radius);
 icon;
 
-microcad::Micro(radius, thickness).translate(x=radius*2+gap, y=-radius/2);
+microcad::Micro(radius, thickness).translate(x=radius*2+icon.gap, y=-radius/2);
 
 ```
 

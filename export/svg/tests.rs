@@ -200,7 +200,7 @@ fn svg_sample_sketch() -> std::io::Result<()> {
     )?;
     CenteredText {
         text: "c".into(),
-        rect: circle.fetch_bounds_2d().rect().expect("Rect"),
+        rect: circle.calc_bounds_2d().rect().expect("Rect"),
         font_size: 4.0,
     }
     .write_svg_mapped(
@@ -225,8 +225,7 @@ fn svg_sample_sketch() -> std::io::Result<()> {
 
     // Draw intersection.
     let intersection = Geometry2D::Rect(rect).boolean_op(
-        &RenderResolution::default(),
-        &Geometry2D::Circle(circle.clone()),
+        Geometry2D::Polygon(circle.render(&RenderResolution::default())),
         &BooleanOp::Intersect,
     );
 

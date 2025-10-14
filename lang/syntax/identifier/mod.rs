@@ -6,14 +6,24 @@
 mod identifier_list;
 mod qualified_name;
 
+use derive_more::{Deref, DerefMut};
 pub use identifier_list::*;
 pub use qualified_name::*;
 
-use crate::{parse::*, parser::Parser, src_ref::*, syntax::*, Id};
+use crate::{Id, parse::*, parser::Parser, src_ref::*, syntax::*};
 
 /// µcad identifier
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Identifier(pub Refer<Id>);
+
+#[derive(Deref, DerefMut, Default)]
+pub(crate) struct IdentifierSet(indexmap::IndexSet<Identifier>);
+
+impl std::iter::FromIterator<Identifier> for IdentifierSet {
+    fn from_iter<T: IntoIterator<Item = Identifier>>(iter: T) -> Self {
+        IdentifierSet(indexmap::IndexSet::from_iter(iter))
+    }
+}
 
 static UNIQUE_ID_NEXT: std::sync::Mutex<usize> = std::sync::Mutex::new(0);
 
@@ -151,6 +161,12 @@ impl std::str::FromStr for Identifier {
     }
 }
 
+impl From<&std::ffi::OsStr> for Identifier {
+    fn from(value: &std::ffi::OsStr) -> Self {
+        Identifier::no_ref(value.to_string_lossy().to_string().as_str())
+    }
+}
+
 #[cfg(test)]
 impl From<&str> for Identifier {
     fn from(value: &str) -> Self {
@@ -205,22 +221,30 @@ impl TreeDisplay for Identifier {
     }
 }
 
-/// join several identifiers with `::` and return as string
-pub fn join_identifiers(identifiers: &[Identifier], separator: &str) -> String {
-    identifiers
-        .iter()
-        .map(|ident| format!("{ident}"))
-        .collect::<Vec<_>>()
-        .join(separator)
+impl std::fmt::Display for IdentifierSet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.iter()
+                .map(|id| id.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
 }
 
-/// join several identifiers with `::` and return as string
-pub fn join_identifiers_debug(identifiers: &[Identifier], separator: &str) -> String {
-    identifiers
-        .iter()
-        .map(|ident| format!("{ident:?}"))
-        .collect::<Vec<_>>()
-        .join(separator)
+impl std::fmt::Debug for IdentifierSet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.iter()
+                .map(|id| format!("{id:?}"))
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
 }
 
 #[test]

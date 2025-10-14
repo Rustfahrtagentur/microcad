@@ -83,7 +83,7 @@ impl MapToCanvas for (Scalar, Scalar) {
         let new_height = canvas.rect.height() / scale;
 
         let x = self.0 - canvas.content_rect.min().x;
-        let y = canvas.content_rect.max().y - self.1; // Flip Y
+        let y = self.1 - canvas.content_rect.min().y; // Flip Y
         let x = x / new_width * canvas.rect.width() + canvas.rect.min().x;
         let y = y / new_height * canvas.rect.height() + canvas.rect.min().y;
         (x, y)
@@ -198,7 +198,6 @@ impl MapToCanvas for Geometry2D {
                 Geometry2D::MultiPolygon(multi_polygon.map_to_canvas(canvas))
             }
             Geometry2D::Rect(rect) => Geometry2D::Rect(rect.map_to_canvas(canvas)),
-            Geometry2D::Circle(circle) => Geometry2D::Circle(circle.map_to_canvas(canvas)),
             Geometry2D::Line(edge) => Geometry2D::Line(edge.map_to_canvas(canvas)),
             Geometry2D::Collection(collection) => {
                 Geometry2D::Collection(collection.map_to_canvas(canvas))

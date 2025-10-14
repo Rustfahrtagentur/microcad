@@ -100,10 +100,53 @@
 
 -- Output --
 -- Errors --
--- Model --
-  Group (root) ->
-
+error: Assertion failed: Found valid symbol 'module::value' within module 'value_declarations'.
+  ---> <FROM STR>:87:16
+     |
+  87 | assert_invalid(module::value);
+     |                ^^^^^^^^^^^^^
+     |
+error: Assertion failed: Found valid symbol 'module::sub_module::value' within module 'value_declarations::module'.
+  ---> <FROM STR>:89:16
+     |
+  89 | assert_invalid(module::sub_module::value);
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Assertion failed: Found valid symbol 'super::value' within module 'value_declarations'.
+  ---> <FROM STR>:47:28
+     |
+  47 |             assert_invalid(super::value);
+     |                            ^^^^^^^^^^^^
+     |
+error: Assertion failed: Found valid symbol 'super::value' within module 'value_declarations'.
+  ---> <FROM STR>:61:28
+     |
+  61 |             assert_invalid(super::value);
+     |                            ^^^^^^^^^^^^
+     |
+error: Assertion failed: Found valid symbol 'param' within module '<INVALID NAME>'.
+  ---> <FROM STR>:65:28
+     |
+  65 |             assert_invalid(param);
+     |                            ^^^^^
+     |
+error: Assertion failed: Found valid symbol 'module::sub_module::PrivateWorkbench' within module 'value_declarations::module'.
+  ---> <FROM STR>:92:16
+     |
+  92 | assert_invalid(module::sub_module::PrivateWorkbench);
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+error: Assertion failed: Found valid symbol 'value' within module '<INVALID NAME>'.
+  ---> <FROM STR>:74:24
+     |
+  74 |         assert_invalid(value);
+     |                        ^^^^^
+     |
+error: Assertion failed: Found valid symbol 'sub_module::value' within module 'value_declarations'.
+  ---> <FROM STR>:76:24
+     |
+  76 |         assert_invalid(sub_module::value);
+     |                        ^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-OK
-Could not determine output type.
-Nothing will be exported.
+FAIL

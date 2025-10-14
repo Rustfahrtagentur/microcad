@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Parameters and return type of a function
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct FunctionSignature {
     /// Function's parameters
     pub parameters: ParameterList,
@@ -39,5 +39,35 @@ impl TreeDisplay for FunctionSignature {
             return_type.tree_print(f, depth)?;
         };
         Ok(())
+    }
+}
+
+impl std::fmt::Display for FunctionSignature {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "({}){}",
+            self.parameters,
+            if let Some(ret) = &self.return_type {
+                format!("-> {ret}")
+            } else {
+                String::default()
+            }
+        )
+    }
+}
+
+impl std::fmt::Debug for FunctionSignature {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "({:?}){:?}",
+            self.parameters,
+            if let Some(ret) = &self.return_type {
+                format!("-> {ret}")
+            } else {
+                String::default()
+            }
+        )
     }
 }

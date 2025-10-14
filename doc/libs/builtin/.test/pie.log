@@ -1,0 +1,17 @@
+-- Test --
+  pie
+  ../doc/libs/builtin/geo2d.md:11
+
+-- Code --
+
+ 1: __builtin::geo2d::Pie(radius = 20mm / 1mm, start_angle = 45°, end_angle = 135°);
+
+-- Output --
+-- Errors --
+-- Model --
+  Group (root) ->
+    Primitive2D __builtin::geo2d::Pie(end_angle=2.35619449019234rad, radius=20, start_angle=0.78539816339745rad) ->
+
+Export successful.
+-- Test Result --
+OK

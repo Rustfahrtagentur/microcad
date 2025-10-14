@@ -15,13 +15,13 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::Wheel(radius=1mm) ->
+    Workpiece(sketch) code::Wheel(radius=1mm) ->
       - radius = 1mm
       Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=1mm) ->
         - center = (x=0mm, y=0mm)
         - radius = 1mm
-        Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=1)⏎ ->
+        Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=1) ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

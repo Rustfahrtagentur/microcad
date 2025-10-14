@@ -109,9 +109,9 @@ impl Exporter for SvgExporter {
 
     fn export(&self, model: &Model, filename: &std::path::Path) -> Result<Value, ExportError> {
         use crate::svg::*;
-        use microcad_core::FetchBounds2D;
+        use microcad_core::CalcBounds2D;
         let settings = SvgExporterSettings::default();
-        let bounds = model.fetch_bounds_2d();
+        let bounds = model.calc_bounds_2d();
 
         if bounds.is_valid() {
             let content_rect = bounds

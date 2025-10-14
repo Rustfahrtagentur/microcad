@@ -6,7 +6,7 @@
 use crate::{src_ref::*, syntax::*};
 
 /// Function definition
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct FunctionDefinition {
     /// Visibility
     pub visibility: Visibility,
@@ -34,5 +34,17 @@ impl TreeDisplay for FunctionDefinition {
         self.signature.tree_print(f, depth)?;
         writeln!(f, "{:depth$}Body:", "")?;
         self.body.tree_print(f, depth)
+    }
+}
+
+impl std::fmt::Display for FunctionDefinition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "fn {}{}", self.id, self.signature)
+    }
+}
+
+impl std::fmt::Debug for FunctionDefinition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "fn {:?}{:?}", self.id, self.signature)
     }
 }

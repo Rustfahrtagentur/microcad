@@ -7,7 +7,6 @@ pub use __builtin::ops::align;
 
 pub op revolve(angle = 360°) {
     @input.__builtin::ops::revolve(
-        circular_segments = 64, // TODO: Make this adaptive to resolution 
         revolve_degrees = angle / 1°
     );
 }
@@ -87,7 +86,7 @@ pub op rotate(matrix: Matrix3) {
 /// An operation that scales a part.
 ///
 /// See the `init`s for examples on how to use this operation. 
-op scale(v: Vec3) {
+pub op scale(v: Vec3) {
 	/// Uniform scale.
 	/// 
 	/// * `s` - Scale factor.

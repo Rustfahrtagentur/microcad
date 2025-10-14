@@ -10,7 +10,7 @@
 
 -- Output --
 -- Errors --
-error: Use statement not available here
+error: Use statement is not available within sketch
   ---> <FROM STR>:2:3
      |
    2 |   pub use std; // error

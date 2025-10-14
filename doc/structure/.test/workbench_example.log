@@ -20,19 +20,19 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Workpiece(sketch) <NO ID>::PunchedDisk(radius=10mm) ->
+    Workpiece(sketch) workbench_example::PunchedDisk(radius=10mm) ->
       - radius = 10mm
-      Operation subtract()⏎ ->
+      Operation subtract() ->
         Group ->
           Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=10mm) ->
             - center = (x=0mm, y=0mm)
             - radius = 10mm
-            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10)⏎ ->
+            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=10) ->
           Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=5mm) ->
             - center = (x=0mm, y=0mm)
             - radius = 5mm
-            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=5)⏎ ->
+            Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=5) ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

@@ -22,7 +22,7 @@ impl Assignment {
 }
 
 impl Eval<()> for AssignmentStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<()> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<()> {
         log::debug!("Evaluating assignment statement:\n{self}");
         context.grant(self)?;
 
@@ -48,7 +48,7 @@ impl Eval<()> for AssignmentStatement {
                     context.error(
                         &self.attribute_list,
                         AttributeError::CannotAssignAttribute(
-                            self.assignment.expression.clone().into(),
+                            self.assignment.expression.to_string(),
                         ),
                     )?;
                 }
@@ -58,27 +58,37 @@ impl Eval<()> for AssignmentStatement {
 
         // lookup if we find any existing symbol
         if let Ok(symbol) = context.lookup(&QualifiedName::from_id(assignment.id.clone())) {
-            let err = match &mut symbol.borrow_mut().def {
-                SymbolDefinition::Constant(_, identifier, value) => {
+            let err = symbol.with_def_mut(|def| match def {
+                SymbolDefinition::Constant(_, id, value) => {
                     if value.is_invalid() {
                         *value = new_value.clone();
                         None
                     } else {
                         Some((
                             assignment.id.clone(),
-                            EvalError::ValueAlreadyInitialized(
-                                identifier.clone(),
-                                value.clone(),
-                                identifier.src_ref(),
+                            EvalError::ValueAlreadyDefined(
+                                id.clone(),
+                                value.to_string(),
+                                id.src_ref(),
                             ),
                         ))
                     }
+                }
+                SymbolDefinition::ConstExpression(visibility, id, expr) => {
+                    match expr.eval(context) {
+                        Ok(value) => {
+                            *def = SymbolDefinition::Constant(*visibility, id.clone(), value);
+                            None
+                        }
+                        Err(err) => Some((assignment.id.clone(), err)),
+                    };
+                    None
                 }
                 _ => Some((
                     assignment.id.clone(),
                     EvalError::NotAnLValue(assignment.id.clone()),
                 )),
-            };
+            });
             // because logging is blocked while `symbol.borrow_mut()` it must run outside the borrow
             if let Some((id, err)) = err {
                 context.error(&id, err)?;
@@ -86,7 +96,7 @@ impl Eval<()> for AssignmentStatement {
         }
 
         // now check what to do with the value
-        match assignment.qualifier {
+        match assignment.qualifier() {
             Qualifier::Const => {
                 if context.get_property(&assignment.id).is_ok() {
                     todo!("property with that name exists")

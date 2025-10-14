@@ -1,14 +1,14 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! 2D edge geometry.
+//! 2D line geometry.
 
 use cgmath::{Angle, InnerSpace, Rad};
 use geo::AffineOps;
 
 use crate::*;
 
-/// A 2D edge type.
+/// A 2D line type.
 #[derive(Debug, Clone)]
 pub struct Line(pub geo2d::Point, pub geo2d::Point);
 
@@ -62,14 +62,14 @@ impl Line {
     }
 }
 
-impl FetchBounds2D for Line {
-    fn fetch_bounds_2d(&self) -> geo2d::Bounds2D {
+impl CalcBounds2D for Line {
+    fn calc_bounds_2d(&self) -> geo2d::Bounds2D {
         geo2d::Bounds2D::new(self.0.x_y().into(), self.1.x_y().into())
     }
 }
 
 impl Transformed2D for Line {
-    fn transformed_2d(&self, _: &RenderResolution, mat: &Mat3) -> Self {
+    fn transformed_2d(&self, mat: &Mat3) -> Self {
         let transform = &geo2d::mat3_to_affine_transform(mat);
         Self(
             self.0.affine_transform(transform),

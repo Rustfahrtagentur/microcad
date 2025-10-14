@@ -3,39 +3,50 @@
 
 //! µcad CLI resolve command.
 
-use microcad_lang::{diag::*, rc::*, resolve::*, syntax::*};
+use microcad_lang::{diag::*, resolve::*};
 
 use crate::*;
 
 #[derive(clap::Parser)]
 pub struct Resolve {
-    /// Input µcad file.
-    pub input: std::path::PathBuf,
-    /// Output symbol table.
-    pub output: Option<std::path::PathBuf>,
+    #[clap(flatten)]
+    pub parse: Parse,
+
+    /// Check all symbols after resolve.
+    #[clap(short, long)]
+    pub check: bool,
+
+    /// Print resolve context.
+    #[clap(long)]
+    pub resolve: bool,
 }
 
-impl Resolve {
-    pub fn load(&self) -> ResolveResult<Rc<SourceFile>> {
-        let source = crate::commands::parse::Parse {
-            input: self.input.clone(),
+impl RunCommand<ResolveContext> for Resolve {
+    fn run(&self, cli: &Cli) -> anyhow::Result<ResolveContext> {
+        // run prior parse step
+        let root = self.parse.run(cli)?;
+
+        // resolve the file
+        let mut context = ResolveContext::create(
+            root,
+            &cli.search_paths,
+            Some(microcad_builtin::builtin_module()),
+            DiagHandler::default(),
+        )?;
+
+        if self.check {
+            context.check()?;
         }
-        .parse()?;
+
+        if context.has_errors() {
+            eprint!("{}", context.diagnosis());
+        }
+
+        if self.resolve {
+            print!("{context}");
+        }
+
         log::info!("Resolved successfully!");
-        Ok(source)
-    }
-}
-
-impl RunCommand for Resolve {
-    fn run(&self, cli: &Cli) -> anyhow::Result<()> {
-        let root = self.load()?;
-        let sources = Sources::load(root, &cli.search_paths)?;
-        let symbols = sources.resolve()?;
-        match &self.output {
-            Some(filename) => symbols.write_to_file(&filename)?,
-            None => println!("{symbols}"),
-        }
-
-        Ok(())
+        Ok(context)
     }
 }

@@ -1,9 +1,18 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use microcad_core::*;
 use microcad_lang::builtin::*;
 
-pub struct Circle;
+/// Circle with offset.
+#[derive(Debug, Clone)]
+pub struct Circle(microcad_core::Circle);
+
+impl Render<Geometry2D> for Circle {
+    fn render(&self, resolution: &RenderResolution) -> Geometry2D {
+        Geometry2D::Polygon(self.0.render(resolution))
+    }
+}
 
 impl BuiltinWorkbenchDefinition for Circle {
     fn id() -> &'static str {
@@ -18,12 +27,12 @@ impl BuiltinWorkbenchDefinition for Circle {
         use microcad_core::*;
 
         &|args| {
-            Ok(BuiltinWorkpieceOutput::Primitive2D(Geometry2D::Circle(
-                geo2d::Circle {
+            Ok(BuiltinWorkpieceOutput::Primitive2D(Box::new(Circle(
+                Circle {
                     radius: args.get("radius"),
                     offset: (args.get("cx"), args.get("cy")).into(),
                 },
-            )))
+            ))))
         }
     }
 

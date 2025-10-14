@@ -12,11 +12,11 @@ pub struct Align;
 
 impl Operation for Align {
     fn process_2d(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
-        context.update_2d(|context, model, resolution| {
+        context.update_2d(|context, model| {
             let model_ = model.borrow();
-            let geometry: Geometry2DOutput = model_.children.render(context)?;
+            let geometry: Geometry2DOutput = model_.children.render_with_context(context)?;
             use microcad_core::traits::Align;
-            Ok(geometry.map(|geometry| Rc::new(geometry.align(&resolution))))
+            Ok(geometry.map(|geometry| Rc::new(geometry.align().into())))
         })
     }
 

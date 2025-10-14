@@ -10,19 +10,19 @@
 -- Errors --
 -- Model --
   Group (root) ->
-    Operation union()⏎ ->
+    Operation union() ->
       Group ->
         Workpiece(sketch) std::geo2d::Circle(center=(x=0mm, y=0mm), radius=3mm) ->
           - center = (x=0mm, y=0mm)
           - radius = 3mm
-          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=3)⏎ ->
+          Primitive2D __builtin::geo2d::Circle(cx=0, cy=0, radius=3) ->
         Workpiece(sketch) std::geo2d::Rect(height=2mm, width=3mm) ->
           - height = 2mm
           - width = 3mm
           - x = -1.5mm
           - y = -1mm
-          Primitive2D __builtin::geo2d::Rect(height=2, width=3, x=-1.5, y=-1)⏎ ->
+          Primitive2D __builtin::geo2d::Rect(height=2, width=3, x=-1.5, y=-1) ->
 
+Export successful.
 -- Test Result --
 OK
-Export successful.

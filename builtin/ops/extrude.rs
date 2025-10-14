@@ -22,27 +22,17 @@ impl Operation for Extrude {
     }
 
     fn process_3d(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
-        context.update_3d(|context, model, resolution| {
+        context.update_3d(|context, model| {
             let model_ = model.borrow();
-            let geometries: Geometries2D = model_.children.render(context)?;
+            let geometries: Geometries2D = model_.children.render_with_context(context)?;
 
-            let multi_polygon_data =
-                geo2d::multi_polygon_to_vec(&geometries.render_to_multi_polygon(&resolution));
-            let multi_polygon_data: Vec<_> = multi_polygon_data
-                .iter()
-                .map(|ring| ring.as_slice())
-                .collect();
+            use microcad_core::Extrude;
+            let mesh = geometries.linear_extrude(self.height);
 
-            Ok(Some(Rc::new(Geometry3D::Manifold(Rc::new(
-                Manifold::extrude(
-                    &multi_polygon_data,
-                    self.height,
-                    self.n_divisions as u32,
-                    self.twist_degrees,
-                    self.scale_top_x,
-                    self.scale_top_y,
-                ),
-            )))))
+            Ok(Some(Rc::new(WithBounds3D::new(
+                mesh.inner.into(),
+                mesh.bounds,
+            ))))
         })
     }
 }

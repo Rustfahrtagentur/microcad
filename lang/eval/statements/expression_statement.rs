@@ -4,7 +4,7 @@
 use crate::{eval::*, model::*};
 
 impl Eval for ExpressionStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         log::debug!("Evaluating expression statement to value:\n{self}");
         context.grant(self)?;
         let value: Value = self.expression.eval(context)?;
@@ -22,7 +22,7 @@ impl Eval for ExpressionStatement {
                 if !self.attribute_list.is_empty() {
                     context.error(
                         &self.attribute_list,
-                        AttributeError::CannotAssignAttribute(self.expression.clone().into()),
+                        AttributeError::CannotAssignAttribute(self.expression.to_string()),
                     )?;
                 }
                 Ok(value)
@@ -32,7 +32,7 @@ impl Eval for ExpressionStatement {
 }
 
 impl Eval<Option<Model>> for ExpressionStatement {
-    fn eval(&self, context: &mut Context) -> EvalResult<Option<Model>> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Option<Model>> {
         log::debug!("Evaluating expression statement to models:\n{self}");
         Ok(match self.eval(context)? {
             Value::Model(model) => Some(model),

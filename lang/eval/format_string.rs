@@ -4,14 +4,14 @@
 use crate::eval::*;
 
 impl Eval for FormatExpression {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         let value: Value = self.expression.eval(context)?;
         Ok(Value::String(format!("{value}")))
     }
 }
 
 impl Eval for FormatString {
-    fn eval(&self, context: &mut Context) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         let mut result = String::new();
         for elem in &*self.0 {
             match elem {

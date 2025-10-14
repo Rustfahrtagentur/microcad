@@ -5,7 +5,7 @@
 
 use thiserror::Error;
 
-use crate::{parse::ParseError, src_ref::*, syntax::*};
+use crate::{diag::*, parse::*, syntax::*};
 
 /// Resolve error.
 #[derive(Debug, Error)]
@@ -39,16 +39,12 @@ pub enum ResolveError {
     FileNotFound(std::path::PathBuf),
 
     /// Symbol not found.
-    #[error("Symbol {0} not found.")]
+    #[error("Symbol {0} not found while resolving.")]
     SymbolNotFound(QualifiedName),
 
     /// Symbol not found (retry to load from external).
     #[error("Symbol {0} must be loaded from {1}")]
     SymbolMustBeLoaded(QualifiedName, std::path::PathBuf),
-
-    /// Property is not allowed at this place
-    #[error("Defining a property is not allowed here ({0})")]
-    PropertyNotAllowed(SrcRef),
 
     /// Symbol is not a value
     #[error("Symbol {0} is not a value")]
@@ -57,6 +53,38 @@ pub enum ResolveError {
     /// Declaration of property not allowed here
     #[error("Declaration of {0} not allowed within {1}")]
     DeclNotAllowed(Identifier, QualifiedName),
+
+    /// Sternal module file not found
+    #[error("Ambiguous external module files found {0:?}")]
+    AmbiguousExternals(Vec<std::path::PathBuf>),
+
+    /// Ambiguous symbol was added
+    #[error("Ambiguous symbol added: {0}")]
+    AmbiguousSymbol(Identifier),
+
+    /// ScanDir Error
+    #[error("{0}")]
+    ScanDirError(#[from] scan_dir::Error),
+
+    /// Invalid path.
+    #[error("Invalid path: {0:?}")]
+    InvalidPath(std::path::PathBuf),
+
+    /// Diagnostic error
+    #[error("Diagnostic error: {0}")]
+    DiagError(#[from] DiagError),
+
+    /// Statement is not supported in this context.
+    #[error("{0} is not available within {1}")]
+    StatementNotSupported(String, String),
+
+    /// Alias leads to itself.
+    #[error("Alias leads to itself: {0}")]
+    CircularAlias(String),
+
+    /// Resolve check failed
+    #[error("Resolve failed")]
+    ResolveCheckFailed,
 }
 
 /// Result type of any resolve.

@@ -31,31 +31,34 @@ mod argument_match;
 mod attribute;
 mod body;
 mod call;
-mod context;
+mod eval_context;
 mod eval_error;
 mod expression;
-
 mod format_string;
 mod function;
+mod grant;
 mod init;
 mod literal;
+mod locals;
 mod module_definition;
 mod output;
 mod parameter;
 mod source_file;
+mod sources;
 mod statements;
-mod symbols;
 mod tuple;
 mod workbench;
 
 pub use argument_match::*;
 pub use attribute::*;
 pub use call::*;
-pub use context::*;
+pub use eval_context::*;
 pub use eval_error::*;
 pub use output::*;
-pub use statements::*;
-pub use symbols::*;
+
+use grant::*;
+use locals::*;
+use statements::*;
 
 use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 
@@ -76,7 +79,7 @@ use crate::{diag::*, resolve::*, src_ref::*, syntax::*, ty::*, value::*};
 /// | `Models`            | Statement, statement list, body, multiplicities.    | `Models::default()`     | A collection of models . |
 pub trait Eval<T = Value> {
     /// Evaluate a syntax element into a type `T`.
-    fn eval(&self, context: &mut Context) -> EvalResult<T>;
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<T>;
 }
 
 impl MethodCall {
@@ -86,10 +89,15 @@ impl MethodCall {
     /// ```microcad
     /// assert([2.0, 2.0].all_equal(), "All elements in this list must be equal.");
     /// ```
-    fn eval(&self, context: &mut Context, lhs: &Expression) -> EvalResult<Value> {
+    fn eval(&self, context: &mut EvalContext, lhs: &Expression) -> EvalResult<Value> {
         let value: Value = lhs.eval(context)?;
+        if let Value::Model(model) = &value {
+            if model.is_empty_model() {
+                context.warning(&lhs, EvalError::EmptyModelExpression)?;
+            }
+        }
         let args = self.argument_list.eval(context)?;
-        value.call_method(&self.id, &args, context)
+        value.call_method(&self.name, &args, context)
     }
 }
 

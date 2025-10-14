@@ -8,5 +8,11 @@
 
 -- Output --
 -- Errors --
+warning: This expression statement did not produce any model
+  ---> <FROM STR>:1:1
+     |
+   1 | {}.std::ops::translate(x = 5mm) // warning: Calling operation on empty geometry
+     | ^^
+     |
 -- Test Result --
-OK BUT SHOULD FAIL
+FAILED AS EXPECTED

@@ -13,8 +13,18 @@ pub use method_call::*;
 
 use crate::{model::*, src_ref::*, syntax::*, value::*};
 
+/// Result of a call.
+pub enum CallResult {
+    /// Call returned models.
+    Models(Vec<Model>),
+    /// Call returned a single value.
+    Value(Value),
+    /// Call returned nothing.
+    None,
+}
+
 /// Call of a *workbench* or *function*.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct Call {
     /// Qualified name of the call.
     pub name: QualifiedName,
@@ -36,6 +46,12 @@ impl std::fmt::Display for Call {
     }
 }
 
+impl std::fmt::Debug for Call {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}({:?})", self.name, self.argument_list)
+    }
+}
+
 impl TreeDisplay for Call {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(f, "{:depth$}Call '{}':", "", self.name)?;
@@ -44,16 +60,4 @@ impl TreeDisplay for Call {
             .iter()
             .try_for_each(|a| a.tree_print(f, depth))
     }
-}
-
-/// Result of a call.
-pub enum CallResult {
-    /// Call returned models.
-    Models(Vec<Model>),
-
-    /// Call returned a single value.
-    Value(Value),
-
-    /// Call returned nothing.
-    None,
 }

@@ -35,7 +35,7 @@ impl std::fmt::Display for WorkbenchKind {
 }
 
 /// Workbench definition, e.g `sketch`, `part` or `op`.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct WorkbenchDefinition {
     /// Documentation.
     pub doc: DocBlock,
@@ -81,6 +81,19 @@ impl std::fmt::Display for WorkbenchDefinition {
         write!(
             f,
             "{kind} {id}({plan}) {body}",
+            kind = self.kind,
+            id = self.id,
+            plan = self.plan,
+            body = self.body
+        )
+    }
+}
+
+impl std::fmt::Debug for WorkbenchDefinition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{kind} {id:?}({plan:?}) {body:?}",
             kind = self.kind,
             id = self.id,
             plan = self.plan,

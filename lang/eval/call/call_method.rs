@@ -16,7 +16,7 @@ pub trait CallMethod<T = Value> {
         &self,
         id: &QualifiedName,
         args: &ArgumentValueList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<T>;
 }
 
@@ -25,7 +25,7 @@ impl CallMethod for Array {
         &self,
         id: &QualifiedName,
         _: &ArgumentValueList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Value> {
         match id.single_identifier().expect("Single id").id().as_str() {
             "count" => Ok(Value::Integer(self.len() as i64)),
@@ -57,7 +57,7 @@ impl CallMethod<Option<Model>> for Model {
         &self,
         name: &QualifiedName,
         args: &ArgumentValueList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Option<Model>> {
         if let Some(symbol) = name.eval(context)? {
             context.scope(
@@ -67,7 +67,7 @@ impl CallMethod<Option<Model>> for Model {
                     src_ref: SrcRef::merge(name, args),
                 },
                 |context| {
-                    Ok(match &symbol.borrow().def {
+                    symbol.with_def(|def| match def {
                         SymbolDefinition::Workbench(workbench_definition) => {
                             let model = workbench_definition.call(
                                 SrcRef::merge(name, args),
@@ -76,24 +76,18 @@ impl CallMethod<Option<Model>> for Model {
                                 context,
                             )?;
 
-                            Some(model.replace_input_placeholders(self))
+                            Ok::<_, EvalError>(Some(model.replace_input_placeholders(self)))
                         }
                         SymbolDefinition::Builtin(builtin) => match builtin.call(args, context)? {
                             Value::Model(model) => {
                                 model.append(self.make_deep_copy());
-                                Some(model.clone())
+                                Ok(Some(model.clone()))
                             }
                             value => panic!("Builtin call returned {value} but no models."),
                         },
-                        def => {
-                            context.error(
-                                name,
-                                EvalError::SymbolCannotBeCalled(
-                                    name.clone(),
-                                    Box::new(def.clone()),
-                                ),
-                            )?;
-                            None
+                        _ => {
+                            context.error(name, EvalError::SymbolCannotBeCalled(name.clone()))?;
+                            Ok(None)
                         }
                     })
                 },
@@ -109,7 +103,7 @@ impl CallMethod for Value {
         &self,
         id: &QualifiedName,
         args: &ArgumentValueList,
-        context: &mut Context,
+        context: &mut EvalContext,
     ) -> EvalResult<Value> {
         match self {
             Value::Integer(_) => eval_todo!(context, id, "call_method for Integer"),
@@ -133,7 +127,7 @@ impl CallMethod for Value {
 
 #[test]
 fn call_list_method() {
-    let list = Array::new(
+    let list = Array::from_values(
         ValueList::new(vec![
             Value::Quantity(Quantity::new(3.0, QuantityType::Scalar)),
             Value::Quantity(Quantity::new(3.0, QuantityType::Scalar)),
@@ -146,7 +140,7 @@ fn call_list_method() {
         .call_method(
             &"all_equal".into(),
             &ArgumentValueList::default(),
-            &mut Context::default(),
+            &mut EvalContext::default(),
         )
         .expect("test error")
     {

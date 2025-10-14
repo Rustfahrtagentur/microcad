@@ -10,7 +10,7 @@
 
 -- Output --
 -- Errors --
-error: Return statement not available here
+error: Statement is not available within module
   ---> <FROM STR>:2:3
      |
    2 |   return 1;  // error

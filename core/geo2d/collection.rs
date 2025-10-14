@@ -4,11 +4,11 @@
 //! 2D Geometry collection
 
 use derive_more::{Deref, DerefMut};
-use geo::{CoordsIter, HasDimensions, LineString, Polygon};
+use geo::{CoordsIter, HasDimensions, MultiPolygon};
 use std::rc::Rc;
 
 use crate::{
-    geo2d::{FetchBounds2D, bounds::Bounds2D},
+    geo2d::{CalcBounds2D, bounds::Bounds2D},
     *,
 };
 
@@ -28,13 +28,13 @@ impl Geometries2D {
     }
 
     /// Apply boolean operation to render into MultiPolygon.
-    pub fn boolean_op(&self, resolution: &RenderResolution, op: &BooleanOp) -> geo2d::MultiPolygon {
+    pub fn boolean_op(&self, op: &BooleanOp) -> geo2d::MultiPolygon {
         let multi_polygon_list: Vec<_> = self
             .0
             .iter()
             // Render each geometry into a multipolygon and filter out empty ones
             .filter_map(|geo| {
-                let multi_polygon = geo.render_to_multi_polygon(resolution);
+                let multi_polygon = geo.to_multi_polygon();
                 if multi_polygon.is_empty() {
                     None
                 } else {
@@ -55,8 +55,18 @@ impl Geometries2D {
             })
     }
 
+    /// Generate multipolygon.
+    pub fn to_multi_polygon(&self) -> MultiPolygon {
+        let mut polygons = Vec::new();
+        self.iter().for_each(|geo| {
+            polygons.append(&mut (**geo).clone().to_multi_polygon().0);
+        });
+
+        MultiPolygon::new(polygons)
+    }
+
     /// Apply contex hull operation to geometries.
-    pub fn hull(&self, resolution: &RenderResolution) -> geo2d::Polygon {
+    pub fn hull(&self) -> geo2d::Polygon {
         let mut coords = self.iter().fold(Vec::new(), |mut coords, geo| {
             match geo.as_ref() {
                 Geometry2D::LineString(line_string) => {
@@ -75,20 +85,12 @@ impl Geometries2D {
                     let mut rect_corners: Vec<_> = rect.coords_iter().collect();
                     coords.append(&mut rect_corners)
                 }
-                Geometry2D::Circle(circle) => coords.append(
-                    &mut circle
-                        .clone()
-                        .render_to_polygon(resolution)
-                        .unwrap_or(Polygon::new(LineString(vec![]), vec![]))
-                        .exterior_coords_iter()
-                        .collect(),
-                ),
                 Geometry2D::Line(line) => {
                     coords.push(line.0.into());
                     coords.push(line.1.into());
                 }
                 Geometry2D::Collection(collection) => {
-                    coords.append(&mut collection.hull(resolution).exterior_coords_iter().collect())
+                    coords.append(&mut collection.hull().exterior_coords_iter().collect())
                 }
             }
             coords
@@ -107,32 +109,34 @@ impl FromIterator<Rc<Geometry2D>> for Geometries2D {
     }
 }
 
-impl FetchBounds2D for Geometries2D {
-    fn fetch_bounds_2d(&self) -> Bounds2D {
+impl CalcBounds2D for Geometries2D {
+    fn calc_bounds_2d(&self) -> Bounds2D {
         self.0.iter().fold(Bounds2D::default(), |bounds, geometry| {
-            bounds.extend(geometry.fetch_bounds_2d())
+            bounds.extend(geometry.calc_bounds_2d())
         })
     }
 }
 
 impl Transformed2D for Geometries2D {
-    fn transformed_2d(&self, render_resolution: &RenderResolution, mat: &Mat3) -> Self {
+    fn transformed_2d(&self, mat: &Mat3) -> Self {
         Self(
             self.iter()
-                .map(|geometry| Rc::new(geometry.transformed_2d(render_resolution, mat)))
+                .map(|geometry| Rc::new(geometry.transformed_2d(mat)))
                 .collect::<Vec<_>>(),
         )
     }
 }
 
-impl RenderToMultiPolygon for Geometries2D {
-    fn render_to_existing_multi_polygon(
-        &self,
-        resolution: &RenderResolution,
-        polygons: &mut geo2d::MultiPolygon,
-    ) {
-        self.iter().for_each(|geometry| {
-            geometry.render_to_existing_multi_polygon(resolution, polygons);
-        });
+impl From<Geometries2D> for MultiPolygon {
+    fn from(geometries: Geometries2D) -> Self {
+        Self(
+            geometries
+                .iter()
+                .flat_map(|geo| {
+                    let multi_polygon: MultiPolygon = geo.as_ref().clone().into();
+                    multi_polygon.0
+                })
+                .collect(),
+        )
     }
 }
