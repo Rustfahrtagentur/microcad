@@ -256,32 +256,6 @@ impl EvalContext {
         Err(ResolveError::SymbolNotFound(name.clone()))
     }
 
-    fn lookup_within(&self, what: &QualifiedName, within: QualifiedName) -> EvalResult<Symbol> {
-        log::trace!(
-            "{lookup} for symbol '{what:?}' within '{within:?}':",
-            lookup = crate::mark!(LOOKUP)
-        );
-
-        // process internal supers
-        let (what, within) = what.dissolve_super(within);
-
-        log::trace!("Looking within: {what:?} for {within:?}");
-        let within_symbol = self.symbol_table.lookup(&within)?;
-        if let Ok(symbol) = within_symbol.search(&what) {
-            log::trace!(
-                "{found} Symbol {symbol:?} within {within:?}:",
-                found = crate::mark!(FOUND_INTERIM),
-            );
-            return Ok(symbol);
-        }
-
-        log::trace!(
-            "{not_found} Symbol {what:?} within {within:?}",
-            not_found = crate::mark!(NOT_FOUND_INTERIM),
-        );
-        Err(EvalError::SymbolNotFound(what.clone()))
-    }
-
     /// Check if current stack frame is code
     pub fn is_code(&self) -> bool {
         !matches!(self.stack.current_frame(), Some(StackFrame::Module(..)))
@@ -418,15 +392,14 @@ impl Lookup<EvalError> for EvalContext {
         // collect all symbols that can be found and remember origin
         let results = [
             ("local", { self.stack.lookup(name) }),
-            ("module", {
-                self.lookup_within(name, self.stack.current_module_name())
+            ("global", {
+                self.symbol_table
+                    .lookup_within_name(name, &self.stack.current_module_name())
+                    .map_err(|err| err.into())
             }),
             ("property", { self.lookup_property(name) }),
             ("workbench", {
                 self.lookup_workbench(name).map_err(|err| err.into())
-            }),
-            ("global", {
-                self.symbol_table.lookup(name).map_err(|err| err.into())
             }),
         ]
         .into_iter();

@@ -45,10 +45,11 @@ pub trait Lookup<E: std::error::Error = ResolveError> {
 
     /// Search for qualified name within the symbol table **and** within the given symbol.
     ///
-    /// If both are found
     /// # Arguments
     /// -`name`: qualified name to search for
-    /// -`within`: If some searches in this symbol too.
+    /// -`within`: If some, searches in this symbol too.
+    /// # Return
+    /// Returns the one that isn't an alias if both are found.
     fn lookup_within(&self, name: &QualifiedName, within: &Option<Symbol>) -> Result<Symbol, E> {
         if let Some(within) = within {
             match (self.lookup(name), within.search(name)) {
@@ -76,6 +77,20 @@ pub trait Lookup<E: std::error::Error = ResolveError> {
         } else {
             self.lookup(name)
         }
+    }
+
+    /// Search for qualified name within the symbol table **and** within the symbol given by name.
+    ///
+    /// If both are found
+    /// # Arguments
+    /// -`name`: qualified name to search for
+    /// -`within`: Searches in the symbol with this name too.
+    fn lookup_within_name(
+        &self,
+        name: &QualifiedName,
+        within: &QualifiedName,
+    ) -> Result<Symbol, E> {
+        self.lookup_within(name, &Some(self.lookup(within)?))
     }
 }
 
