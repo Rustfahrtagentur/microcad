@@ -15,7 +15,7 @@ pub(super) struct SymbolInner {
     /// Symbol's children
     pub(super) children: SymbolMap,
     /// Flag if this symbol has been checked after resolving
-    pub(super) checked: bool,
+    pub(super) checked: std::cell::OnceCell<()>,
     /// Flag if this symbol was in use
     pub(super) used: std::cell::OnceCell<()>,
 }
@@ -26,7 +26,7 @@ impl Default for SymbolInner {
             def: SymbolDefinition::SourceFile(SourceFile::default().into()),
             parent: Default::default(),
             children: Default::default(),
-            checked: false,
+            checked: Default::default(),
             used: Default::default(),
         }
     }

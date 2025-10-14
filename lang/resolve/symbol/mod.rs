@@ -99,11 +99,7 @@ impl Symbol {
         let full_name = self.full_name();
         let visibility = self.visibility();
         if debug && cfg!(feature = "ansi-color") && self.inner.borrow().used.get().is_none() {
-            let checked = if self.inner.borrow().checked {
-                " ✓"
-            } else {
-                ""
-            };
+            let checked = if self.is_checked() { " ✓" } else { "" };
             color_print::cwrite!(
                 f,
                 "{:depth$}<#606060>{visibility:?}{id:?} {def:?} [{full_name:?}]</>{checked}",
@@ -292,11 +288,15 @@ impl Symbol {
 
     /// Mark this symbol as *checked*.
     pub(super) fn set_check(&self) {
-        self.inner.borrow_mut().checked = true;
+        let _ = self.inner.borrow().checked.set(());
+    }
+
+    fn is_checked(&self) -> bool {
+        self.inner.borrow().checked.get().is_some()
     }
 
     /// Mark this symbol as *used*.
-    pub(crate) fn set_use(&self) {
+    pub(crate) fn set_used(&self) {
         let _ = self.inner.borrow().used.set(());
     }
 
@@ -494,7 +494,7 @@ impl Symbol {
 
     pub(super) fn unchecked(&self, unchecked: &mut Symbols) {
         let inner = self.inner.borrow();
-        if !inner.checked {
+        if inner.checked.get().is_none() {
             unchecked.push(self.clone())
         }
         inner

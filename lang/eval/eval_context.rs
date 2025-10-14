@@ -517,7 +517,7 @@ impl Lookup<EvalError> for EvalContext {
                         "{found} symbol '{name:?}' in {origin}",
                         found = crate::mark!(FOUND)
                     );
-                    symbol.set_use();
+                    symbol.set_used();
                     Ok(symbol.clone())
                 }
             }
