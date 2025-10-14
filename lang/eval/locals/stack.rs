@@ -170,9 +170,10 @@ impl Stack {
     pub(crate) fn current_symbol(&self) -> Option<Symbol> {
         self.0.iter().rev().find_map(|frame| frame.symbol())
     }
+}
 
-    /// Lookup a symbol from local stack.
-    pub fn lookup(&self, name: &QualifiedName) -> EvalResult<Symbol> {
+impl Lookup<EvalError> for Stack {
+    fn lookup(&self, name: &QualifiedName) -> EvalResult<Symbol> {
         log::trace!(
             "{lookup} for local symbol '{name:?}'",
             lookup = crate::mark!(LOOKUP)
