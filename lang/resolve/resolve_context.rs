@@ -160,10 +160,11 @@ impl ResolveContext {
             std.resolve(self)?;
         }
 
-        let max_passes = 3;
+        // multi pass resolve
+        const MAX_PASSES: usize = 3;
         let mut passes_needed = 0;
         let mut resolved = false;
-        for _ in 0..max_passes {
+        for _ in 0..MAX_PASSES {
             self.symbol_table
                 .symbols()
                 .iter()
