@@ -343,23 +343,6 @@ impl Symbol {
         }
     }
 
-    // Search recursively within symbol **and** in the symbol table (global)
-    fn lookup(&self, name: &QualifiedName, context: &ResolveContext) -> ResolveResult<Symbol> {
-        match (self.search(name), context.lookup(name)) {
-            (Ok(relative), Ok(global)) => {
-                if relative == global || relative.is_alias() {
-                    Ok(global)
-                } else if global.is_alias() {
-                    Ok(relative)
-                } else {
-                    todo!("lookup ambiguous:\n  {relative:?}\n  {global:?}")
-                }
-            }
-            (Ok(symbol), Err(_)) | (Err(_), Ok(symbol)) => Ok(symbol),
-            (Err(err), Err(_)) => Err(err),
-        }
-    }
-
     /// Create a vector of cloned children.
     fn public_children(&self, visibility: Visibility) -> SymbolMap {
         let inner = self.inner.borrow();
@@ -392,12 +375,10 @@ impl Symbol {
                 SymbolDefinition::Alias(visibility, id, name) => {
                     log::trace!("resolving use (as): {self} => {visibility}{id} ({name})");
 
-                    let symbol = if let Some(parent) = &inner.parent {
-                        parent.lookup(name, context)?
-                    } else {
-                        context.lookup(name)?
-                    }
-                    .clone_with_visibility(*visibility);
+                    let symbol = context
+                        .symbol_table
+                        .lookup_within(name, &inner.parent)?
+                        .clone_with_visibility(*visibility);
 
                     self.visibility.set(Visibility::Deleted);
 
@@ -408,12 +389,10 @@ impl Symbol {
 
                     self.visibility.set(Visibility::Deleted);
 
-                    let symbols = if let Some(parent) = &inner.parent {
-                        parent.lookup(name, context)?
-                    } else {
-                        context.lookup(name)?
-                    }
-                    .public_children(*visibility);
+                    let symbols = context
+                        .symbol_table
+                        .lookup_within(name, &inner.parent)?
+                        .public_children(*visibility);
 
                     if !symbols.is_empty() {
                         self.visibility.set(Visibility::Deleted);
@@ -469,10 +448,14 @@ impl Symbol {
                     .filter(|name| {
                         exclude_ids.contains(name.last().expect("symbol with empty name"))
                     })
-                    .try_for_each(|name| match context.lookup(name) {
+                    .try_for_each(|name| match context.symbol_table.lookup(name) {
                         Ok(_) => Ok::<_, ResolveError>(()),
                         Err(err) => {
-                            if context.lookup(&name.with_prefix(&prefix)).is_err() {
+                            if context
+                                .symbol_table
+                                .lookup(&name.with_prefix(&prefix))
+                                .is_err()
+                            {
                                 context.error(name, err)?;
                             }
                             Ok(())

@@ -237,14 +237,6 @@ impl ResolveContext {
 
 impl WriteToFile for ResolveContext {}
 
-impl Lookup for ResolveContext {
-    fn lookup(&self, name: &QualifiedName) -> Result<Symbol, ResolveError> {
-        let symbol = self.symbol_table.lookup(name)?;
-        symbol.set_check();
-        Ok(symbol)
-    }
-}
-
 impl PushDiag for ResolveContext {
     fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         self.diag.push_diag(diag)
