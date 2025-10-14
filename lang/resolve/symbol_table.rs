@@ -9,7 +9,7 @@ use crate::{resolve::*, syntax::*};
 #[derive(Default, Deref, DerefMut)]
 pub struct SymbolTable {
     /// Global symbols (including root).
-    symbols: SymbolMap,
+    symbol_map: SymbolMap,
 }
 
 impl SymbolTable {
@@ -32,7 +32,7 @@ impl SymbolTable {
     /// Add a new symbol to the table
     pub fn insert_symbol(&mut self, id: Identifier, symbol: Symbol) -> ResolveResult<()> {
         log::trace!("insert symbol: {id}");
-        if let Some(symbol) = self.symbols.insert(id, symbol.clone()) {
+        if let Some(symbol) = self.symbol_map.insert(id, symbol.clone()) {
             Err(ResolveError::AmbiguousSymbol(symbol.id()))
         } else {
             Ok(())
@@ -40,7 +40,7 @@ impl SymbolTable {
     }
 
     pub(super) fn values(&self) -> Symbols {
-        self.symbols.values().cloned().collect()
+        self.symbol_map.values().cloned().collect()
     }
 
     /// Return a list of unchecked symbols
@@ -48,7 +48,7 @@ impl SymbolTable {
     /// Symbols only get *checked* if [check()] was called before!
     pub fn unchecked(&self) -> Symbols {
         let mut unchecked = Symbols::default();
-        self.symbols
+        self.symbol_map
             .values()
             .for_each(|symbol| symbol.unchecked(&mut unchecked));
         unchecked
@@ -57,7 +57,7 @@ impl SymbolTable {
     /// Return a list of unused symbols
     pub fn unused(&self) -> Symbols {
         let mut unchecked = Symbols::default();
-        self.symbols
+        self.symbol_map
             .values()
             .for_each(|symbol| symbol.unused(&mut unchecked));
         unchecked
@@ -66,7 +66,7 @@ impl SymbolTable {
     /// search all ids which require target mode (e.g. `assert_valid`)
     pub(super) fn search_target_mode_ids(&self) -> ResolveResult<IdentifierSet> {
         let mut ids = IdentifierSet::default();
-        self.symbols
+        self.symbol_map
             .values()
             .try_for_each(|symbol| symbol.search_target_mode_ids(&mut ids))?;
         Ok(ids)
@@ -82,7 +82,7 @@ impl Lookup for SymbolTable {
             "{lookup} for global symbol '{name:?}'",
             lookup = crate::mark!(LOOKUP)
         );
-        let symbol = match self.symbols.search(name) {
+        let symbol = match self.symbol_map.search(name) {
             Ok(symbol) => symbol,
             Err(err) => {
                 log::trace!(
@@ -105,7 +105,7 @@ impl std::fmt::Display for SymbolTable {
         writeln!(
             f,
             "{}",
-            self.symbols
+            self.symbol_map
                 .iter()
                 .map(|(_, symbol)| symbol)
                 .filter(|symbol| !symbol.is_deleted())
@@ -118,6 +118,6 @@ impl std::fmt::Display for SymbolTable {
 
 impl std::fmt::Debug for SymbolTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{:?}", self.symbols)
+        writeln!(f, "{:?}", self.symbol_map)
     }
 }

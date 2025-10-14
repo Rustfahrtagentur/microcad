@@ -225,7 +225,7 @@ impl EvalContext {
     /// Fetch local variable from local stack (for testing only).
     #[cfg(test)]
     pub fn fetch_local(&self, id: &Identifier) -> EvalResult<Symbol> {
-        self.stack.fetch(id)
+        self.stack.fetch_symbol(id)
     }
 
     fn lookup_workbench(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
@@ -383,8 +383,8 @@ impl Locals for EvalContext {
         self.stack.close();
     }
 
-    fn fetch(&self, id: &Identifier) -> EvalResult<Symbol> {
-        self.stack.fetch(id)
+    fn fetch_symbol(&self, id: &Identifier) -> EvalResult<Symbol> {
+        self.stack.fetch_symbol(id)
     }
 
     fn get_model(&self) -> EvalResult<Model> {
@@ -559,6 +559,11 @@ impl PushDiag for EvalContext {
     fn push_diag(&mut self, diag: Diagnostic) -> DiagResult<()> {
         let result = self.diag.push_diag(diag);
         log::trace!("Error Context:\n{self:?}");
+        #[cfg(debug_assertions)]
+        if std::env::var("MICROCAD_ERROR_PANIC").is_ok() {
+            eprintln!("{}", self.diagnosis());
+            panic!("MICROCAD_ERROR_PANIC")
+        }
         result
     }
 }

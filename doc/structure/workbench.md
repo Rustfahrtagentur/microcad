@@ -269,7 +269,7 @@ In the following example we declare a building plan which consists of a `radius`
 
 [![test](.test/property.svg)](.test/property.log)
 
-```µcad,property#todo
+```µcad,property
 // `outer` will automatically become a property because
 // it is declared in the building plan:
 sketch Wheel(outer: Length) {

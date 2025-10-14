@@ -69,24 +69,17 @@ impl SymbolMap {
     /// Search for a symbol in symbol map.
     pub(crate) fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         log::trace!("Searching {name:?} in symbol map");
-        if name.is_empty() {
-            if let Some(symbol) = self.get(&Identifier::none()) {
-                log::trace!("Fetched {name:?} from globals (symbol map)");
-                return Ok(symbol.clone());
+        let (id, leftover) = name.split_first();
+        if let Some(symbol) = self.get(&id) {
+            if leftover.is_empty() {
+                log::trace!("Fetched {name:?} from symbol map");
+                Ok(symbol.clone())
+            } else {
+                symbol.search(&leftover)
             }
         } else {
-            let (id, leftover) = name.split_first();
-            if let Some(symbol) = self.get(&id) {
-                if leftover.is_empty() {
-                    log::trace!("Fetched {name:?} from globals (symbol map)");
-                    return Ok(symbol.clone());
-                } else {
-                    return symbol.search(&leftover);
-                }
-            }
+            Err(ResolveError::SymbolNotFound(name.clone()))
         }
-
-        Err(ResolveError::SymbolNotFound(name.clone()))
     }
 
     fn merge_all<I>(iter: I) -> SymbolMap
