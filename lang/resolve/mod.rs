@@ -7,9 +7,7 @@
 //!
 //! ```no_run
 //! use microcad_lang::{syntax::*, parse::*, resolve::*};
-//!
 //! let source_file = SourceFile::load("my.µcad").expect("parsing success");
-//!
 //! let source_symbol = source_file.resolve();
 //! ```
 //!

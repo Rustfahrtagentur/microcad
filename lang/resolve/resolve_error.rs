@@ -10,10 +10,6 @@ use crate::{diag::*, parse::*, syntax::*};
 /// Resolve error.
 #[derive(Debug, Error)]
 pub enum ResolveError {
-    /// To do
-    #[error("Not implemented: {0}")]
-    Todo(String),
-
     /// Parse Error.
     #[error("Parse Error: {0}")]
     ParseError(#[from] ParseError),
@@ -81,10 +77,6 @@ pub enum ResolveError {
     /// Statement is not supported in this context.
     #[error("{0} is not available within {1}")]
     StatementNotSupported(String, String),
-
-    /// Alias leads to itself.
-    #[error("Alias leads to itself: {0}")]
-    CircularAlias(String),
 
     /// Resolve check failed
     #[error("Resolve failed")]

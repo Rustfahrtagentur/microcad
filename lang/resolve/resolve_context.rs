@@ -9,35 +9,39 @@ use crate::{diag::*, rc::*, resolve::*, src_ref::*, syntax::*};
 #[derive(Default)]
 pub struct ResolveContext {
     /// Symbol table.
-    pub symbol_table: SymbolTable,
+    pub(crate) symbol_table: SymbolTable,
     /// Source file cache.
-    pub sources: Sources,
+    pub(crate) sources: Sources,
     /// Diagnostic handler.
-    pub diag: DiagHandler,
+    pub(crate) diag: DiagHandler,
     /// Unchecked symbols.
     ///
     /// Filled by [check()] with symbols which are not in use in ANY checked code.
-    pub unchecked: Option<Symbols>,
-
+    unchecked: Option<Symbols>,
+    /// Signals resolve stage.
     mode: ResolveMode,
 }
 
 /// Select what {ResolveContext::create()] automatically does.
 #[derive(Default, PartialEq, PartialOrd)]
 pub enum ResolveMode {
-    /// Only load the sources
+    /// Failed context.
+    Failed,
+    /// Only load the sources.
     #[default]
     Loaded,
     /// Create symbol table.
     Symbolized,
-    /// Resolve symbol table
+    /// Resolve symbol table.
     Resolved,
-    /// Check symbol table
+    /// Check symbol table.
     Checked,
 }
 
 impl ResolveContext {
     /// Create new context from source file.
+    ///
+    /// Just reads the syntax and does **not** create any symbols nor resolves anything.
     pub fn new(
         root: Rc<SourceFile>,
         search_paths: &[impl AsRef<std::path::Path>],
@@ -60,7 +64,11 @@ impl ResolveContext {
         match Self::create_ex(root, search_paths, builtin, diag, ResolveMode::Checked) {
             Ok(context) => Ok(context),
             Err(err) => {
-                let mut context = ResolveContext::default();
+                // create empty context which might be given to following stages like export.
+                let mut context = ResolveContext {
+                    mode: ResolveMode::Failed,
+                    ..Default::default()
+                };
                 context.error(&SrcRef(None), err)?;
                 Ok(context)
             }
@@ -78,9 +86,8 @@ impl ResolveContext {
         context.symbolize()?;
         log::trace!("Symbolized Context:\n{context:?}");
         if let Some(builtin) = builtin {
-            let id = builtin.id();
-            context.add_symbol(builtin)?;
-            log::trace!("Added builtin library {id} to context:\n{context:?}");
+            log::trace!("Added builtin library {id}.", id = builtin.id());
+            context.symbol_table.add_symbol(builtin)?;
         }
         if matches!(mode, ResolveMode::Resolved | ResolveMode::Checked) {
             context.resolve()?;
@@ -107,15 +114,14 @@ impl ResolveContext {
         let symbol = file
             .symbolize(Visibility::Private, self)
             .expect("symbolize");
-        self.add_symbol(symbol).expect("symbolize error");
-    }
-
-    pub(super) fn add_symbol(&mut self, symbol: Symbol) -> ResolveResult<()> {
-        self.symbol_table.add_symbol(symbol.clone())
+        self.symbol_table
+            .add_symbol(symbol)
+            .expect("symbolize error");
     }
 
     pub(crate) fn symbolize(&mut self) -> ResolveResult<()> {
         assert!(matches!(self.mode, ResolveMode::Loaded));
+        self.mode = ResolveMode::Failed;
 
         let named_symbols = self
             .sources
@@ -136,7 +142,7 @@ impl ResolveContext {
             if let Some(id) = name.single_identifier() {
                 self.symbol_table.insert_symbol(id.clone(), symbol)?;
             } else {
-                todo!()
+                unreachable!("name is not an id")
             }
         }
 
@@ -147,27 +153,35 @@ impl ResolveContext {
 
     pub(super) fn resolve(&mut self) -> ResolveResult<()> {
         assert!(matches!(self.mode, ResolveMode::Symbolized));
+        self.mode = ResolveMode::Failed;
 
         // resolve std as first
         if let Some(std) = self.symbol_table.get(&Identifier::no_ref("std")).cloned() {
             std.resolve(self)?;
         }
 
+        let max_passes = 3;
         let mut passes_needed = 0;
-        for _ in 0..3 {
+        let mut resolved = false;
+        for _ in 0..max_passes {
             self.symbol_table
-                .values()
+                .symbols()
                 .iter()
                 .filter(|child| child.is_resolvable())
                 .map(|child| child.resolve(self))
                 .collect::<Result<Vec<_>, _>>()?;
             passes_needed += 1;
             if !self.has_links() {
+                resolved = true;
                 break;
             }
         }
 
-        log::info!("Resolve OK ({passes_needed} passes)");
+        if resolved {
+            log::info!("Resolve OK ({passes_needed} passes).");
+        } else {
+            log::info!("Resolve failed after {passes_needed} passes.");
+        }
         log::debug!("Resolved symbol table:\n{self:?}");
 
         self.mode = ResolveMode::Resolved;
@@ -177,7 +191,7 @@ impl ResolveContext {
 
     fn has_links(&self) -> bool {
         self.symbol_table
-            .values()
+            .symbols()
             .iter_mut()
             .any(|symbol| symbol.has_links())
     }
@@ -185,13 +199,14 @@ impl ResolveContext {
     /// check names in all symbols
     pub fn check(&mut self) -> ResolveResult<()> {
         log::trace!("Checking symbol table");
+        self.mode = ResolveMode::Failed;
 
         let exclude_ids = self.symbol_table.search_target_mode_ids()?;
         log::trace!("Excluding target mode ids: {exclude_ids}");
 
         if let Err(err) = self
             .symbol_table
-            .values()
+            .symbols()
             .iter_mut()
             .try_for_each(|symbol| symbol.check(self, &exclude_ids))
         {

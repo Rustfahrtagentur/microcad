@@ -54,7 +54,7 @@ impl EvalContext {
     }
 
     /// Current symbol, panics if there no current symbol.
-    pub fn current_symbol(&self) -> Symbol {
+    pub(crate) fn current_symbol(&self) -> Symbol {
         self.stack.current_symbol().expect("Some symbol")
     }
 
@@ -85,24 +85,6 @@ impl EvalContext {
         self.output.print(what).expect("could not write to output");
     }
 
-    /// Get the source code location of the given referrer as string (e.g. `/path/to/file.µcad:52:1`).
-    pub fn locate(&self, referrer: &impl SrcReferrer) -> EvalResult<String> {
-        Ok(format!(
-            "{}:{}",
-            self.get_by_hash(referrer.src_ref().source_hash())?
-                .filename_as_str(),
-            referrer.src_ref()
-        ))
-    }
-
-    /// Get the original source code of the given referrer.
-    pub fn source_code(&self, referrer: &impl SrcReferrer) -> EvalResult<String> {
-        Ok(referrer
-            .src_ref()
-            .source_slice(&self.get_by_hash(referrer.src_ref().source_hash())?.source)
-            .to_string())
-    }
-
     /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Option<Model>> {
         if self.diag.error_count() > 0 {
@@ -120,7 +102,7 @@ impl EvalContext {
     }
 
     /// Run the closure `f` within the given `stack_frame`.
-    pub fn scope<T>(
+    pub(super) fn scope<T>(
         &mut self,
         stack_frame: StackFrame,
         f: impl FnOnce(&mut EvalContext) -> T,
@@ -142,7 +124,7 @@ impl EvalContext {
     }
 
     /// Get property from current model.
-    pub fn get_property(&self, id: &Identifier) -> EvalResult<Value> {
+    pub(super) fn get_property(&self, id: &Identifier) -> EvalResult<Value> {
         match self.get_model() {
             Ok(model) => {
                 if let Some(value) = model.get_property(id) {
@@ -158,7 +140,7 @@ impl EvalContext {
     /// Initialize a property.
     ///
     /// Returns error if there is no model or the property has been initialized before.
-    pub fn init_property(&self, id: Identifier, value: Value) -> EvalResult<()> {
+    pub(super) fn init_property(&self, id: Identifier, value: Value) -> EvalResult<()> {
         match self.get_model() {
             Ok(model) => {
                 if let Some(previous_value) = model.borrow_mut().set_property(id.clone(), value) {
@@ -222,12 +204,6 @@ impl EvalContext {
         }
     }
 
-    /// Fetch local variable from local stack (for testing only).
-    #[cfg(test)]
-    pub fn fetch_local(&self, id: &Identifier) -> EvalResult<Symbol> {
-        self.stack.fetch_symbol(id)
-    }
-
     fn lookup_workbench(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         if let Some(workbench) = &self.stack.current_workbench_name() {
             log::trace!(
@@ -257,12 +233,12 @@ impl EvalContext {
     }
 
     /// Check if current stack frame is code
-    pub fn is_code(&self) -> bool {
+    fn is_code(&self) -> bool {
         !matches!(self.stack.current_frame(), Some(StackFrame::Module(..)))
     }
 
     /// Check if current stack frame is a module
-    pub fn is_module(&self) -> bool {
+    pub(crate) fn is_module(&self) -> bool {
         matches!(
             self.stack.current_frame(),
             Some(StackFrame::Module(..) | StackFrame::Source(..))
@@ -287,7 +263,7 @@ impl UseSymbol for EvalContext {
             if within.is_empty() {
                 self.symbol_table.insert_symbol(id, symbol)?;
             } else {
-                self.symbol_table.lookup(within)?.insert(id, symbol);
+                self.symbol_table.lookup(within)?.insert_child(id, symbol);
             }
             log::trace!("Symbol Table:\n{}", self.symbol_table);
         }
@@ -318,7 +294,9 @@ impl UseSymbol for EvalContext {
                     if within.is_empty() {
                         self.symbol_table.insert_symbol(id.clone(), symbol)?;
                     } else {
-                        self.symbol_table.lookup(within)?.insert(id.clone(), symbol);
+                        self.symbol_table
+                            .lookup(within)?
+                            .insert_child(id.clone(), symbol);
                     }
                     Ok::<_, EvalError>(())
                 })?;
@@ -423,7 +401,7 @@ impl Lookup<EvalError> for EvalContext {
                         EvalError::SymbolNotFound(_)
                         // for locals
                         | EvalError::LocalNotFound(_)
-                        // for model proper
+                        // for model property
                         | EvalError::NoModelInWorkbench
                         | EvalError::PropertyNotFound(_)
                         | EvalError::NoPropertyId(_)

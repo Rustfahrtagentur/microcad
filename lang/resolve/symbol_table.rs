@@ -5,12 +5,9 @@ use derive_more::{Deref, DerefMut};
 
 use crate::{resolve::*, syntax::*};
 
-/// *Symbol table* holding global and local symbols.
+/// *Symbol table* holding global symbols.
 #[derive(Default, Deref, DerefMut)]
-pub struct SymbolTable {
-    /// Global symbols (including root).
-    symbol_map: SymbolMap,
-}
+pub struct SymbolTable(SymbolMap);
 
 impl SymbolTable {
     /// Add a new symbol to the table
@@ -18,56 +15,42 @@ impl SymbolTable {
         self.insert_symbol(symbol.id(), symbol.clone())
     }
 
-    /// Add another symbol map to the table
-    pub fn add_symbol_map(&mut self, symbol_map: &SymbolMap) -> ResolveResult<()> {
-        symbol_map
-            .iter()
-            .map(|(id, symbol)| (id.clone(), symbol.clone()))
-            .try_for_each(|(id, symbol)| {
-                assert!(!symbol.is_link());
-                self.insert_symbol(id, symbol)
-            })
-    }
-
     /// Add a new symbol to the table
     pub fn insert_symbol(&mut self, id: Identifier, symbol: Symbol) -> ResolveResult<()> {
         log::trace!("insert symbol: {id}");
-        if let Some(symbol) = self.symbol_map.insert(id, symbol.clone()) {
+        if let Some(symbol) = self.insert(id, symbol.clone()) {
             Err(ResolveError::SymbolAlreadyDefined(symbol.full_name()))
         } else {
             Ok(())
         }
     }
 
-    pub(super) fn values(&self) -> Symbols {
-        self.symbol_map.values().cloned().collect()
+    pub(super) fn symbols(&self) -> Symbols {
+        self.values().cloned().collect()
     }
 
-    /// Return a list of unchecked symbols
-    ///
-    /// Symbols only get *checked* if [check()] was called before!
+    /// Return a list of symbols which could not or have not been checked.
     pub fn unchecked(&self) -> Symbols {
         let mut unchecked = Symbols::default();
-        self.symbol_map
-            .values()
+        self.values()
             .for_each(|symbol| symbol.unchecked(&mut unchecked));
         unchecked
     }
 
     /// Return a list of unused symbols
+    ///
+    /// Use this after eval for any useful result.
     pub fn unused(&self) -> Symbols {
         let mut unchecked = Symbols::default();
-        self.symbol_map
-            .values()
+        self.values()
             .for_each(|symbol| symbol.unused(&mut unchecked));
         unchecked
     }
 
-    /// search all ids which require target mode (e.g. `assert_valid`)
+    /// Search all ids which require target mode (e.g. `assert_valid`)
     pub(super) fn search_target_mode_ids(&self) -> ResolveResult<IdentifierSet> {
         let mut ids = IdentifierSet::default();
-        self.symbol_map
-            .values()
+        self.values()
             .try_for_each(|symbol| symbol.search_target_mode_ids(&mut ids))?;
         Ok(ids)
     }
@@ -82,7 +65,7 @@ impl Lookup for SymbolTable {
             "{lookup} for global symbol '{name:?}'",
             lookup = crate::mark!(LOOKUP)
         );
-        let symbol = match self.symbol_map.search(name) {
+        let symbol = match self.search(name) {
             Ok(symbol) => symbol,
             Err(err) => {
                 log::trace!(
@@ -110,8 +93,7 @@ impl std::fmt::Display for SymbolTable {
         writeln!(
             f,
             "{}",
-            self.symbol_map
-                .iter()
+            self.iter()
                 .map(|(_, symbol)| symbol)
                 .filter(|symbol| !symbol.is_deleted())
                 .map(|symbol| symbol.full_name().to_string())
@@ -123,6 +105,6 @@ impl std::fmt::Display for SymbolTable {
 
 impl std::fmt::Debug for SymbolTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{:?}", self.symbol_map)
+        writeln!(f, "{:?}", self.0)
     }
 }
