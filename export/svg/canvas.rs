@@ -83,7 +83,7 @@ impl MapToCanvas for (Scalar, Scalar) {
         let new_height = canvas.rect.height() / scale;
 
         let x = self.0 - canvas.content_rect.min().x;
-        let y = self.1 - canvas.content_rect.min().y; // Flip Y
+        let y = canvas.content_rect.max().y - self.1; // Flip Y
         let x = x / new_width * canvas.rect.width() + canvas.rect.min().x;
         let y = y / new_height * canvas.rect.height() + canvas.rect.min().y;
         (x, y)
