@@ -68,3 +68,10 @@ impl TryFrom<&Value> for Target {
         }
     }
 }
+
+impl std::hash::Hash for Target {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.target.hash(state);
+    }
+}

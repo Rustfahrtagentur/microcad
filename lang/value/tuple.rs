@@ -563,6 +563,19 @@ impl std::ops::Neg for Tuple {
     }
 }
 
+impl std::hash::Hash for Tuple {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.unnamed.iter().for_each(|(ty, value)| {
+            ty.hash(state);
+            value.hash(state);
+        });
+        self.named.iter().for_each(|(id, value)| {
+            id.hash(state);
+            value.hash(state);
+        });
+    }
+}
+
 impl Ty for Tuple {
     fn ty(&self) -> Type {
         Type::Tuple(Box::new(self.tuple_type()))

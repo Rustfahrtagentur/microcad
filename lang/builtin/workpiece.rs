@@ -84,7 +84,7 @@ pub type BuiltinWorkpieceFn = dyn Fn(&Tuple) -> RenderResult<BuiltinWorkpieceOut
 pub struct BuiltinWorkpiece {
     /// Kind of the workpiece.
     pub kind: BuiltinWorkbenchKind,
-    /// Output type
+    /// Output type.
     pub output_type: OutputType,
     /// Creator symbol.
     pub creator: Creator,
@@ -108,6 +108,12 @@ impl std::fmt::Display for BuiltinWorkpiece {
             kind = self.kind,
             creator = self.creator,
         )
+    }
+}
+
+impl std::hash::Hash for BuiltinWorkpiece {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.creator.hash(state)
     }
 }
 

@@ -102,12 +102,29 @@ impl Ty for Quantity {
 
 impl std::fmt::Display for Quantity {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}", round::round(self.value,OUTPUT_PRECISION), self.quantity_type.base_unit())
+        write!(
+            f,
+            "{}{}",
+            round::round(self.value, OUTPUT_PRECISION),
+            self.quantity_type.base_unit()
+        )
     }
 }
 
 impl std::fmt::Debug for Quantity {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} = {}", self.quantity_type, round::round(self.value,OUTPUT_PRECISION))
+        write!(
+            f,
+            "{} = {}",
+            self.quantity_type,
+            round::round(self.value, OUTPUT_PRECISION)
+        )
+    }
+}
+
+impl std::hash::Hash for Quantity {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        bytemuck::bytes_of(&self.value).hash(state);
+        self.quantity_type.hash(state)
     }
 }

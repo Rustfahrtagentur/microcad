@@ -400,6 +400,25 @@ impl std::fmt::Debug for Value {
     }
 }
 
+impl std::hash::Hash for Value {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        match self {
+            Value::None => std::mem::discriminant(&Value::None).hash(state),
+            Value::Quantity(quantity) => quantity.hash(state),
+            Value::Bool(b) => b.hash(state),
+            Value::Integer(i) => i.hash(state),
+            Value::String(s) => s.hash(state),
+            Value::Array(array) => array.hash(state),
+            Value::Tuple(tuple) => tuple.hash(state),
+            Value::Matrix(matrix) => matrix.hash(state),
+            Value::Model(model) => model.hash(state),
+            Value::Return(value) => value.hash(state),
+            Value::ConstExpression(expression) => expression.to_string().hash(state), // TODO: Is this correct?
+            Value::Target(target) => target.hash(state),
+        }
+    }
+}
+
 macro_rules! impl_try_from {
     ($($variant:ident),+ => $ty:ty ) => {
         impl TryFrom<Value> for $ty {

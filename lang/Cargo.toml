@@ -18,6 +18,7 @@ path = "lib.rs"
 
 [dependencies]
 compact_str = { version = "0.9", features = ["serde"] }
+bytemuck = "1.24"
 log = "0.4"
 pest = "2.8"
 pest_derive = "2.8"

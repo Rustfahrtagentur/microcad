@@ -310,3 +310,11 @@ impl TreeDisplay for Model {
 }
 
 impl WriteToFile for Model {}
+
+impl std::hash::Hash for Model {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        let self_ = self.borrow();
+        self_.element().hash(state);
+        self_.children().for_each(|child| child.hash(state));
+    }
+}

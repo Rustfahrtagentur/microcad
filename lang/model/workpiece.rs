@@ -54,6 +54,12 @@ impl std::fmt::Display for Workpiece {
     }
 }
 
+impl std::hash::Hash for Workpiece {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.creator.hash(state)
+    }
+}
+
 impl PropertiesAccess for Workpiece {
     fn get_property(&self, id: &Identifier) -> Option<&Value> {
         self.properties.get(id)

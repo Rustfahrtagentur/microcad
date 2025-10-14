@@ -26,7 +26,7 @@ pub enum Element {
     /// Multiplicity.
     Multiplicity,
 
-    /// Children marker.
+    /// Created from `@input` marker. Will never be part of the final model.
     InputPlaceholder,
 }
 
@@ -75,6 +75,20 @@ impl std::fmt::Display for Element {
             Element::Workpiece(workpiece) => write!(f, "{workpiece}"),
             Element::BuiltinWorkpiece(builtin_workpiece) => write!(f, "{builtin_workpiece}"),
             _ => write!(f, "{name}"),
+        }
+    }
+}
+
+impl std::hash::Hash for Element {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        match self {
+            Element::Group => std::mem::discriminant(&Element::Group).hash(state),
+            Element::Multiplicity => std::mem::discriminant(&Element::Multiplicity).hash(state),
+            Element::InputPlaceholder => {
+                std::mem::discriminant(&Element::InputPlaceholder).hash(state)
+            }
+            Element::Workpiece(workpiece) => workpiece.hash(state),
+            Element::BuiltinWorkpiece(builtin_workpiece) => builtin_workpiece.hash(state),
         }
     }
 }
