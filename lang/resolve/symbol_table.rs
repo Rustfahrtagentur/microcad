@@ -71,31 +71,6 @@ impl SymbolTable {
             .try_for_each(|symbol| symbol.search_target_mode_ids(&mut ids))?;
         Ok(ids)
     }
-
-    // Search recursively within symbol **and** in the symbol table (global)
-    pub(super) fn lookup_within(
-        &self,
-        name: &QualifiedName,
-        within: &Option<Symbol>,
-    ) -> ResolveResult<Symbol> {
-        if let Some(within) = within {
-            match (within.search(name), self.lookup(name)) {
-                (Ok(relative), Ok(global)) => {
-                    if relative == global || relative.is_alias() {
-                        Ok(global)
-                    } else if global.is_alias() {
-                        Ok(relative)
-                    } else {
-                        todo!("lookup ambiguous:\n  {relative:?}\n  {global:?}")
-                    }
-                }
-                (Ok(symbol), Err(_)) | (Err(_), Ok(symbol)) => Ok(symbol),
-                (Err(err), Err(_)) => Err(err),
-            }
-        } else {
-            self.lookup(name)
-        }
-    }
 }
 
 impl WriteToFile for SymbolTable {}

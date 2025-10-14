@@ -39,15 +39,44 @@ use names::*;
 /// Trait to handle symbol table.
 pub trait Lookup<E: std::error::Error = ResolveError> {
     /// Lookup for local or global symbol by qualified name.
-    ///
-    /// - looks on *stack*
-    /// - looks in *symbol table*
-    /// - follows *aliases* (use statements)
-    /// - detect any ambiguity
-    ///
     /// # Arguments
     /// -`name`: qualified name to search for
     fn lookup(&self, name: &QualifiedName) -> Result<Symbol, E>;
+
+    /// Search for qualified name within the symbol table **and** within the given symbol.
+    ///
+    /// If both are found
+    /// # Arguments
+    /// -`name`: qualified name to search for
+    /// -`within`: If some searches in this symbol too.
+    fn lookup_within(&self, name: &QualifiedName, within: &Option<Symbol>) -> Result<Symbol, E> {
+        if let Some(within) = within {
+            match (self.lookup(name), within.search(name)) {
+                // found both
+                (Ok(global), Ok(relative)) => {
+                    if relative == global {
+                        Ok(global)
+                    } else {
+                        // check if one is an alias of the other
+                        match (global.is_alias(), relative.is_alias()) {
+                            (true, false) => Ok(relative),
+                            (false, true) => Ok(global),
+                            (true, true) => unreachable!("found two aliases"),
+                            (false, false) => {
+                                todo!("lookup ambiguous:\n  {relative:?}\n  {global:?}")
+                            }
+                        }
+                    }
+                }
+                // found one
+                (Ok(symbol), Err(_)) | (Err(_), Ok(symbol)) => Ok(symbol),
+                // found nothing
+                (Err(err), Err(_)) => Err(err),
+            }
+        } else {
+            self.lookup(name)
+        }
+    }
 }
 
 /// Trait for items which can be fully qualified.
