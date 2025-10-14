@@ -16,3 +16,4 @@ keywords.workspace = true
 [dependencies]
 regex = "1"
 scan_dir = "0.3"
+env_logger = "0.11"
