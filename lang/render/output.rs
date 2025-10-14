@@ -3,7 +3,10 @@
 
 //! Model output types.
 
-use std::rc::Rc;
+use std::{
+    hash::{Hash, Hasher},
+    rc::Rc,
+};
 
 use microcad_core::{Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
 
@@ -28,6 +31,8 @@ pub enum RenderOutput {
         resolution: Option<RenderResolution>,
         /// The output geometry.
         geometry: Geometry2DOutput,
+        /// Model hash.
+        hash: u64,
     },
 
     /// 3D render output.
@@ -40,6 +45,8 @@ pub enum RenderOutput {
         resolution: Option<RenderResolution>,
         /// The output geometry.
         geometry: Geometry3DOutput,
+        /// Model hash.
+        hash: u64,
     },
 }
 
@@ -47,6 +54,9 @@ impl RenderOutput {
     /// Create new render output for model.
     pub fn new(model: &Model) -> RenderResult<Self> {
         let output_type = model.deduce_output_type();
+        let mut hasher = std::hash::DefaultHasher::new();
+        model.hash(&mut hasher);
+        let hash = hasher.finish();
 
         match output_type {
             OutputType::Geometry2D => {
@@ -61,6 +71,7 @@ impl RenderOutput {
                     world_matrix: None,
                     resolution: None,
                     geometry: None,
+                    hash,
                 })
             }
 
@@ -76,6 +87,7 @@ impl RenderOutput {
                     world_matrix: None,
                     resolution: None,
                     geometry: None,
+                    hash,
                 })
             }
             output_type => Err(RenderError::InvalidOutputType(output_type)),
@@ -164,9 +176,10 @@ impl std::fmt::Display for RenderOutput {
             RenderOutput::Geometry2D {
                 local_matrix,
                 geometry,
+                hash,
                 ..
             } => {
-                write!(f, "2D: ")?;
+                write!(f, "2D ({hash:X}): ")?;
                 if local_matrix.is_none() && geometry.is_none() {
                     write!(f, "(nothing to render)")?;
                 }
@@ -189,9 +202,10 @@ impl std::fmt::Display for RenderOutput {
             RenderOutput::Geometry3D {
                 local_matrix,
                 geometry,
+                hash,
                 ..
             } => {
-                write!(f, "3D: ")?;
+                write!(f, "3D ({hash:X}): ")?;
                 match (geometry, local_matrix) {
                     (None, None) => write!(f, "(nothing to render)"),
                     (None, Some(_)) => {

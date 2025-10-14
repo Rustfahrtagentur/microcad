@@ -167,7 +167,7 @@ impl RenderWithContext<Geometry2DOutput> for Model {
             let model = context.model();
             let geometry = {
                 let model_ = model.borrow();
-                let output = model.deduce_output_type();
+                let output = model.render_output_type();
                 match output {
                     OutputType::Geometry2D => {
                         match model_.element() {
@@ -201,7 +201,7 @@ impl RenderWithContext<Geometry3DOutput> for Model {
             let model = context.model();
             let geometry = {
                 let model_ = model.borrow();
-                let output = model.deduce_output_type();
+                let output = model.render_output_type();
                 match output {
                     OutputType::Geometry3D => {
                         match model_.element() {
