@@ -29,7 +29,7 @@ strum = { version = "0.27", features = ["derive"] }
 scan_dir = "0.3"
 delegate = "0.13"
 pathdiff = "0.2"
-ctor = "0.5"
+ctor = "0.6"
 color-print = { version = "0.3", optional = true }
 sqids = "0.4"
 indexmap = "2"
