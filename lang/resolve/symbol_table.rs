@@ -33,7 +33,7 @@ impl SymbolTable {
     pub fn insert_symbol(&mut self, id: Identifier, symbol: Symbol) -> ResolveResult<()> {
         log::trace!("insert symbol: {id}");
         if let Some(symbol) = self.symbol_map.insert(id, symbol.clone()) {
-            Err(ResolveError::AmbiguousSymbol(symbol.id()))
+            Err(ResolveError::SymbolAlreadyDefined(symbol.full_name()))
         } else {
             Ok(())
         }
@@ -98,6 +98,10 @@ impl Lookup for SymbolTable {
             found = crate::mark!(FOUND_INTERIM),
         );
         Ok(symbol)
+    }
+
+    fn ambiguity_error(ambiguous: QualifiedName, others: QualifiedNames) -> ResolveError {
+        ResolveError::AmbiguousSymbol(ambiguous, others)
     }
 }
 

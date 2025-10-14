@@ -54,13 +54,8 @@ pub enum EvalError {
     SymbolCannotBeCalled(QualifiedName),
 
     /// Found ambiguous symbols.
-    #[error("Ambiguous symbol {ambiguous} might be one of the following: {others}")]
-    AmbiguousSymbol {
-        /// Searched name
-        ambiguous: QualifiedName,
-        /// Symbols which matches the name
-        others: String,
-    },
+    #[error("Ambiguous symbol {0} might be one of the following: {1}")]
+    AmbiguousSymbol(QualifiedName, QualifiedNames),
 
     /// Local Symbol not found.
     #[error("Local symbol not found: {0}")]

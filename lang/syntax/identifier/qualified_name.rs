@@ -13,8 +13,6 @@ pub struct QualifiedName(Refer<Vec<Identifier>>);
 #[derive(Deref)]
 pub struct QualifiedNames(Vec<QualifiedName>);
 
-pub(crate) type QualifiedNameSet = indexmap::IndexSet<QualifiedName>;
-
 impl std::fmt::Display for QualifiedNames {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
@@ -28,6 +26,22 @@ impl std::fmt::Display for QualifiedNames {
         )
     }
 }
+
+impl std::fmt::Debug for QualifiedNames {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.0
+                .iter()
+                .map(|name| format!("{:?}", name.to_string()))
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
+}
+
+pub(crate) type QualifiedNameSet = indexmap::IndexSet<QualifiedName>;
 
 impl FromIterator<QualifiedName> for QualifiedNames {
     fn from_iter<T: IntoIterator<Item = QualifiedName>>(iter: T) -> Self {

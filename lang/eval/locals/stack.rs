@@ -212,6 +212,10 @@ impl Lookup<EvalError> for Stack {
             }
         }
     }
+
+    fn ambiguity_error(ambiguous: QualifiedName, others: QualifiedNames) -> EvalError {
+        EvalError::AmbiguousSymbol(ambiguous, others)
+    }
 }
 
 impl Locals for Stack {

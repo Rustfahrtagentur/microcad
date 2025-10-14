@@ -58,9 +58,13 @@ pub enum ResolveError {
     #[error("Ambiguous external module files found {0:?}")]
     AmbiguousExternals(Vec<std::path::PathBuf>),
 
-    /// Ambiguous symbol was added
-    #[error("Ambiguous symbol added: {0}")]
-    AmbiguousSymbol(Identifier),
+    /// Ambiguous symbol was found
+    #[error("Symbol {0} already defined")]
+    SymbolAlreadyDefined(QualifiedName),
+
+    /// Ambiguous symbol was found
+    #[error("Ambiguous symbol found: {0}")]
+    AmbiguousSymbol(QualifiedName, QualifiedNames),
 
     /// ScanDir Error
     #[error("{0}")]

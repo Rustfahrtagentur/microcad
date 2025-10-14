@@ -377,7 +377,7 @@ impl Symbol {
 
                     let symbol = context
                         .symbol_table
-                        .lookup_within(name, &inner.parent)?
+                        .lookup_within_opt(name, &inner.parent)?
                         .clone_with_visibility(*visibility);
 
                     self.visibility.set(Visibility::Deleted);
@@ -391,7 +391,7 @@ impl Symbol {
 
                     let symbols = context
                         .symbol_table
-                        .lookup_within(name, &inner.parent)?
+                        .lookup_within_opt(name, &inner.parent)?
                         .public_children(*visibility);
 
                     if !symbols.is_empty() {
