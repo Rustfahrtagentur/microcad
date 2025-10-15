@@ -424,30 +424,22 @@ impl Symbol {
         // retrieve symbols from any use statements
         let mut from_self = {
             let inner = self.inner.borrow();
-
             match &inner.def {
                 SymbolDefinition::Alias(visibility, id, name) => {
                     log::trace!("resolving use (as): {self} => {visibility}{id} ({name})");
-
                     let symbol = context
                         .symbol_table
                         .lookup_within_opt(name, &inner.parent)?
                         .clone_with_visibility(*visibility);
-
                     self.visibility.set(Visibility::Deleted);
-
                     [(id.clone(), symbol)].into_iter().collect()
                 }
                 SymbolDefinition::UseAll(visibility, name) => {
                     log::trace!("resolving use all: {self} => {visibility}{name}");
-
-                    self.visibility.set(Visibility::Deleted);
-
                     let symbols = context
                         .symbol_table
                         .lookup_within_opt(name, &inner.parent)?
                         .public_children(*visibility);
-
                     if !symbols.is_empty() {
                         self.visibility.set(Visibility::Deleted);
                     }
@@ -460,15 +452,12 @@ impl Symbol {
 
         let resolved = from_self.resolve_all(context)?;
         from_self.extend(resolved.iter().map(|(k, v)| (k.clone(), v.clone())));
-
         // collect symbols resolved from children
         let from_children = self.inner.borrow().children.resolve_all(context)?;
-
         self.inner
             .borrow_mut()
             .children
             .extend(from_children.iter().map(|(k, v)| (k.clone(), v.clone())));
-
         // return symbols collected from self
         Ok(from_self)
     }
