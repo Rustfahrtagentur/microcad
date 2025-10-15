@@ -203,8 +203,7 @@ impl EvalContext {
                 "{lookup} for symbol '{name:?}' in current workbench '{workbench:?}'",
                 lookup = crate::mark!(LOOKUP)
             );
-            let name = &name.with_prefix(workbench);
-            match self.symbol_table.lookup(name) {
+            match self.symbol_table.lookup_within_name(name, workbench) {
                 Ok(symbol) => {
                     if symbol.full_name() == *name {
                         log::trace!(
@@ -408,6 +407,7 @@ impl Lookup<EvalError> for EvalContext {
                         // for symbol table
                         | EvalError::ResolveError(ResolveError::SymbolNotFound(_))
                         | EvalError::ResolveError(ResolveError::ExternalPathNotFound(_))
+                        | EvalError::ResolveError(ResolveError::SymbolIsPrivate(_))
                         | EvalError::ResolveError(ResolveError::NulHash),
                     ) => (),
                     Err(err) => errors.push((origin, err)),
