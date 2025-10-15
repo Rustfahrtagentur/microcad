@@ -9,7 +9,13 @@ impl Eval<ArgumentValue> for Argument {
     /// Evaluate `Argument` and return `ArgumentValue`
     fn eval(&self, context: &mut EvalContext) -> EvalResult<ArgumentValue> {
         Ok(ArgumentValue::new(
-            self.expression.eval(context)?,
+            match self.expression.eval(context) {
+                Ok(value) => value,
+                Err(err) => {
+                    context.error(self, err)?;
+                    Value::None
+                }
+            },
             self.expression.single_identifier().cloned(),
             self.src_ref.clone(),
         ))

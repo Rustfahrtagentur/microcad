@@ -43,9 +43,9 @@ pub trait PushDiag {
     fn warning(
         &mut self,
         src: &impl SrcReferrer,
-        error: impl std::error::Error + 'static,
+        err: impl std::error::Error + 'static,
     ) -> DiagResult<()> {
-        let err = Diagnostic::Warning(Refer::new(error.into(), src.src_ref()));
+        let err = Diagnostic::Warning(Refer::new(err.into(), src.src_ref()));
         if cfg!(feature = "ansi-color") {
             log::warn!("{}", color_print::cformat!("<y,s>{err}</>"));
         } else {
@@ -57,9 +57,9 @@ pub trait PushDiag {
     fn error(
         &mut self,
         src: &impl SrcReferrer,
-        error: impl std::error::Error + 'static,
+        err: impl std::error::Error + 'static,
     ) -> DiagResult<()> {
-        let err = Diagnostic::Error(Refer::new(error.into(), src.src_ref()));
+        let err = Diagnostic::Error(Refer::new(err.into(), src.src_ref()));
         if cfg!(feature = "ansi-color") {
             log::error!("{}", color_print::cformat!("<r,s>{err}</>"));
         } else {
