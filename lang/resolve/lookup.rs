@@ -21,6 +21,11 @@ pub trait Lookup<E: std::error::Error = ResolveError> {
     /// # Return
     /// If both are found and one is an *alias* returns the other one.
     fn lookup_within(&self, name: &QualifiedName, within: &Symbol) -> Result<Symbol, E> {
+        log::trace!(
+            "{lookup} for symbol '{name:?}' within '{within}'",
+            within = within.full_name(),
+            lookup = crate::mark!(LOOKUP)
+        );
         match (self.lookup(name), within.search(name, true)) {
             // found both
             (Ok(global), Ok(relative)) => {
@@ -40,9 +45,23 @@ pub trait Lookup<E: std::error::Error = ResolveError> {
                 }
             }
             // found one
-            (Ok(symbol), Err(_)) | (Err(_), Ok(symbol)) => Ok(symbol),
+            (Ok(symbol), Err(_)) | (Err(_), Ok(symbol)) => {
+                log::trace!(
+                    "{found} symbol '{name:?}' within '{within}'",
+                    within = within.full_name(),
+                    found = crate::mark!(FOUND_INTERIM)
+                );
+                Ok(symbol)
+            }
             // found nothing
-            (Err(err), Err(_)) => Err(err),
+            (Err(err), Err(_)) => {
+                log::trace!(
+                    "{not_found} symbol '{name:?}' within '{within}'",
+                    within = within.full_name(),
+                    not_found = crate::mark!(NOT_FOUND_INTERIM)
+                );
+                Err(err)
+            }
         }
     }
 
