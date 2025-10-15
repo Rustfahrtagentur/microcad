@@ -11,7 +11,7 @@ use strum::IntoStaticStr;
 /// A use declaration is an element of a use statement.
 /// It can be a single symbol, all symbols from a module, or an alias.
 ///
-/// ```µcad
+/// ```mcad
 /// use std::print;
 /// use std::*;
 /// use std::print as p;

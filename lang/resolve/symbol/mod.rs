@@ -16,7 +16,7 @@ use crate::{builtin::*, rc::*, resolve::*, src_ref::*, syntax::*, ty::*, value::
 
 /// Symbol
 ///
-/// Every `Symbol` has a [`SymbolDefinition`], a *parent* and *children* stored within a `Rc<RefCell<`[`SymbolInner`]`>`.
+/// Every `Symbol` has a [`SymbolDefinition`], a *parent* and *children*.
 /// So `Symbol` is meant as a tree which is used by [`SymbolTable`] to store
 /// the resolved symbols by it's original structure in the source code and by it's *id*.
 ///

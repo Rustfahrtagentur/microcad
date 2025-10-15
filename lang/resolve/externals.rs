@@ -191,8 +191,8 @@ fn is_mod_file(p: &std::path::PathBuf) -> bool {
 ///
 /// Module files might be on of the following:
 ///
-/// - <path>`/`<id>`.`*ext*
-/// - <path>`/`<id>`/mod.`*ext*
+/// - \<path>`/`\<id>`.`*ext*
+/// - \<path>`/`\<id>`/mod.`*ext*
 ///
 /// *ext* = any valid microcad file extension.
 pub fn find_mod_file_by_id(

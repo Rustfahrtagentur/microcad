@@ -4,17 +4,17 @@
 //! Evaluation of parsed content.
 //!
 //! To be able to evaluate (run) a source file, it must be loaded, parsed and resolved.
-//! To do so a [`Context`] can be created with [`Context::new()`] based on an already resolved symbol or
-//! by using [`Context::from_source()`] or `ContextBuilder::from_source_captured()` which both automatically
-//! load and resolve the source file and build a context around it which then can be evaluated with [`Context::eval()`]:
+//! To do so a [`EvalContext`] can be created with [`EvalContext::new()`] based on an already resolved symbol or
+//! by using [`EvalContext::from_source()`] or `ContextBuilder::from_source_captured()` which both automatically
+//! load and resolve the source file and build a context around it which then can be evaluated with [`EvalContext::eval()`]:
 //!
 //! ```ignore
-//! use microcad_lang::eval::Context;
+//! use microcad_lang::eval::EvalContext;
 //! use microcad_lang::diag::Diag;
 //! use std::io::stdout;
 //!
 //! // create a context for evaluation of the source file
-//! let mut context = Context::from_source(
+//! let mut context = EvalContext::from_source(
 //!     "my.µcad",              // root file name
 //!     builtin_module(),    // `__builtin` library
 //!     &["./lib".into()]       // list of library paths

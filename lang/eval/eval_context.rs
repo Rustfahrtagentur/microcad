@@ -8,13 +8,6 @@ use crate::{
 /// *Context* for *evaluation* of a resolved µcad file.
 ///
 /// The context is used to store the current state of the evaluation.
-///
-/// A context consists of the following members:
-/// - A *symbol table* ([`SymbolTable`]) with symbols stored by [`QualifiedName`] and a [`Stack`].
-/// - A *diagnostic handler* ([`DiagHandler`]) that accumulates *evaluation errors* for later output.
-/// - One *output channel* ([`Output`]) where `__builtin::print` writes it's output to while evaluation.
-///
-/// All these internal structures can be accessed by several implemented traits.
 pub struct EvalContext {
     /// Symbol table
     symbol_table: SymbolTable,
