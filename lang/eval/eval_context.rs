@@ -205,23 +205,27 @@ impl EvalContext {
             );
             match self.symbol_table.lookup_within_name(name, workbench) {
                 Ok(symbol) => {
-                    if symbol.full_name() == *name {
-                        log::trace!(
-                            "{found} symbol in current module: {symbol:?}",
-                            found = crate::mark!(FOUND_INTERIM),
-                        );
-                        return Ok(symbol);
-                    }
+                    log::trace!(
+                        "{found} symbol in current module: {symbol:?}",
+                        found = crate::mark!(FOUND_INTERIM),
+                    );
+                    Ok(symbol)
                 }
-                Err(err) => return Err(err)?,
-            };
+                Err(err) => {
+                    log::trace!(
+                        "{not_found} symbol '{name:?}': {err}",
+                        not_found = crate::mark!(NOT_FOUND_INTERIM)
+                    );
+                    Err(err)
+                }
+            }
         } else {
             log::trace!(
                 "{not_found} No current workbench",
                 not_found = crate::mark!(NOT_FOUND_INTERIM)
             );
+            Err(ResolveError::SymbolNotFound(name.clone()))
         }
-        Err(ResolveError::SymbolNotFound(name.clone()))
     }
 
     /// Check if current stack frame is code

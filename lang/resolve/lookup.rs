@@ -29,18 +29,20 @@ pub trait Lookup<E: std::error::Error = ResolveError> {
         match (self.lookup(name), within.search(name, true)) {
             // found both
             (Ok(global), Ok(relative)) => {
-                if relative == global {
-                    Ok(global)
-                } else {
-                    // check if one is an alias of the other
-                    match (global.is_alias(), relative.is_alias()) {
-                        (true, false) => Ok(relative),
-                        (false, true) => Ok(global),
-                        (true, true) => unreachable!("found two aliases"),
-                        (false, false) => Err(Self::ambiguity_error(
-                            relative.full_name(),
-                            [global.full_name()].into_iter().collect(),
-                        )),
+                // check if one is an alias of the other
+                match (global.is_alias(), relative.is_alias()) {
+                    (true, false) => Ok(relative),
+                    (false, true) => Ok(global),
+                    (true, true) => unreachable!("found two aliases"),
+                    (false, false) => {
+                        if relative == global {
+                            Ok(global)
+                        } else {
+                            Err(Self::ambiguity_error(
+                                relative.full_name(),
+                                [global.full_name()].into_iter().collect(),
+                            ))
+                        }
                     }
                 }
             }
