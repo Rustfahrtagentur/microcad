@@ -258,14 +258,13 @@ impl RenderWithContext<Geometries2D> for Models {
 
 impl RenderWithContext<Geometry2DOutput> for Models {
     fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
-        Ok(match self.len() {
-            0 => unreachable!(),
-            1 => self
-                .first()
-                .expect("One item")
-                .render_with_context(context)?,
-            _ => Rc::new(Geometry2D::Collection(self.render_with_context(context)?).into()),
-        })
+        match self.len() {
+            0 => Err(RenderError::NothingToRender),
+            1 => self.first().expect("One item").render_with_context(context),
+            _ => Ok(Rc::new(
+                Geometry2D::Collection(self.render_with_context(context)?).into(),
+            )),
+        }
     }
 }
 
@@ -282,14 +281,13 @@ impl RenderWithContext<Geometries3D> for Models {
 
 impl RenderWithContext<Geometry3DOutput> for Models {
     fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
-        Ok(match self.len() {
-            0 => unreachable!(),
-            1 => self
-                .first()
-                .expect("One item")
-                .render_with_context(context)?,
-            _ => Rc::new(Geometry3D::Collection(self.render_with_context(context)?).into()),
-        })
+        match self.len() {
+            0 => Err(RenderError::NothingToRender),
+            1 => self.first().expect("One item").render_with_context(context),
+            _ => Ok(Rc::new(
+                Geometry3D::Collection(self.render_with_context(context)?).into(),
+            )),
+        }
     }
 }
 
