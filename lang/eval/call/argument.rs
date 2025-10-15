@@ -5,9 +5,9 @@
 
 use crate::{eval::*, syntax::*};
 
-impl Argument {
+impl Eval<ArgumentValue> for Argument {
     /// Evaluate `Argument` and return `ArgumentValue`
-    pub fn eval_value(&self, context: &mut EvalContext) -> EvalResult<ArgumentValue> {
+    fn eval(&self, context: &mut EvalContext) -> EvalResult<ArgumentValue> {
         Ok(ArgumentValue::new(
             self.expression.eval(context)?,
             self.expression.single_identifier().cloned(),

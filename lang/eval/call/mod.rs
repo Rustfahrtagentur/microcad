@@ -22,7 +22,7 @@ impl Eval<ArgumentValueList> for ArgumentList {
             .map(|arg| {
                 (
                     arg.id.clone().unwrap_or(Identifier::none()),
-                    arg.eval_value(context),
+                    arg.eval(context),
                 )
             })
             .map(|(id, arg)| match arg {
@@ -66,7 +66,7 @@ impl Eval<ArgumentValueListRaw> for ArgumentList {
                             arg.src_ref.clone(),
                         ))
                     } else {
-                        arg.eval_value(context)
+                        arg.eval(context)
                     },
                 )
             })
