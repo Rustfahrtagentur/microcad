@@ -80,7 +80,8 @@ impl std::fmt::Display for WorkbenchDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{kind} {id}({plan}) {body}",
+            "{visibility}{kind} {id}({plan}) {body}",
+            visibility = self.visibility,
             kind = self.kind,
             id = self.id,
             plan = self.plan,
@@ -93,7 +94,8 @@ impl std::fmt::Debug for WorkbenchDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{kind} {id:?}({plan:?}) {body:?}",
+            "{visibility}{kind} {id:?}({plan:?}) {body:?}",
+            visibility = self.visibility,
             kind = self.kind,
             id = self.id,
             plan = self.plan,
@@ -106,8 +108,9 @@ impl TreeDisplay for WorkbenchDefinition {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(
             f,
-            "{:depth$}Workbench ({kind}) '{id}':",
+            "{:depth$}{visibility}Workbench ({kind}) '{id}':",
             "",
+            visibility = self.visibility,
             kind = self.kind,
             id = self.id
         )?;

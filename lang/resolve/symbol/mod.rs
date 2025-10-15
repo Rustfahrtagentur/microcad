@@ -506,6 +506,7 @@ impl Symbol {
         if let Some(first) = name.first() {
             if let Some(child) = self.get_child(first) {
                 if respect && !top_level && !child.is_public() {
+                    log::trace!("Symbol {:?} is private", child.full_name());
                     Err(ResolveError::SymbolIsPrivate(child.full_name().clone()))
                 } else if name.is_single_identifier() && !child.is_deleted() {
                     log::trace!("Found {name:?} in {:?}", self.full_name());
