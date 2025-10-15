@@ -65,35 +65,6 @@ pub trait Lookup<E: std::error::Error = ResolveError> {
         }
     }
 
-    /// Search a *symbol* by it's *qualified name* **and** within any of the given *symbol*s.
-    ///
-    /// # Arguments
-    /// - `name`: *qualified name* to search for
-    /// - `within`: If some, searches in this *symbol* too.
-    /// # Return
-    /// If multiple were found returns the one which is no aliases.
-    fn lookup_within_many(&self, name: &QualifiedName, within: &Symbols) -> Result<Symbol, E> {
-        assert!(!within.is_empty());
-
-        let found: Vec<_> = within
-            .iter()
-            .map(|within| self.lookup_within(name, within))
-            .chain([self.lookup(name)])
-            .filter_map(|result| result.ok())
-            .filter(|symbol| !symbol.is_alias())
-            .collect();
-
-        if found.len() > 1 {
-            todo!("ambiguous");
-        }
-
-        if let Some(first) = found.first() {
-            Ok(first.clone())
-        } else {
-            todo!("not found");
-        }
-    }
-
     /// Search a *symbol* by it's *qualified name* **and** within a *symbol* given by name.
     ///
     /// If both are found
