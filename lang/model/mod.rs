@@ -32,8 +32,13 @@ use derive_more::{Deref, DerefMut};
 use microcad_core::BooleanOp;
 
 use crate::{
-    diag::WriteToFile, rc::RcMut, render::RenderOutput, src_ref::SrcReferrer, syntax::Identifier,
-    tree_display::*, value::Value,
+    diag::WriteToFile,
+    rc::RcMut,
+    render::{ComputedHash, HashId, RenderOutput},
+    src_ref::SrcReferrer,
+    syntax::Identifier,
+    tree_display::*,
+    value::Value,
 };
 
 /// A reference counted, mutable [`Model`].
@@ -326,5 +331,12 @@ impl std::hash::Hash for Model {
         let self_ = self.borrow();
         self_.element().hash(state);
         self_.children().for_each(|child| child.hash(state));
+    }
+}
+
+impl ComputedHash for Model {
+    fn computed_hash(&self) -> HashId {
+        let self_ = self.borrow();
+        self_.output().computed_hash()
     }
 }

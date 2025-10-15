@@ -15,7 +15,8 @@ impl Operation for Hull {
         context.update_2d(|context, model| {
             let model_ = model.borrow();
             let geometry: Geometry2DOutput = model_.children.render_with_context(context)?;
-            Ok(geometry.map(|geometry| Rc::new(geometry.hull().with_bounds())))
+
+            Ok(Rc::new(geometry.inner.hull().into())) // TODO: Improve this API: model_.children.render_with_context(context)?.hull().into()
         })
     }
 
@@ -23,7 +24,8 @@ impl Operation for Hull {
         context.update_3d(|context, model| {
             let model_ = model.borrow();
             let geometry: Geometry3DOutput = model_.children.render_with_context(context)?;
-            Ok(geometry.map(|geometry| Rc::new(geometry.hull().with_bounds())))
+
+            Ok(Rc::new(geometry.inner.hull().into())) // TODO: Improve this API
         })
     }
 }

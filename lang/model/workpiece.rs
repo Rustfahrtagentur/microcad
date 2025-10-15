@@ -3,7 +3,13 @@
 
 //! Work piece element
 
-use crate::{eval::*, model::*, syntax::*, value::*};
+use crate::{
+    eval::*,
+    model::*,
+    render::{ComputedHash, Hashed},
+    syntax::*,
+    value::*,
+};
 
 /// A workpiece is an element produced by a workbench.
 #[derive(Debug, Clone)]
@@ -13,7 +19,7 @@ pub struct Workpiece {
     /// Workpiece properties.
     pub properties: Properties,
     /// Creator symbol.
-    pub creator: Creator,
+    pub creator: Hashed<Creator>,
 }
 
 impl Workpiece {
@@ -47,16 +53,16 @@ impl Workpiece {
 impl std::fmt::Display for Workpiece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.kind {
-            WorkbenchKind::Part => write!(f, "Workpiece(part) {}", self.creator),
-            WorkbenchKind::Sketch => write!(f, "Workpiece(sketch) {}", self.creator),
-            WorkbenchKind::Operation => write!(f, "Workpiece(op) {}", self.creator),
+            WorkbenchKind::Part => write!(f, "Workpiece(part) {}", *self.creator),
+            WorkbenchKind::Sketch => write!(f, "Workpiece(sketch) {}", *self.creator),
+            WorkbenchKind::Operation => write!(f, "Workpiece(op) {}", *self.creator),
         }
     }
 }
 
-impl std::hash::Hash for Workpiece {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.creator.hash(state)
+impl ComputedHash for Workpiece {
+    fn computed_hash(&self) -> crate::render::HashId {
+        self.creator.computed_hash()
     }
 }
 

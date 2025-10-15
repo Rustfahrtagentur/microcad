@@ -3,7 +3,7 @@
 
 //! Workbench definition syntax element evaluation
 
-use crate::{eval::*, model::*, syntax::*};
+use crate::{eval::*, model::*, render::Hashed, syntax::*};
 
 impl WorkbenchDefinition {
     /// Try to evaluate a single call into a [`Model`].
@@ -52,7 +52,7 @@ impl WorkbenchDefinition {
                 kind: *self.kind,
                 // copy all arguments which are part of the building plan to properties
                 properties: properties.into_iter().collect(),
-                creator,
+                creator: Hashed::new(creator),
             }),
             call_src_ref,
         )

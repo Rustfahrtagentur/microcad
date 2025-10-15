@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::builtin::*;
+use microcad_lang::{builtin::*, render::*};
 
 /// The builtin sphere primitive, defined by its radius.
 #[derive(Debug, Clone)]
@@ -14,6 +14,16 @@ pub struct Sphere {
 impl Render<Geometry3D> for Sphere {
     fn render(&self, resolution: &RenderResolution) -> Geometry3D {
         Manifold::sphere(self.radius, resolution.circular_segments(self.radius)).into()
+    }
+}
+
+impl RenderWithContext<Geometry3DOutput> for Sphere {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        context.update_3d(|context, _| {
+            Ok(std::rc::Rc::new(
+                self.render(&context.current_resolution()).into(),
+            ))
+        })
     }
 }
 

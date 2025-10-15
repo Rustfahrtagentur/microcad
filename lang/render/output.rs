@@ -13,10 +13,10 @@ use microcad_core::{Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
 use crate::{model::*, render::*};
 
 /// Geometry 2D type alias.
-pub type Geometry2DOutput = Option<Rc<WithBounds2D<Geometry2D>>>;
+pub type Geometry2DOutput = Rc<WithBounds2D<Geometry2D>>;
 
 /// Geometry 3D type alias.
-pub type Geometry3DOutput = Option<Rc<WithBounds3D<Geometry3D>>>;
+pub type Geometry3DOutput = Rc<WithBounds3D<Geometry3D>>;
 
 /// The model output when a model has been processed.
 #[derive(Debug, Clone)]
@@ -30,9 +30,9 @@ pub enum RenderOutput {
         /// The render resolution, calculated from transformation matrix.
         resolution: Option<RenderResolution>,
         /// The output geometry.
-        geometry: Geometry2DOutput,
-        /// Model hash.
-        hash: u64,
+        geometry: Option<Geometry2DOutput>,
+        /// Computed model hash.
+        hash: HashId,
     },
 
     /// 3D render output.
@@ -44,9 +44,9 @@ pub enum RenderOutput {
         /// The render resolution, calculated from transformation matrix.
         resolution: Option<RenderResolution>,
         /// The output geometry.
-        geometry: Geometry3DOutput,
-        /// Model hash.
-        hash: u64,
+        geometry: Option<Geometry3DOutput>,
+        /// Computed model hash.
+        hash: HashId,
     },
 }
 
@@ -107,7 +107,7 @@ impl RenderOutput {
     /// Set the 2D geometry as render output.
     pub fn set_geometry_2d(&mut self, geo: Geometry2DOutput) {
         match self {
-            RenderOutput::Geometry2D { geometry, .. } => *geometry = geo,
+            RenderOutput::Geometry2D { geometry, .. } => *geometry = Some(geo),
             RenderOutput::Geometry3D { .. } => unreachable!(),
         }
     }
@@ -116,7 +116,7 @@ impl RenderOutput {
     pub fn set_geometry_3d(&mut self, geo: Geometry3DOutput) {
         match self {
             RenderOutput::Geometry2D { .. } => unreachable!(),
-            RenderOutput::Geometry3D { geometry, .. } => *geometry = geo,
+            RenderOutput::Geometry3D { geometry, .. } => *geometry = Some(geo),
         }
     }
 
@@ -221,5 +221,13 @@ impl std::fmt::Display for RenderOutput {
             write!(f, " {resolution}")?
         }
         Ok(())
+    }
+}
+
+impl ComputedHash for RenderOutput {
+    fn computed_hash(&self) -> HashId {
+        match self {
+            RenderOutput::Geometry2D { hash, .. } | RenderOutput::Geometry3D { hash, .. } => *hash,
+        }
     }
 }

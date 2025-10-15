@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::builtin::*;
+use microcad_lang::{builtin::*, render::*};
 
 /// The built-in cylinder primitive, defined by an bottom radius, top radius and height.
 /// The cylinder is oriented along the z-axis.
@@ -25,6 +25,16 @@ impl Render<Geometry3D> for Cylinder {
             resolution.circular_segments(self.radius_bottom.max(self.radius_top)),
         )
         .into()
+    }
+}
+
+impl RenderWithContext<Geometry3DOutput> for Cylinder {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        context.update_3d(|context, _| {
+            Ok(std::rc::Rc::new(
+                self.render(&context.current_resolution()).into(),
+            ))
+        })
     }
 }
 

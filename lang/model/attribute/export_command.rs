@@ -26,6 +26,10 @@ impl ExportCommand {
     /// Export the model. By the settings in the attribute.
     pub fn export(&self, model: &Model) -> Result<Value, ExportError> {
         let mut render_context = RenderContext::init(model, self.resolution.clone())?;
+        log::warn!(
+            "Pre-rendered model:\n{}",
+            crate::tree_display::FormatTree(model)
+        );
 
         use crate::render::RenderWithContext;
         self.exporter.export(

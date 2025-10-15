@@ -1,9 +1,8 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use geo::Simplify;
 use microcad_core::*;
-use microcad_lang::builtin::*;
+use microcad_lang::{builtin::*, render::*};
 
 /// Pie geometry with offset.
 #[derive(Debug, Clone)]
@@ -18,9 +17,9 @@ pub struct Text {
     pub font_file: String,
 }
 
-impl Text {
-    fn workpiece(self) -> BuiltinWorkpieceOutput {
-        BuiltinWorkpieceOutput::Primitive2D(Box::new(self))
+impl From<Text> for BuiltinWorkpieceOutput {
+    fn from(text: Text) -> Self {
+        BuiltinWorkpieceOutput::Primitive2D(Box::new(text))
     }
 }
 
@@ -39,7 +38,18 @@ impl Render<Geometry2D> for Text {
         let options = geo_rusttype::TextOptions::new(self.height as f32, font, None, None);
         let polygons = geo_rusttype::text_to_multi_polygon(&self.text, options);
 
+        use geo::Simplify;
         Geometry2D::MultiPolygon(polygons.simplify(resolution.linear))
+    }
+}
+
+impl RenderWithContext<Geometry2DOutput> for Text {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
+        context.update_2d(|context, _| {
+            Ok(std::rc::Rc::new(
+                self.render(&context.current_resolution()).into(),
+            ))
+        })
     }
 }
 
@@ -59,7 +69,7 @@ impl BuiltinWorkbenchDefinition for Text {
                 text: args.get("text"),
                 font_file: args.get("font_file"),
             }
-            .workpiece())
+            .into())
         }
     }
 

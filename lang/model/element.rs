@@ -3,7 +3,7 @@
 
 //! Element of a [`Model`].
 
-use crate::{builtin::*, model::*, syntax::*, value::*};
+use crate::{builtin::*, model::*, render::ComputedHash, syntax::*, value::*};
 use strum::IntoStaticStr;
 
 /// An element defines the entity of a [`Model`].
@@ -87,8 +87,10 @@ impl std::hash::Hash for Element {
             Element::InputPlaceholder => {
                 std::mem::discriminant(&Element::InputPlaceholder).hash(state)
             }
-            Element::Workpiece(workpiece) => workpiece.hash(state),
-            Element::BuiltinWorkpiece(builtin_workpiece) => builtin_workpiece.hash(state),
+            Element::Workpiece(workpiece) => workpiece.computed_hash().hash(state),
+            Element::BuiltinWorkpiece(builtin_workpiece) => {
+                builtin_workpiece.computed_hash().hash(state)
+            }
         }
     }
 }

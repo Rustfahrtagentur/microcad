@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::builtin::*;
+use microcad_lang::{builtin::*, render::*};
 
 /// Pie geometry with offset.
 #[derive(Debug, Clone)]
@@ -75,6 +75,16 @@ impl Render<Geometry2D> for Pie {
         };
 
         Geometry2D::Polygon(Polygon::new(LineString::new(points), vec![]))
+    }
+}
+
+impl RenderWithContext<Geometry2DOutput> for Pie {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
+        context.update_2d(|context, _| {
+            Ok(std::rc::Rc::new(
+                self.render(&context.current_resolution()).into(),
+            ))
+        })
     }
 }
 

@@ -28,7 +28,6 @@ impl RenderContext {
     /// Initialize context with current model and prerender model.
     pub fn init(model: &Model, resolution: RenderResolution) -> RenderResult<Self> {
         model.prerender(resolution)?;
-
         Ok(Self {
             model_stack: vec![model.clone()],
             ..Default::default()

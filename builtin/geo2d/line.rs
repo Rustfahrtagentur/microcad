@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::builtin::*;
+use microcad_lang::{builtin::*, render::*};
 
 /// Built-in line primitive.
 pub struct Line(geo2d::Line);
@@ -21,6 +21,16 @@ impl Line {
 impl Render<Geometry2D> for Line {
     fn render(&self, _: &RenderResolution) -> Geometry2D {
         Geometry2D::Line(self.0.clone())
+    }
+}
+
+impl RenderWithContext<Geometry2DOutput> for Line {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
+        context.update_2d(|context, _| {
+            Ok(std::rc::Rc::new(
+                self.render(&context.current_resolution()).into(),
+            ))
+        })
     }
 }
 
