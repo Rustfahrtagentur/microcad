@@ -22,23 +22,6 @@
 
 -- Output --
 -- Errors --
-error: Assertion failed: Found valid symbol 'my::mod_public::const_private' within module 'visibility'.
-  ---> <FROM STR>:13:34
-     |
-  13 | __builtin::debug::assert_invalid(my::mod_public::const_private);
-     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Assertion failed: Found valid symbol 'my::mod_private::const_public' within module 'visibility'.
-  ---> <FROM STR>:14:34
-     |
-  14 | __builtin::debug::assert_invalid(my::mod_private::const_public);
-     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
-error: Assertion failed: Found valid symbol 'my::mod_private::const_private' within module 'visibility'.
-  ---> <FROM STR>:15:34
-     |
-  15 | __builtin::debug::assert_invalid(my::mod_private::const_private);
-     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-     |
+-- No model --
 -- Test Result --
-FAIL
+OK

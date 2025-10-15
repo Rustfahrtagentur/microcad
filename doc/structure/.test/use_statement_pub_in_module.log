@@ -6,7 +6,7 @@
 
  1: mod my {
  2:     mod name {
- 3:         mod space {
+ 3:         pub mod space {
  4:             pub use std::geo2d::*;
  5:         }
  6:     }

@@ -5,13 +5,13 @@
 -- Code --
 
  1: mod a {
- 2:     mod b {
- 3:         mod c {
- 4:             part M1() {}
+ 2:     pub mod b {
+ 3:         pub mod c {
+ 4:             pub part M1() {}
  5:         }
  6:     }
  7: 
- 8:     part M2() {}
+ 8:     pub part M2() {}
  9: }
 10: 
 11: a::b::c::M1();
