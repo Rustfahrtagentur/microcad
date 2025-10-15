@@ -235,12 +235,16 @@ impl Symbol {
 
     /// Overwrite any value in this symbol
     pub(crate) fn set_value(&self, new_value: Value) -> ResolveResult<()> {
-        match &mut self.inner.borrow_mut().def {
+        let is_a_value = match &mut self.inner.borrow_mut().def {
             SymbolDefinition::Constant(.., value) => {
                 *value = new_value;
-                Ok(())
+                true
             }
-            _ => Err(ResolveError::NotAValue(self.full_name())),
+            _ => false,
+        };
+        match is_a_value {
+            true => Ok(()),
+            false => Err(ResolveError::NotAValue(self.full_name())),
         }
     }
 
