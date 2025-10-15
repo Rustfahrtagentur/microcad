@@ -2,7 +2,7 @@
 
 We can scale objects in 2D and 3D using `std::ops::scale`:
 
-[![test](.test/scale_2d.svg)](.test/scale_2d.log)
+[![test](.test/scale_uniform.svg)](.test/scale_uniform.log)
 
 ```µcad,scale_uniform
 std::geo2d::Rect(30mm).std::ops::scale(200%);

@@ -19,8 +19,6 @@ my_brick.µcad
 Let's add the following content to the `my_brick.µcad` file to
 create a few bricks with different parameters:
 
-[![test](.test/library.svg)](.test/library.log)
-
 ```µcad
 mod lego_brick;
 

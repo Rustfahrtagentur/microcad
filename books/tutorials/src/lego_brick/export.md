@@ -9,8 +9,6 @@ microcad export lego_brick
 
 But we also can use the `#[export]` attribute to export each brick to a different file:
 
-[![test](.test/export.svg)](.test/export.log)
-
 ```µcad
 mod lego_brick;
 
