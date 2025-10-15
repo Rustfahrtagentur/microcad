@@ -81,6 +81,10 @@ pub enum ResolveError {
     /// Resolve check failed
     #[error("Resolve failed")]
     ResolveCheckFailed,
+
+    /// Symbol is private
+    #[error("Symbol {0} is private")]
+    SymbolIsPrivate(QualifiedName),
 }
 
 /// Result type of any resolve.

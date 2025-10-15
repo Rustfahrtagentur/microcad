@@ -244,6 +244,15 @@ impl EvalContext {
             Some(StackFrame::Module(..) | StackFrame::Source(..))
         )
     }
+
+    fn lookup_within(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
+        self.symbol_table.lookup_within(
+            name,
+            &self
+                .symbol_table
+                .search(&self.stack.current_module_name(), false)?,
+        )
+    }
 }
 
 impl UseSymbol for EvalContext {
@@ -371,9 +380,7 @@ impl Lookup<EvalError> for EvalContext {
         let results = [
             ("local", { self.stack.lookup(name) }),
             ("global", {
-                self.symbol_table
-                    .lookup_within_name(name, &self.stack.current_module_name())
-                    .map_err(|err| err.into())
+                self.lookup_within(name).map_err(|err| err.into())
             }),
             ("property", { self.lookup_property(name) }),
             ("workbench", {

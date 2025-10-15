@@ -55,7 +55,7 @@ impl SymbolMap {
     }
 
     /// Search for a symbol in symbol map.
-    pub(crate) fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
+    pub(crate) fn search(&self, name: &QualifiedName, respect: bool) -> ResolveResult<Symbol> {
         log::trace!("Searching {name:?} in symbol map");
         let (id, leftover) = name.split_first();
         if let Some(symbol) = self.get(&id) {
@@ -63,7 +63,7 @@ impl SymbolMap {
                 log::trace!("Fetched {name:?} from symbol map");
                 Ok(symbol.clone())
             } else {
-                symbol.search(&leftover)
+                symbol.search(&leftover, respect)
             }
         } else {
             Err(ResolveError::SymbolNotFound(name.clone()))

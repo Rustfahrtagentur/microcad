@@ -488,17 +488,27 @@ impl Symbol {
     /// Search down the symbol tree for a qualified name.
     /// # Arguments
     /// - `name`: Name to search for.
-    pub(crate) fn search(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
+    pub(crate) fn search(&self, name: &QualifiedName, respect: bool) -> ResolveResult<Symbol> {
         log::trace!("Searching {name} in {:?}", self.full_name());
+        self.search_inner(name, true, respect)
+    }
 
+    fn search_inner(
+        &self,
+        name: &QualifiedName,
+        top_level: bool,
+        respect: bool,
+    ) -> ResolveResult<Symbol> {
         if let Some(first) = name.first() {
             if let Some(child) = self.get_child(first) {
-                if name.is_single_identifier() && !child.is_deleted() {
+                if respect && !top_level && !child.is_public() {
+                    Err(ResolveError::SymbolIsPrivate(child.full_name().clone()))
+                } else if name.is_single_identifier() && !child.is_deleted() {
                     log::trace!("Found {name:?} in {:?}", self.full_name());
                     Ok(child.clone())
                 } else {
                     let name = &name.remove_first();
-                    child.search(name)
+                    child.search_inner(name, false, respect)
                 }
             } else {
                 log::trace!("No child in {:?} while searching for {name:?}", self.id());

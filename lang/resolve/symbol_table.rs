@@ -65,7 +65,7 @@ impl Lookup for SymbolTable {
             "{lookup} for global symbol '{name:?}'",
             lookup = crate::mark!(LOOKUP)
         );
-        let symbol = match self.search(name) {
+        let symbol = match self.search(name, true) {
             Ok(symbol) => symbol,
             Err(err) => {
                 log::trace!(

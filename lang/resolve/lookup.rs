@@ -21,7 +21,7 @@ pub trait Lookup<E: std::error::Error = ResolveError> {
     /// # Return
     /// If both are found and one is an *alias* returns the other one.
     fn lookup_within(&self, name: &QualifiedName, within: &Symbol) -> Result<Symbol, E> {
-        match (self.lookup(name), within.search(name)) {
+        match (self.lookup(name), within.search(name, true)) {
             // found both
             (Ok(global), Ok(relative)) => {
                 if relative == global {
