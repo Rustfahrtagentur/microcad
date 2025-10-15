@@ -56,6 +56,8 @@ impl Eval<()> for AssignmentStatement {
             }
         };
 
+        let mut abort = false;
+
         // lookup if we find any existing symbol
         if let Ok(symbol) = context.lookup(&QualifiedName::from_id(assignment.id.clone())) {
             let err = symbol.with_def_mut(|def| match def {
@@ -74,14 +76,8 @@ impl Eval<()> for AssignmentStatement {
                         ))
                     }
                 }
-                SymbolDefinition::ConstExpression(visibility, id, expr) => {
-                    match expr.eval(context) {
-                        Ok(value) => {
-                            *def = SymbolDefinition::Constant(*visibility, id.clone(), value);
-                            None
-                        }
-                        Err(err) => Some((assignment.id.clone(), err)),
-                    };
+                SymbolDefinition::ConstExpression(..) => {
+                    abort = true;
                     None
                 }
                 _ => Some((
@@ -95,46 +91,48 @@ impl Eval<()> for AssignmentStatement {
             }
         }
 
-        // now check what to do with the value
-        match assignment.qualifier() {
-            Qualifier::Const => {
-                if context.get_property(&assignment.id).is_ok() {
-                    todo!("property with that name exists")
-                }
-
-                let symbol = context.lookup(&assignment.id.clone().into());
-                match symbol {
-                    Ok(symbol) => {
-                        if let Err(err) = symbol.set_value(new_value) {
-                            context.error(self, err)?
-                        }
-                    }
-                    Err(err) => context.error(self, err)?,
-                }
-            }
-            Qualifier::Value => {
-                let result = if context.get_property(&assignment.id).is_ok() {
-                    if context.is_init() {
-                        context.init_property(assignment.id.clone(), new_value)
-                    } else {
+        if !abort {
+            // now check what to do with the value
+            match assignment.qualifier() {
+                Qualifier::Const => {
+                    if context.get_property(&assignment.id).is_ok() {
                         todo!("property with that name exists")
                     }
-                } else {
-                    context.set_local_value(assignment.id.clone(), new_value)
-                };
-                if let Err(err) = result {
-                    context.error(self, err)?;
+
+                    let symbol = context.lookup(&assignment.id.clone().into());
+                    match symbol {
+                        Ok(symbol) => {
+                            if let Err(err) = symbol.set_value(new_value) {
+                                context.error(self, err)?
+                            }
+                        }
+                        Err(err) => context.error(self, err)?,
+                    }
+                }
+                Qualifier::Value => {
+                    let result = if context.get_property(&assignment.id).is_ok() {
+                        if context.is_init() {
+                            context.init_property(assignment.id.clone(), new_value)
+                        } else {
+                            todo!("property with that name exists")
+                        }
+                    } else {
+                        context.set_local_value(assignment.id.clone(), new_value)
+                    };
+                    if let Err(err) = result {
+                        context.error(self, err)?;
+                    }
+                }
+                Qualifier::Prop => {
+                    if context.get_local_value(&assignment.id).is_ok() {
+                        todo!("local value with that name exists")
+                    }
+                    if let Err(err) = context.init_property(assignment.id.clone(), new_value) {
+                        context.error(self, err)?;
+                    }
                 }
             }
-            Qualifier::Prop => {
-                if context.get_local_value(&assignment.id).is_ok() {
-                    todo!("local value with that name exists")
-                }
-                if let Err(err) = context.init_property(assignment.id.clone(), new_value) {
-                    context.error(self, err)?;
-                }
-            }
-        };
+        }
 
         Ok(())
     }
