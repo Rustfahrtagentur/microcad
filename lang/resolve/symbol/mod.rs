@@ -157,7 +157,7 @@ impl Symbol {
     }
 
     /// Get parent symbol.
-    pub(super) fn get_parent(&self) -> Option<Symbol> {
+    pub(crate) fn get_parent(&self) -> Option<Symbol> {
         self.inner.borrow().parent.clone()
     }
 
@@ -226,11 +226,15 @@ impl Symbol {
         matches!(self.inner.borrow().def, SymbolDefinition::Workbench(..))
     }
 
-    pub(super) fn is_module(&self) -> bool {
+    pub(crate) fn is_module(&self) -> bool {
         matches!(
             self.inner.borrow().def,
             SymbolDefinition::SourceFile(..) | SymbolDefinition::Module(..)
         )
+    }
+
+    pub(crate) fn is_workbench(&self) -> bool {
+        matches!(self.inner.borrow().def, SymbolDefinition::Workbench(..))
     }
 
     /// Overwrite any value in this symbol

@@ -8,29 +8,32 @@ use crate::{eval::*, syntax::*, value::*};
 impl Eval for FunctionDefinition {
     fn eval(&self, context: &mut EvalContext) -> EvalResult<Value> {
         context.grant(self)?;
-        context.scope(StackFrame::Function(Default::default()), |_context| {
-            /*
+        context.scope(
+            StackFrame::Function(self.id.clone(), Default::default()),
+            |_context| {
+                /*
 
-            TODO: This whole thing is not working proper because statements can
-                  have other statements inside. Thinking about if clauses every path
-                  must be checked instead of just the top statements.
+                TODO: This whole thing is not working proper because statements can
+                      have other statements inside. Thinking about if clauses every path
+                      must be checked instead of just the top statements.
 
-            // check if there is any return statement
-            if !self
-                .body
-                .statements
-                .iter()
-                .any(|s| matches!(&s, Statement::Return(..)))
-            {
-                context.error(
-                    &self.body,
-                    EvalError::MissingReturn(context.current_name().with_suffix(self.id.clone())),
-                )?
-            }
-            */
-            // avoid body frame
-            Ok(Value::None)
-        })
+                // check if there is any return statement
+                if !self
+                    .body
+                    .statements
+                    .iter()
+                    .any(|s| matches!(&s, Statement::Return(..)))
+                {
+                    context.error(
+                        &self.body,
+                        EvalError::MissingReturn(context.current_name().with_suffix(self.id.clone())),
+                    )?
+                }
+                */
+                // avoid body frame
+                Ok(Value::None)
+            },
+        )
     }
 }
 
@@ -40,9 +43,10 @@ impl CallTrait for FunctionDefinition {
             Ok(matches) => {
                 let mut result: Vec<Value> = Vec::new();
                 for args in matches {
-                    result.push(context.scope(StackFrame::Function(args.into()), |context| {
-                        self.body.statements.eval(context)
-                    })?);
+                    result.push(context.scope(
+                        StackFrame::Function(self.id.clone(), args.into()),
+                        |context| self.body.statements.eval(context),
+                    )?);
                 }
                 if result.len() == 1 {
                     Ok(result.first().expect("one result item").clone())

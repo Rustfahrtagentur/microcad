@@ -12,10 +12,7 @@ pub trait Grant<T> {
 impl Grant<WorkbenchDefinition> for EvalContext {
     fn grant(&mut self, statement: &WorkbenchDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
-            matches!(
-                stack_frame,
-                StackFrame::Source(_, _) | StackFrame::Module(_, _)
-            )
+            matches!(stack_frame, StackFrame::Source(..) | StackFrame::Module(..))
         } else {
             false
         };
@@ -32,10 +29,7 @@ impl Grant<WorkbenchDefinition> for EvalContext {
 impl Grant<ModuleDefinition> for EvalContext {
     fn grant(&mut self, statement: &ModuleDefinition) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
-            matches!(
-                stack_frame,
-                StackFrame::Source(_, _) | StackFrame::Module(_, _)
-            )
+            matches!(stack_frame, StackFrame::Source(..) | StackFrame::Module(..))
         } else {
             false
         };
@@ -103,10 +97,10 @@ impl Grant<IfStatement> for EvalContext {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(
                 stack_frame,
-                StackFrame::Source(_, _)
-                    | StackFrame::Workbench(_, _, _)
-                    | StackFrame::Body(_)
-                    | StackFrame::Function(_)
+                StackFrame::Source(..)
+                    | StackFrame::Workbench(..)
+                    | StackFrame::Body(..)
+                    | StackFrame::Function(..)
             )
         } else {
             false
@@ -130,10 +124,10 @@ impl Grant<AssignmentStatement> for EvalContext {
                         stack_frame,
                         StackFrame::Source(..)
                             | StackFrame::Module(..)
-                            | StackFrame::Body(_)
+                            | StackFrame::Body(..)
                             | StackFrame::Workbench(..)
-                            | StackFrame::Init(_)
-                            | StackFrame::Function(_)
+                            | StackFrame::Init(..)
+                            | StackFrame::Function(..)
                     )
                 }
                 Qualifier::Prop => matches!(stack_frame, StackFrame::Workbench(..)),
@@ -153,10 +147,10 @@ impl Grant<ExpressionStatement> for EvalContext {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(
                 stack_frame,
-                StackFrame::Source(_, _)
-                    | StackFrame::Body(_)
-                    | StackFrame::Workbench(_, _, _)
-                    | StackFrame::Function(_)
+                StackFrame::Source(..)
+                    | StackFrame::Body(..)
+                    | StackFrame::Workbench(..)
+                    | StackFrame::Function(..)
             )
         } else {
             false
@@ -171,7 +165,7 @@ impl Grant<ExpressionStatement> for EvalContext {
 impl Grant<Marker> for EvalContext {
     fn grant(&mut self, statement: &Marker) -> EvalResult<()> {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
-            matches!(stack_frame, StackFrame::Workbench(_, _, _))
+            matches!(stack_frame, StackFrame::Workbench(..))
         } else {
             false
         };
@@ -187,7 +181,7 @@ impl Grant<Attribute> for EvalContext {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(
                 stack_frame,
-                StackFrame::Source(_, _) | StackFrame::Body(_) | StackFrame::Workbench(_, _, _)
+                StackFrame::Source(..) | StackFrame::Body(..) | StackFrame::Workbench(..)
             )
         } else {
             false
@@ -207,7 +201,7 @@ impl Grant<Body> for EvalContext {
         let granted = if let Some(stack_frame) = self.stack.current_frame() {
             matches!(
                 stack_frame,
-                StackFrame::Source(_, _) | StackFrame::Body(_) | StackFrame::Workbench(_, _, _)
+                StackFrame::Source(..) | StackFrame::Body(..) | StackFrame::Workbench(..)
             )
         } else {
             false

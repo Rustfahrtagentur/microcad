@@ -168,34 +168,28 @@ impl EvalContext {
         );
         self.symbol_table.check_super(name)?;
 
-        match name.single_identifier() {
-            Some(id) => match self.get_property(id) {
-                Ok(value) => {
-                    log::trace!(
-                        "{found} property '{name:?}'",
-                        found = crate::mark!(FOUND_INTERIM)
-                    );
-                    Ok(Symbol::new(
-                        SymbolDefinition::Constant(Visibility::Public, id.clone(), value),
-                        None,
-                    ))
+        if self.stack.current_workbench_name().is_some() {
+            if let Some(id) = name.single_identifier() {
+                match self.get_property(id) {
+                    Ok(value) => {
+                        log::trace!(
+                            "{found} property '{name:?}'",
+                            found = crate::mark!(FOUND_INTERIM)
+                        );
+                        return Ok(Symbol::new(
+                            SymbolDefinition::Constant(Visibility::Public, id.clone(), value),
+                            None,
+                        ));
+                    }
+                    Err(err) => return Err(err),
                 }
-                Err(err) => {
-                    log::trace!(
-                        "{not_found} Property '{name:?}'",
-                        not_found = crate::mark!(NOT_FOUND_INTERIM)
-                    );
-                    Err(err)
-                }
-            },
-            None => {
-                log::trace!(
-                    "{not_found} Property '{name:?}'",
-                    not_found = crate::mark!(NOT_FOUND_INTERIM)
-                );
-                Err(EvalError::NoPropertyId(name.clone()))
             }
         }
+        log::trace!(
+            "{not_found} Property '{name:?}'",
+            not_found = crate::mark!(NOT_FOUND_INTERIM)
+        );
+        Err(EvalError::NoPropertyId(name.clone()))
     }
 
     fn lookup_workbench(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
