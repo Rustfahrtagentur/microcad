@@ -292,6 +292,7 @@ impl Symbol {
                 .borrow()
                 .children
                 .values()
+                .filter(|symbol| !symbol.is_deleted())
                 .any(|symbol| symbol.has_links())
         }
     }
