@@ -6,9 +6,14 @@
 //! After parsing a source file (see [`mod@crate::parse`]) it must be resolved to get a symbol out of it:
 //!
 //! ```no_run
-//! use microcad_lang::{syntax::*, parse::*, resolve::*};
+//! use microcad_lang::{syntax::*, parse::*, resolve::*, diag::*};
 //! let source_file = SourceFile::load("my.µcad").expect("parsing success");
-//! let source_symbol = source_file.resolve();
+//! let mut context = ResolveContext::create(
+//!     source_file,
+//!     &["./lib"],
+//!     None,
+//!     DiagHandler::default(),
+//! ).unwrap();
 //! ```
 //!
 //! To "run" the source file (and get the expected output) it must now be evaluated (see [`crate::eval`])  .

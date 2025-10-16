@@ -31,12 +31,6 @@ pub fn find_rule<T: crate::parser::Parse>(
 }
 
 /// Find rule or use default with proper error handling.
-///
-/// e.g.:
-///
-/// ```
-/// let s : StatementList = crate::find_rule!(pair, StatementList, statement_list)
-/// ```
 #[macro_export]
 macro_rules! find_rule {
     ($pair:ident, $rule:ident) => {
@@ -45,12 +39,6 @@ macro_rules! find_rule {
 }
 
 /// Find rule and return optional with proper error handling.
-///
-/// e.g.:
-///
-/// ```
-/// let s : StatementList = crate::find_rule_opt!(pair, StatementList, statement_list)
-/// ```
 #[macro_export]
 macro_rules! find_rule_opt {
     ($pair:ident, $rule:ident) => {
@@ -62,12 +50,6 @@ macro_rules! find_rule_opt {
 }
 
 /// Find rule and return definition or [`ParseError::NotAvailable`] with proper error handling.
-///
-/// e.g.:
-///
-/// ```
-/// let s : StatementList = crate::find_rule_opt!(pair, StatementList, statement_list)
-/// ```
 #[macro_export]
 macro_rules! find_rule_exact {
     ($pair:ident, $rule:ident) => {
