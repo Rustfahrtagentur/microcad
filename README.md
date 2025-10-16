@@ -102,7 +102,6 @@ The resulting STL model looks like this:
   - [`microcad-core` module](https://docs.rs/microcad-core)
   - [`microcad-export` module](https://docs.rs/microcad-export)
 - [Markdown Tests](doc/test_list.md)
-- [File Tests](TEST_SUMMARY.md)
 - [Glossary](doc/GLOSSARY.md)
 - [Contribute Documentation](CONTRIBUTE.md#contribute-documentation)
 
