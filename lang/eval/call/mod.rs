@@ -56,7 +56,7 @@ impl Eval<ArgumentValueListRaw> for ArgumentList {
                     if let Expression::QualifiedName(name) = &arg.expression {
                         Ok(ArgumentValue::new(
                             Value::Target(Target::new(
-                                name.clone(),
+                                name.un_super(),
                                 match context.lookup(name) {
                                     Ok(symbol) => Some(symbol.full_name()),
                                     Err(_) => None,

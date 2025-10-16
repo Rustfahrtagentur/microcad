@@ -158,13 +158,14 @@ pub fn assert_invalid() -> Symbol {
                 Ok(multi_args) => {
                     for arg in multi_args {
                         let target = arg.get::<Target>("target");
-                        if let Some(target_name) = target.target {
+                        if let Some(query) = target.target {
+                            log::trace!("target_name: {query}, {}", target.name);
                             context.error(
                                 &arg,
                                 EvalError::AssertionFailed(format!(
-                                    "Found valid symbol '{}' within module '{}'.",
-                                    target.name,
-                                    target_name.base(&target.name)
+                                    "Found valid symbol '{name}' within module '{base}'.",
+                                    name = target.name,
+                                    base = query.base(&target.name)
                                 )),
                             )?;
                         }

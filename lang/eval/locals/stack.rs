@@ -178,6 +178,8 @@ impl Lookup<EvalError> for Stack {
             "{lookup} for local symbol '{name:?}'",
             lookup = crate::mark!(LOOKUP)
         );
+        self.check_super(name)?;
+
         let symbol = if let Some(id) = name.single_identifier() {
             self.fetch_symbol(id)
         } else {
