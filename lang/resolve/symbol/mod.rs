@@ -494,6 +494,13 @@ impl Symbol {
     /// - `name`: Name to search for.
     pub(crate) fn search(&self, name: &QualifiedName, respect: bool) -> ResolveResult<Symbol> {
         log::trace!("Searching {name} in {:?}", self.full_name());
+        if let Some(id) = name.first() {
+            if id.is_super() {
+                if let Some(parent) = self.get_parent() {
+                    return parent.search(&name[1..].iter().cloned().collect(), respect);
+                }
+            }
+        }
         self.search_inner(name, true, respect)
     }
 

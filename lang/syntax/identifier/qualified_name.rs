@@ -174,27 +174,12 @@ impl QualifiedName {
         name
     }
 
-    /// If name includes any "super" ids those will be dissolved.
-    pub fn dissolve_super(&self, mut within: QualifiedName) -> (Self, Self) {
-        // dissolve any leading supers
-        let what: QualifiedName = self
-            .iter()
-            .filter(|id| {
-                if id.is_super() {
-                    within.pop();
-                    false
-                } else {
-                    true
-                }
-            })
-            .cloned()
-            .collect();
+    pub(crate) fn count_super(&self) -> usize {
+        self.iter().take_while(|id| id.is_super()).count()
+    }
 
-        // check for more supers
-        if what.iter().any(Identifier::is_super) {
-            todo!("error: super allowed only at begin of qualified name");
-        }
-        (what, within)
+    pub(crate) fn un_super(&self) -> Self {
+        self.iter().filter(|id| !id.is_super()).cloned().collect()
     }
 }
 
@@ -216,11 +201,7 @@ fn test_base_panic() {
 #[test]
 fn dissolve_super() {
     let what: QualifiedName = "super::super::c::x".into();
-    let within: QualifiedName = "a::b::c::d".into();
-
-    let (what, within) = what.dissolve_super(within);
-    assert_eq!(what, "c::x".into());
-    assert_eq!(within, "a::b".into());
+    assert_eq!(what.count_super(), 2);
 }
 
 impl std::fmt::Display for QualifiedName {
