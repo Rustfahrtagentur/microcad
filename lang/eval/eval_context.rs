@@ -8,13 +8,6 @@ use crate::{
 /// *Context* for *evaluation* of a resolved µcad file.
 ///
 /// The context is used to store the current state of the evaluation.
-///
-/// A context consists of the following members:
-/// - A *symbol table* ([`SymbolTable`]) with symbols stored by [`QualifiedName`] and a [`Stack`].
-/// - A *diagnostic handler* ([`DiagHandler`]) that accumulates *evaluation errors* for later output.
-/// - One *output channel* ([`Output`]) where `__builtin::print` writes it's output to while evaluation.
-///
-/// All these internal structures can be accessed by several implemented traits.
 pub struct EvalContext {
     /// Symbol table
     symbol_table: SymbolTable,
@@ -54,7 +47,7 @@ impl EvalContext {
     }
 
     /// Current symbol, panics if there no current symbol.
-    pub fn current_symbol(&self) -> Symbol {
+    pub(crate) fn current_symbol(&self) -> Symbol {
         self.stack.current_symbol().expect("Some symbol")
     }
 
@@ -85,24 +78,6 @@ impl EvalContext {
         self.output.print(what).expect("could not write to output");
     }
 
-    /// Get the source code location of the given referrer as string (e.g. `/path/to/file.µcad:52:1`).
-    pub fn locate(&self, referrer: &impl SrcReferrer) -> EvalResult<String> {
-        Ok(format!(
-            "{}:{}",
-            self.get_by_hash(referrer.src_ref().source_hash())?
-                .filename_as_str(),
-            referrer.src_ref()
-        ))
-    }
-
-    /// Get the original source code of the given referrer.
-    pub fn source_code(&self, referrer: &impl SrcReferrer) -> EvalResult<String> {
-        Ok(referrer
-            .src_ref()
-            .source_slice(&self.get_by_hash(referrer.src_ref().source_hash())?.source)
-            .to_string())
-    }
-
     /// Evaluate context into a value.
     pub fn eval(&mut self) -> EvalResult<Option<Model>> {
         if self.diag.error_count() > 0 {
@@ -111,8 +86,8 @@ impl EvalContext {
         }
         let model: Model = self.sources.root().eval(self)?;
         log::trace!("Post-evaluation context:\n{self:?}");
-        log::debug!("Evaluated Model:\n{model:?}");
-        if model.is_empty() {
+        log::debug!("Evaluated Model:\n{}", FormatTree(&model));
+        if model.is_empty_model() {
             Ok(None)
         } else {
             Ok(Some(model))
@@ -120,7 +95,7 @@ impl EvalContext {
     }
 
     /// Run the closure `f` within the given `stack_frame`.
-    pub fn scope<T>(
+    pub(super) fn scope<T>(
         &mut self,
         stack_frame: StackFrame,
         f: impl FnOnce(&mut EvalContext) -> T,
@@ -142,7 +117,7 @@ impl EvalContext {
     }
 
     /// Get property from current model.
-    pub fn get_property(&self, id: &Identifier) -> EvalResult<Value> {
+    pub(super) fn get_property(&self, id: &Identifier) -> EvalResult<Value> {
         match self.get_model() {
             Ok(model) => {
                 if let Some(value) = model.get_property(id) {
@@ -158,7 +133,7 @@ impl EvalContext {
     /// Initialize a property.
     ///
     /// Returns error if there is no model or the property has been initialized before.
-    pub fn init_property(&self, id: Identifier, value: Value) -> EvalResult<()> {
+    pub(super) fn init_property(&self, id: Identifier, value: Value) -> EvalResult<()> {
         match self.get_model() {
             Ok(model) => {
                 if let Some(previous_value) = model.borrow_mut().set_property(id.clone(), value) {
@@ -222,76 +197,56 @@ impl EvalContext {
         }
     }
 
-    /// Fetch local variable from local stack (for testing only).
-    #[cfg(test)]
-    pub fn fetch_local(&self, id: &Identifier) -> EvalResult<Symbol> {
-        self.stack.fetch_symbol(id)
-    }
-
     fn lookup_workbench(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
         if let Some(workbench) = &self.stack.current_workbench_name() {
             log::trace!(
                 "{lookup} for symbol '{name:?}' in current workbench '{workbench:?}'",
                 lookup = crate::mark!(LOOKUP)
             );
-            let name = &name.with_prefix(workbench);
-            match self.symbol_table.lookup(name) {
+            match self.symbol_table.lookup_within_name(name, workbench) {
                 Ok(symbol) => {
-                    if symbol.full_name() == *name {
-                        log::trace!(
-                            "{found} symbol in current module: {symbol:?}",
-                            found = crate::mark!(FOUND_INTERIM),
-                        );
-                        return Ok(symbol);
-                    }
+                    log::trace!(
+                        "{found} symbol in current module: {symbol:?}",
+                        found = crate::mark!(FOUND_INTERIM),
+                    );
+                    Ok(symbol)
                 }
-                Err(err) => return Err(err)?,
-            };
+                Err(err) => {
+                    log::trace!(
+                        "{not_found} symbol '{name:?}': {err}",
+                        not_found = crate::mark!(NOT_FOUND_INTERIM)
+                    );
+                    Err(err)
+                }
+            }
         } else {
             log::trace!(
                 "{not_found} No current workbench",
                 not_found = crate::mark!(NOT_FOUND_INTERIM)
             );
+            Err(ResolveError::SymbolNotFound(name.clone()))
         }
-        Err(ResolveError::SymbolNotFound(name.clone()))
-    }
-
-    fn lookup_within(&self, what: &QualifiedName, within: QualifiedName) -> EvalResult<Symbol> {
-        log::trace!(
-            "{lookup} for symbol '{what:?}' within '{within:?}':",
-            lookup = crate::mark!(LOOKUP)
-        );
-
-        // process internal supers
-        let (what, within) = what.dissolve_super(within);
-
-        log::trace!("Looking within: {what:?} for {within:?}");
-        let within_symbol = self.symbol_table.lookup(&within)?;
-        if let Ok(symbol) = within_symbol.search(&what) {
-            log::trace!(
-                "{found} Symbol {symbol:?} within {within:?}:",
-                found = crate::mark!(FOUND_INTERIM),
-            );
-            return Ok(symbol);
-        }
-
-        log::trace!(
-            "{not_found} Symbol {what:?} within {within:?}",
-            not_found = crate::mark!(NOT_FOUND_INTERIM),
-        );
-        Err(EvalError::SymbolNotFound(what.clone()))
     }
 
     /// Check if current stack frame is code
-    pub fn is_code(&self) -> bool {
+    fn is_code(&self) -> bool {
         !matches!(self.stack.current_frame(), Some(StackFrame::Module(..)))
     }
 
     /// Check if current stack frame is a module
-    pub fn is_module(&self) -> bool {
+    pub(crate) fn is_module(&self) -> bool {
         matches!(
             self.stack.current_frame(),
             Some(StackFrame::Module(..) | StackFrame::Source(..))
+        )
+    }
+
+    fn lookup_within(&self, name: &QualifiedName) -> ResolveResult<Symbol> {
+        self.symbol_table.lookup_within(
+            name,
+            &self
+                .symbol_table
+                .search(&self.stack.current_module_name(), false)?,
         )
     }
 }
@@ -313,7 +268,7 @@ impl UseSymbol for EvalContext {
             if within.is_empty() {
                 self.symbol_table.insert_symbol(id, symbol)?;
             } else {
-                self.symbol_table.lookup(within)?.insert(id, symbol);
+                self.symbol_table.lookup(within)?.insert_child(id, symbol);
             }
             log::trace!("Symbol Table:\n{}", self.symbol_table);
         }
@@ -344,7 +299,9 @@ impl UseSymbol for EvalContext {
                     if within.is_empty() {
                         self.symbol_table.insert_symbol(id.clone(), symbol)?;
                     } else {
-                        self.symbol_table.lookup(within)?.insert(id.clone(), symbol);
+                        self.symbol_table
+                            .lookup(within)?
+                            .insert_child(id.clone(), symbol);
                     }
                     Ok::<_, EvalError>(())
                 })?;
@@ -418,15 +375,12 @@ impl Lookup<EvalError> for EvalContext {
         // collect all symbols that can be found and remember origin
         let results = [
             ("local", { self.stack.lookup(name) }),
-            ("module", {
-                self.lookup_within(name, self.stack.current_module_name())
+            ("global", {
+                self.lookup_within(name).map_err(|err| err.into())
             }),
             ("property", { self.lookup_property(name) }),
             ("workbench", {
                 self.lookup_workbench(name).map_err(|err| err.into())
-            }),
-            ("global", {
-                self.symbol_table.lookup(name).map_err(|err| err.into())
             }),
         ]
         .into_iter();
@@ -442,21 +396,22 @@ impl Lookup<EvalError> for EvalContext {
             |(mut oks, mut ambiguities), (origin, r)| {
                 match r {
                     Ok(symbol) => oks.push((origin, symbol)),
-                    Err(EvalError::AmbiguousSymbol { ambiguous, others }) => {
-                        ambiguities.push((origin, EvalError::AmbiguousSymbol { ambiguous, others }))
+                    Err(EvalError::AmbiguousSymbol( ambiguous, others)) => {
+                        ambiguities.push((origin, EvalError::AmbiguousSymbol ( ambiguous, others )))
                     }
                     Err(
                         // ignore all kinds of "not found" errors
                         EvalError::SymbolNotFound(_)
                         // for locals
                         | EvalError::LocalNotFound(_)
-                        // for model proper
+                        // for model property
                         | EvalError::NoModelInWorkbench
                         | EvalError::PropertyNotFound(_)
                         | EvalError::NoPropertyId(_)
                         // for symbol table
                         | EvalError::ResolveError(ResolveError::SymbolNotFound(_))
                         | EvalError::ResolveError(ResolveError::ExternalPathNotFound(_))
+                        | EvalError::ResolveError(ResolveError::SymbolIsPrivate(_))
                         | EvalError::ResolveError(ResolveError::NulHash),
                     ) => (),
                     Err(err) => errors.push((origin, err)),
@@ -494,30 +449,19 @@ impl Lookup<EvalError> for EvalContext {
             Some((origin, symbol)) => {
                 // check if all findings point to the same symbol
                 if !found.iter().all(|(_, x)| x == symbol) {
-                    let origin = found
-                        .iter()
-                        .map(|(id, _)| *id)
-                        .collect::<Vec<_>>()
-                        .join(", ");
+                    let others: QualifiedNames =
+                        found.iter().map(|(_, symbol)| symbol.full_name()).collect();
                     log::debug!(
-                        "{ambiguous} symbol '{name:?}' in {origin}:\n{self:?}",
+                        "{ambiguous} symbol '{name:?}' in {others:?}:\n{self:?}",
                         ambiguous = crate::mark!(AMBIGUOUS),
-                        origin = found
-                            .iter()
-                            .map(|(id, _)| *id)
-                            .collect::<Vec<_>>()
-                            .join(" and ")
                     );
-                    Err(EvalError::AmbiguousSymbol {
-                        ambiguous: name.clone(),
-                        others: origin,
-                    })
+                    Err(EvalError::AmbiguousSymbol(name.clone(), others))
                 } else {
                     log::debug!(
                         "{found} symbol '{name:?}' in {origin}",
                         found = crate::mark!(FOUND)
                     );
-                    symbol.set_use();
+                    symbol.set_used();
                     Ok(symbol.clone())
                 }
             }
@@ -530,6 +474,10 @@ impl Lookup<EvalError> for EvalContext {
                 Err(EvalError::SymbolNotFound(name.clone()))
             }
         }
+    }
+
+    fn ambiguity_error(ambiguous: QualifiedName, others: QualifiedNames) -> EvalError {
+        EvalError::AmbiguousSymbol(ambiguous, others)
     }
 }
 

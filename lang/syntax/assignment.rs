@@ -102,7 +102,7 @@ impl TreeDisplay for Assignment {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         writeln!(
             f,
-            "{:depth$}Assignment {vis}{qual}{id}:",
+            "{:depth$}Assignment {vis}{qual}'{id}':",
             "",
             vis = self.visibility,
             qual = self.qualifier,

@@ -115,7 +115,7 @@ my::Rect(size = 40mm);
 ```µcad,use_statement_pub_in_module
 mod my {
     mod name {
-        mod space {
+        pub mod space {
             pub use std::geo2d::*;
         }
     }

@@ -38,23 +38,45 @@ impl SrcReferrer for ModuleDefinition {
 impl TreeDisplay for ModuleDefinition {
     fn tree_print(&self, f: &mut std::fmt::Formatter, mut depth: TreeState) -> std::fmt::Result {
         if let Some(body) = &self.body {
-            writeln!(f, "{:depth$}ModuleDefinition '{}':", "", self.id)?;
+            writeln!(
+                f,
+                "{:depth$}ModuleDefinition {visibility}'{id}':",
+                "",
+                id = self.id,
+                visibility = self.visibility,
+            )?;
             depth.indent();
             body.tree_print(f, depth)
         } else {
-            writeln!(f, "{:depth$}ModuleDefinition '{}' (external)", "", self.id)
+            writeln!(
+                f,
+                "{:depth$}ModuleDefinition {visibility}'{id}' (external)",
+                "",
+                id = self.id,
+                visibility = self.visibility,
+            )
         }
     }
 }
 
 impl std::fmt::Display for ModuleDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "mod {}", self.id)
+        write!(
+            f,
+            "{visibility}mod {id}",
+            id = self.id,
+            visibility = self.visibility,
+        )
     }
 }
 
 impl std::fmt::Debug for ModuleDefinition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "mod {:?}", self.id)
+        write!(
+            f,
+            "{visibility}mod {id:?}",
+            id = self.id,
+            visibility = self.visibility,
+        )
     }
 }

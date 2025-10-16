@@ -13,8 +13,6 @@ pub struct QualifiedName(Refer<Vec<Identifier>>);
 #[derive(Deref)]
 pub struct QualifiedNames(Vec<QualifiedName>);
 
-pub(crate) type QualifiedNameSet = indexmap::IndexSet<QualifiedName>;
-
 impl std::fmt::Display for QualifiedNames {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
@@ -28,6 +26,22 @@ impl std::fmt::Display for QualifiedNames {
         )
     }
 }
+
+impl std::fmt::Debug for QualifiedNames {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.0
+                .iter()
+                .map(|name| format!("{:?}", name.to_string()))
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
+}
+
+pub(crate) type QualifiedNameSet = indexmap::IndexSet<QualifiedName>;
 
 impl FromIterator<QualifiedName> for QualifiedNames {
     fn from_iter<T: IntoIterator<Item = QualifiedName>>(iter: T) -> Self {
@@ -134,11 +148,16 @@ impl QualifiedName {
     }
 
     /// Return the base of the given relative name.
-    ///
-    /// Does not check if ids match!
     pub fn base(&self, relative: &Self) -> Self {
-        let (base, _) = self.split_at(relative.len() - 2);
-        base.iter().cloned().collect()
+        if self == relative {
+            QualifiedName::default()
+        } else {
+            assert!(!relative.is_empty());
+            assert!(self.len() > relative.len());
+            assert!(self.ends_with(relative));
+            let (base, _) = self.split_at(self.len() - relative.len());
+            base.iter().cloned().collect()
+        }
     }
 
     /// Add given prefix to name
@@ -177,6 +196,21 @@ impl QualifiedName {
         }
         (what, within)
     }
+}
+
+#[test]
+fn test_base() {
+    let d: QualifiedName = "a::b::c::d".into();
+    assert_eq!(d.base(&"b::c::d".into()), "a".into());
+    assert_eq!(d.base(&"c::d".into()), "a::b".into());
+    assert_eq!(d.base(&"d".into()), "a::b::c".into());
+}
+
+#[test]
+#[should_panic]
+fn test_base_panic() {
+    let d: QualifiedName = "a::b::c::d".into();
+    assert_eq!(d.base(&"a::b::c::d".into()), "".into());
 }
 
 #[test]

@@ -10,10 +10,6 @@ use crate::{diag::*, parse::*, syntax::*};
 /// Resolve error.
 #[derive(Debug, Error)]
 pub enum ResolveError {
-    /// To do
-    #[error("Not implemented: {0}")]
-    Todo(String),
-
     /// Parse Error.
     #[error("Parse Error: {0}")]
     ParseError(#[from] ParseError),
@@ -58,9 +54,13 @@ pub enum ResolveError {
     #[error("Ambiguous external module files found {0:?}")]
     AmbiguousExternals(Vec<std::path::PathBuf>),
 
-    /// Ambiguous symbol was added
-    #[error("Ambiguous symbol added: {0}")]
-    AmbiguousSymbol(Identifier),
+    /// Ambiguous symbol was found
+    #[error("Symbol {0} already defined")]
+    SymbolAlreadyDefined(QualifiedName),
+
+    /// Ambiguous symbol was found
+    #[error("Ambiguous symbol found: {0}")]
+    AmbiguousSymbol(QualifiedName, QualifiedNames),
 
     /// ScanDir Error
     #[error("{0}")]
@@ -78,13 +78,13 @@ pub enum ResolveError {
     #[error("{0} is not available within {1}")]
     StatementNotSupported(String, String),
 
-    /// Alias leads to itself.
-    #[error("Alias leads to itself: {0}")]
-    CircularAlias(String),
-
     /// Resolve check failed
     #[error("Resolve failed")]
     ResolveCheckFailed,
+
+    /// Symbol is private
+    #[error("Symbol {0} is private")]
+    SymbolIsPrivate(QualifiedName),
 }
 
 /// Result type of any resolve.

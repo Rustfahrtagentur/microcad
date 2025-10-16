@@ -11,10 +11,7 @@ pub struct Symbols(Vec<Symbol>);
 
 impl FromIterator<Symbols> for Symbols {
     fn from_iter<T: IntoIterator<Item = Symbols>>(iter: T) -> Self {
-        let mut symbols = Self::default();
-        iter.into_iter()
-            .for_each(|mut children| symbols.append(&mut children));
-        symbols
+        iter.into_iter().collect()
     }
 }
 

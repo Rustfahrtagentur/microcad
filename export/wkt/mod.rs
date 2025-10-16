@@ -1,4 +1,4 @@
-// Copyright © 2024-2025 The µcad authors <info@ucad.xyz>
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //! Export 2D models to Well-Known Text (WKT).

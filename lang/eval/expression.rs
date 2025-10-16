@@ -288,11 +288,16 @@ impl Eval for Expression {
             }
             expr => todo!("{expr:?}"),
         };
-        match &result {
-            Ok(result) => log::trace!("Evaluated expression:\n{self:?}\n--- into ---\n{result:?}"),
-            Err(_) => log::trace!("Evaluation of expression failed:\n{self:?}"),
-        };
-        result
+        match result {
+            Ok(value) => {
+                log::trace!("Evaluated expression:\n{self:?}\n--- into ---\n{value:?}");
+                Ok(value)
+            }
+            Err(err) => {
+                context.error(self, err)?;
+                Ok(Value::None)
+            }
+        }
     }
 }
 

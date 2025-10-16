@@ -7,9 +7,7 @@
 //!
 //! ```no_run
 //! use microcad_lang::{syntax::*, parse::*, resolve::*};
-//!
 //! let source_file = SourceFile::load("my.µcad").expect("parsing success");
-//!
 //! let source_symbol = source_file.resolve();
 //! ```
 //!
@@ -17,6 +15,7 @@
 
 mod externals;
 mod grant;
+mod lookup;
 mod names;
 mod resolve_context;
 mod resolve_error;
@@ -27,6 +26,7 @@ mod symbolize;
 
 use crate::{diag::*, syntax::*};
 pub use externals::*;
+pub use lookup::*;
 pub use resolve_context::*;
 pub use resolve_error::*;
 pub use sources::*;
@@ -35,20 +35,6 @@ pub use symbol_table::*;
 
 use grant::*;
 use names::*;
-
-/// Trait to handle symbol table.
-pub trait Lookup<E: std::error::Error = ResolveError> {
-    /// Lookup for local or global symbol by qualified name.
-    ///
-    /// - looks on *stack*
-    /// - looks in *symbol table*
-    /// - follows *aliases* (use statements)
-    /// - detect any ambiguity
-    ///
-    /// # Arguments
-    /// -`name`: qualified name to search for
-    fn lookup(&self, name: &QualifiedName) -> Result<Symbol, E>;
-}
 
 /// Trait for items which can be fully qualified.
 pub trait FullyQualify {

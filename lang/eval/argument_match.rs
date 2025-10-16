@@ -122,10 +122,10 @@ impl<'a> ArgumentMatch<'a> {
                         self.params.swap_remove(*n);
                         return false;
                     } else {
-                        log::warn!("more than one parameter with that type")
+                        log::debug!("more than one parameter with that type")
                     }
                 } else {
-                    log::warn!("no parameter with that type (or id mismatch)")
+                    log::debug!("no parameter with that type (or id mismatch)")
                 }
                 true
             })

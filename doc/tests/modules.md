@@ -4,13 +4,13 @@
 
 ```µcad,builtin_modules
 mod a {
-    mod b {
-        mod c {
-            part M1() {}
+    pub mod b {
+        pub mod c {
+            pub part M1() {}
         }
     }
 
-    part M2() {}
+    pub part M2() {}
 }
 
 a::b::c::M1();

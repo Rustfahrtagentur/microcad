@@ -10,12 +10,12 @@ TODO
 
 ```µcad,mod_example
 mod my {
-    mod math {
+    pub mod math {
         // define PI as property
-        const PI = 3.14159;
+        pub const PI = 3.14159;
 
         // define calculation function
-        fn abs(x: Scalar) -> Scalar {
+        pub fn abs(x: Scalar) -> Scalar {
             if x < 0 { return -x; } else { return x; }
         }
     }

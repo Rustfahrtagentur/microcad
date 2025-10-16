@@ -28,5 +28,11 @@
 
 -- Output --
 -- Errors --
+error: Symbol math::pow not found.
+  ---> <FROM STR>:21:1
+     |
+  21 | math::pow(2.0, 5);  // error: pow is private
+     | ^^^^^^^^^^^^^^^^^
+     |
 -- Test Result --
-FAIL(TODO)
+FAILED AS EXPECTED BUT IS TODO
