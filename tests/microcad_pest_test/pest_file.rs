@@ -28,16 +28,17 @@ impl std::ops::Deref for PestFile {
 
 impl PestFile {
     /// Read  content of file int a string
-    pub fn from_file(path: impl AsRef<std::path::Path>) -> Result<Self, String> {
+    pub fn from_file(path: impl AsRef<std::path::Path> + std::fmt::Debug) -> Result<Self, String> {
         use std::{fs::*, io::*};
 
         // Read file line by line
         let mut buf = String::new();
+        let path_str = format!("{path:?}");
         // Read file to string
         File::open(path)
-            .expect("cannot open PEST grammar file {path}")
+            .expect(format!("cannot open PEST grammar file {path_str}").as_str())
             .read_to_string(&mut buf)
-            .expect("cannot read PEST grammar from file {path}");
+            .expect(format!("cannot read PEST grammar from file {path_str}").as_str());
 
         buf.parse()
     }

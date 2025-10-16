@@ -23,7 +23,7 @@ pub struct PestTest {
 pub fn generate(
     parser_struct_name: &str,
     rule_enum_name: &str,
-    grammar_file: impl AsRef<std::path::Path>,
+    grammar_file: impl AsRef<std::path::Path> + std::fmt::Debug,
 ) {
     use std::{env::*, fs::*, path::*};
 
