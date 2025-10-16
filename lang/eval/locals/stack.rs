@@ -27,7 +27,7 @@ impl Stack {
                 | StackFrame::Init(locals)
                 | StackFrame::Body(locals)
                 | StackFrame::Module(_, locals)
-                | StackFrame::Function(locals) => {
+                | StackFrame::Function(_, locals) => {
                     let op = if locals.insert(id.clone(), symbol).is_some() {
                         "Added"
                     } else {
@@ -57,6 +57,34 @@ impl Stack {
         Err(EvalError::LocalStackEmpty(id))
     }
 
+    //    pub(crate) fn current_module(&self) -> Option<QualifiedName> {
+    //        self.0
+    //            .iter()
+    //            .rev()
+    //            .enumerate()
+    //            .find_map(|(n, frame)| match frame {
+    //                StackFrame::Module(id, _) => Some(
+    //                    QualifiedName::new(vec![id.clone()], id.src_ref())
+    //                        .with_prefix(&self.current_module_name()),
+    //                ),
+    //                StackFrame::Call { symbol, .. } => {
+    //                    if n > 0 {
+    //                        let parent = symbol.get_parent().expect("call from nowhere");
+    //                        if parent.is_module() {
+    //                            Some(parent.full_name())
+    //                        } else if parent.is_workbench() {
+    //                            None
+    //                        } else {
+    //                            unreachable!("call must com from either module or workbench")
+    //                        }
+    //                    } else {
+    //                        None
+    //                    }
+    //                }
+    //                _ => None,
+    //            })
+    //    }
+    //
     fn current_workbench_id(&self) -> Option<&Identifier> {
         self.0.iter().rev().find_map(|frame| {
             if let StackFrame::Workbench(_, id, _) = frame {
@@ -97,12 +125,40 @@ impl Stack {
 
     /// Get name of current workbench.
     pub fn current_workbench_name(&self) -> Option<QualifiedName> {
-        if let Some(id) = self.current_workbench_id() {
-            let name = QualifiedName::new(vec![id.clone()], id.src_ref());
-            Some(name.with_prefix(&self.current_module_name()))
-        } else {
-            None
-        }
+        self.0
+            .iter()
+            .rev()
+            .enumerate()
+            .take_while(|(n, frame)| {
+                if let StackFrame::Call { symbol, .. } = frame {
+                    if *n > 0 {
+                        let parent = symbol.get_parent().expect("call from nowhere");
+                        if parent.is_module() {
+                            return false;
+                        }
+                    }
+                };
+                true
+            })
+            .find_map(|(n, frame)| match frame {
+                StackFrame::Workbench(_, id, _) => Some(
+                    QualifiedName::new(vec![id.clone()], id.src_ref())
+                        .with_prefix(&self.current_module_name()),
+                ),
+                StackFrame::Call { symbol, .. } => {
+                    if n > 0 {
+                        let parent = symbol.get_parent().expect("call from nowhere");
+                        if parent.is_workbench() {
+                            Some(parent.full_name())
+                        } else {
+                            unreachable!("call must com from either module or workbench")
+                        }
+                    } else {
+                        None
+                    }
+                }
+                _ => None,
+            })
     }
 
     /// Check if current stack frame it within a function.
@@ -282,7 +338,7 @@ impl Locals for Stack {
                 | StackFrame::Body(locals)
                 | StackFrame::Workbench(_, _, locals)
                 | StackFrame::Init(locals)
-                | StackFrame::Function(locals) => {
+                | StackFrame::Function(_, locals) => {
                     if let Some(local) = locals.get(id) {
                         log::trace!("fetched {id:?} from locals");
                         return Ok(local.clone());
