@@ -46,7 +46,10 @@ impl RunCommand<ResolveContext> for Resolve {
             print!("{context}");
         }
 
-        log::info!("Resolved successfully!");
+        if cli.is_resolve() {
+            eprintln!("Resolved successfully!");
+        }
+
         Ok(context)
     }
 }

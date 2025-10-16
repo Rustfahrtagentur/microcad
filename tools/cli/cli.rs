@@ -30,6 +30,10 @@ pub struct Cli {
     #[arg(short = 'C', long)]
     config: Option<std::path::PathBuf>,
 
+    /// Verbosity level (use -v, -vv, or -vvv)
+    #[arg(short, action = clap::ArgAction::Count)]
+    pub(crate) verbose: u8,
+
     #[command(subcommand)]
     command: Commands,
 }
@@ -123,6 +127,22 @@ impl Cli {
             let file_path = dir.join("std/mod.µcad");
             file_path.exists() && file_path.is_file()
         })
+    }
+
+    pub(super) fn is_parse(&self) -> bool {
+        matches!(self.command, Commands::Parse(..))
+    }
+
+    pub(super) fn is_resolve(&self) -> bool {
+        matches!(self.command, Commands::Resolve(..))
+    }
+
+    pub(super) fn is_eval(&self) -> bool {
+        matches!(self.command, Commands::Eval(..))
+    }
+
+    pub(super) fn is_export(&self) -> bool {
+        matches!(self.command, Commands::Export(..))
     }
 }
 

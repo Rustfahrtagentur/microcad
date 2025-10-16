@@ -51,7 +51,13 @@ impl RunCommand<Vec<(Model, ExportCommand)>> for Export {
             if !self.dry_run {
                 self.export_targets(&target_models)?;
             }
-
+            if cli.is_export() {
+                if self.dry_run {
+                    eprintln!("Did not export {} file(s) (dry-run!).", target_models.len());
+                } else {
+                    eprintln!("Exported {} file(s) successfully!", target_models.len());
+                }
+            }
             Ok(target_models)
         } else {
             Err(anyhow!("Model missing!"))
