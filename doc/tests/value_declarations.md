@@ -61,7 +61,7 @@ mod module {
             prop property = 9;
 
             // post init code
-            assert_invalid(super::value);
+            assert_eq([super::value,1]);
             assert_eq([super::pub_value, 2]);
             assert_eq([value, 3]);
             assert_eq([pub_value, 4]);
@@ -75,7 +75,7 @@ mod module {
         }
 
         fn function(fn_param = 10) {
-            assert_invalid(super::value);
+            assert_eq([super::value, 1]);
             assert_eq([super::pub_value, 2]);
             assert_eq([value, 3]);
             assert_eq([pub_value, 4]);
@@ -88,7 +88,7 @@ mod module {
     }
 
     pub fn function(fn_param = 11) {
-        assert_invalid(value);
+        assert_eq([value, 1]);
         assert_eq([pub_value, 2]);
         assert_invalid(pub_sub_module::value);
         assert_eq([pub_sub_module::pub_value, 4]);
