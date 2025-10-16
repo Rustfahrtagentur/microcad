@@ -28,7 +28,7 @@ However, now we can combine both rectangles by using an *operation*.
 
 ## Manipulate geometry with *Operations*
 
-In µcad, the operation to *subtract a geometry* from one another is called [`subtract`](../libs/std/ops/subtract.md).
+In µcad, the operation to *subtract a geometry* from one another is called [`subtract`](../../../../../../doc/libs/std/ops/subtract.md).
 In our case, we want to subtract the *outer part* by the *inner part* in our frame group:
 
 [![test](.test/subtract.svg)](.test/subtract.log)
