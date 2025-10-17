@@ -343,6 +343,7 @@ impl Symbol {
                 SymbolDefinition::Module(m) => m.names(),
                 SymbolDefinition::Workbench(wb) => wb.names(),
                 SymbolDefinition::Function(f) => f.names(),
+                SymbolDefinition::ConstExpression(.., ce) => ce.names(),
                 SymbolDefinition::Alias(..) | SymbolDefinition::UseAll(..) => {
                     log::error!("Resolve Context:\n{context:?}");
                     return Err(ResolveError::ResolveCheckFailed);
