@@ -135,6 +135,6 @@ impl std::fmt::Debug for NameList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.symbols
             .iter()
-            .try_for_each(|name| writeln!(f, "  {name}"))
+            .try_for_each(|name| writeln!(f, "  {name} at {:?}", name.src_ref))
     }
 }

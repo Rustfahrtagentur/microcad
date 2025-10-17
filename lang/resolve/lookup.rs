@@ -101,7 +101,7 @@ pub trait Lookup<E: std::error::Error = ResolveError> {
     }
 
     /// Returns an error if name starts with `super::`.
-    fn check_super(&self, name: &QualifiedName) -> ResolveResult<()> {
+    fn deny_super(&self, name: &QualifiedName) -> ResolveResult<()> {
         if name.count_super() > 0 {
             log::trace!(
                 "{not_found} '{name:?}' is not canonical",
