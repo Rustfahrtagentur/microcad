@@ -20,7 +20,7 @@ pub struct Eval {
 
 impl RunCommand<(EvalContext, Option<Model>)> for Eval {
     fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<(EvalContext, Option<Model>)> {
-        if !cli.has_std_lib() {
+        if !self.resolve.has_std_lib() {
             return Err(anyhow!(
                 "No std library was found. Use `microcad install std` to install the std library."
             ));
