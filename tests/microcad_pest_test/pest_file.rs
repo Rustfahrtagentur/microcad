@@ -33,12 +33,11 @@ impl PestFile {
 
         // Read file line by line
         let mut buf = String::new();
-        let path_str = format!("{path:?}");
         // Read file to string
         File::open(path)
-            .expect(format!("cannot open PEST grammar file {path_str}").as_str())
+            .expect("cannot open PEST grammar file")
             .read_to_string(&mut buf)
-            .expect(format!("cannot read PEST grammar from file {path_str}").as_str());
+            .expect("cannot read PEST grammar from file");
 
         buf.parse()
     }
