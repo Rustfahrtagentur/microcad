@@ -1,9 +1,7 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-//! Builtin center operation.
-
-use std::rc::Rc;
+//! Builtin align operation.
 
 use microcad_core::{Geometries2D, Geometry2D};
 use microcad_lang::{builtin::*, render::*};
@@ -17,7 +15,7 @@ impl Operation for Align {
             let model_ = model.borrow();
             let geometries: Geometries2D = model_.children.render_with_context(context)?;
             use microcad_core::traits::Align;
-            Ok(Rc::new(Geometry2D::Collection(geometries).align().into()))
+            Ok(Geometry2D::Collection(geometries).align())
         })
     }
 

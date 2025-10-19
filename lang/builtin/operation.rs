@@ -3,8 +3,6 @@
 
 //! Builtin operations.
 
-use std::rc::Rc;
-
 use microcad_core::{BooleanOp, Geometry2D};
 
 use crate::{builtin::*, model::*, render::*, value::Tuple};
@@ -16,9 +14,7 @@ impl Operation for BooleanOp {
             let model_ = model.borrow();
             let geometries: Geometries2D = model_.children.render_with_context(context)?;
 
-            Ok(Rc::new(
-                Geometry2D::MultiPolygon(geometries.boolean_op(self)).into(),
-            ))
+            Ok(Geometry2D::MultiPolygon(geometries.boolean_op(self)))
         })
     }
 
@@ -28,9 +24,7 @@ impl Operation for BooleanOp {
             let model_ = model.borrow();
             let geometries: Geometries3D = model_.children.render_with_context(context)?;
 
-            Ok(Rc::new(
-                Geometry3D::Manifold(geometries.boolean_op(self)).into(),
-            ))
+            Ok(Geometry3D::Manifold(geometries.boolean_op(self)))
         })
     }
 }

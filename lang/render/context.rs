@@ -48,36 +48,38 @@ impl RenderContext {
     }
 
     /// Update a 2D geometry if it is not in cache.
-    pub fn update_2d(
+    pub fn update_2d<T: Into<WithBounds2D<Geometry2D>>>(
         &mut self,
-        f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<Geometry2DOutput>,
+        f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<T>,
     ) -> RenderResult<Geometry2DOutput> {
         let model = self.model();
         let hash = model.computed_hash();
-        match self.cache.get_2d(&hash) {
-            Some(geo) => Ok(geo.clone()),
+        match self.cache.get(&hash) {
+            Some(GeometryOutput::Geometry2D(geo)) => Ok(geo.clone()),
             None => {
-                let geo = f(self, model)?;
-                self.cache.insert_2d(hash, geo.clone());
+                let geo: Geometry2DOutput = Rc::new(f(self, model)?.into());
+                self.cache.insert(hash, geo.clone());
                 Ok(geo)
             }
+            _ => unreachable!("Something went wrong"),
         }
     }
 
     /// Update a 3D geometry if it is not in cache.
-    pub fn update_3d(
+    pub fn update_3d<T: Into<WithBounds3D<Geometry3D>>>(
         &mut self,
-        f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<Geometry3DOutput>,
+        f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<T>,
     ) -> RenderResult<Geometry3DOutput> {
         let model = self.model();
         let hash = model.computed_hash();
-        match self.cache.get_3d(&hash) {
-            Some(geo) => Ok(geo.clone()),
+        match self.cache.get(&hash) {
+            Some(GeometryOutput::Geometry3D(geo)) => Ok(geo.clone()),
             None => {
-                let geo = f(self, model)?;
-                self.cache.insert_3d(hash, geo.clone());
+                let geo: Geometry3DOutput = Rc::new(f(self, model)?.into());
+                self.cache.insert(hash, geo.clone());
                 Ok(geo)
             }
+            _ => unreachable!("Something went wrong"),
         }
     }
 

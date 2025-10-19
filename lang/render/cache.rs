@@ -3,72 +3,78 @@
 
 //! Render cache.
 
-use crate::render::{Geometry2DOutput, Geometry3DOutput, HashId};
+use crate::render::{GeometryOutput, HashId};
 
 /// An item in the [`RenderCache`].
-pub enum RenderCacheItem {
-    /// 2D geometry.
-    Geometry2D(Geometry2DOutput),
-    /// 3D geometry.
-    Geometry3D(Geometry3DOutput),
+pub struct RenderCacheItem {
+    content: GeometryOutput,
+    hits: u64,
+    last_access: u64,
+}
+
+impl RenderCacheItem {
+    pub fn new(content: impl Into<GeometryOutput>, time_stamp: u64) -> Self {
+        Self {
+            content: content.into(),
+            hits: 0,
+            last_access: time_stamp,
+        }
+    }
 }
 
 /// The [`RenderCache`] owns all geometry created during the render process.
-pub struct RenderCache(rustc_hash::FxHashMap<HashId, RenderCacheItem>);
+pub struct RenderCache {
+    current_cycle: u64,
+    items: rustc_hash::FxHashMap<HashId, RenderCacheItem>,
+}
 
 impl RenderCache {
     /// Create a new empty cache.
     pub fn new() -> Self {
-        Self(Default::default())
+        Self {
+            current_cycle: 0,
+            items: Default::default(),
+        }
     }
 
-    /// Empty cache.
+    pub fn next_cycle(&mut self) {
+        self.current_cycle += 1;
+    }
+
+    /// Empty cache entirely.
     pub fn clear(&mut self) {
-        self.0.clear();
+        self.items.clear();
     }
 
-    /// Get 2D geometry from the cache.
-    pub fn get_2d(&self, hash: &HashId) -> Option<&Geometry2DOutput> {
-        match self.0.get(hash) {
-            Some(RenderCacheItem::Geometry2D(g)) => {
+    /// Remove old items from the cache.
+    pub fn sweep(&mut self, age: u64) {
+        self.items
+            .retain(|_, item| self.current_cycle - item.last_access <= age);
+    }
+
+    /// Get geometry output from the cache.
+    pub fn get(&mut self, hash: &HashId) -> Option<&GeometryOutput> {
+        match self.items.get_mut(hash) {
+            Some(output) => {
+                output.hits += 1;
+                output.last_access = self.current_cycle;
                 log::trace!("Cache hit: {hash:X}");
-                Some(g)
+                Some(&output.content)
             }
             _ => None,
         }
     }
 
-    /// Get 3D geometry from the cache.
-    pub fn get_3d(&self, hash: &HashId) -> Option<&Geometry3DOutput> {
-        match self.0.get(hash) {
-            Some(RenderCacheItem::Geometry3D(g)) => {
-                log::trace!("Cache hit: {hash:X}");
-                Some(g)
-            }
-            _ => None,
-        }
-    }
-
-    /// Insert 2D geometry into the cache and return inserted geometry.
-    pub fn insert_2d(
+    /// Insert geometry output into the cache and return inserted geometry.
+    pub fn insert(
         &mut self,
         hash: impl Into<HashId>,
-        geo2d: Geometry2DOutput,
-    ) -> Geometry2DOutput {
-        self.0
-            .insert(hash.into(), RenderCacheItem::Geometry2D(geo2d.clone()));
-        geo2d
-    }
-
-    /// Insert 3D geometry into the cache and return inserted geometry.
-    pub fn insert_3d(
-        &mut self,
-        hash: impl Into<HashId>,
-        geo3d: Geometry3DOutput,
-    ) -> Geometry3DOutput {
-        self.0
-            .insert(hash.into(), RenderCacheItem::Geometry3D(geo3d.clone()));
-        geo3d
+        geo: impl Into<GeometryOutput>,
+    ) -> &GeometryOutput {
+        let hash: HashId = hash.into();
+        self.items
+            .insert(hash, RenderCacheItem::new(geo, self.current_cycle));
+        self.get(&hash).expect("Cached item")
     }
 }
 

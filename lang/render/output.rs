@@ -18,6 +18,36 @@ pub type Geometry2DOutput = Rc<WithBounds2D<Geometry2D>>;
 /// Geometry 3D type alias.
 pub type Geometry3DOutput = Rc<WithBounds3D<Geometry3D>>;
 
+#[derive(Debug, Clone)]
+pub enum GeometryOutput {
+    Geometry2D(Geometry2DOutput),
+    Geometry3D(Geometry3DOutput),
+}
+
+impl From<Geometry2D> for GeometryOutput {
+    fn from(geo: Geometry2D) -> Self {
+        Self::Geometry2D(Rc::new(geo.into()))
+    }
+}
+
+impl From<Geometry3D> for GeometryOutput {
+    fn from(geo: Geometry3D) -> Self {
+        Self::Geometry3D(Rc::new(geo.into()))
+    }
+}
+
+impl From<Geometry2DOutput> for GeometryOutput {
+    fn from(geo: Geometry2DOutput) -> Self {
+        Self::Geometry2D(geo)
+    }
+}
+
+impl From<Geometry3DOutput> for GeometryOutput {
+    fn from(geo: Geometry3DOutput) -> Self {
+        Self::Geometry3D(geo)
+    }
+}
+
 /// The model output when a model has been processed.
 #[derive(Debug, Clone)]
 pub enum RenderOutput {

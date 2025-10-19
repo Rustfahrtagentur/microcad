@@ -15,12 +15,12 @@ pub trait Operation: std::fmt::Debug {
         OutputType::NotDetermined
     }
 
-    /// Process the model.
+    /// Process the model and output a 2D geometry.
     fn process_2d(&self, _context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
         unimplemented!()
     }
 
-    /// Process the model.
+    /// Process the model and output a 3D geometry.
     fn process_3d(&self, _context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
         unimplemented!()
     }

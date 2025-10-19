@@ -79,10 +79,9 @@ impl ModelInner {
 }
 
 impl Model {
-    /// Pre render the model.
+    /// Pre-render the model.
     ///
-    /// Rendering the model means that all geometry is calculated and stored
-    /// in the in the render cache.
+    /// Pre-rendering create as render output and calculates the matrices, resolutions and hashes of a model.
     pub fn prerender(&self, resolution: RenderResolution) -> RenderResult<()> {
         pub fn create_render_output(model: &Model) -> RenderResult<()> {
             let output = RenderOutput::new(model)?;
@@ -235,8 +234,8 @@ impl RenderWithContext<Model> for Model {
             OutputType::Geometry3D => {
                 let _: Geometry3DOutput = self.render_with_context(context)?;
             }
-            output_type => {
-                log::warn!("Nothing to render: {output_type}");
+            _ => {
+                return Err(RenderError::NothingToRender);
             }
         }
         log::trace!("Finished render:\n{}", FormatTree(self));

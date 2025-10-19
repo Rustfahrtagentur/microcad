@@ -1,8 +1,6 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::rc::Rc;
-
 use microcad_core::*;
 use microcad_lang::{builtin::*, model::*, render::*};
 
@@ -29,7 +27,7 @@ impl Operation for Revolve {
                 context.current_resolution().circular_segments(radius) as usize,
             );
 
-            Ok(Rc::new(WithBounds3D::new(inner.into(), bounds)))
+            Ok(WithBounds3D::new(inner.into(), bounds))
         })
     }
 }

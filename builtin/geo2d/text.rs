@@ -45,11 +45,7 @@ impl Render<Geometry2D> for Text {
 
 impl RenderWithContext<Geometry2DOutput> for Text {
     fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry2DOutput> {
-        context.update_2d(|context, _| {
-            Ok(std::rc::Rc::new(
-                self.render(&context.current_resolution()).into(),
-            ))
-        })
+        context.update_2d(|context, _| Ok(self.render(&context.current_resolution())))
     }
 }
 

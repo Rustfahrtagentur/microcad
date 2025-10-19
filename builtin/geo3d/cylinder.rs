@@ -30,11 +30,7 @@ impl Render<Geometry3D> for Cylinder {
 
 impl RenderWithContext<Geometry3DOutput> for Cylinder {
     fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
-        context.update_3d(|context, _| {
-            Ok(std::rc::Rc::new(
-                self.render(&context.current_resolution()).into(),
-            ))
-        })
+        context.update_3d(|context, _| Ok(self.render(&context.current_resolution())))
     }
 }
 
