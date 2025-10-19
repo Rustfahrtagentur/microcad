@@ -27,7 +27,7 @@ pub struct Hashed<T: std::hash::Hash> {
 impl<T: std::hash::Hash> Hashed<T> {
     /// Create a new wrapper with hashed.
     pub fn new(inner: T) -> Self {
-        let mut hasher = std::hash::DefaultHasher::new();
+        let mut hasher = rustc_hash::FxHasher::default();
         inner.hash(&mut hasher);
         Self {
             inner,

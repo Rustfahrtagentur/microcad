@@ -14,7 +14,7 @@ pub enum RenderCacheItem {
 }
 
 /// The [`RenderCache`] owns all geometry created during the render process.
-pub struct RenderCache(std::collections::HashMap<HashId, RenderCacheItem>);
+pub struct RenderCache(rustc_hash::FxHashMap<HashId, RenderCacheItem>);
 
 impl RenderCache {
     /// Create a new empty cache.

@@ -54,7 +54,7 @@ impl RenderOutput {
     /// Create new render output for model.
     pub fn new(model: &Model) -> RenderResult<Self> {
         let output_type = model.deduce_output_type();
-        let mut hasher = std::hash::DefaultHasher::new();
+        let mut hasher = rustc_hash::FxHasher::default();
         model.hash(&mut hasher);
         let hash = hasher.finish();
 

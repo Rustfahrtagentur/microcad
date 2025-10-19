@@ -34,6 +34,7 @@ ctor = "0.6"
 color-print = { version = "0.3", optional = true }
 sqids = "0.4"
 indexmap = "2"
+rustc-hash = "2.1.1"
 
 microcad-core = { workspace = true }
 custom_debug = "0.6.2"
