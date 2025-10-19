@@ -68,9 +68,10 @@ impl RenderContext {
                     }
                 }
                 {
-                    let geo: Geometry2DOutput = Rc::new(f(self, model)?.into());
+                    let (geo, cost) = self.call_with_cost(model, f)?;
+                    let geo: Geometry2DOutput = Rc::new(geo.into());
                     let mut cache = cache.borrow_mut();
-                    cache.insert(hash, geo.clone());
+                    cache.insert_with_cost(hash, geo.clone(), cost);
                     Ok(geo)
                 }
             }
@@ -94,9 +95,10 @@ impl RenderContext {
                     }
                 }
                 {
-                    let geo: Geometry3DOutput = Rc::new(f(self, model)?.into());
+                    let (geo, cost) = self.call_with_cost(model, f)?;
+                    let geo: Geometry3DOutput = Rc::new(geo.into());
                     let mut cache = cache.borrow_mut();
-                    cache.insert(hash, geo.clone());
+                    cache.insert_with_cost(hash, geo.clone(), cost);
                     Ok(geo)
                 }
             }
@@ -107,5 +109,20 @@ impl RenderContext {
     /// Return current render resolution.
     pub fn current_resolution(&self) -> RenderResolution {
         self.model().borrow().resolution()
+    }
+
+    // Return the generated item and the number of milliseconds.
+    fn call_with_cost<T>(
+        &mut self,
+        model: Model,
+        f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<T>,
+    ) -> RenderResult<(T, f64)> {
+        use std::time::Instant;
+        let start = Instant::now();
+
+        let r = f(self, model)?;
+
+        let duration = start.elapsed();
+        Ok((r, (duration.as_nanos() as f64) / 1_000_000.0))
     }
 }

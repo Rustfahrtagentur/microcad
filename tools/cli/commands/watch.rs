@@ -53,7 +53,7 @@ impl RunCommand for Watch {
                 // Remove unused cache items.
                 {
                     let mut cache = render_cache.borrow_mut();
-                    cache.gc();
+                    cache.garbage_collection();
                 }
 
                 // Wait until anything relevant happens.

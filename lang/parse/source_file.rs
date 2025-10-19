@@ -59,7 +59,7 @@ impl SourceFile {
 
     fn calculate_hash(value: &str) -> u64 {
         use std::hash::{Hash, Hasher};
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        let mut hasher = rustc_hash::FxHasher::default();
         value.hash(&mut hasher);
         hasher.finish()
     }

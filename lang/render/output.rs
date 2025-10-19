@@ -18,9 +18,12 @@ pub type Geometry2DOutput = Rc<WithBounds2D<Geometry2D>>;
 /// Geometry 3D type alias.
 pub type Geometry3DOutput = Rc<WithBounds3D<Geometry3D>>;
 
+/// Geometry output to be stored in the render cache.
 #[derive(Debug, Clone)]
 pub enum GeometryOutput {
+    /// 2D output.
     Geometry2D(Geometry2DOutput),
+    /// 3D output.
     Geometry3D(Geometry3DOutput),
 }
 

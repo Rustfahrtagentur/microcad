@@ -7,24 +7,58 @@ use crate::render::{GeometryOutput, HashId};
 
 /// An item in the [`RenderCache`].
 pub struct RenderCacheItem {
+    /// The actual item content.
     content: GeometryOutput,
+    /// Number of times this cache item has been accessed successfully.
     hits: u64,
+    /// Number of milliseconds this item took to create.
+    millis: f64,
+    /// Time stamp of the last access to this cache item.
     last_access: u64,
 }
 
 impl RenderCacheItem {
-    pub fn new(content: impl Into<GeometryOutput>, time_stamp: u64) -> Self {
+    /// Create new cache item.
+    pub fn new(content: impl Into<GeometryOutput>, millis: f64, last_access: u64) -> Self {
         Self {
             content: content.into(),
             hits: 1,
-            last_access: time_stamp,
+            millis,
+            last_access,
         }
+    }
+
+    /// The cost of this cache item.
+    pub fn cost(&self, current_time_stamp: u64) -> f64 {
+        // Weighted sum of:
+        // - Recency: more recent items are more valuable
+        // - Frequency: more frequently accessed items are more valuable
+        // - Computation cost: items that are expensive to regenerate are more valuable
+
+        let recency = 1.0 / (1.0 + (current_time_stamp - self.last_access) as f64);
+        let frequency = self.hits as f64;
+        let computation_cost = self.millis;
+
+        // We can tune these weights.
+        let weight_recency = 2.3;
+        let weight_frequency = 0.5;
+        let weight_computation = 0.2;
+
+        (weight_recency * recency)
+            + (weight_frequency * frequency)
+            + (weight_computation * computation_cost)
     }
 }
 
 /// The [`RenderCache`] owns all geometry created during the render process.
 pub struct RenderCache {
-    current_cycle: u64,
+    /// Current render cache item stamp.
+    current_time_stamp: u64,
+    /// Number of cache hits in this cycle.
+    hits: u64,
+    /// Maximum cost of a cache item before it is removed during garbage collection.
+    max_cost: f64,
+    /// The actual cache item store.
     items: rustc_hash::FxHashMap<HashId, RenderCacheItem>,
 }
 
@@ -32,15 +66,36 @@ impl RenderCache {
     /// Create a new empty cache.
     pub fn new() -> Self {
         Self {
-            current_cycle: 0,
+            current_time_stamp: 0,
+            hits: 0,
             items: Default::default(),
+            max_cost: std::env::var("MICROCAD_CACHE_MAX_COST")
+                .ok()
+                .and_then(|s| s.parse::<f64>().ok())
+                .unwrap_or(1.2),
         }
     }
 
-    /// Garbage collection.
-    pub fn gc(&mut self) {
-        self.current_cycle += 1;
-        self.sweep(16);
+    /// Remove old items based on a cost function from the cache.
+    pub fn garbage_collection(&mut self) {
+        let old_count = self.items.len();
+        self.items.retain(|hash, item| {
+            let cost = item.cost(self.current_time_stamp);
+            log::trace!(
+                "Item {hash:X} cost = {cost}: {cached}",
+                cached = if cost > self.max_cost { "🔄" } else { "🗑" }
+            );
+            cost > self.max_cost
+        });
+
+        let removed = old_count - self.items.len();
+        log::debug!(
+            "Removed {removed} items from cache. Cache contains {n} items. {hits} cache hits in this cycle.",
+            n = self.items.len(),
+            hits = self.hits,
+        );
+        self.current_time_stamp += 1;
+        self.hits = 0;
     }
 
     /// Empty cache entirely.
@@ -48,38 +103,37 @@ impl RenderCache {
         self.items.clear();
     }
 
-    /// Remove old items from the cache.
-    fn sweep(&mut self, cost: u64) {
-        let old_count = self.items.len();
-        self.items
-            .retain(|_, item| (self.current_cycle - item.last_access) / item.hits <= cost);
-        let removed = old_count - self.items.len();
-        log::trace!("Removed {removed} items from cache.")
-    }
-
     /// Get geometry output from the cache.
     pub fn get(&mut self, hash: &HashId) -> Option<&GeometryOutput> {
         match self.items.get_mut(hash) {
-            Some(output) => {
-                output.hits += 1;
-                output.last_access = self.current_cycle;
-                log::trace!("Cache hit: {hash:X}");
-                Some(&output.content)
+            Some(item) => {
+                item.hits += 1;
+                self.hits += 1;
+                item.last_access = self.current_time_stamp;
+                log::trace!(
+                    "Cache hit: {hash:X}. Cost: {}",
+                    item.cost(self.current_time_stamp)
+                );
+                Some(&item.content)
             }
             _ => None,
         }
     }
 
-    /// Insert geometry output into the cache and return inserted geometry.
-    pub fn insert(
+    /// Insert geometry output into the cache with pre-estimated cost and return inserted geometry.
+    pub fn insert_with_cost(
         &mut self,
         hash: impl Into<HashId>,
         geo: impl Into<GeometryOutput>,
-    ) -> &GeometryOutput {
+        cost: f64,
+    ) -> GeometryOutput {
         let hash: HashId = hash.into();
-        self.items
-            .insert(hash, RenderCacheItem::new(geo, self.current_cycle));
-        self.get(&hash).expect("Cached item")
+        let geo: GeometryOutput = geo.into();
+        self.items.insert(
+            hash,
+            RenderCacheItem::new(geo.clone(), cost, self.current_time_stamp),
+        );
+        geo
     }
 }
 
