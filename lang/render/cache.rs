@@ -16,7 +16,7 @@ impl RenderCacheItem {
     pub fn new(content: impl Into<GeometryOutput>, time_stamp: u64) -> Self {
         Self {
             content: content.into(),
-            hits: 0,
+            hits: 1,
             last_access: time_stamp,
         }
     }
@@ -37,8 +37,10 @@ impl RenderCache {
         }
     }
 
-    pub fn next_cycle(&mut self) {
+    /// Garbage collection.
+    pub fn gc(&mut self) {
         self.current_cycle += 1;
+        self.sweep(16);
     }
 
     /// Empty cache entirely.
@@ -47,9 +49,12 @@ impl RenderCache {
     }
 
     /// Remove old items from the cache.
-    pub fn sweep(&mut self, age: u64) {
+    fn sweep(&mut self, cost: u64) {
+        let old_count = self.items.len();
         self.items
-            .retain(|_, item| self.current_cycle - item.last_access <= age);
+            .retain(|_, item| (self.current_cycle - item.last_access) / item.hits <= cost);
+        let removed = old_count - self.items.len();
+        log::trace!("Removed {removed} items from cache.")
     }
 
     /// Get geometry output from the cache.

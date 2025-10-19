@@ -319,7 +319,7 @@ fn report_model(
             _ => panic!("Invalid geometry output"),
         };
         match export {
-            Some(export) => match export.export(&model) {
+            Some(export) => match export.render_and_export(&model) {
                 Ok(_) => writeln!(log_out, "Export successful."),
                 Err(error) => writeln!(log_out, "Export error: {error}"),
             },

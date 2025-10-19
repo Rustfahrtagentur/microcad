@@ -5,7 +5,7 @@
 
 use microcad_core::RenderResolution;
 
-use crate::{model::Model, render::*};
+use crate::{model::Model, rc::RcMut, render::*};
 
 /// The render context.
 ///
@@ -15,8 +15,8 @@ pub struct RenderContext {
     /// Model stack.
     pub model_stack: Vec<Model>,
 
-    /// Render cache.
-    pub cache: RenderCache,
+    /// Optional render cache.
+    pub cache: Option<RcMut<RenderCache>>,
 }
 
 impl RenderContext {
@@ -26,11 +26,15 @@ impl RenderContext {
     }
 
     /// Initialize context with current model and prerender model.
-    pub fn init(model: &Model, resolution: RenderResolution) -> RenderResult<Self> {
+    pub fn init(
+        model: &Model,
+        resolution: RenderResolution,
+        cache: Option<RcMut<RenderCache>>,
+    ) -> RenderResult<Self> {
         model.prerender(resolution)?;
         Ok(Self {
             model_stack: vec![model.clone()],
-            ..Default::default()
+            cache,
         })
     }
 
@@ -54,14 +58,23 @@ impl RenderContext {
     ) -> RenderResult<Geometry2DOutput> {
         let model = self.model();
         let hash = model.computed_hash();
-        match self.cache.get(&hash) {
-            Some(GeometryOutput::Geometry2D(geo)) => Ok(geo.clone()),
-            None => {
-                let geo: Geometry2DOutput = Rc::new(f(self, model)?.into());
-                self.cache.insert(hash, geo.clone());
-                Ok(geo)
+
+        match self.cache.clone() {
+            Some(cache) => {
+                {
+                    let mut cache = cache.borrow_mut();
+                    if let Some(GeometryOutput::Geometry2D(geo)) = cache.get(&hash) {
+                        return Ok(geo.clone());
+                    }
+                }
+                {
+                    let geo: Geometry2DOutput = Rc::new(f(self, model)?.into());
+                    let mut cache = cache.borrow_mut();
+                    cache.insert(hash, geo.clone());
+                    Ok(geo)
+                }
             }
-            _ => unreachable!("Something went wrong"),
+            None => Ok(Rc::new(f(self, model)?.into())),
         }
     }
 
@@ -72,14 +85,22 @@ impl RenderContext {
     ) -> RenderResult<Geometry3DOutput> {
         let model = self.model();
         let hash = model.computed_hash();
-        match self.cache.get(&hash) {
-            Some(GeometryOutput::Geometry3D(geo)) => Ok(geo.clone()),
-            None => {
-                let geo: Geometry3DOutput = Rc::new(f(self, model)?.into());
-                self.cache.insert(hash, geo.clone());
-                Ok(geo)
+        match self.cache.clone() {
+            Some(cache) => {
+                {
+                    let mut cache = cache.borrow_mut();
+                    if let Some(GeometryOutput::Geometry3D(geo)) = cache.get(&hash) {
+                        return Ok(geo.clone());
+                    }
+                }
+                {
+                    let geo: Geometry3DOutput = Rc::new(f(self, model)?.into());
+                    let mut cache = cache.borrow_mut();
+                    cache.insert(hash, geo.clone());
+                    Ok(geo)
+                }
             }
-            _ => unreachable!("Something went wrong"),
+            None => Ok(Rc::new(f(self, model)?.into())),
         }
     }
 
