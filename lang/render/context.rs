@@ -48,25 +48,37 @@ impl RenderContext {
     }
 
     /// Update a 2D geometry if it is not in cache.
-    ///
-    /// TODO Add cache look up functionality.
     pub fn update_2d(
         &mut self,
         f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<Geometry2DOutput>,
     ) -> RenderResult<Geometry2DOutput> {
         let model = self.model();
-        f(self, model)
+        let hash = model.computed_hash();
+        match self.cache.get_2d(&hash) {
+            Some(geo) => Ok(geo.clone()),
+            None => {
+                let geo = f(self, model)?;
+                self.cache.insert_2d(hash, geo.clone());
+                Ok(geo)
+            }
+        }
     }
 
     /// Update a 3D geometry if it is not in cache.
-    ///
-    /// TODO Add cache look up functionality.
     pub fn update_3d(
         &mut self,
         f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<Geometry3DOutput>,
     ) -> RenderResult<Geometry3DOutput> {
         let model = self.model();
-        f(self, model)
+        let hash = model.computed_hash();
+        match self.cache.get_3d(&hash) {
+            Some(geo) => Ok(geo.clone()),
+            None => {
+                let geo = f(self, model)?;
+                self.cache.insert_3d(hash, geo.clone());
+                Ok(geo)
+            }
+        }
     }
 
     /// Return current render resolution.

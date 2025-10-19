@@ -4,7 +4,6 @@
 //! Builtin function evaluation entity
 
 use custom_debug::Debug;
-use microcad_core::{Geometry2D, Geometry3D, Render};
 use strum::Display;
 
 use crate::{

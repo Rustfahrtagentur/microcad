@@ -3,17 +3,13 @@
 
 //! Render cache.
 
-use std::rc::Rc;
-
-use microcad_core::{Geometry2D, Geometry3D};
-
 use crate::render::{Geometry2DOutput, Geometry3DOutput, HashId};
 
 /// An item in the [`RenderCache`].
 pub enum RenderCacheItem {
-    /// 2D geometry. Note: The Rc can be removed eventually, once the implementation of RenderHash is finished.
+    /// 2D geometry.
     Geometry2D(Geometry2DOutput),
-    /// 3D geometry. Note: The Rc can be removed eventually, once the implementation of RenderHash is finished.
+    /// 3D geometry.
     Geometry3D(Geometry3DOutput),
 }
 
@@ -34,7 +30,10 @@ impl RenderCache {
     /// Get 2D geometry from the cache.
     pub fn get_2d(&self, hash: &HashId) -> Option<&Geometry2DOutput> {
         match self.0.get(hash) {
-            Some(RenderCacheItem::Geometry2D(g)) => Some(g),
+            Some(RenderCacheItem::Geometry2D(g)) => {
+                log::trace!("Cache hit: {hash:X}");
+                Some(g)
+            }
             _ => None,
         }
     }
@@ -42,22 +41,33 @@ impl RenderCache {
     /// Get 3D geometry from the cache.
     pub fn get_3d(&self, hash: &HashId) -> Option<&Geometry3DOutput> {
         match self.0.get(hash) {
-            Some(RenderCacheItem::Geometry3D(g)) => Some(g),
+            Some(RenderCacheItem::Geometry3D(g)) => {
+                log::trace!("Cache hit: {hash:X}");
+                Some(g)
+            }
             _ => None,
         }
     }
 
     /// Insert 2D geometry into the cache and return inserted geometry.
-    pub fn insert_2d(&mut self, hash: HashId, geo2d: Geometry2DOutput) -> Geometry2DOutput {
+    pub fn insert_2d(
+        &mut self,
+        hash: impl Into<HashId>,
+        geo2d: Geometry2DOutput,
+    ) -> Geometry2DOutput {
         self.0
-            .insert(hash, RenderCacheItem::Geometry2D(geo2d.clone()));
+            .insert(hash.into(), RenderCacheItem::Geometry2D(geo2d.clone()));
         geo2d
     }
 
     /// Insert 3D geometry into the cache and return inserted geometry.
-    pub fn insert_3d(&mut self, hash: HashId, geo3d: Geometry3DOutput) -> Geometry3DOutput {
+    pub fn insert_3d(
+        &mut self,
+        hash: impl Into<HashId>,
+        geo3d: Geometry3DOutput,
+    ) -> Geometry3DOutput {
         self.0
-            .insert(hash, RenderCacheItem::Geometry3D(geo3d.clone()));
+            .insert(hash.into(), RenderCacheItem::Geometry3D(geo3d.clone()));
         geo3d
     }
 }

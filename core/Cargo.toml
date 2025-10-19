@@ -25,6 +25,7 @@ manifold-rs = { version = "0.6.2", optional = true }
 strum = { version = "0.27", features = ["derive"] }
 thiserror = "2.0"
 toml = "0.9"
+bytemuck = "1.24.0"
 
 [features]
 default = ["geo3d"]
