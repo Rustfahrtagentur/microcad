@@ -81,11 +81,12 @@ impl RenderCache {
         let old_count = self.items.len();
         self.items.retain(|hash, item| {
             let cost = item.cost(self.current_time_stamp);
+            let keep = cost > self.max_cost;
             log::trace!(
-                "Item {hash:X} cost = {cost}: {cached}",
-                cached = if cost > self.max_cost { "🔄" } else { "🗑" }
+                "Item {hash:X} cost = {cost}: {keep}",
+                keep = if keep { "🔄" } else { "🗑" }
             );
-            cost > self.max_cost
+            keep
         });
 
         let removed = old_count - self.items.len();
