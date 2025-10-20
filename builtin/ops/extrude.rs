@@ -1,8 +1,6 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::rc::Rc;
-
 use microcad_core::*;
 use microcad_lang::{builtin::*, model::*, render::*};
 
@@ -28,11 +26,7 @@ impl Operation for Extrude {
 
             use microcad_core::Extrude;
             let mesh = geometries.linear_extrude(self.height);
-
-            Ok(Some(Rc::new(WithBounds3D::new(
-                mesh.inner.into(),
-                mesh.bounds,
-            ))))
+            Ok(WithBounds3D::new(mesh.inner.into(), mesh.bounds))
         })
     }
 }

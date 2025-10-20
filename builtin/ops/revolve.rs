@@ -1,8 +1,6 @@
 // Copyright © 2025 The µcad authors <info@ucad.xyz>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use std::rc::Rc;
-
 use microcad_core::*;
 use microcad_lang::{builtin::*, model::*, render::*};
 
@@ -21,18 +19,18 @@ impl Operation for Revolve {
         context.update_3d(|context, model| {
             let model_ = model.borrow();
             let geometries: Geometries2D = model_.children.render_with_context(context)?;
-            let radius = geometries.calc_bounds_2d().max_extent();
+
+            let mut bounds = geometries.calc_bounds_2d();
+            bounds.extend_by_point(Vec2::new(0.0, 0.0)); // Add origin point.
+            let radius = bounds.max_extent();
+            use microcad_core::Extrude;
 
             let WithBounds3D { inner, bounds } = geometries.revolve_extrude(
                 cgmath::Deg(self.revolve_degrees).into(),
                 context.current_resolution().circular_segments(radius) as usize,
             );
 
-            use microcad_core::Extrude;
-            Ok(Some(Rc::new(WithBounds3D::new(
-                Geometry3D::from(inner),
-                bounds,
-            ))))
+            Ok(WithBounds3D::new(inner.into(), bounds))
         })
     }
 }

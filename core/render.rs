@@ -73,3 +73,9 @@ impl std::fmt::Display for RenderResolution {
         write!(f, "@{}mm", self.linear)
     }
 }
+
+impl std::hash::Hash for RenderResolution {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        bytemuck::bytes_of(&self.linear).hash(state);
+    }
+}

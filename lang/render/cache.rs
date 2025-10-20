@@ -3,95 +3,138 @@
 
 //! Render cache.
 
-use std::{
-    hash::{Hash, Hasher},
-    rc::Rc,
-};
-
-use microcad_core::{Geometry2D, Geometry3D};
-
-/// Render hash type.
-#[derive(PartialEq, Eq, Default)]
-pub struct RenderHash(u64);
-
-impl Hash for RenderHash {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        state.write_u64(self.0);
-    }
-}
-
-/*pub trait RenderHashable: fmt::Display {
-    fn hash(&self) -> RenderHash {
-        let mut hasher = DefaultHasher::new();
-        self.to_string().hash(&mut hasher);
-        RenderHash(hasher.finish())
-    }
-}
-
-pub struct RenderHashed<T: RenderHashable> {
-    inner: T,
-    hash: RenderHash,
-}
-
-impl<T: RenderHashable> RenderHashed<T> {
-    pub fn new(inner: T) -> Self {
-        let hash = inner.hash();
-        Self { inner, hash }
-    }
-}*/
+use crate::render::{GeometryOutput, HashId};
 
 /// An item in the [`RenderCache`].
-pub enum RenderCacheItem {
-    /// 2D geometry. Note: The Rc can be removed eventually, once the implementation of RenderHash is finished.
-    Geometry2D(Rc<Geometry2D>),
-    /// 3D geometry. Note: The Rc can be removed eventually, once the implementation of RenderHash is finished.
-    Geometry3D(Rc<Geometry3D>),
+pub struct RenderCacheItem {
+    /// The actual item content.
+    content: GeometryOutput,
+    /// Number of times this cache item has been accessed successfully.
+    hits: u64,
+    /// Number of milliseconds this item took to create.
+    millis: f64,
+    /// Time stamp of the last access to this cache item.
+    last_access: u64,
+}
+
+impl RenderCacheItem {
+    /// Create new cache item.
+    pub fn new(content: impl Into<GeometryOutput>, millis: f64, last_access: u64) -> Self {
+        Self {
+            content: content.into(),
+            hits: 1,
+            millis,
+            last_access,
+        }
+    }
+
+    /// The cost of this cache item.
+    pub fn cost(&self, current_time_stamp: u64) -> f64 {
+        // Weighted sum of:
+        // - Recency: more recent items are more valuable
+        // - Frequency: more frequently accessed items are more valuable
+        // - Computation cost: items that are expensive to regenerate are more valuable
+
+        let recency = 1.0 / (1.0 + (current_time_stamp - self.last_access) as f64);
+        let frequency = self.hits as f64;
+        let computation_cost = self.millis;
+
+        // We can tune these weights.
+        let weight_recency = 2.3;
+        let weight_frequency = 0.5;
+        let weight_computation = 0.2;
+
+        (weight_recency * recency)
+            + (weight_frequency * frequency)
+            + (weight_computation * computation_cost)
+    }
 }
 
 /// The [`RenderCache`] owns all geometry created during the render process.
-pub struct RenderCache(std::collections::HashMap<RenderHash, RenderCacheItem>);
+pub struct RenderCache {
+    /// Current render cache item stamp.
+    current_time_stamp: u64,
+    /// Number of cache hits in this cycle.
+    hits: u64,
+    /// Maximum cost of a cache item before it is removed during garbage collection.
+    max_cost: f64,
+    /// The actual cache item store.
+    items: rustc_hash::FxHashMap<HashId, RenderCacheItem>,
+}
 
 impl RenderCache {
     /// Create a new empty cache.
     pub fn new() -> Self {
-        Self(Default::default())
+        Self {
+            current_time_stamp: 0,
+            hits: 0,
+            items: Default::default(),
+            max_cost: std::env::var("MICROCAD_CACHE_MAX_COST")
+                .ok()
+                .and_then(|s| s.parse::<f64>().ok())
+                .unwrap_or(1.2),
+        }
     }
 
-    /// Empty cache.
+    /// Remove old items based on a cost function from the cache.
+    pub fn garbage_collection(&mut self) {
+        let old_count = self.items.len();
+        self.items.retain(|hash, item| {
+            let cost = item.cost(self.current_time_stamp);
+            let keep = cost > self.max_cost;
+            log::trace!(
+                "Item {hash:X} cost = {cost}: {keep}",
+                keep = if keep { "🔄" } else { "🗑" }
+            );
+            keep
+        });
+
+        let removed = old_count - self.items.len();
+        log::debug!(
+            "Removed {removed} items from cache. Cache contains {n} items. {hits} cache hits in this cycle.",
+            n = self.items.len(),
+            hits = self.hits,
+        );
+        self.current_time_stamp += 1;
+        self.hits = 0;
+    }
+
+    /// Empty cache entirely.
     pub fn clear(&mut self) {
-        self.0.clear();
+        self.items.clear();
     }
 
-    /// Get 2D geometry from the cache.
-    pub fn get_2d(&self, hash: &RenderHash) -> Option<&Rc<Geometry2D>> {
-        match self.0.get(hash) {
-            Some(RenderCacheItem::Geometry2D(g)) => Some(g),
+    /// Get geometry output from the cache.
+    pub fn get(&mut self, hash: &HashId) -> Option<&GeometryOutput> {
+        match self.items.get_mut(hash) {
+            Some(item) => {
+                item.hits += 1;
+                self.hits += 1;
+                item.last_access = self.current_time_stamp;
+                log::trace!(
+                    "Cache hit: {hash:X}. Cost: {}",
+                    item.cost(self.current_time_stamp)
+                );
+                Some(&item.content)
+            }
             _ => None,
         }
     }
 
-    /// Get 3D geometry from the cache.
-    pub fn get_3d(&self, hash: &RenderHash) -> Option<&Rc<Geometry3D>> {
-        match self.0.get(hash) {
-            Some(RenderCacheItem::Geometry3D(g)) => Some(g),
-            _ => None,
-        }
-    }
-
-    /// Insert 2D geometry into the cache and return inserted geometry.
-    pub fn insert_2d(&mut self, hash: RenderHash, geo2d: Geometry2D) -> Rc<Geometry2D> {
-        let geo2d = Rc::new(geo2d);
-        self.0
-            .insert(hash, RenderCacheItem::Geometry2D(geo2d.clone()));
-        geo2d
-    }
-
-    /// Insert 3D geometry into the cache and return inserted geometry.
-    pub fn insert_3d(&mut self, hash: RenderHash, geo3d: Geometry3D) -> Rc<Geometry3D> {
-        let geo3d = Rc::new(geo3d);
-        self.0
-            .insert(hash, RenderCacheItem::Geometry3D(geo3d.clone()));
-        geo3d
+    /// Insert geometry output into the cache with pre-estimated cost and return inserted geometry.
+    pub fn insert_with_cost(
+        &mut self,
+        hash: impl Into<HashId>,
+        geo: impl Into<GeometryOutput>,
+        cost: f64,
+    ) -> GeometryOutput {
+        let hash: HashId = hash.into();
+        let geo: GeometryOutput = geo.into();
+        self.items.insert(
+            hash,
+            RenderCacheItem::new(geo.clone(), cost, self.current_time_stamp),
+        );
+        geo
     }
 }
 

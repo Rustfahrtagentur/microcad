@@ -86,7 +86,7 @@ impl EvalContext {
         }
         let model: Model = self.sources.root().eval(self)?;
         log::trace!("Post-evaluation context:\n{self:?}");
-        log::debug!("Evaluated Model:\n{}", FormatTree(&model));
+        log::trace!("Evaluated Model:\n{}", FormatTree(&model));
         if model.is_empty_model() {
             Ok(None)
         } else {

@@ -33,15 +33,14 @@ impl ModelBuilder {
         Ok(self)
     }
 
-    /// Set object attributes.
+    /// Set model attributes.
     pub fn attributes(mut self, attributes: Attributes) -> Self {
         self.root.attributes = attributes;
         self
     }
 
-    /// Set object properties.
+    /// Set model properties.
     pub fn properties(mut self, properties: Properties) -> Self {
-        log::trace!("Properties:\n{properties}");
         self.properties = properties;
         self
     }

@@ -3,17 +3,53 @@
 
 //! Model output types.
 
-use std::rc::Rc;
+use std::{
+    hash::{Hash, Hasher},
+    rc::Rc,
+};
 
 use microcad_core::{Geometry2D, Geometry3D, Mat3, Mat4, RenderResolution};
 
 use crate::{model::*, render::*};
 
 /// Geometry 2D type alias.
-pub type Geometry2DOutput = Option<Rc<WithBounds2D<Geometry2D>>>;
+pub type Geometry2DOutput = Rc<WithBounds2D<Geometry2D>>;
 
 /// Geometry 3D type alias.
-pub type Geometry3DOutput = Option<Rc<WithBounds3D<Geometry3D>>>;
+pub type Geometry3DOutput = Rc<WithBounds3D<Geometry3D>>;
+
+/// Geometry output to be stored in the render cache.
+#[derive(Debug, Clone)]
+pub enum GeometryOutput {
+    /// 2D output.
+    Geometry2D(Geometry2DOutput),
+    /// 3D output.
+    Geometry3D(Geometry3DOutput),
+}
+
+impl From<Geometry2D> for GeometryOutput {
+    fn from(geo: Geometry2D) -> Self {
+        Self::Geometry2D(Rc::new(geo.into()))
+    }
+}
+
+impl From<Geometry3D> for GeometryOutput {
+    fn from(geo: Geometry3D) -> Self {
+        Self::Geometry3D(Rc::new(geo.into()))
+    }
+}
+
+impl From<Geometry2DOutput> for GeometryOutput {
+    fn from(geo: Geometry2DOutput) -> Self {
+        Self::Geometry2D(geo)
+    }
+}
+
+impl From<Geometry3DOutput> for GeometryOutput {
+    fn from(geo: Geometry3DOutput) -> Self {
+        Self::Geometry3D(geo)
+    }
+}
 
 /// The model output when a model has been processed.
 #[derive(Debug, Clone)]
@@ -27,7 +63,9 @@ pub enum RenderOutput {
         /// The render resolution, calculated from transformation matrix.
         resolution: Option<RenderResolution>,
         /// The output geometry.
-        geometry: Geometry2DOutput,
+        geometry: Option<Geometry2DOutput>,
+        /// Computed model hash.
+        hash: HashId,
     },
 
     /// 3D render output.
@@ -39,7 +77,9 @@ pub enum RenderOutput {
         /// The render resolution, calculated from transformation matrix.
         resolution: Option<RenderResolution>,
         /// The output geometry.
-        geometry: Geometry3DOutput,
+        geometry: Option<Geometry3DOutput>,
+        /// Computed model hash.
+        hash: HashId,
     },
 }
 
@@ -47,6 +87,9 @@ impl RenderOutput {
     /// Create new render output for model.
     pub fn new(model: &Model) -> RenderResult<Self> {
         let output_type = model.deduce_output_type();
+        let mut hasher = rustc_hash::FxHasher::default();
+        model.hash(&mut hasher);
+        let hash = hasher.finish();
 
         match output_type {
             OutputType::Geometry2D => {
@@ -61,6 +104,7 @@ impl RenderOutput {
                     world_matrix: None,
                     resolution: None,
                     geometry: None,
+                    hash,
                 })
             }
 
@@ -76,6 +120,7 @@ impl RenderOutput {
                     world_matrix: None,
                     resolution: None,
                     geometry: None,
+                    hash,
                 })
             }
             output_type => Err(RenderError::InvalidOutputType(output_type)),
@@ -95,7 +140,7 @@ impl RenderOutput {
     /// Set the 2D geometry as render output.
     pub fn set_geometry_2d(&mut self, geo: Geometry2DOutput) {
         match self {
-            RenderOutput::Geometry2D { geometry, .. } => *geometry = geo,
+            RenderOutput::Geometry2D { geometry, .. } => *geometry = Some(geo),
             RenderOutput::Geometry3D { .. } => unreachable!(),
         }
     }
@@ -104,7 +149,7 @@ impl RenderOutput {
     pub fn set_geometry_3d(&mut self, geo: Geometry3DOutput) {
         match self {
             RenderOutput::Geometry2D { .. } => unreachable!(),
-            RenderOutput::Geometry3D { geometry, .. } => *geometry = geo,
+            RenderOutput::Geometry3D { geometry, .. } => *geometry = Some(geo),
         }
     }
 
@@ -164,9 +209,10 @@ impl std::fmt::Display for RenderOutput {
             RenderOutput::Geometry2D {
                 local_matrix,
                 geometry,
+                hash,
                 ..
             } => {
-                write!(f, "2D: ")?;
+                write!(f, "2D ({hash:X}): ")?;
                 if local_matrix.is_none() && geometry.is_none() {
                     write!(f, "(nothing to render)")?;
                 }
@@ -189,9 +235,10 @@ impl std::fmt::Display for RenderOutput {
             RenderOutput::Geometry3D {
                 local_matrix,
                 geometry,
+                hash,
                 ..
             } => {
-                write!(f, "3D: ")?;
+                write!(f, "3D ({hash:X}): ")?;
                 match (geometry, local_matrix) {
                     (None, None) => write!(f, "(nothing to render)"),
                     (None, Some(_)) => {
@@ -207,5 +254,13 @@ impl std::fmt::Display for RenderOutput {
             write!(f, " {resolution}")?
         }
         Ok(())
+    }
+}
+
+impl ComputedHash for RenderOutput {
+    fn computed_hash(&self) -> HashId {
+        match self {
+            RenderOutput::Geometry2D { hash, .. } | RenderOutput::Geometry3D { hash, .. } => *hash,
+        }
     }
 }

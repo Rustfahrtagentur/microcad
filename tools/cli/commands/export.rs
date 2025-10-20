@@ -85,7 +85,7 @@ impl Export {
     }
 
     /// Parse render resolution.
-    fn resolution(&self) -> RenderResolution {
+    pub fn resolution(&self) -> RenderResolution {
         use microcad_lang::*;
 
         use std::str::FromStr;
@@ -192,7 +192,7 @@ impl Export {
         models
             .iter()
             .try_for_each(|(model, export)| -> anyhow::Result<()> {
-                let value = export.export(model)?;
+                let value = export.render_and_export(model)?;
                 if !matches!(value, Value::None) {
                     log::info!("{value}");
                 };

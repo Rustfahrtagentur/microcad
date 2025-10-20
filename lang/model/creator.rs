@@ -34,3 +34,10 @@ impl std::fmt::Display for Creator {
         )
     }
 }
+
+impl std::hash::Hash for Creator {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.symbol.full_name().hash(state);
+        self.arguments.hash(state);
+    }
+}

@@ -19,24 +19,24 @@ impl<'a> StlWriter<'a> {
     }
 
     /// Write triangle
-    pub fn write_triangle(&mut self, tri: &Triangle<&Vertex>) -> std::io::Result<()> {
+    pub fn write_triangle(&mut self, tri: &Triangle<&cgmath::Vector3<f32>>) -> std::io::Result<()> {
         let n = tri.normal();
         writeln!(&mut self.writer, "facet normal {} {} {}", n.x, n.y, n.z)?;
         writeln!(&mut self.writer, "\touter loop")?;
         writeln!(
             &mut self.writer,
             "\t\tvertex {} {} {}",
-            tri.0.pos.x, tri.0.pos.y, tri.0.pos.z
+            tri.0.x, tri.0.y, tri.0.z
         )?;
         writeln!(
             &mut self.writer,
             "\t\tvertex {} {} {}",
-            tri.1.pos.x, tri.1.pos.y, tri.1.pos.z
+            tri.1.x, tri.1.y, tri.1.z
         )?;
         writeln!(
             &mut self.writer,
             "\t\tvertex {} {} {}",
-            tri.2.pos.x, tri.2.pos.y, tri.2.pos.z
+            tri.2.x, tri.2.y, tri.2.z
         )?;
         writeln!(&mut self.writer, "\tendloop")?;
         writeln!(&mut self.writer, "endfacet")?;

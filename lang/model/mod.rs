@@ -32,7 +32,12 @@ use derive_more::{Deref, DerefMut};
 use microcad_core::BooleanOp;
 
 use crate::{
-    diag::WriteToFile, rc::RcMut, src_ref::SrcReferrer, syntax::Identifier, tree_display::*,
+    diag::WriteToFile,
+    rc::RcMut,
+    render::{ComputedHash, HashId, RenderOutput},
+    src_ref::SrcReferrer,
+    syntax::Identifier,
+    tree_display::*,
     value::Value,
 };
 
@@ -160,6 +165,16 @@ impl Model {
         }
 
         output_type
+    }
+
+    /// Get render output type. Expects a render output.
+    pub fn render_output_type(&self) -> OutputType {
+        let self_ = self.borrow();
+        match self_.output {
+            Some(RenderOutput::Geometry2D { .. }) => OutputType::Geometry2D,
+            Some(RenderOutput::Geometry3D { .. }) => OutputType::Geometry3D,
+            None => OutputType::InvalidMixed,
+        }
     }
 
     /// Return inner group if this model only contains a group as single child.
@@ -310,3 +325,18 @@ impl TreeDisplay for Model {
 }
 
 impl WriteToFile for Model {}
+
+impl std::hash::Hash for Model {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        let self_ = self.borrow();
+        self_.element().hash(state);
+        self_.children().for_each(|child| child.hash(state));
+    }
+}
+
+impl ComputedHash for Model {
+    fn computed_hash(&self) -> HashId {
+        let self_ = self.borrow();
+        self_.output().computed_hash()
+    }
+}

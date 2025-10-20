@@ -5,7 +5,7 @@
 
 use microcad_core::RenderResolution;
 
-use crate::{model::Model, render::*};
+use crate::{model::Model, rc::RcMut, render::*};
 
 /// The render context.
 ///
@@ -15,8 +15,8 @@ pub struct RenderContext {
     /// Model stack.
     pub model_stack: Vec<Model>,
 
-    /// Render cache.
-    pub cache: RenderCache,
+    /// Optional render cache.
+    pub cache: Option<RcMut<RenderCache>>,
 }
 
 impl RenderContext {
@@ -26,12 +26,15 @@ impl RenderContext {
     }
 
     /// Initialize context with current model and prerender model.
-    pub fn init(model: &Model, resolution: RenderResolution) -> RenderResult<Self> {
+    pub fn init(
+        model: &Model,
+        resolution: RenderResolution,
+        cache: Option<RcMut<RenderCache>>,
+    ) -> RenderResult<Self> {
         model.prerender(resolution)?;
-
         Ok(Self {
             model_stack: vec![model.clone()],
-            ..Default::default()
+            cache,
         })
     }
 
@@ -49,29 +52,77 @@ impl RenderContext {
     }
 
     /// Update a 2D geometry if it is not in cache.
-    ///
-    /// TODO Add cache look up functionality.
-    pub fn update_2d(
+    pub fn update_2d<T: Into<WithBounds2D<Geometry2D>>>(
         &mut self,
-        f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<Geometry2DOutput>,
+        f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<T>,
     ) -> RenderResult<Geometry2DOutput> {
         let model = self.model();
-        f(self, model)
+        let hash = model.computed_hash();
+
+        match self.cache.clone() {
+            Some(cache) => {
+                {
+                    let mut cache = cache.borrow_mut();
+                    if let Some(GeometryOutput::Geometry2D(geo)) = cache.get(&hash) {
+                        return Ok(geo.clone());
+                    }
+                }
+                {
+                    let (geo, cost) = self.call_with_cost(model, f)?;
+                    let geo: Geometry2DOutput = Rc::new(geo.into());
+                    let mut cache = cache.borrow_mut();
+                    cache.insert_with_cost(hash, geo.clone(), cost);
+                    Ok(geo)
+                }
+            }
+            None => Ok(Rc::new(f(self, model)?.into())),
+        }
     }
 
     /// Update a 3D geometry if it is not in cache.
-    ///
-    /// TODO Add cache look up functionality.
-    pub fn update_3d(
+    pub fn update_3d<T: Into<WithBounds3D<Geometry3D>>>(
         &mut self,
-        f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<Geometry3DOutput>,
+        f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<T>,
     ) -> RenderResult<Geometry3DOutput> {
         let model = self.model();
-        f(self, model)
+        let hash = model.computed_hash();
+        match self.cache.clone() {
+            Some(cache) => {
+                {
+                    let mut cache = cache.borrow_mut();
+                    if let Some(GeometryOutput::Geometry3D(geo)) = cache.get(&hash) {
+                        return Ok(geo.clone());
+                    }
+                }
+                {
+                    let (geo, cost) = self.call_with_cost(model, f)?;
+                    let geo: Geometry3DOutput = Rc::new(geo.into());
+                    let mut cache = cache.borrow_mut();
+                    cache.insert_with_cost(hash, geo.clone(), cost);
+                    Ok(geo)
+                }
+            }
+            None => Ok(Rc::new(f(self, model)?.into())),
+        }
     }
 
     /// Return current render resolution.
     pub fn current_resolution(&self) -> RenderResolution {
         self.model().borrow().resolution()
+    }
+
+    // Return the generated item and the number of milliseconds.
+    fn call_with_cost<T>(
+        &mut self,
+        model: Model,
+        f: impl FnOnce(&mut RenderContext, Model) -> RenderResult<T>,
+    ) -> RenderResult<(T, f64)> {
+        use std::time::Instant;
+        let start = Instant::now();
+
+        let r = f(self, model)?;
+
+        let duration = start.elapsed();
+        Ok((r, (duration.as_nanos() as f64) / 1_000_000.0))
     }
 }

@@ -4,11 +4,18 @@
 //! Builtin function evaluation entity
 
 use custom_debug::Debug;
-use microcad_core::{Geometry2D, Geometry3D, Render};
 use strum::Display;
 
 use crate::{
-    eval::*, model::*, render::RenderResult, resolve::Symbol, src_ref::SrcRef, syntax::*, value::*,
+    eval::*,
+    model::*,
+    render::{
+        ComputedHash, Geometry2DOutput, Geometry3DOutput, Hashed, RenderResult, RenderWithContext,
+    },
+    resolve::Symbol,
+    src_ref::SrcRef,
+    syntax::*,
+    value::*,
 };
 
 /// Builtin function type
@@ -67,9 +74,9 @@ pub enum BuiltinWorkbenchKind {
 /// The return value when calling a built-in workpiece.
 pub enum BuiltinWorkpieceOutput {
     /// 2D geometry output.
-    Primitive2D(Box<dyn Render<Geometry2D>>),
+    Primitive2D(Box<dyn RenderWithContext<Geometry2DOutput>>),
     /// 3D geometry output.
-    Primitive3D(Box<dyn Render<Geometry3D>>),
+    Primitive3D(Box<dyn RenderWithContext<Geometry3DOutput>>),
     /// Transformation.
     Transform(AffineTransform),
     /// Operation.
@@ -84,10 +91,10 @@ pub type BuiltinWorkpieceFn = dyn Fn(&Tuple) -> RenderResult<BuiltinWorkpieceOut
 pub struct BuiltinWorkpiece {
     /// Kind of the workpiece.
     pub kind: BuiltinWorkbenchKind,
-    /// Output type
+    /// Output type.
     pub output_type: OutputType,
     /// Creator symbol.
-    pub creator: Creator,
+    pub creator: Hashed<Creator>,
     /// The function that will be called when the workpiece is rendered.
     #[debug(skip)]
     pub f: &'static BuiltinWorkpieceFn,
@@ -106,8 +113,14 @@ impl std::fmt::Display for BuiltinWorkpiece {
             f,
             "{kind} {creator}",
             kind = self.kind,
-            creator = self.creator,
+            creator = *self.creator,
         )
+    }
+}
+
+impl ComputedHash for BuiltinWorkpiece {
+    fn computed_hash(&self) -> crate::render::HashId {
+        self.creator.computed_hash()
     }
 }
 
@@ -132,7 +145,7 @@ pub trait BuiltinWorkbenchDefinition {
         BuiltinWorkpiece {
             kind: Self::kind(),
             output_type: Self::output_type(),
-            creator,
+            creator: Hashed::new(creator),
             f: Self::workpiece_function(),
         }
     }

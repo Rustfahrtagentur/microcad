@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use microcad_core::*;
-use microcad_lang::builtin::*;
+use microcad_lang::{builtin::*, render::*};
 
 /// The builtin cube primitive, defined by its size in the x, y, and z dimensions.
 #[derive(Debug, Clone)]
@@ -14,6 +14,12 @@ pub struct Cube {
 impl Render<Geometry3D> for Cube {
     fn render(&self, _: &RenderResolution) -> Geometry3D {
         Manifold::cube(self.size.x, self.size.y, self.size.z).into()
+    }
+}
+
+impl RenderWithContext<Geometry3DOutput> for Cube {
+    fn render_with_context(&self, context: &mut RenderContext) -> RenderResult<Geometry3DOutput> {
+        context.update_3d(|context, _| Ok(self.render(&context.current_resolution())))
     }
 }
 

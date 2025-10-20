@@ -3,8 +3,6 @@
 
 //! Builtin hull operation.
 
-use std::rc::Rc;
-
 use microcad_lang::{builtin::*, render::*};
 
 #[derive(Debug)]
@@ -15,7 +13,8 @@ impl Operation for Hull {
         context.update_2d(|context, model| {
             let model_ = model.borrow();
             let geometry: Geometry2DOutput = model_.children.render_with_context(context)?;
-            Ok(geometry.map(|geometry| Rc::new(geometry.hull().with_bounds())))
+
+            Ok(geometry.inner.hull())
         })
     }
 
@@ -23,7 +22,8 @@ impl Operation for Hull {
         context.update_3d(|context, model| {
             let model_ = model.borrow();
             let geometry: Geometry3DOutput = model_.children.render_with_context(context)?;
-            Ok(geometry.map(|geometry| Rc::new(geometry.hull().with_bounds())))
+
+            Ok(geometry.inner.hull())
         })
     }
 }
