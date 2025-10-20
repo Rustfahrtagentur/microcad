@@ -19,7 +19,10 @@ impl Operation for Revolve {
         context.update_3d(|context, model| {
             let model_ = model.borrow();
             let geometries: Geometries2D = model_.children.render_with_context(context)?;
-            let radius = geometries.calc_bounds_2d().max_extent();
+
+            let mut bounds = geometries.calc_bounds_2d();
+            bounds.extend_by_point(Vec2::new(0.0, 0.0)); // Add origin point.
+            let radius = bounds.max_extent();
             use microcad_core::Extrude;
 
             let WithBounds3D { inner, bounds } = geometries.revolve_extrude(
