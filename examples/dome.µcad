@@ -6,9 +6,8 @@ Rect(0.5mm)
 	.translate(x = size)
 	.revolve(180°)
 	.rotate(x = [0..5]*180°/5)
-	.rotate(z = [0..3]*360°/3);
+	.rotate(z = [0..3]*180°/3);
 }
 
-Dome(5mm);
-Dome(10mm).translate(y = 10mm);
+Dome(10mm)
 
