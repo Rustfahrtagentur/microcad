@@ -6,6 +6,7 @@
 use microcad_lang::{diag::*, resolve::*};
 
 use crate::*;
+use anyhow::*;
 
 #[derive(clap::Parser)]
 pub struct Resolve {
@@ -19,7 +20,7 @@ pub struct Resolve {
     /// Paths to search for files.
     ///
     /// By default, `./lib` (if it exists) and `~/.microcad/lib` are used.
-    #[arg(short = 'P', long = "search-path", action = clap::ArgAction::Append, global = true)]
+    #[arg(short = 'P', long = "search-path", action = clap::ArgAction::Append)]
     pub search_paths: Vec<std::path::PathBuf>,
 
     /// Load config from file.
@@ -27,37 +28,34 @@ pub struct Resolve {
     omit_default_libs: bool,
 }
 
-impl Resolve {
-    /// Check if we have a std lib in search paths.
-    pub fn has_std_lib(&self) -> bool {
-        self.search_paths.iter().any(|dir| {
-            let file_path = dir.join("std/mod.µcad");
-            file_path.exists() && file_path.is_file()
-        })
-    }
-}
-
 impl RunCommand<ResolveContext> for Resolve {
     fn run(&self, cli: &Cli) -> anyhow::Result<ResolveContext> {
         // run prior parse step
         let root = self.parse.run(cli)?;
 
-        // add default paths if not omitted
-        let search_paths = if !self.omit_default_libs {
-            &self
-                .search_paths
-                .iter()
-                .chain(Cli::default_search_paths().iter())
-                .cloned()
-                .collect()
-        } else {
-            &self.search_paths
+        // add default paths or omit this step by option
+        let mut search_paths = self.search_paths.clone();
+
+        if !self.omit_default_libs {
+            search_paths.append(&mut Cli::default_search_paths())
         };
+
+        // search for a usable std library
+        if !search_paths.iter().any(|dir| {
+            let file_path = dir.join("std/mod.µcad");
+            file_path.exists() && file_path.is_file()
+        }) {
+            eprintln!(
+                "Warning: No std library was found in given search paths: {:?}.
+Use `microcad install std` to install the std library.",
+                search_paths
+            );
+        }
 
         // resolve the file
         let context = ResolveContext::create(
             root,
-            search_paths,
+            &search_paths,
             Some(microcad_builtin::builtin_module()),
             DiagHandler::default(),
         )?;
