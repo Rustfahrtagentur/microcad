@@ -83,31 +83,23 @@ impl Extrude for LineString {
         if len < 2 {
             return mesh; // Not enough points to extrude
         }
+        // Reserve space for positions and indices
+        mesh.positions.reserve(len * 2); // each point produces 2 vertices
+        mesh.triangle_indices.reserve(len * 2); // each side produces 2 triangles
 
         let m_a: cgmath::Matrix4<f32> = m_a.cast().expect("Successful cast");
         let m_b: cgmath::Matrix4<f32> = m_b.cast().expect("Successful cast");
 
-        let transform_point = |p: &Point, m: &cgmath::Matrix4<f32>| -> cgmath::Vector3<f32> {
-            let local = Point3::new(p.x() as f32, p.y() as f32, 0.0_f32);
-            m.transform_point(local).to_homogeneous().truncate()
-        };
+        let transform_point =
+            |p: &cgmath::Point3<f32>, m: &cgmath::Matrix4<f32>| -> cgmath::Vector3<f32> {
+                m.transform_point(*p).to_homogeneous().truncate()
+            };
 
-        let mut bottom_indices = Vec::with_capacity(len);
-        let mut top_indices = Vec::with_capacity(len);
-
-        // Add vertices with position and zeroed normals
+        // Interleave bottom and top vertex positions
         for point in points {
-            let bottom_pos = transform_point(&point, &m_a);
-            let top_pos = transform_point(&point, &m_b);
-
-            let bottom_index = mesh.positions.len() as u32;
-            mesh.positions.push(bottom_pos);
-
-            let top_index = mesh.positions.len() as u32;
-            mesh.positions.push(top_pos);
-
-            bottom_indices.push(bottom_index);
-            top_indices.push(top_index);
+            let point = cgmath::Point3::new(point.x() as f32, point.y() as f32, 0.0_f32);
+            mesh.positions.push(transform_point(&point, &m_a)); // bottom
+            mesh.positions.push(transform_point(&point, &m_b)); // top
         }
 
         let range = if self.is_closed() {
@@ -119,15 +111,11 @@ impl Extrude for LineString {
         for i in range {
             let next = (i + 1) % len;
 
-            let bl = bottom_indices[i];
-            let br = bottom_indices[next];
-            let tl = top_indices[i];
-            let tr = top_indices[next];
-
-            // Triangle 1: bl, br, tr
+            let bl = (i * 2) as u32;
+            let br = (next * 2) as u32;
+            let tl = bl + 1;
+            let tr = br + 1;
             mesh.triangle_indices.push(Triangle(bl, br, tr));
-
-            // Triangle 2: bl, tr, tl
             mesh.triangle_indices.push(Triangle(bl, tr, tl));
         }
 
