@@ -241,7 +241,7 @@ impl ResolveContext {
         id: &Identifier,
     ) -> ResolveResult<Symbol> {
         self.sources
-            .load_file(parent_path, id)?
+            .load_mod_file(parent_path, id)?
             .symbolize(visibility, self)
     }
 
@@ -249,6 +249,14 @@ impl ResolveContext {
     /// Return `true` if context has been resolved (or checked as well)
     pub fn is_checked(&self) -> bool {
         self.mode >= ResolveMode::Checked
+    }
+
+    pub fn update_files(&mut self, files: &[&impl AsRef<std::path::Path>]) -> ResolveContext<()> {
+        files.iter().for_each(|path| {
+            self.sources.update_file(path.as_ref());
+        });
+
+        todo!("update symbols")
     }
 }
 

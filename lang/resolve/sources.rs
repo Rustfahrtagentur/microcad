@@ -221,7 +221,7 @@ impl Sources {
     }
 
     /// Load another source file into cache.
-    pub fn load_file(
+    pub fn load_mod_file(
         &mut self,
         parent_path: impl AsRef<std::path::Path>,
         id: &Identifier,
@@ -232,6 +232,25 @@ impl Sources {
         let source_file = SourceFile::load_with_name(&file_path, name)?;
         self.insert(source_file.clone());
         Ok(source_file)
+    }
+
+    /// Reload an existing file
+    pub fn update_file(
+        &mut self,
+        path: impl AsRef<std::path::Path>,
+    ) -> ResolveResult<Rc<SourceFile>> {
+        let path = path.as_ref().to_path_buf();
+        if let Some(index) = self.by_path.get(&path) {
+            let old_source_file = self.source_files[*index].clone();
+            let name = old_source_file.name.clone();
+            let new_source_file = SourceFile::load_with_name(path, name)?;
+            self.by_hash.remove(&old_source_file.hash);
+            self.by_hash.insert(new_source_file.hash, *index);
+            self.source_files[*index] = new_source_file;
+            Ok(old_source_file)
+        } else {
+            Err(ResolveError::FileNotFound(path))
+        }
     }
 }
 
