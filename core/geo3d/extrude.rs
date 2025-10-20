@@ -5,7 +5,7 @@
 
 use std::f64::consts::PI;
 
-use cgmath::{InnerSpace, Matrix, Point3, SquareMatrix, Transform};
+use cgmath::{Matrix, Point3, SquareMatrix, Transform, Vector3};
 
 use geo::TriangulateEarcut;
 
@@ -17,7 +17,7 @@ pub trait Extrude {
     fn extrude_slice(&self, m_a: &Mat4, m_b: &Mat4) -> TriangleMesh;
 
     /// Generate the cap geometry.
-    fn cap(&self, _m: &Mat4, _normal: &Vec3, _bottom: bool) -> TriangleMesh {
+    fn cap(&self, _m: &Mat4, _bottom: bool) -> TriangleMesh {
         TriangleMesh::default()
     }
 
@@ -26,8 +26,8 @@ pub trait Extrude {
         let m_a = Mat4::identity();
         let m_b = Mat4::from_translation(Vec3::new(0.0, 0.0, height));
         let mut mesh = self.extrude_slice(&m_a, &m_b);
-        mesh.append(&self.cap(&m_a, &-m_a.z.truncate(), true));
-        mesh.append(&self.cap(&m_b, &m_b.z.truncate(), false));
+        mesh.append(&self.cap(&m_a, true));
+        mesh.append(&self.cap(&m_b, false));
         let bounds = mesh.calc_bounds_3d();
         mesh.repair(&bounds);
         WithBounds3D::new(mesh, bounds)
@@ -64,11 +64,8 @@ pub trait Extrude {
         if angle_rad.0 < PI * 2.0 {
             let m_start = &transforms[0];
             let m_end = transforms.last().expect("Transform");
-            let normal_start = m_start.x.truncate(); // Points outward at start
-            let normal_end = -m_end.x.truncate(); // Points inward at end
-
-            mesh.append(&self.cap(m_start, &normal_start, true));
-            mesh.append(&self.cap(m_end, &normal_end, false));
+            mesh.append(&self.cap(m_start, true));
+            mesh.append(&self.cap(m_end, false));
         }
 
         let bounds = mesh.calc_bounds_3d();
@@ -87,8 +84,11 @@ impl Extrude for LineString {
             return mesh; // Not enough points to extrude
         }
 
-        let transform_point = |p: &Point, m: &Mat4| -> Vec3 {
-            let local = Point3::new(p.x(), p.y(), 0.0);
+        let m_a: cgmath::Matrix4<f32> = m_a.cast().expect("Successful cast");
+        let m_b: cgmath::Matrix4<f32> = m_b.cast().expect("Successful cast");
+
+        let transform_point = |p: &Point, m: &cgmath::Matrix4<f32>| -> cgmath::Vector3<f32> {
+            let local = Point3::new(p.x() as f32, p.y() as f32, 0.0_f32);
             m.transform_point(local).to_homogeneous().truncate()
         };
 
@@ -97,20 +97,14 @@ impl Extrude for LineString {
 
         // Add vertices with position and zeroed normals
         for point in points {
-            let bottom_pos = transform_point(&point, m_a);
-            let top_pos = transform_point(&point, m_b);
+            let bottom_pos = transform_point(&point, &m_a);
+            let top_pos = transform_point(&point, &m_b);
 
-            let bottom_index = mesh.vertices.len() as u32;
-            mesh.vertices.push(Vertex {
-                pos: bottom_pos,
-                normal: Vec3::new(0.0, 0.0, 0.0),
-            });
+            let bottom_index = mesh.positions.len() as u32;
+            mesh.positions.push(bottom_pos);
 
-            let top_index = mesh.vertices.len() as u32;
-            mesh.vertices.push(Vertex {
-                pos: top_pos,
-                normal: Vec3::new(0.0, 0.0, 0.0),
-            });
+            let top_index = mesh.positions.len() as u32;
+            mesh.positions.push(top_pos);
 
             bottom_indices.push(bottom_index);
             top_indices.push(top_index);
@@ -132,17 +126,10 @@ impl Extrude for LineString {
 
             // Triangle 1: bl, br, tr
             mesh.triangle_indices.push(Triangle(bl, br, tr));
-            Vertex::accumulate_normal(&mut mesh.vertices, bl, br, tr);
 
             // Triangle 2: bl, tr, tl
             mesh.triangle_indices.push(Triangle(bl, tr, tl));
-            Vertex::accumulate_normal(&mut mesh.vertices, bl, tr, tl);
         }
-
-        // Normalize vertex normals
-        mesh.vertices
-            .iter_mut()
-            .for_each(|v| v.normal = v.normal.normalize());
 
         mesh
     }
@@ -158,23 +145,22 @@ impl Extrude for Polygon {
         mesh
     }
 
-    fn cap(&self, m: &Mat4, normal: &Vec3, flip: bool) -> TriangleMesh {
+    fn cap(&self, m: &Mat4, flip: bool) -> TriangleMesh {
         let raw_triangulation = self.earcut_triangles_raw();
+        let m: cgmath::Matrix4<f32> = m.cast().expect("Successful cast");
 
         TriangleMesh {
-            vertices: raw_triangulation
+            positions: raw_triangulation
                 .vertices
                 .as_slice()
                 .chunks_exact(2)
                 .map(|chunk| {
-                    let p = Point3::new(chunk[0], chunk[1], 0.0);
+                    let p = Point3::new(chunk[0] as f32, chunk[1] as f32, 0.0_f32);
                     let p = m.transform_point(p);
-                    Vertex {
-                        pos: Vec3::new(p.x, p.y, p.z),
-                        normal: *normal,
-                    }
+                    Vector3::<f32>::new(p.x, p.y, p.z)
                 })
                 .collect(),
+            normals: None,
             triangle_indices: raw_triangulation
                 .triangle_indices
                 .as_slice()
@@ -197,10 +183,10 @@ impl Extrude for MultiPolygon {
         mesh
     }
 
-    fn cap(&self, m: &Mat4, normal: &Vec3, flip: bool) -> TriangleMesh {
+    fn cap(&self, m: &Mat4, flip: bool) -> TriangleMesh {
         let mut mesh = TriangleMesh::default();
         self.iter().for_each(|polygon| {
-            mesh.append(&polygon.cap(m, normal, flip));
+            mesh.append(&polygon.cap(m, flip));
         });
         mesh
     }
@@ -211,7 +197,7 @@ impl Extrude for Geometries2D {
         self.to_multi_polygon().extrude_slice(m_a, m_b)
     }
 
-    fn cap(&self, m: &Mat4, normal: &Vec3, flip: bool) -> TriangleMesh {
-        self.to_multi_polygon().cap(m, normal, flip)
+    fn cap(&self, m: &Mat4, flip: bool) -> TriangleMesh {
+        self.to_multi_polygon().cap(m, flip)
     }
 }

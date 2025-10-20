@@ -2,18 +2,19 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use crate::*;
-use cgmath::ElementWise;
+use cgmath::{ElementWise, Vector3};
 use manifold_rs::{Manifold, Mesh};
 
 /// Triangle mesh
 #[derive(Default, Clone)]
 pub struct TriangleMesh {
     /// Mesh Vertices
-    pub vertices: Vec<Vertex>,
-    /// Triangle indices
+    pub positions: Vec<Vector3<f32>>,
+    /// Optional normals.
+    pub normals: Option<Vec<Vector3<f32>>>,
+    /// Triangle indices.
     pub triangle_indices: Vec<Triangle<u32>>,
 }
-
 /// Triangle iterator state.
 pub struct Triangles<'a> {
     triangle_mesh: &'a TriangleMesh,
@@ -21,16 +22,16 @@ pub struct Triangles<'a> {
 }
 
 impl<'a> Iterator for Triangles<'a> {
-    type Item = Triangle<&'a Vertex>;
+    type Item = Triangle<&'a Vector3<f32>>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.triangle_mesh.triangle_indices.len() {
             let t = self.triangle_mesh.triangle_indices[self.index];
             self.index += 1;
             Some(Triangle(
-                &self.triangle_mesh.vertices[t.0 as usize],
-                &self.triangle_mesh.vertices[t.1 as usize],
-                &self.triangle_mesh.vertices[t.2 as usize],
+                &self.triangle_mesh.positions[t.0 as usize],
+                &self.triangle_mesh.positions[t.1 as usize],
+                &self.triangle_mesh.positions[t.2 as usize],
             ))
         } else {
             None
@@ -41,24 +42,24 @@ impl<'a> Iterator for Triangles<'a> {
 impl TriangleMesh {
     /// Is this mesh empty?
     pub fn is_empty(&self) -> bool {
-        self.vertices.is_empty() || self.triangle_indices.is_empty()
+        self.positions.is_empty() || self.triangle_indices.is_empty()
     }
 
     /// Clear mesh.
     pub fn clear(&mut self) {
-        self.vertices.clear();
+        self.positions.clear();
         self.triangle_indices.clear();
     }
 
     /// Fetch triangles.
-    pub fn fetch_triangles(&self) -> Vec<Triangle<Vertex>> {
+    pub fn fetch_triangles(&self) -> Vec<Triangle<Vector3<f32>>> {
         self.triangle_indices
             .iter()
             .map(|t| {
                 Triangle(
-                    self.vertices[t.0 as usize],
-                    self.vertices[t.1 as usize],
-                    self.vertices[t.2 as usize],
+                    self.positions[t.0 as usize],
+                    self.positions[t.1 as usize],
+                    self.positions[t.2 as usize],
                 )
             })
             .collect()
@@ -66,8 +67,8 @@ impl TriangleMesh {
 
     /// Append a triangle mesh.
     pub fn append(&mut self, other: &TriangleMesh) {
-        let offset = self.vertices.len() as u32;
-        self.vertices.append(&mut other.vertices.clone());
+        let offset = self.positions.len() as u32;
+        self.positions.append(&mut other.positions.clone());
         self.triangle_indices.extend(
             other
                 .triangle_indices
@@ -87,9 +88,9 @@ impl TriangleMesh {
     /// Convert mesh to manifold.
     pub fn to_manifold(&self) -> Manifold {
         let vertices = self
-            .vertices
+            .positions
             .iter()
-            .flat_map(|v| vec![v.pos.x as f32, v.pos.y as f32, v.pos.z as f32])
+            .flat_map(|v| vec![v.x, v.y, v.z])
             .collect::<Vec<_>>();
 
         let triangle_indices = self
@@ -98,7 +99,7 @@ impl TriangleMesh {
             .flat_map(|t| vec![t.0, t.1, t.2])
             .collect::<Vec<_>>();
 
-        assert_eq!(vertices.len(), self.vertices.len() * 3);
+        assert_eq!(vertices.len(), self.positions.len() * 3);
         assert_eq!(triangle_indices.len(), self.triangle_indices.len() * 3);
 
         Manifold::from_mesh(Mesh::new(&vertices, &triangle_indices))
@@ -107,17 +108,17 @@ impl TriangleMesh {
     /// Calculate volume of mesh.
     pub fn volume(&self) -> f64 {
         self.triangles()
-            .map(|t| t.signed_volume())
+            .map(|t| t.signed_volume() as f64)
             .sum::<f64>()
             .abs()
     }
 
     /// Fetch a vertex triangle from index triangle.
-    pub fn fetch_triangle(&self, tri: Triangle<u32>) -> Triangle<&Vertex> {
+    pub fn fetch_triangle(&self, tri: Triangle<u32>) -> Triangle<&Vector3<f32>> {
         Triangle(
-            &self.vertices[tri.0 as usize],
-            &self.vertices[tri.1 as usize],
-            &self.vertices[tri.2 as usize],
+            &self.positions[tri.0 as usize],
+            &self.positions[tri.1 as usize],
+            &self.positions[tri.2 as usize],
         )
     }
 
@@ -125,12 +126,14 @@ impl TriangleMesh {
     pub fn repair(&mut self, bounds: &Bounds3D) {
         // 1. Merge duplicate vertices using a spatial hash map (or hashmap keyed on quantized position)
 
-        let min = bounds.min;
-        let inv_size = 1.0 / (bounds.max - bounds.min);
+        let min: Vector3<f32> = bounds.min.cast().expect("Successful cast");
+        let inv_size: Vector3<f32> = (1.0 / (bounds.max - bounds.min))
+            .cast()
+            .expect("Successful cast");
 
         // Quantize vertex positions to grid to group duplicates
-        let quantize = |pos: &Vec3| {
-            let mapped = (pos - min).mul_element_wise(inv_size) * (u32::MAX as Scalar);
+        let quantize = |pos: &Vector3<f32>| {
+            let mapped = (pos - min).mul_element_wise(inv_size) * (u32::MAX as f32);
             (
                 mapped.x.floor() as u32,
                 mapped.y.floor() as u32,
@@ -140,24 +143,24 @@ impl TriangleMesh {
 
         let mut vertex_map: std::collections::HashMap<(u32, u32, u32), u32> =
             std::collections::HashMap::new();
-        let mut new_vertices: Vec<Vertex> = Vec::with_capacity(self.vertices.len());
-        let mut remap: Vec<u32> = vec![0; self.vertices.len()];
+        let mut new_positions: Vec<Vector3<f32>> = Vec::with_capacity(self.positions.len());
+        let mut remap: Vec<u32> = vec![0; self.positions.len()];
 
-        for (i, vertex) in self.vertices.iter().enumerate() {
-            let key = quantize(&vertex.pos);
+        for (i, position) in self.positions.iter().enumerate() {
+            let key = quantize(position);
             if let Some(&existing_idx) = vertex_map.get(&key) {
                 // Duplicate vertex found
                 remap[i] = existing_idx;
             } else {
                 // New unique vertex
-                let new_idx = new_vertices.len() as u32;
-                new_vertices.push(*vertex);
+                let new_idx = new_positions.len() as u32;
+                new_positions.push(*position);
                 vertex_map.insert(key, new_idx);
                 remap[i] = new_idx;
             }
         }
 
-        self.vertices = new_vertices;
+        self.positions = new_positions;
 
         // 2. Remap triangle indices and remove degenerate triangles (zero area or repeated vertices)
         let mut new_triangles = Vec::with_capacity(self.triangle_indices.len());
@@ -189,7 +192,10 @@ impl TriangleMesh {
 
 impl CalcBounds3D for TriangleMesh {
     fn calc_bounds_3d(&self) -> Bounds3D {
-        self.vertices.iter().map(|vertex| vertex.pos).collect()
+        self.positions
+            .iter()
+            .map(|positions| positions.cast::<f64>().expect("Successful cast"))
+            .collect()
     }
 }
 
@@ -202,17 +208,11 @@ impl From<Mesh> for TriangleMesh {
         // of vertices and indices
 
         TriangleMesh {
-            vertices: (0..vertices.len())
+            positions: (0..vertices.len())
                 .step_by(3)
-                .map(|i| Vertex {
-                    pos: Vec3::new(
-                        vertices[i] as f64,
-                        vertices[i + 1] as f64,
-                        vertices[i + 2] as f64,
-                    ),
-                    normal: Vec3::new(0.0, 0.0, 0.0),
-                })
+                .map(|i| Vector3::new(vertices[i], vertices[i + 1], vertices[i + 2]))
                 .collect(),
+            normals: None,
             triangle_indices: (0..indices.len())
                 .step_by(3)
                 .map(|i| Triangle(indices[i], indices[i + 1], indices[i + 2]))
@@ -226,10 +226,10 @@ impl From<TriangleMesh> for Mesh {
         let mut vertices = Vec::new();
         let mut indices = Vec::new();
 
-        for v in &mesh.vertices {
-            vertices.push(v.pos.x as f32);
-            vertices.push(v.pos.y as f32);
-            vertices.push(v.pos.z as f32);
+        for v in &mesh.positions {
+            vertices.push(v.x);
+            vertices.push(v.y);
+            vertices.push(v.z);
         }
 
         for t in &mesh.triangle_indices {
@@ -250,16 +250,27 @@ impl From<Manifold> for TriangleMesh {
 
 impl Transformed3D for TriangleMesh {
     fn transformed_3d(&self, mat: &Mat4) -> Self {
-        let rot_mat = crate::Mat3::from_cols(mat.x.truncate(), mat.y.truncate(), mat.z.truncate());
+        let mat = mat.cast::<f32>().expect("Successful cast");
+        let normals = match &self.normals {
+            Some(normals) => {
+                let rot_mat = cgmath::Matrix3::from_cols(
+                    mat.x.truncate(),
+                    mat.y.truncate(),
+                    mat.z.truncate(),
+                );
+                let normals = normals.iter().map(|n| rot_mat * n).collect();
+                Some(normals)
+            }
+            None => None,
+        };
+
         Self {
-            vertices: self
-                .vertices
+            positions: self
+                .positions
                 .iter()
-                .map(|v| Vertex {
-                    pos: (mat * v.pos.extend(1.0)).truncate(),
-                    normal: rot_mat * v.normal,
-                })
+                .map(|v| (mat * v.extend(1.0)).truncate())
                 .collect(),
+            normals,
             triangle_indices: self.triangle_indices.clone(),
         }
     }
@@ -295,29 +306,18 @@ impl From<&Geometries3D> for TriangleMesh {
 #[test]
 fn test_triangle_mesh_transform() {
     let mesh = TriangleMesh {
-        vertices: vec![
-            Vertex {
-                pos: Vec3::new(0.0, 0.0, 0.0),
-                normal: Vec3::new(0.0, 0.0, 1.0),
-            },
-            Vertex {
-                pos: Vec3::new(1.0, 0.0, 0.0),
-                normal: Vec3::new(0.0, 0.0, 1.0),
-            },
-            Vertex {
-                pos: Vec3::new(0.0, 1.0, 0.0),
-                normal: Vec3::new(0.0, 0.0, 1.0),
-            },
+        positions: vec![
+            cgmath::Vector3::new(0.0, 0.0, 0.0),
+            cgmath::Vector3::new(1.0, 0.0, 0.0),
+            cgmath::Vector3::new(0.0, 1.0, 0.0),
         ],
+        normals: None,
         triangle_indices: vec![Triangle(0, 1, 2)],
     };
 
     let mesh = mesh.transformed_3d(&crate::Mat4::from_translation(Vec3::new(1.0, 2.0, 3.0)));
 
-    assert_eq!(mesh.vertices[0].pos, Vec3::new(1.0, 2.0, 3.0));
-    assert_eq!(mesh.vertices[0].normal, Vec3::new(0.0, 0.0, 1.0));
-    assert_eq!(mesh.vertices[1].pos, Vec3::new(2.0, 2.0, 3.0));
-    assert_eq!(mesh.vertices[1].normal, Vec3::new(0.0, 0.0, 1.0));
-    assert_eq!(mesh.vertices[2].pos, Vec3::new(1.0, 3.0, 3.0));
-    assert_eq!(mesh.vertices[2].normal, Vec3::new(0.0, 0.0, 1.0));
+    assert_eq!(mesh.positions[0], cgmath::Vector3::new(1.0, 2.0, 3.0));
+    assert_eq!(mesh.positions[1], cgmath::Vector3::new(2.0, 2.0, 3.0));
+    assert_eq!(mesh.positions[2], cgmath::Vector3::new(1.0, 3.0, 3.0));
 }
