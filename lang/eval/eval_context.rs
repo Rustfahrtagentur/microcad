@@ -166,7 +166,7 @@ impl EvalContext {
             "{lookup} for property {name:?}",
             lookup = crate::mark!(LOOKUP)
         );
-        self.symbol_table.check_super(name)?;
+        self.symbol_table.deny_super(name)?;
 
         if self.stack.current_workbench_name().is_some() {
             if let Some(id) = name.single_identifier() {
@@ -198,7 +198,7 @@ impl EvalContext {
                 "{lookup} for symbol '{name:?}' in current workbench '{workbench:?}'",
                 lookup = crate::mark!(LOOKUP)
             );
-            self.check_super(name)?;
+            self.deny_super(name)?;
             match self.symbol_table.lookup_within_name(name, workbench) {
                 Ok(symbol) => {
                     log::trace!(

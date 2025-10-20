@@ -292,6 +292,7 @@ impl Symbol {
                 .borrow()
                 .children
                 .values()
+                .filter(|symbol| !symbol.is_deleted())
                 .any(|symbol| symbol.has_links())
         }
     }
@@ -336,11 +337,13 @@ impl Symbol {
         exclude_ids: &IdentifierSet,
     ) -> ResolveResult<()> {
         if !matches!(self.visibility.get(), Visibility::Deleted) {
+            // get names of symbol definitions
             let names = match &self.inner.borrow().def {
                 SymbolDefinition::SourceFile(sf) => sf.names(),
                 SymbolDefinition::Module(m) => m.names(),
                 SymbolDefinition::Workbench(wb) => wb.names(),
                 SymbolDefinition::Function(f) => f.names(),
+                SymbolDefinition::ConstExpression(.., ce) => ce.names(),
                 SymbolDefinition::Alias(..) | SymbolDefinition::UseAll(..) => {
                     log::error!("Resolve Context:\n{context:?}");
                     return Err(ResolveError::ResolveCheckFailed);
@@ -348,24 +351,29 @@ impl Symbol {
                 _ => Default::default(),
             };
 
-            let prefix = self.module_name().clone();
-
             if !names.is_empty() {
-                log::debug!("checking symbols: {names}");
-
+                log::debug!("checking symbols:\n{names:?}");
+                // lookup names
                 names
                     .iter()
                     .filter(|name| {
                         exclude_ids.contains(name.last().expect("symbol with empty name"))
                     })
+                    // search in symbol table
                     .try_for_each(|name| match context.symbol_table.lookup(name) {
                         Ok(_) => Ok::<_, ResolveError>(()),
                         Err(err) => {
-                            if context
-                                .symbol_table
-                                .lookup(&name.with_prefix(&prefix))
-                                .is_err()
-                            {
+                            // get name of current module
+                            let module =
+                                match context.symbol_table.search(&self.module_name(), false) {
+                                    Ok(module) => module,
+                                    Err(err) => {
+                                        context.error(&self.id(), err)?;
+                                        return Ok(());
+                                    }
+                                };
+                            // search within current module
+                            if context.symbol_table.lookup_within(name, &module).is_err() {
                                 context.error(name, err)?;
                             }
                             Ok(())

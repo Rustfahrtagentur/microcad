@@ -193,7 +193,8 @@ impl ResolveContext {
     fn has_links(&self) -> bool {
         self.symbol_table
             .symbols()
-            .iter_mut()
+            .iter()
+            .filter(|symbol| !symbol.is_deleted())
             .any(|symbol| symbol.has_links())
     }
 
