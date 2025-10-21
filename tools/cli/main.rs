@@ -20,24 +20,16 @@ pub use watcher::*;
 fn main() -> anyhow::Result<()> {
     let cli = Cli::default();
 
-    match std::env::var("RUST_LOG") {
-        Ok(_) => {
-            // Init via RUST_LOG variable.
-            env_logger::init();
-        }
-        Err(_) => {
-            // Initialize env_logger with a default filter level
-            env_logger::Builder::from_default_env()
-                .filter_level(match cli.verbose {
-                    0 => log::LevelFilter::Off,
-                    1 => log::LevelFilter::Info,
-                    2 => log::LevelFilter::Debug,
-                    3 => log::LevelFilter::Trace,
-                    _ => panic!("unknown verbosity level"),
-                }) // Set the default log level
-                .init();
-        }
-    }
+    // Initialize env_logger with a default filter level
+    env_logger::Builder::from_default_env()
+        .filter_level(match cli.verbose {
+            0 => log::LevelFilter::Off,
+            1 => log::LevelFilter::Info,
+            2 => log::LevelFilter::Debug,
+            3 => log::LevelFilter::Trace,
+            _ => panic!("unknown verbosity level"),
+        }) // Set the default log level
+        .init();
 
     cli.run()
 }
