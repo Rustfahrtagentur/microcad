@@ -3,6 +3,8 @@
 # Use this script to publish a new µcad version to crates.io
 # Note: Execute this script from the root dir of this repository.
 
+command -v jq >/dev/null 2>&1 || { echo "Please install package 'jq'!"; exit 1; }
+
 # Check if we are on a git tag and if it matches the crate version.
 
 ARGS=$@ # All arguments (e.g. `--dry-run`) will be appended to `cargo publish` 
