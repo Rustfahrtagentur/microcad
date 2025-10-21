@@ -14,7 +14,7 @@ use crate::config::Config;
 pub struct Cli {
     /// Display processing time.
     #[arg(short = 'T', long, default_value = "false", action = clap::ArgAction::SetTrue)]
-    time: bool,
+    pub(crate) time: bool,
 
     /// Load config from file.
     #[arg(short = 'C', long)]
@@ -96,7 +96,10 @@ impl Cli {
         }
 
         if self.time {
-            log::info!("Processing Time: {:?}", start.elapsed());
+            eprintln!(
+                "Overall Time   : {}",
+                Self::time_to_string(&start.elapsed())
+            );
         }
         Ok(())
     }
@@ -123,5 +126,13 @@ impl Cli {
 
     pub(super) fn is_export(&self) -> bool {
         matches!(self.command, Commands::Export(..))
+    }
+
+    pub(super) fn time_to_string(duration: &std::time::Duration) -> String {
+        use num_format::{Locale, ToFormattedString};
+        format!(
+            "{:>8}µs",
+            duration.as_micros().to_formatted_string(&Locale::en)
+        )
     }
 }

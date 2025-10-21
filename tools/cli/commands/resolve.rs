@@ -52,6 +52,8 @@ Use `microcad install std` to install the std library.",
             );
         }
 
+        let start = std::time::Instant::now();
+
         // resolve the file
         let context = ResolveContext::create(
             root,
@@ -59,6 +61,10 @@ Use `microcad install std` to install the std library.",
             Some(microcad_builtin::builtin_module()),
             DiagHandler::default(),
         )?;
+
+        if cli.time {
+            eprintln!("Resolving Time : {}", Cli::time_to_string(&start.elapsed()));
+        }
 
         if context.has_errors() {
             eprint!("{}", context.diagnosis());

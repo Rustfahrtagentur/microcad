@@ -19,7 +19,14 @@ pub struct Parse {
 
 impl RunCommand<Rc<SourceFile>> for Parse {
     fn run(&self, cli: &Cli) -> anyhow::Result<Rc<SourceFile>> {
+        let start = std::time::Instant::now();
+
         let source_file = SourceFile::load(self.input.clone())?;
+
+        if cli.time {
+            eprintln!("Parsing Time   : {}", Cli::time_to_string(&start.elapsed()));
+        }
+
         if cli.is_parse() {
             eprintln!("Parsed successfully!");
         }

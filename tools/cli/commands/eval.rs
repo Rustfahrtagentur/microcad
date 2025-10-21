@@ -5,7 +5,10 @@
 
 use microcad_lang::{diag::*, eval::*, model::Model, tree_display::*};
 
-use crate::commands::{Resolve, RunCommand};
+use crate::{
+    commands::{Resolve, RunCommand},
+    Cli,
+};
 use anyhow::*;
 
 #[derive(clap::Parser)]
@@ -19,9 +22,11 @@ pub struct Eval {
 }
 
 impl RunCommand<(EvalContext, Option<Model>)> for Eval {
-    fn run(&self, cli: &crate::cli::Cli) -> anyhow::Result<(EvalContext, Option<Model>)> {
+    fn run(&self, cli: &Cli) -> anyhow::Result<(EvalContext, Option<Model>)> {
         // run prior parse step
         let resolve_context = self.resolve.run(cli)?;
+
+        let start = std::time::Instant::now();
 
         let mut context = EvalContext::new(
             resolve_context,
@@ -31,6 +36,10 @@ impl RunCommand<(EvalContext, Option<Model>)> for Eval {
         );
 
         let result = context.eval();
+
+        if cli.time {
+            eprintln!("Evaluation Time: {}", Cli::time_to_string(&start.elapsed()));
+        }
 
         match context.has_errors() {
             true => {

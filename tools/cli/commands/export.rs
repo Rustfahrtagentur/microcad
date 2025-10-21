@@ -49,8 +49,14 @@ impl RunCommand<Vec<(Model, ExportCommand)>> for Export {
             }
 
             if !self.dry_run {
+                let start = std::time::Instant::now();
                 self.export_targets(&target_models)?;
+
+                if cli.time {
+                    eprintln!("Exporting Time : {}", Cli::time_to_string(&start.elapsed()));
+                }
             }
+
             if cli.is_export() {
                 if self.dry_run {
                     eprintln!("Did not export {} file(s) (dry-run!).", target_models.len());
