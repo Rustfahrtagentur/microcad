@@ -6,7 +6,15 @@ import {
 	LanguageClientOptions,
 } from 'vscode-languageclient/node';
 
+import type { URI as LspURI } from "vscode-languageserver-types";
+
 let client: LanguageClient;
+
+
+
+export function showPreview(url: LspURI, component: string): Thenable<unknown> {
+	return vscode.commands.executeCommand("microcad/showPreview", url, component);
+}
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -28,7 +36,16 @@ export function activate(context: vscode.ExtensionContext) {
 		// Display a message box to the user
 		vscode.window.showInformationMessage('Hello World from microcad-lsp!');
 	});
+	context.subscriptions.push(
+		vscode.commands.registerCommand("microcad.showPreview", async function () {
+			const ae = vscode.window.activeTextEditor;
+			if (!ae) {
+				return;
+			}
 
+			await showPreview(ae.document.uri.toString(), "");
+		}),
+	);
 	context.subscriptions.push(disposable);
 
 	// Options to control the language client
@@ -41,13 +58,15 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	};
 
+	const path = "/home/micha/Work/mcad/mcad/target/debug/";
+
 	// Create the language client and start the client.
 	client = new LanguageClient(
 		'microcad-lsp',
 		'Microcad LSP',
 		{
-			command: "microcad-lsp",
-			args: ["-l", "microcad-lsp.log"],
+			command: path + "microcad-lsp",
+			args: ["-l", "/home/micha/microcad-lsp.log"],
 		},
 		clientOptions
 	);
@@ -57,10 +76,9 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate(): Thenable<void> | undefined {
-	return undefined;
-	/*	if (!client) {
-			return undefined;
-		}
-		return client.stop();*/
+	if (!client) {
+		return undefined;
+	}
+	return client.stop();
 }
 

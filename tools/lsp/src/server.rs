@@ -10,9 +10,10 @@ use tower_lsp::{
     Client, LanguageServer, LspService, Server, async_trait,
     jsonrpc::Result,
     lsp_types::{
-        DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-        DidSaveTextDocumentParams, DocumentDiagnosticParams, DocumentDiagnosticReportResult,
-        InitializeParams, InitializeResult, InitializedParams, MessageType, ServerCapabilities,
+        DiagnosticOptions, DiagnosticServerCapabilities, DidChangeTextDocumentParams,
+        DidCloseTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams,
+        DocumentDiagnosticParams, DocumentDiagnosticReportResult, InitializeParams,
+        InitializeResult, InitializedParams, MessageType, ServerCapabilities,
         TextDocumentIdentifier, TextDocumentPositionParams, TextDocumentSyncCapability,
         TextDocumentSyncKind, notification::Notification,
     },
@@ -46,6 +47,9 @@ impl LanguageServer for Backend {
             capabilities: ServerCapabilities {
                 text_document_sync: Some(TextDocumentSyncCapability::Kind(
                     TextDocumentSyncKind::FULL,
+                )),
+                diagnostic_provider: Some(DiagnosticServerCapabilities::Options(
+                    DiagnosticOptions::default(),
                 )),
                 ..Default::default()
             },
@@ -92,6 +96,7 @@ impl LanguageServer for Backend {
 
     async fn did_open(&self, params: DidOpenTextDocumentParams) {
         let _ = params;
+        log::info!("Did open: {}", params.text_document.uri);
 
         self.processor
             .send_request(processor::ProcessorRequest::AddDocument(
@@ -101,6 +106,8 @@ impl LanguageServer for Backend {
     }
 
     async fn did_save(&self, params: DidSaveTextDocumentParams) {
+        log::info!("Did save: {}", params.text_document.uri);
+
         self.processor
             .send_request(processor::ProcessorRequest::UpdateDocument(
                 params.text_document.uri,
@@ -202,7 +209,7 @@ async fn main() {
     };
 
     log::info!("Starting LSP server");
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:8080")
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:5007")
         .await
         .unwrap();
     log::info!("LSP server listening...");
