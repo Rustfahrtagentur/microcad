@@ -1,14 +1,19 @@
+// Copyright © 2025 The µcad authors <info@ucad.xyz>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+//! µcad language server.
+
+mod processor;
+
 use serde::{Deserialize, Serialize};
 use tower_lsp::{
-    async_trait,
+    Client, LanguageServer, LspService, Server, async_trait,
     jsonrpc::Result,
     lsp_types::{
-        notification::Notification, DidChangeTextDocumentParams, InitializeParams,
-        InitializeResult, InitializedParams, MessageType, ServerCapabilities,
-        TextDocumentIdentifier, TextDocumentPositionParams, TextDocumentSyncCapability,
-        TextDocumentSyncKind,
+        DidChangeTextDocumentParams, InitializeParams, InitializeResult, InitializedParams,
+        MessageType, ServerCapabilities, TextDocumentIdentifier, TextDocumentPositionParams,
+        TextDocumentSyncCapability, TextDocumentSyncKind, notification::Notification,
     },
-    Client, LanguageServer, LspService, Server,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -27,6 +32,7 @@ impl Notification for CustomNotification {
 #[derive(Debug)]
 struct Backend {
     client: Client,
+    processor: processor::ProcessorInterface,
 }
 
 #[async_trait]
@@ -85,12 +91,53 @@ impl LanguageServer for Backend {
 
 use clap::Parser;
 
+use crate::processor::WorkspaceSettings;
+
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
     /// log into given file
     #[arg(short, long, value_name = "FILE")]
     log_file: Option<std::path::PathBuf>,
+
+    /// Paths to search for files.
+    ///
+    /// By default, `./lib` (if it exists) and `~/.microcad/lib` are used.
+    #[arg(short = 'P', long = "search-path", action = clap::ArgAction::Append)]
+    pub search_paths: Vec<std::path::PathBuf>,
+}
+
+impl Cli {
+    /// Returns microcad's config dir, even if it does not exist.
+    ///
+    /// On Linux, the config dir is located in `~/.config/microcad`.
+    pub fn config_dir() -> Option<std::path::PathBuf> {
+        dirs::config_dir().map(|dir| dir.join("microcad"))
+    }
+
+    /// Returns global root dir, even if it does not exist.
+    ///
+    /// On Linux, the root dir is located in `~/.config/microcad/lib`.
+    pub fn global_root_dir() -> Option<std::path::PathBuf> {
+        Self::config_dir().map(|dir| dir.join("lib"))
+    }
+
+    /// `./lib` (if exists) and `~/.config/microcad/lib` (if exists).
+    pub fn default_search_paths() -> Vec<std::path::PathBuf> {
+        let local_dir = std::path::PathBuf::from("./lib");
+        let mut search_paths = Vec::new();
+
+        if let Some(global_root_dir) = Self::global_root_dir() {
+            if global_root_dir.exists() {
+                search_paths.push(global_root_dir);
+            }
+        }
+        if local_dir.exists() {
+            search_paths.push(local_dir);
+        }
+
+        search_paths
+    }
 }
 
 #[tokio::main]
@@ -120,7 +167,12 @@ async fn main() {
     let (stream, _) = listener.accept().await.unwrap();
     log::info!("Client has connected to LSP service");
     let (read, write) = tokio::io::split(stream);
-    let (service, socket) = LspService::new(|client| Backend { client });
+
+    let processor = processor::ProcessorInterface::run(WorkspaceSettings {
+        search_paths: cli.search_paths,
+    });
+
+    let (service, socket) = LspService::new(|client| Backend { client, processor });
     log::info!("LSP service has been created");
 
     Server::new(read, write, socket).serve(service).await;
