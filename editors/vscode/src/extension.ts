@@ -4,7 +4,11 @@ import * as vscode from 'vscode';
 import {
 	LanguageClient,
 	LanguageClientOptions,
+	ServerOptions,
+	StreamInfo,
 } from 'vscode-languageclient/node';
+
+import * as net from 'net';
 
 import type { URI as LspURI } from "vscode-languageserver-types";
 
@@ -48,13 +52,31 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 	context.subscriptions.push(disposable);
 
+	const serverOptions: ServerOptions = () => {
+		return new Promise<StreamInfo>((resolve, reject) => {
+			const port = 5007;
+			const socket = net.connect(port, '127.0.0.1', () => {
+				console.log(`Connected to language server on port ${port}`);
+				resolve({
+					reader: socket,
+					writer: socket,
+				});
+			});
+
+			socket.on('error', (err) => {
+				console.error('Failed to connect to language server:', err);
+				reject(err);
+			});
+		});
+	};
+
 	// Options to control the language client
 	const clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
 		documentSelector: [{ scheme: 'file', language: 'microcad' }],
 		synchronize: {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
-			fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
+			fileEvents: vscode.workspace.createFileSystemWatcher('**/.µcad')
 		}
 	};
 
@@ -64,10 +86,7 @@ export function activate(context: vscode.ExtensionContext) {
 	client = new LanguageClient(
 		'microcad-lsp',
 		'Microcad LSP',
-		{
-			command: path + "microcad-lsp",
-			args: ["-l", "/home/micha/microcad-lsp.log"],
-		},
+		serverOptions,
 		clientOptions
 	);
 
