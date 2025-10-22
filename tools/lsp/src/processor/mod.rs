@@ -18,17 +18,18 @@ use microcad_lang::{
     eval::EvalContext, model::Model, rc::RcMut, render::*, resolve::ResolveContext,
     syntax::SourceFile,
 };
+use tower_lsp::lsp_types::Url;
 
 /// A processor request.
 ///
 /// Commands that can be passed to the [`Processor`].
 #[derive(Clone)]
 pub enum ProcessorRequest {
-    SetCursorPosition { file: PathBuf, line: u32, col: u32 },
-    AddDocument(PathBuf),
-    RemoveDocument(PathBuf),
-    UpdateDocument(PathBuf),
-    RunViewerForDocument(PathBuf),
+    SetCursorPosition { url: Url, line: u32, col: u32 },
+    AddDocument(Url),
+    RemoveDocument(Url),
+    UpdateDocument(Url),
+    RunViewerForDocument(Url),
 }
 
 /// An interpreter output.
@@ -83,7 +84,7 @@ pub struct WorkspaceSettings {
 /// via [`ProcessorInterface`] by sending requests and handling the corresponing responses.
 pub struct Processor {
     workspace_settings: WorkspaceSettings,
-    documents: HashMap<PathBuf, Document>,
+    documents: HashMap<Url, Document>,
 
     pub request_handler: Receiver<ProcessorRequest>,
 
@@ -98,40 +99,43 @@ impl Processor {
     /// Handle processor request.
     pub fn handle_request(&mut self, request: ProcessorRequest) -> ProcessorResult {
         match request {
-            ProcessorRequest::SetCursorPosition { file, line, col } => todo!(),
-            ProcessorRequest::AddDocument(path) => self.add_document(&path),
-            ProcessorRequest::RemoveDocument(path) => self.remove_document(&path),
-            ProcessorRequest::UpdateDocument(path) => self.update_document(&path),
+            ProcessorRequest::SetCursorPosition { url, line, col } => todo!(),
+            ProcessorRequest::AddDocument(url) => self.add_document(&url),
+            ProcessorRequest::RemoveDocument(url) => self.remove_document(&url),
+            ProcessorRequest::UpdateDocument(url) => self.update_document(&url),
             ProcessorRequest::RunViewerForDocument(_) => todo!(),
         }
     }
 
     /// Process a µcad file (parse, resolve, eval).
-    pub fn add_document(&mut self, path: &Path) -> ProcessorResult {
-        match self.documents.get(path) {
+    pub fn add_document(&mut self, url: &Url) -> ProcessorResult {
+        match self.documents.get(url) {
             Some(_) => {
-                log::info!("Document {} already exists.", path.display());
+                log::info!("Document {url} already exists.");
             }
             None => {
-                let source_file = SourceFile::load(path)?;
+                let source_file = SourceFile::load(
+                    url.to_file_path()
+                        .map_err(|_| anyhow::anyhow!("Error converting {url} to file path."))?,
+                )?;
                 self.documents.insert(
-                    PathBuf::from(path),
+                    url.clone(),
                     Document::new(source_file, &self.workspace_settings.search_paths)?,
                 );
             }
         }
 
-        self.update_document(path)?;
+        self.update_document(url)?;
 
         Ok(vec![])
     }
 
     /// Update (re-evaluate) a document.
-    pub fn update_document(&mut self, path: &Path) -> anyhow::Result<Vec<ProcessorResponse>> {
-        match self.documents.get_mut(path) {
+    pub fn update_document(&mut self, url: &Url) -> anyhow::Result<Vec<ProcessorResponse>> {
+        match self.documents.get_mut(url) {
             Some(document) => document.eval()?,
             None => {
-                log::warn!("Document {} does not exist!", path.display());
+                log::warn!("Document {url} does not exist!");
             }
         }
 
@@ -139,8 +143,8 @@ impl Processor {
     }
 
     /// Remove a document.
-    pub fn remove_document(&mut self, path: &Path) -> ProcessorResult {
-        self.documents.remove(path);
+    pub fn remove_document(&mut self, url: &Url) -> ProcessorResult {
+        self.documents.remove(url);
         Ok(vec![])
     }
 }

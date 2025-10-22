@@ -10,9 +10,11 @@ use tower_lsp::{
     Client, LanguageServer, LspService, Server, async_trait,
     jsonrpc::Result,
     lsp_types::{
-        DidChangeTextDocumentParams, InitializeParams, InitializeResult, InitializedParams,
-        MessageType, ServerCapabilities, TextDocumentIdentifier, TextDocumentPositionParams,
-        TextDocumentSyncCapability, TextDocumentSyncKind, notification::Notification,
+        DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
+        DidSaveTextDocumentParams, DocumentDiagnosticParams, DocumentDiagnosticReportResult,
+        InitializeParams, InitializeResult, InitializedParams, MessageType, ServerCapabilities,
+        TextDocumentIdentifier, TextDocumentPositionParams, TextDocumentSyncCapability,
+        TextDocumentSyncKind, notification::Notification,
     },
 };
 
@@ -87,6 +89,39 @@ impl LanguageServer for Backend {
             }
         }
     }
+
+    async fn did_open(&self, params: DidOpenTextDocumentParams) {
+        let _ = params;
+
+        self.processor
+            .send_request(processor::ProcessorRequest::AddDocument(
+                params.text_document.uri,
+            ))
+            .expect("No error");
+    }
+
+    async fn did_save(&self, params: DidSaveTextDocumentParams) {
+        self.processor
+            .send_request(processor::ProcessorRequest::UpdateDocument(
+                params.text_document.uri,
+            ))
+            .expect("No error");
+    }
+
+    async fn did_close(&self, params: DidCloseTextDocumentParams) {
+        self.processor
+            .send_request(processor::ProcessorRequest::RemoveDocument(
+                params.text_document.uri,
+            ))
+            .expect("No error")
+    }
+
+    async fn diagnostic(
+        &self,
+        _params: DocumentDiagnosticParams,
+    ) -> Result<DocumentDiagnosticReportResult> {
+        todo!()
+    }
 }
 
 use clap::Parser;
@@ -159,6 +194,13 @@ async fn main() {
         tracing::subscriber::set_global_default(subscriber).expect("init log failed");
     */
 
+    // add default paths if no search paths are given.
+    let mut search_paths = cli.search_paths.clone();
+
+    if search_paths.is_empty() {
+        search_paths.append(&mut Cli::default_search_paths())
+    };
+
     log::info!("Starting LSP server");
     let listener = tokio::net::TcpListener::bind("127.0.0.1:8080")
         .await
@@ -168,9 +210,7 @@ async fn main() {
     log::info!("Client has connected to LSP service");
     let (read, write) = tokio::io::split(stream);
 
-    let processor = processor::ProcessorInterface::run(WorkspaceSettings {
-        search_paths: cli.search_paths,
-    });
+    let processor = processor::ProcessorInterface::run(WorkspaceSettings { search_paths });
 
     let (service, socket) = LspService::new(|client| Backend { client, processor });
     log::info!("LSP service has been created");
