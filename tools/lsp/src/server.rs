@@ -12,8 +12,9 @@ use tower_lsp::{
     lsp_types::{
         DiagnosticOptions, DiagnosticServerCapabilities, DidChangeTextDocumentParams,
         DidCloseTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams,
-        DocumentDiagnosticParams, DocumentDiagnosticReportResult, InitializeParams,
-        InitializeResult, InitializedParams, MessageType, ServerCapabilities,
+        DocumentDiagnosticParams, DocumentDiagnosticReport, DocumentDiagnosticReportPartialResult,
+        DocumentDiagnosticReportResult, InitializeParams, InitializeResult, InitializedParams,
+        MessageType, RelatedFullDocumentDiagnosticReport, ServerCapabilities,
         TextDocumentIdentifier, TextDocumentPositionParams, TextDocumentSyncCapability,
         TextDocumentSyncKind, notification::Notification,
     },
@@ -99,9 +100,7 @@ impl LanguageServer for Backend {
         log::info!("Did open: {}", params.text_document.uri);
 
         self.processor
-            .send_request(processor::ProcessorRequest::AddDocument(
-                params.text_document.uri,
-            ))
+            .send_request(ProcessorRequest::AddDocument(params.text_document.uri))
             .expect("No error");
     }
 
@@ -109,31 +108,50 @@ impl LanguageServer for Backend {
         log::info!("Did save: {}", params.text_document.uri);
 
         self.processor
-            .send_request(processor::ProcessorRequest::UpdateDocument(
-                params.text_document.uri,
-            ))
+            .send_request(ProcessorRequest::UpdateDocument(params.text_document.uri))
             .expect("No error");
     }
 
     async fn did_close(&self, params: DidCloseTextDocumentParams) {
         self.processor
-            .send_request(processor::ProcessorRequest::RemoveDocument(
-                params.text_document.uri,
-            ))
+            .send_request(ProcessorRequest::RemoveDocument(params.text_document.uri))
             .expect("No error")
     }
 
     async fn diagnostic(
         &self,
-        _params: DocumentDiagnosticParams,
+        params: DocumentDiagnosticParams,
     ) -> Result<DocumentDiagnosticReportResult> {
-        todo!()
+        self.processor
+            .send_request(ProcessorRequest::GetDocumentDiagnostics(
+                params.text_document.uri,
+            ))
+            .expect("No error");
+
+        // Wait for response
+        if let Ok(ProcessorResponse::DocumentDiagnostics(_url, diag)) =
+            self.processor.recv_response()
+        {
+            log::info!("Diagnostics received!");
+            Ok(DocumentDiagnosticReportResult::Report(
+                DocumentDiagnosticReport::Full(RelatedFullDocumentDiagnosticReport {
+                    related_documents: None, // TODO: Get related documents.
+                    full_document_diagnostic_report: diag,
+                }),
+            ))
+        } else {
+            Ok(DocumentDiagnosticReportResult::Partial(
+                DocumentDiagnosticReportPartialResult {
+                    related_documents: None,
+                },
+            ))
+        }
     }
 }
 
 use clap::Parser;
 
-use crate::processor::WorkspaceSettings;
+use crate::processor::{ProcessorRequest, ProcessorResponse, WorkspaceSettings};
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]

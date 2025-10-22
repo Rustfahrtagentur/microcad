@@ -7,7 +7,7 @@ use crate::{diag::*, resolve::*};
 #[derive(Default)]
 pub struct DiagHandler {
     /// The list of diagnostics per source file.
-    diag_list: DiagList,
+    pub diag_list: DiagList,
     /// The number of overall errors in the evaluation process.
     error_count: u32,
     /// The number of overall errors in the evaluation process.

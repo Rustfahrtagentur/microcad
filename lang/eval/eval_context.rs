@@ -22,7 +22,7 @@ pub struct EvalContext {
     /// Importer registry.
     importers: ImporterRegistry,
     /// Diagnostics handler.
-    diag: DiagHandler,
+    pub diag: DiagHandler,
 }
 
 impl EvalContext {

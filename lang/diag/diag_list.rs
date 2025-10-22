@@ -9,6 +9,11 @@ use derive_more::Deref;
 pub struct DiagList(Vec<Diagnostic>);
 
 impl DiagList {
+    /// Clear diagnostics.
+    pub fn clear(&mut self) {
+        self.0.clear();
+    }
+
     /// Pretty print this list of diagnostics.
     pub fn pretty_print(
         &self,
