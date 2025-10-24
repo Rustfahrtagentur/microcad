@@ -1,5 +1,9 @@
 # µcad
 
+## **THIS REPOSITORY HAS MOVED TO [CODEBERG](https://codeberg.org/microcad/microcad)!**
+
+<hr/>
+
 [![Status](https://github.com/Rustfahrtagentur/microcad/actions/workflows/rust.yml/badge.svg)](https://github.com/Rustfahrtagentur/microcad/actions)
 [![Crates.io](https://img.shields.io/crates/v/microcad.svg)](https://crates.io/crates/microcad)
 [![Documentation](https://docs.rs/microcad/badge.svg)](https://docs.rs/microcad/)
