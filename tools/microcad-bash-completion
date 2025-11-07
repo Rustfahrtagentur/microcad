@@ -1,0 +1,30 @@
+#
+# Bash completion file for MicroCAD utility.
+#
+
+have microcad &&
+_microcad()
+{
+    local cur opt
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+
+    # Completion of commands.
+    if [[ $COMP_CWORD == 1 ]]; then
+    COMPREPLY=( $(compgen -W '
+        parse resolve eval export create watch help
+        ' -- "$cur" ) )
+    return 0
+    fi
+
+    # Completion of command parameters.
+    opt="${COMP_WORDS[1]}"
+    case $opt in
+    # Commands which require .µcad file name.
+    "parse"|"resolve"|"eval"|"export"|"create"|"watch")
+        _filedir 'µcad'
+        return 0
+        ;;
+    esac
+} &&
+complete -F _microcad microcad
